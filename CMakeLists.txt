@@ -59,6 +59,13 @@ endif()
 option(BUILD_TESTING "Build Unit tests." OFF)
 
 ######################################################################
+# Add Mandatory Requirements
+######################################################################
+find_package(OpenCV REQUIRED)
+message("Matt, include:${OpenCV_INCLUDE_DIRS}")
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+######################################################################
 # Add code folders.
 ######################################################################
 include_directories(${CMAKE_SOURCE_DIR}/Code/include)

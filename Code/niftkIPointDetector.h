@@ -12,8 +12,10 @@
 
 =============================================================================*/
 
-#ifndef niftkIDetector_h
-#define niftkIDetector_h
+#ifndef niftkIPointDetector_h
+#define niftkIPointDetector_h
+
+#include <cv.h>
 
 namespace niftk
 {
@@ -21,11 +23,12 @@ namespace niftk
 /**
 * \brief Interface for anything that detects points in an image.
 */
-class IDetector
+class IPointDetector
 {
 
 public:
 
+  virtual cv::
 
 };
 
