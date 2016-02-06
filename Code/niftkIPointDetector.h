@@ -22,6 +22,17 @@ namespace niftk
 {
 
 /**
+* \class PointInfo
+* \brief Placeholder for a point and its associated identifier.
+*/
+struct Point2D
+{
+  unsigned int id;
+  cv::Vec2d    point;
+};
+
+
+/**
 * \class IPointDetector
 * \brief Interface for anything that detects points in an image.
 */
@@ -37,7 +48,7 @@ public:
   * \brief Retrieves points, each one identified by a single id.
   * \return vector of id,point pairs.
   */
-  virtual std::vector< std::pair<unsigned int, cv::Vec2d> > GetPoints() = 0;
+  virtual std::vector< Point2D > GetPoints() = 0;
 
 };
 
