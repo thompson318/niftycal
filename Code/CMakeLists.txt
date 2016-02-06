@@ -11,3 +11,20 @@
 #  See LICENSE.txt in the top level directory for details.
 #
 #============================================================================*/
+
+set(NIFTYCAL_SRCS
+  niftkIPointDetector.cxx
+  niftkIOptimiser.cxx
+)
+
+add_library(niftycal ${NIFTYCAL_SRCS})
+
+if(BUILD_SHARED_LIBS)
+  if(WIN32)
+    add_definitions(-DNIFTYCAL_WINDOWS_EXPORT=1)
+  endif(WIN32)
+endif(BUILD_SHARED_LIBS)
+
+target_link_libraries(niftycal
+  PRIVATE ${OpenCV_LIBS}
+)

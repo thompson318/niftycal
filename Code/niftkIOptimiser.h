@@ -15,8 +15,23 @@
 #ifndef niftkIOptimiser_h
 #define niftkIOptimiser_h
 
+#include "niftkWin32ExportHeader.h"
+
 namespace niftk
 {
+
+/**
+* \brief Interface for any optimiser that can do calibration,
+* e.g. Levenberg-Marquardt.
+*/
+class NIFTYCAL_WINEXPORT IOptimiser {
+
+public:
+
+  IOptimiser();
+  virtual ~IOptimiser();
+
+};
 
 } // end namespace
 

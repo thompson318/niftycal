@@ -15,20 +15,29 @@
 #ifndef niftkIPointDetector_h
 #define niftkIPointDetector_h
 
+#include "niftkWin32ExportHeader.h"
 #include <cv.h>
 
 namespace niftk
 {
 
 /**
+* \class IPointDetector
 * \brief Interface for anything that detects points in an image.
 */
-class IPointDetector
+class NIFTYCAL_WINEXPORT IPointDetector
 {
 
 public:
 
-  virtual cv::
+  IPointDetector();
+  virtual ~IPointDetector();
+
+  /**
+  * \brief Retrieves points, each one identified by a single id.
+  * \return vector of id,point pairs.
+  */
+  virtual std::vector< std::pair<unsigned int, cv::Vec2d> > GetPoints() = 0;
 
 };
 
