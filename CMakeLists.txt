@@ -99,7 +99,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 ######################################################################
 # Add code folders.
 ######################################################################
-include_directories(${CMAKE_SOURCE_DIR}/Code/include)
+include_directories(${CMAKE_SOURCE_DIR}/Code/)
 add_subdirectory(Code)
 if(BUILD_TESTING)
   add_subdirectory(Testing)

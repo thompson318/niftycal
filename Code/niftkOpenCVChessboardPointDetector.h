@@ -12,44 +12,37 @@
 
 =============================================================================*/
 
-#ifndef niftkIPointDetector_h
-#define niftkIPointDetector_h
+#ifndef niftkOpenCVChessboardPointDetector_h
+#define niftkOpenCVChessboardPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
+#include <niftkIPointDetector.h>
 #include <cv.h>
 
 namespace niftk
 {
 
 /**
-* \class PointInfo
-* \brief Placeholder for a point and its associated identifier.
+* \class OpenCVChessboardPointDetector
+* \brief Detects complete chessboards in an image, using OpenCV.
 */
-struct NIFTYCAL_WINEXPORT Point2D
-{
-  unsigned int id;
-  cv::Vec2d    point;
-};
-
-
-/**
-* \class IPointDetector
-* \brief Interface for anything that detects points in an image.
-*/
-class NIFTYCAL_WINEXPORT IPointDetector
+class NIFTYCAL_WINEXPORT OpenCVChessboardPointDetector : public IPointDetector
 {
 
 public:
 
-  IPointDetector();
-  virtual ~IPointDetector();
+  OpenCVChessboardPointDetector(cv::Size2i numberOfCorners);
+  virtual ~OpenCVChessboardPointDetector();
 
   /**
   * \brief Retrieves points, each one identified by a single id.
-  * \return vector of id,point pairs.
+  * \return Point2D containing point and id.
   */
-  virtual std::vector< Point2D > GetPoints() = 0;
+  virtual std::vector< Point2D > GetPoints();
 
+private:
+
+  cv::Size2i m_NumbeOfCorners;
 };
 
 } // end namespace

@@ -13,8 +13,9 @@
 #============================================================================*/
 
 set(NIFTYCAL_SRCS
-  niftkIPointDetector.cxx
   niftkIOptimiser.cxx
+  niftkIPointDetector.cxx
+  niftkOpenCVChessboardPointDetector.cxx
 )
 
 add_library(niftycal ${NIFTYCAL_SRCS})
