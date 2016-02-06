@@ -59,6 +59,38 @@ endif()
 option(BUILD_TESTING "Build Unit tests." OFF)
 
 ######################################################################
+# Configure Dart testing support.  This should be done before any
+# message(FATAL_ERROR ...) commands are invoked.
+######################################################################
+include(${CMAKE_ROOT}/Modules/Dart.cmake)
+mark_as_advanced(TCL_TCLSH DART_ROOT)
+enable_testing()
+
+if(BUILD_TESTING)
+  set(BUILDNAME "NiftyCal" CACHE STRING "Name of build on the dashboard")
+  mark_as_advanced(BUILDNAME)
+
+  # Setup file for setting custom ctest vars
+  configure_file(CMake/CTestCustom.cmake.in ${CMAKE_BINARY_DIR}/CTestCustom.cmake @ONLY)
+
+  # Setup continuous test script
+  CONFIGURE_FILE(CMake/CTestContinuous.cmake.in ${CMAKE_BINARY_DIR}/CTestContinuous.cmake @ONLY)
+
+endif(BUILD_TESTING)
+
+######################################################################
+# NiftyCal uses KWStyle for checking the coding style
+######################################################################
+include(${CMAKE_SOURCE_DIR}/Utilities/KWStyle/NiftyCalKWStyle.cmake)
+
+
+######################################################################
+# NiftyCal uses CppCheck for static analysis
+######################################################################
+include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
+
+
+######################################################################
 # Add Mandatory Requirements
 ######################################################################
 find_package(OpenCV REQUIRED)
