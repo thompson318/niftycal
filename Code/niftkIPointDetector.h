@@ -28,8 +28,21 @@ namespace niftk
 struct NIFTYCAL_WINEXPORT Point2D
 {
   unsigned int id;
-  cv::Vec2d    point;
+  cv::Point2d point;
 };
+
+
+/**
+* \brief Creates a new copy of the input list.
+*/
+NIFTYCAL_WINEXPORT std::vector<Point2D> CopyPoints(const std::vector<Point2D>& p);
+
+
+/**
+* \brief Rescales by multiplying each point by the scale factor.
+* \param scaleFactor contains a multiplier for x,y.
+*/
+NIFTYCAL_WINEXPORT std::vector<Point2D> RescalePoints(const std::vector<Point2D>& p, const cv::Point2d& scaleFactor);
 
 
 /**
@@ -45,8 +58,8 @@ public:
   virtual ~IPointDetector();
 
   /**
-  * \brief Retrieves points, each one identified by a single id.
-  * \return vector of id,point pairs.
+  * \brief Retrieves points, each one identified by a Point2D.
+  * \return vector of Point2D.
   */
   virtual std::vector< Point2D > GetPoints() = 0;
 
