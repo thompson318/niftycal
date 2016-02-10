@@ -56,7 +56,7 @@ endif()
 ######################################################################
 # Build options.
 ######################################################################
-option(BUILD_TESTING "Build Unit tests." OFF)
+option(BUILD_TESTING "Build Unit tests." ON)
 
 ######################################################################
 # Configure Dart testing support.  This should be done before any

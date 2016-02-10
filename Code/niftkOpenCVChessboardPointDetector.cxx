@@ -18,8 +18,11 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(cv::Size2i numberOfCorners)
-: m_NumbeOfCorners(numberOfCorners)
+OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
+    float squareSizeInMillimetres, cv::Size2i numberOfCorners)
+: m_SquareSizeInMillimetres(squareSizeInMillimetres)
+, m_NumberOfCorners(numberOfCorners)
+, m_Image(nullptr)
 {
 }
 
@@ -27,7 +30,14 @@ OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(cv::Size2i numberOf
 //-----------------------------------------------------------------------------
 OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 {
+  // Do NOT destroy m_Image, we don't own it.
+}
 
+
+//-----------------------------------------------------------------------------
+void OpenCVChessboardPointDetector::SetImage(cv::Mat* image)
+{
+  m_Image = image;
 }
 
 
@@ -35,6 +45,33 @@ OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
 {
   std::vector< Point2D > result;
+
+  std::vector<cv::Point2d> corners;
+  bool found = cv::findChessboardCorners(*m_Image, m_NumberOfCorners, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+
+  if ( corners.size() == 0 )
+  {
+    return result;
+  }
+
+  unsigned int numberOfCorners = m_NumberOfCorners.width * m_NumberOfCorners.height;
+
+  cv::Mat greyImage;
+  cv::cvtColor(*m_Image, greyImage, CV_BGR2GRAY);
+  cv::cornerSubPix(greyImage, corners, cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
+
+  if (found  && corners.size() == numberOfCorners)
+  {
+    for ( unsigned int k = 0; k < numberOfCorners; ++k)
+    {
+      Point2D tmp;
+      tmp.point.x = (k % m_NumberOfCorners.width) * m_SquareSizeInMillimetres;
+      tmp.point.y = (k / m_NumberOfCorners.height) * m_SquareSizeInMillimetres;
+      tmp.id = k;
+      result.push_back(tmp);
+    }
+  }
+
   return result;
 }
 
