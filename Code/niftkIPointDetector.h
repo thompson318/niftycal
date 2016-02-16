@@ -48,6 +48,11 @@ NIFTYCAL_WINEXPORT std::vector<Point2D> RescalePoints(const std::vector<Point2D>
 /**
 * \class IPointDetector
 * \brief Interface for anything that detects points in an image.
+*
+* The point here, is that implementing classes should *just* detect
+* the points. There is no conversion to millimetres, no camera
+* calibration, nothing but point detection. The points can be
+* chessboard corners, centres of circles, SIFT points etc.
 */
 class NIFTYCAL_WINEXPORT IPointDetector
 {

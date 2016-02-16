@@ -93,8 +93,10 @@ include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
 ######################################################################
 # Add Mandatory Requirements
 ######################################################################
+set(ALL_LIBRARIES niftycal)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
 
 ######################################################################
 # Add code folders.
@@ -102,6 +104,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/Code/)
 add_subdirectory(Code)
 if(BUILD_TESTING)
+  include_directories(${CMAKE_SOURCE_DIR}/Testing/)
   add_subdirectory(Testing)
 endif()
 

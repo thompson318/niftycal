@@ -1,0 +1,177 @@
+
+<!-- saved from url=(0070)http://research.microsoft.com/en-us/um/people/zhang/Calib/#Calibration -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--#include virtual="/scripts/includes/inc_master.asp"-->
+<meta name="author" content="Zhengyou Zhang">
+<meta name="keywords" content="Camera Calibration">
+<meta name="description" content="Camera Calibration; Plane-based">
+<title>A Flexible New Technique for Camera Calibration: Zhengyou Zhang</title>
+<!-- Be sure to change your meta tags and put your name in the title.
+Do not modify any other tags on this page, doing so might prevent
+it from functioning properly! -->
+</head>
+<body>
+<!---  Content goes below this line -->
+
+<h1>A Flexible New Technique for Camera Calibration</h1>
+
+<address>
+    <a href="http://research.microsoft.com/~zhang/" onclick="stc(this, 1)">Zhengyou
+    Zhang</a> 
+</address>
+
+<address>
+    <a href="http://research.microsoft.com/" onclick="stc(this, 2)">Microsoft Research</a>
+</address>
+
+<p align="center"><img src="./index_files/arc.jpg" width="540" height="4"> </p>
+
+<ul>
+    <li><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/#Abstract" onclick="stc(this, 3)">Abstract</a></li>
+    <li>Full text available as a <strong>Technical report </strong> <a href="http://research.microsoft.com/en-us/um/people/zhang/Papers/TR98-71.pdf" onclick="stc(this, 4)"><strong>in
+        PDF</strong></a><strong> </strong>(846KB)</li>
+    <li>Software <strong>Microsoft Easy Camera Calibration Tool: </strong>
+    <a href="http://research.microsoft.com/en-us/downloads/7e9de40f-06db-452c-a0f2-4fabb4f20f52/" onclick="stc(this, 5)">The
+        executable for Windows is available here. </a>
+		</li>
+    <li><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/#Calibration" onclick="stc(this, 6)">Experimental data and result for
+        camera calibration</a></li>
+    <li><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/#Application" onclick="stc(this, 7)">Application
+        to image-based modeling</a>
+    </li>
+    <li>References:
+    <ul>
+    <li>Z. Zhang. A flexible new technique for camera calibration.
+    <i>IEEE Transactions on Pattern Analysis and Machine Intelligence,</i> 
+    22(11):1330-1334, 2000.</li>
+    <li>Z. Zhang. Flexible Camera Calibration By Viewing a Plane 
+    From Unknown Orientations. <i>International Conference on Computer Vision 
+    (ICCV'99)</i>, Corfu, Greece, pages 666-673, September 1999.</li>
+    </ul>
+    </li>
+    <li>Translations:
+    <ul>
+		<li>Russian translation: softdroid.net: 
+			<a href="http://softdroid.net/novye-tehniki-kalibrovki-kamery" onclick="stc(this, 8)">Vse o vosstanovlenii dannyh: Novye texniki kalibrovki kamery</a>.
+ 		</li>
+		<li> Kazakh Translation: 
+		<a href="http://13motors.com/myblog/calib/" onclick="stc(this, 9)">
+		http://13motors.com/myblog/calib/</a></li>
+		<li>Polish translation: <a href="http://kreedle.com/blog/calib/" onclick="stc(this, 10)">http://kreedle.com/blog/calib/</a> </li>
+		<li>Slovak translation: <a href="http://elelur.com/calibration/" onclick="stc(this, 11)">http://elelur.com/calibration/</a></li>
+	</ul>
+	</li>
+</ul>
+
+<p align="center"><img src="./index_files/arc.jpg" width="540" height="4"> </p>
+
+<h3><a name="Abstract"></a> Abstract</h3>
+
+<p>We propose a flexible new technique to easily calibrate a
+camera. It is well suited for use without specialized knowledge
+of 3D geometry or computer vision. The technique only requires
+the camera to observe a planar pattern shown at a few (at least
+two) different orientations. Either the camera or the planar
+pattern can be freely moved. The motion need not be known. Radial
+lens distortion is modeled. The proposed procedure consists of a
+closed-form solution, followed by a nonlinear refinement based on
+the maximum likelihood criterion. Both computer simulation and
+real data have been used to test the proposed technique, and very
+good results have been obtained. Compared with classical
+techniques which use expensive equipments such as two or three
+orthogonal planes, the proposed technique is easy to use and
+flexible. It advances 3D computer vision one step from laboratory
+environments to real world use.</p>
+
+<p>Full text available as a <strong>Technical report</strong> <a href="http://research.microsoft.com/en-us/um/people/zhang/Papers/TR98-71.pdf" onclick="stc(this, 12)"><strong>in PDF</strong></a><strong>
+</strong>(846KB)</p>
+
+<p align="center"><img src="./index_files/arc.jpg" width="540" height="4"> </p>
+
+<h3><a name="Calibration"></a>Experimental data and result for
+camera calibration</h3>
+
+<p>The model plane contains a pattern of 8x8 squares, so there
+are 256 corners. The size of the pattern is 17cm x 17cm. The 2D
+coordinates (in inches) of these points are available <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/Model.txt" onclick="stc(this, 13)">here</a>. (We assume the plane is at
+<em>Z</em>=0.)</p>
+
+<p>We have taken five an off-the-shelf PULNiX CCD camera with 6
+mm lens. The image resolution is 640x480. The five images are
+available here: <a href="./index_files/CalibIm1.gif" onclick="stc(this, 14)">Image 1</a>, <a href="./index_files/CalibIm2.gif" onclick="stc(this, 15)">Image 2</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/CalibIm3.gif" onclick="stc(this, 16)">Image 3</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/CalibIm4.gif" onclick="stc(this, 17)">Image 4</a> and <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/CalibIm5.gif" onclick="stc(this, 18)">Image 5</a>. The first two are
+shown below. We can observe a significant lens distortion in the
+images.</p>
+
+<p><img src="./index_files/CalibIm1.gif" width="576" height="432"></p>
+
+<p><img src="./index_files/CalibIm2.gif" width="576" height="432"></p>
+
+<p>The corners were detected as the intersection of straight
+lines fitted to each square. The image coordinates are available
+here: <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/data1.txt" onclick="stc(this, 19)">image points 1</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/data2.txt" onclick="stc(this, 20)">image points 2</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/data3.txt" onclick="stc(this, 21)">image points 3</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/data4.txt" onclick="stc(this, 22)">image points 4</a> and <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/data5.txt" onclick="stc(this, 23)">image points 5</a>. Below we show
+the first two images with detected points indicated as +.</p>
+
+<p><img src="./index_files/marked1.gif" width="640" height="480"></p>
+
+<p><img src="./index_files/marked2.gif" width="640" height="480"></p>
+
+<p>(other images with marked points are available here: <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/marked3.gif" onclick="stc(this, 24)">marked 3</a>, <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/marked4.gif" onclick="stc(this, 25)">marked 4</a>, and <a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/marked5.gif" onclick="stc(this, 26)">marked 5</a>.)</p>
+
+<p><font size="3">And here is what the calibration tells us about
+the camera: The pixel is <em>square </em>(aspect ratio = 1); the
+focal length = 832.5 pixels; the image center is at (303.959,
+206.585); there is a significant radial distortion: k1 =
+-0.228601, k2 = 0.190353. The complete calibration result is
+available </font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/Calibration/Calib.txt" onclick="stc(this, 27)"><font size="3">here</font></a><font size="3">. (The format of the calibration file is: </font><font size="3" face="Symbol">a, </font><font size="3"><em>c, </em></font><font size="3" face="Symbol"><em>b</em></font><font size="3"><em>, u0,
+v0, k1, k2, </em>then the rotation matrix and translation vector
+for the first image, the rotation matrix and translation vector
+for the second image, etc.)</font></p>
+
+<p><font size="3">The estimated distortion parameters allow us to
+correct the distortion in the original images. Below, we show the
+first two such distortion-corrected images, which should be
+compared with the first two images shown above. We see clearly
+that the curved pattern in the original images is straightened.</font></p>
+
+<p><font size="3"><img src="./index_files/UndistortIm1.gif" width="640" height="480"></font></p>
+
+<p><font size="3"><img src="./index_files/UndistortIm2.gif" width="640" height="480"></font></p>
+
+<p align="center"><img src="./index_files/arc.jpg" width="540" height="4"> </p>
+
+<h2><a name="Application"></a><font size="3">Application to
+image-based modeling</font></h2>
+
+<p><font size="3">Two images of a tea tin (see below) were taken
+by the same camera as used above for calibration. </font></p>
+
+<p><font size="3"><img src="./index_files/TeaBox1.gif" width="640" height="480"></font></p>
+
+<p><font size="3"><img src="./index_files/TeaBox2.gif" width="640" height="480"></font></p>
+
+<p><font size="3">Mainly two sides are visible. After correcting
+the radial distortion (</font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBoxUnd1.gif" onclick="stc(this, 28)"><font size="3">tea tin 1</font></a><font size="3">, </font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBoxUnd2.gif" onclick="stc(this, 29)"><font size="3">tea tin 2</font></a><font size="3">), we manually picked 8 point matches on each side. The
+matches are </font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBox1.txt" onclick="stc(this, 30)"><font size="3">here
+for mage 1</font></a><font size="3"> and </font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBox2.txt" onclick="stc(this, 31)"><font size="3">here for mage 2</font></a><font size="3">.</font></p>
+
+<p><font size="3">The </font><a href="http://www-sop.inria.fr/robotvis/personnel/zzhang/software-SFM.html" onclick="stc(this, 32)"><font size="3">structure-from-motion software we developed ealier</font></a><font size="3"> was run on these 16 point matches to build a partial
+model of the tea tin. The </font><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBoxConnect.wrl" onclick="stc(this, 33)"><font size="3">reconstructed
+model</font></a><font size="3"> is in VRML. The reconstructed
+points on each side are indeed coplanar, and we computed the
+angle between the two reconstructed planes which is 94.7 degrees.
+Although we do not have the ground truth, but the two sides of
+the tea tin are indeed almost orthogonal to each other. </font></p>
+
+<p><a href="http://research.microsoft.com/en-us/um/people/zhang/Calib/TeaBox/TeaBox2Planes.wrl" onclick="stc(this, 34)"><font color="#0000FF" size="3"><strong><i><u>Click here to view the reconstructed tea
+tin in VRML.</u></i></strong></font></a></p>
+
+<p>¡¡</p>
+
+<!---  Content goes above this line -->
+
+&lt;% Call GetFooter() %&gt;
+<script type="text/javascript">
+function stc(e,linkIndex){if(document.images){var linkText;if(navigator.appName.toLowerCase()=="microsoft internet explorer"){linkText=e.innerText}else{linkText=e.textContent}if(linkText==""){if(e.firstChild){var firstChild=e.firstChild.nodeName.toUpperCase();if(firstChild=="IMG"){linkText="Image: "+getName(e.firstChild.getAttribute('src'))}}else{var nodeName=e.nodeName.toUpperCase();if(nodeName=="AREA"){linkText="ImageMap: "+e.href}}}if(linkText==""){linkText=e.href}(new Image()).src="/a/i/stg.gif?f="+escape(document.location.href)+"&t="+escape(e.href)+"&i="+linkIndex+"&n="+escape(trimString(linkText))}}function getName(s){if(s.lastIndexOf('/')>=0){return(s.substring(s.lastIndexOf('/')+1,s.length))}else{return(s)}}function trimString(s){return(s.replace(/^\s*/,"").replace(/\s*$/,""))}
+</script>
+
+</body></html>

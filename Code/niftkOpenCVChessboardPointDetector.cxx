@@ -13,17 +13,21 @@
 =============================================================================*/
 
 #include "niftkOpenCVChessboardPointDetector.h"
+#include "niftkNiftyCalExceptionMacro.h"
 
-namespace niftk
-{
+namespace niftk {
 
 //-----------------------------------------------------------------------------
 OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
-    float squareSizeInMillimetres, cv::Size2i numberOfCorners)
-: m_SquareSizeInMillimetres(squareSizeInMillimetres)
-, m_NumberOfCorners(numberOfCorners)
-, m_Image(nullptr)
+    cv::Mat* image,
+    cv::Size2i numberOfCorners)
+: m_NumberOfCorners(numberOfCorners)
+, m_Image(image)
 {
+  if (m_Image == nullptr)
+  {
+    niftkNiftyCalThrow() << "Image is NULL";
+  }
 }
 
 
@@ -35,19 +39,14 @@ OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 
 
 //-----------------------------------------------------------------------------
-void OpenCVChessboardPointDetector::SetImage(cv::Mat* image)
-{
-  m_Image = image;
-}
-
-
-//-----------------------------------------------------------------------------
 std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
 {
   std::vector< Point2D > result;
-
   std::vector<cv::Point2d> corners;
-  bool found = cv::findChessboardCorners(*m_Image, m_NumberOfCorners, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+
+  bool found = cv::findChessboardCorners(
+        *m_Image, m_NumberOfCorners, corners,
+        CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 
   if ( corners.size() == 0 )
   {
@@ -58,15 +57,18 @@ std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
 
   cv::Mat greyImage;
   cv::cvtColor(*m_Image, greyImage, CV_BGR2GRAY);
-  cv::cornerSubPix(greyImage, corners, cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
+
+  cv::cornerSubPix(greyImage, corners, cv::Size(11,11), cv::Size(-1,-1),
+                   cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
   if (found  && corners.size() == numberOfCorners)
   {
+
     for ( unsigned int k = 0; k < numberOfCorners; ++k)
     {
       Point2D tmp;
-      tmp.point.x = (k % m_NumberOfCorners.width) * m_SquareSizeInMillimetres;
-      tmp.point.y = (k / m_NumberOfCorners.height) * m_SquareSizeInMillimetres;
+      tmp.point.x = corners[k].x;
+      tmp.point.y = corners[k].y;
       tmp.id = k;
       result.push_back(tmp);
     }

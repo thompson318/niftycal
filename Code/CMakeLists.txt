@@ -13,6 +13,7 @@
 #============================================================================*/
 
 set(NIFTYCAL_SRCS
+  niftkNiftyCalException.cxx
   niftkIOptimiser.cxx
   niftkIPointDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx

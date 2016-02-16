@@ -15,7 +15,7 @@
   <EndOfFileNewLine>true</EndOfFileNewLine>
   <Tabs>true</Tabs>
   <Spaces>0</Spaces>
-  <Indent>SPACE,2,true,true</Indent>
+  <Indent>SPACE,2,false,false</Indent>
   <Header>
     <location>@CMAKE_SOURCE_DIR@/Utilities/KWStyle/NiftyCalHeader.h</location>
     <checkSpacesEndOfLine>true</checkSpacesEndOfLine>
@@ -32,8 +32,8 @@
     <middle> *</middle>
     <end> */<end>
     <emptyLineBeforeClass>true</emptyLineBeforeClass>
-    <checkWrongComment>false</checkWrongComment>
-    <checkMissingComment>false</checkMissingComment>
+    <checkWrongComment>true</checkWrongComment>
+    <checkMissingComment>true</checkMissingComment>
   </Comments>
   <EmptyLines>2</EmptyLines>
   <Template>[TNV]</Template>
