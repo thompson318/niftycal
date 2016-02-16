@@ -14,6 +14,7 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
+#include <iostream>
 
 #include <cv.h>
 #include <highgui.h>
@@ -21,10 +22,11 @@
 
 TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
-  if (niftk::argc != 6)
+  int expectedNumberOfArguments =  6;
+  if (niftk::argc != expectedNumberOfArguments)
   {
     std::cerr << "Usage: niftkExtractChessboardPoints image expectedImageWidth expectedImageHeight expectedNumberInternalCornersX expectedNumberInternalCornersY" << std::endl;
-    REQUIRE( niftk::argc == 6);
+    REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -37,6 +39,8 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   REQUIRE( image.rows == expectedHeight );
 
   cv::Size2i internalCorners(expectedInternalCornersX, expectedInternalCornersY);
+
+  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector(NULL, internalCorners));
 
   niftk::OpenCVChessboardPointDetector detector(&image, internalCorners);
   std::vector< niftk::Point2D > points = detector.GetPoints();
