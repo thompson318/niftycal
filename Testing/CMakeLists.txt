@@ -13,11 +13,12 @@
 #============================================================================*/
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
-file(GLOB CPP_FILES *.cxx)
-foreach(_cpp_file ${CPP_FILES})
-  get_filename_component(_cpp_file_we ${_cpp_file} NAME_WE)
-  add_executable(${_cpp_file_we} ${_cpp_file})
-  target_link_libraries(${_cpp_file_we} ${ALL_LIBRARIES})
+set(TEST_CASES
+  niftkExtractChessboardPoints
+)
+foreach(_test_case ${TEST_CASES})
+  add_executable(${_test_case} ${_test_case}.cxx niftkCatchMain.cxx)
+  target_link_libraries(${_test_case} ${ALL_LIBRARIES})
 endforeach()
 
 # Adding tests is done outside the above loop,
@@ -27,5 +28,5 @@ endforeach()
 # Dont forget its:  add_test(<test name (globally unique) > <exe name> <argument1> <argument2>
 ##################################################################################################
 
-add_test(ExtChessZhang1 niftkExtractChessboardPoints ${DATA_DIR}/Zhang2000/CalibIm1.png 640 480 14 14)
+add_test(ExtChessZhang1 niftkExtractChessboardPoints ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
 

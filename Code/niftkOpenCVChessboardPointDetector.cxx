@@ -42,7 +42,7 @@ OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
 {
   std::vector< Point2D > result;
-  std::vector<cv::Point2d> corners;
+  std::vector<cv::Point2f> corners;
 
   bool found = cv::findChessboardCorners(
         *m_Image, m_NumberOfCorners, corners,
