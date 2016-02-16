@@ -67,7 +67,7 @@ public:
 
   /**
   * \brief Retrieves points, each one identified by a Point2D.
-  * \return vector of Point2D.
+  * \return PointSet of Point2D.
   */
   virtual PointSet GetPoints() = 0;
 
