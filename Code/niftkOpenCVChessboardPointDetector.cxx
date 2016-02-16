@@ -26,7 +26,15 @@ OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
 {
   if (m_Image == nullptr)
   {
-    niftkNiftyCalThrow() << "Image is NULL";
+    niftkNiftyCalThrow() << "Image is NULL.";
+  }
+  if (m_NumberOfCorners.width < 2)
+  {
+    niftkNiftyCalThrow() << "Can't retrieve chessboards with < 2 corners in width.";
+  }
+  if (m_NumberOfCorners.height < 2)
+  {
+    niftkNiftyCalThrow() << "Can't retrieve chessboards with < 2 corners in height.";
   }
 }
 
