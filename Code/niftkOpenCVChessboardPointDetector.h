@@ -37,7 +37,7 @@ public:
   /**
   * \see IPointDetector::GetPoints()
   */
-  virtual std::vector< Point2D > GetPoints();
+  virtual PointSet GetPoints();
 
 private:
 

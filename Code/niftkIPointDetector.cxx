@@ -17,39 +17,36 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-std::vector<Point2D> CopyPoints(const std::vector<Point2D>& p)
+PointSet CopyPoints(const PointSet& p)
 {
-  std::vector<Point2D> result;
+  PointSet result;
 
-  if ( p.size() > 0 )
+  PointSet::const_iterator iter;
+  for ( iter = p.begin(); iter != p.end(); ++iter )
   {
-    std::vector<Point2D>::const_iterator iter;
-    for ( iter = p.begin(); iter != p.end(); ++iter )
-    {
-      result.push_back(*iter);
-    }
+    result.insert(IdPoint((*iter).first, (*iter).second));
   }
+
   return result;
 }
 
 
 //-----------------------------------------------------------------------------
-std::vector<Point2D> RescalePoints(const std::vector<Point2D>& p, const cv::Point2d& scaleFactor)
+PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
 {
-  std::vector<Point2D> result;
-  if ( result.size() > 0 )
+  PointSet result;
+
+  PointSet::const_iterator iter;
+  for ( iter = p.begin(); iter != p.end(); ++iter )
   {
-    std::vector<Point2D>::const_iterator iter;
-    for ( iter = p.begin(); iter != p.end(); ++iter )
-    {
-      Point2D tmp;
-      tmp.point = (*iter).point;
-      tmp.id = (*iter).id;
-      tmp.point.x *= scaleFactor.x;
-      tmp.point.y *= scaleFactor.y;
-      result.push_back(tmp);
-    }
+    Point2D tmp;
+    tmp.point = (*iter).second.point;
+    tmp.id = (*iter).second.id;
+    tmp.point.x *= scaleFactor.x;
+    tmp.point.y *= scaleFactor.y;
+    result.insert(IdPoint(tmp.id, tmp));
   }
+
   return result;
 }
 

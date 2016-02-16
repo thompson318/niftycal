@@ -43,7 +43,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector(NULL, internalCorners));
 
   niftk::OpenCVChessboardPointDetector detector(&image, internalCorners);
-  std::vector< niftk::Point2D > points = detector.GetPoints();
+  niftk::PointSet points = detector.GetPoints();
 
   REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
 }

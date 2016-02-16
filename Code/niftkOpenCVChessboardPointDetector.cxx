@@ -39,9 +39,9 @@ OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 
 
 //-----------------------------------------------------------------------------
-std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
+PointSet OpenCVChessboardPointDetector::GetPoints()
 {
-  std::vector< Point2D > result;
+  PointSet result;
   std::vector<cv::Point2f> corners;
 
   bool found = cv::findChessboardCorners(
@@ -70,7 +70,7 @@ std::vector< Point2D > OpenCVChessboardPointDetector::GetPoints()
       tmp.point.x = corners[k].x;
       tmp.point.y = corners[k].y;
       tmp.id = k;
-      result.push_back(tmp);
+      result.insert(IdPoint(tmp.id, tmp));
     }
   }
 
