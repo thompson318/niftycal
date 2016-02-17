@@ -101,7 +101,7 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   REQUIRE( listOfPoints.size() >= 2 );
 
   cv::Matx33d intrinsic;
-  cv::Matx16d distortion;
+  cv::Matx14d distortion;
 
   double rms = niftk::MonoCameraCalibration(model,
                                             listOfPoints,
@@ -109,5 +109,5 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
                                             distortion,
                                             extrinsics
                                             );
-  REQUIRE( rms == 0 );
+  REQUIRE( fabs(rms - 0.580) < 0.001 );
 }

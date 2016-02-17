@@ -27,12 +27,12 @@ namespace niftk
 /**
 * \file niftkMonoCameraCalibration.h
 * \brief Performs a mono camera calibration.
-* \return rms error of projected 3D points onto 2D points
+* \return rms error of re-projected 3D points onto 2D points
 */
 NIFTYCAL_WINEXPORT double MonoCameraCalibration(const Model3D& model,
                                                 const std::list<PointSet>& listOfPointSets,
                                                 cv::Matx33d& intrinsic,
-                                                cv::Matx16d& distortion,
+                                                cv::Matx14d& distortion,
                                                 std::list<cv::Matx44d>& extrinsic
                                                );
 
