@@ -17,6 +17,10 @@ set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkExtractChessboardPointsTest
 )
+if(AprilTags_FOUND)
+  list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
+endif()
+
 foreach(_test_case ${TEST_CASES})
   add_executable(${_test_case} ${_test_case}.cxx niftkCatchMain.cxx)
   target_link_libraries(${_test_case} ${ALL_LIBRARIES})
@@ -31,4 +35,4 @@ endforeach()
 
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
-
+add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612 35)

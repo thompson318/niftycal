@@ -54,6 +54,14 @@ if(WIN32)
 endif()
 
 ######################################################################
+# Setup the path to load CMake macros, and extra CMake files.
+######################################################################
+set(CMAKE_MODULE_PATH
+    ${CMAKE_SOURCE_DIR}/CMake
+    ${CMAKE_MODULE_PATH}
+   )
+
+######################################################################
 # Build options.
 ######################################################################
 option(BUILD_TESTING "Build Unit tests." ON)
@@ -83,12 +91,10 @@ endif(BUILD_TESTING)
 ######################################################################
 include(${CMAKE_SOURCE_DIR}/Utilities/KWStyle/NiftyCalKWStyle.cmake)
 
-
 ######################################################################
 # NiftyCal uses CppCheck for static analysis
 ######################################################################
 include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
-
 
 ######################################################################
 # Add Mandatory Requirements
@@ -97,6 +103,15 @@ set(ALL_LIBRARIES niftycal)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
+
+######################################################################
+# Add Optional Requirements
+######################################################################
+find_package(AprilTags)
+if(AprilTags_FOUND)
+  include_directories(${AprilTags_INCLUDE_DIR})
+  list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
+endif()
 
 ######################################################################
 # Add code folders.

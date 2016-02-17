@@ -17,7 +17,12 @@ set(NIFTYCAL_SRCS
   niftkIOptimiser.cxx
   niftkIPointDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
+
 )
+
+if(AprilTags_FOUND)
+  list(APPEND NIFTYCAL_SRCS niftkAprilTagsPointDetector.cxx)
+endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
 
@@ -28,5 +33,5 @@ if(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 
 target_link_libraries(niftycal
-  PRIVATE ${OpenCV_LIBS}
+  PRIVATE ${OpenCV_LIBS} ${AprilTags_LIBRARIES}
 )
