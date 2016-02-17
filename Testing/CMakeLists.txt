@@ -17,7 +17,7 @@ set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkExtractChessboardPointsTest
 )
-if(AprilTags_FOUND)
+if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
 endif()
 

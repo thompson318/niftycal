@@ -24,14 +24,21 @@ namespace niftk
 
 /**
 * \class AprilTagsPointDetector
-* \brief Detects AprilTags markers in an image.
+* \brief Detects AprilTags markers in a grey scale image.
+*
+* Note, this detector does no image conversion.
 */
 class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public IPointDetector
 {
 
 public:
 
-  AprilTagsPointDetector(cv::Mat* image);
+  AprilTagsPointDetector(cv::Mat* greyScaleImage,
+                         bool includeCorners,
+                         const std::string& name,
+                         float sigma,
+                         float segmentationSigma
+                         );
   virtual ~AprilTagsPointDetector();
 
   /**
@@ -41,7 +48,11 @@ public:
 
 private:
 
-  cv::Mat*   m_Image; // non-owning
+  cv::Mat*    m_Image; // non-owning
+  bool        m_IncludeCorners;
+  std::string m_Name;
+  float       m_Sigma;
+  float       m_SegmentationSigma;
 };
 
 } // end namespace

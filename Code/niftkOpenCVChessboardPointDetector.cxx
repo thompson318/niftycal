@@ -26,7 +26,7 @@ OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
 {
   if (m_Image == nullptr)
   {
-    niftkNiftyCalThrow() << "Image is NULL.";
+    niftkNiftyCalThrow() << "Image should not be NULL.";
   }
   if (m_NumberOfCorners.width < 2)
   {
@@ -63,10 +63,8 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
 
   unsigned int numberOfCorners = m_NumberOfCorners.width * m_NumberOfCorners.height;
 
-  cv::Mat greyImage;
-  cv::cvtColor(*m_Image, greyImage, CV_BGR2GRAY);
 
-  cv::cornerSubPix(greyImage, corners, cv::Size(11,11), cv::Size(-1,-1),
+  cv::cornerSubPix(*m_Image, corners, cv::Size(11,11), cv::Size(-1,-1),
                    cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
   if (found  && corners.size() == numberOfCorners)

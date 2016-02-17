@@ -112,6 +112,10 @@ if(AprilTags_FOUND)
   include_directories(${AprilTags_INCLUDE_DIR})
   list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
 endif()
+find_package(Eigen)
+if(Eigen_FOUND)
+  include_directories(${Eigen_INCLUDE_DIR})
+endif()
 
 ######################################################################
 # Add code folders.

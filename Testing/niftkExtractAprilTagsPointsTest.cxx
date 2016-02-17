@@ -25,7 +25,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   int expectedNumberOfArguments =  5;
   if (niftk::argc != expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkExtractChessboardPoints image expectedImageWidth expectedImageHeight expectedNumberTags" << std::endl;
+    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image expectedImageWidth expectedImageHeight expectedNumberTags" << std::endl;
     REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
@@ -37,9 +37,24 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
 
-  niftk::AprilTagsPointDetector detector(&image);
-  niftk::PointSet points = detector.GetPoints();
+  cv::Mat greyImage;
+  cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
+  niftk::AprilTagsPointDetector detector1(&greyImage,
+                                         false, // don't include corners
+                                         "36h11",
+                                         0,
+                                         0.8
+                                         );
+  niftk::PointSet points = detector1.GetPoints();
   REQUIRE( points.size() == expectedNumberTags);
 
+  niftk::AprilTagsPointDetector detector2(&greyImage,
+                                         true, // do include corners
+                                         "36h11",
+                                         0,
+                                         0.8
+                                         );
+  points = detector2.GetPoints();
+  REQUIRE( points.size() == expectedNumberTags*5);
 }

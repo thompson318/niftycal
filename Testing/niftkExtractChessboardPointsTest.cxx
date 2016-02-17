@@ -25,7 +25,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   int expectedNumberOfArguments =  6;
   if (niftk::argc != expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkExtractChessboardPoints image expectedImageWidth expectedImageHeight expectedNumberInternalCornersX expectedNumberInternalCornersY" << std::endl;
+    std::cerr << "Usage: niftkExtractChessboardPointsTest image expectedImageWidth expectedImageHeight expectedNumberInternalCornersX expectedNumberInternalCornersY" << std::endl;
     REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
@@ -38,16 +38,19 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
 
+  cv::Mat greyImage;
+  cv::cvtColor(image, greyImage, CV_BGR2GRAY);
+
   cv::Size2i tooFewInternalCornersWidth(1, 2);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector1(&image, tooFewInternalCornersWidth));
+  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector1(&greyImage, tooFewInternalCornersWidth));
 
   cv::Size2i tooFewInternalCornersHeight(2, 1);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector2(&image, tooFewInternalCornersHeight));
+  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector2(&greyImage, tooFewInternalCornersHeight));
 
   cv::Size2i internalCorners(expectedInternalCornersX, expectedInternalCornersY);
   REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector3(NULL, internalCorners));
 
-  niftk::OpenCVChessboardPointDetector detector(&image, internalCorners);
+  niftk::OpenCVChessboardPointDetector detector(&greyImage, internalCorners);
   niftk::PointSet points = detector.GetPoints();
 
   REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
