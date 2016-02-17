@@ -1,0 +1,15 @@
+*~
+# Mercurial:
+.hg*
+# Eclipse config files:
+/.cproject
+/.project
+# QtCreator config files:
+/*.config
+/*.creator
+/*.creator.user
+/*.files
+/*.includes
+/CMakeLists.txt.user*
+# Mac Finder:
+.DS_Store
