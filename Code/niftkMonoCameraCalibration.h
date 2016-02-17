@@ -31,9 +31,11 @@ namespace niftk
 */
 NIFTYCAL_WINEXPORT double MonoCameraCalibration(const Model3D& model,
                                                 const std::list<PointSet>& listOfPointSets,
-                                                cv::Matx33d& intrinsic,
-                                                cv::Matx14d& distortion,
-                                                std::list<cv::Matx44d>& extrinsic
+                                                const cv::Size2i& imageSize,
+                                                cv::Mat& intrinsic,
+                                                cv::Mat& distortion,
+                                                std::vector<cv::Mat>& rvecs,
+                                                std::vector<cv::Mat>& tvecs
                                                );
 
 } // end namespace

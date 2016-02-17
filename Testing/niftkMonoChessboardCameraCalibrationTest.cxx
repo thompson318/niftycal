@@ -26,16 +26,25 @@
 
 TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  6;
+  int expectedMinimumNumberOfArguments =  15;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
   float squareSizeInMillimetres = atof(niftk::argv[1]);
   int numberInternalCornersInX = atoi(niftk::argv[2]);
   int numberInternalCornersInY = atoi(niftk::argv[3]);
+  float eRMS = atof(niftk::argv[4]);
+  float eFx = atof(niftk::argv[5]);
+  float eFy = atof(niftk::argv[6]);
+  float eCx = atof(niftk::argv[7]);
+  float eCy = atof(niftk::argv[8]);
+  float eK1 = atof(niftk::argv[9]);
+  float eK2 = atof(niftk::argv[10]);
+  float eP1 = atof(niftk::argv[11]);
+  float eP2 = atof(niftk::argv[12]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -70,15 +79,18 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
   niftk::PointSet pointSet;
   std::list<niftk::PointSet> listOfPoints;
-  std::list<cv::Matx44d> extrinsics;
+  cv::Size2i imageSize;
 
-  for (int i = 4; i < niftk::argc; i++)
+  for (int i = 13; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
     {
       cv::Mat greyImage;
       cv::cvtColor(image, greyImage, CV_BGR2GRAY);
+
+      imageSize.width = greyImage.cols;
+      imageSize.height = greyImage.rows;
 
       niftk::OpenCVChessboardPointDetector detector(&greyImage, corners);
       pointSet = detector.GetPoints();
@@ -89,25 +101,43 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
       {
         listOfPoints.push_back(pointSet);
       }
-
-      cv::Matx44d ext;
-      ext = cv::Matx44d::eye();
-
-      extrinsics.push_back(ext);
     }
   }
 
   std::cout << "listOfPoints.size()=" << listOfPoints.size() << std::endl;
   REQUIRE( listOfPoints.size() >= 2 );
 
-  cv::Matx33d intrinsic;
-  cv::Matx14d distortion;
+  cv::Mat intrinsic;
+  cv::Mat distortion;
+  std::vector<cv::Mat> rvecs;
+  std::vector<cv::Mat> tvecs;
 
   double rms = niftk::MonoCameraCalibration(model,
                                             listOfPoints,
+                                            imageSize,
                                             intrinsic,
                                             distortion,
-                                            extrinsics
+                                            rvecs,
+                                            tvecs
                                             );
-  REQUIRE( fabs(rms - 0.580) < 0.001 );
+
+  std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
+  std::cout << "Fy=" << intrinsic.at<double>(1,1) << std::endl;
+  std::cout << "Cx=" << intrinsic.at<double>(0,2) << std::endl;
+  std::cout << "Cy=" << intrinsic.at<double>(1,2) << std::endl;
+  std::cout << "K1=" << distortion.at<double>(0,0) << std::endl;
+  std::cout << "K2=" << distortion.at<double>(0,1) << std::endl;
+  std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
+  std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
+
+  double tolerance = 0.005;
+  REQUIRE( fabs(rms - eRMS) < 0.001 );
+  REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < tolerance );
+  REQUIRE( fabs(intrinsic.at<double>(1,1) - eFy) < tolerance );
+  REQUIRE( fabs(intrinsic.at<double>(0,2) - eCx) < tolerance );
+  REQUIRE( fabs(intrinsic.at<double>(1,2) - eCy) < tolerance );
+  REQUIRE( fabs(distortion.at<double>(0,0) - eK1) < tolerance );
+  REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < tolerance );
+  REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < tolerance );
+  REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < tolerance );
 }

@@ -29,7 +29,7 @@ namespace niftk
 struct NIFTYCAL_WINEXPORT Point2D
 {
   unsigned int id;
-  cv::Point2d point;
+  cv::Point2d  point;
 };
 
 typedef std::map<unsigned int, Point2D> PointSet;
