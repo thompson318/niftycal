@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkIPointDetector.h"
+#include "niftkIPoint2DDetector.h"
 
 namespace niftk {
 
@@ -52,14 +52,14 @@ PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
 
 
 //-----------------------------------------------------------------------------
-IPointDetector::IPointDetector()
+IPoint2DDetector::IPoint2DDetector()
 {
 
 }
 
 
 //-----------------------------------------------------------------------------
-IPointDetector::~IPointDetector()
+IPoint2DDetector::~IPoint2DDetector()
 {
 
 }

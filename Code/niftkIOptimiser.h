@@ -22,7 +22,8 @@ namespace niftk
 
 /**
 * \class IOptimiser
-* \brief Interface for any optimiser that can do calibration,
+* \brief Interface for any optimiser that can do calibration.
+*
 * e.g. Levenberg-Marquardt.
 */
 class NIFTYCAL_WINEXPORT IOptimiser {

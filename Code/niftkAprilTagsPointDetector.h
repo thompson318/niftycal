@@ -16,7 +16,7 @@
 #define niftkAprilTagsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include <niftkIPointDetector.h>
+#include <niftkIPoint2DDetector.h>
 #include <cv.h>
 
 namespace niftk
@@ -28,7 +28,7 @@ namespace niftk
 *
 * Note, this detector does no image conversion.
 */
-class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public IPointDetector
+class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public IPoint2DDetector
 {
 
 public:

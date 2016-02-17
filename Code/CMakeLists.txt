@@ -15,7 +15,7 @@
 set(NIFTYCAL_SRCS
   niftkNiftyCalException.cxx
   niftkIOptimiser.cxx
-  niftkIPointDetector.cxx
+  niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
 
 )
