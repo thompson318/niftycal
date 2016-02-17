@@ -18,6 +18,7 @@ set(NIFTYCAL_SRCS
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
   niftkModel3D.cxx
+  niftkMonoCameraCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

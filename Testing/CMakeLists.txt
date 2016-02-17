@@ -16,6 +16,7 @@ set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
 set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkExtractChessboardPointsTest
+  niftkMonoChessboardCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -36,3 +37,4 @@ endforeach()
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612 35)
+add_test(CalibMonoLap1 niftkMonoChessboardCameraCalibrationTest 3 14 10 ${DATA_DIR}/Laparoscope/left-1095.png	${DATA_DIR}/Laparoscope/left-1338.png	${DATA_DIR}/Laparoscope/left-1884.png	${DATA_DIR}/Laparoscope/left-2520.png	${DATA_DIR}/Laparoscope/left-3083.png	${DATA_DIR}/Laparoscope/left-3335.png	${DATA_DIR}/Laparoscope/left-3685.png	${DATA_DIR}/Laparoscope/left-4848.png	${DATA_DIR}/Laparoscope/left-798.png)
