@@ -23,8 +23,8 @@ namespace niftk
 {
 
 /**
-* \class PointInfo
-* \brief Placeholder for a point and its associated identifier.
+* \class Point2D
+* \brief Placeholder for a 2D point and its associated identifier.
 */
 struct NIFTYCAL_WINEXPORT Point2D
 {
@@ -33,7 +33,7 @@ struct NIFTYCAL_WINEXPORT Point2D
 };
 
 typedef std::map<unsigned int, Point2D> PointSet;
-typedef std::pair<unsigned int, Point2D> IdPoint;
+typedef std::pair<unsigned int, Point2D> IdPoint2D;
 
 /**
 * \brief Creates a new copy of the input list.

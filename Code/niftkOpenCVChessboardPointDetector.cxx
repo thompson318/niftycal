@@ -76,7 +76,7 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
       tmp.point.x = corners[k].x;
       tmp.point.y = corners[k].y;
       tmp.id = k;
-      result.insert(IdPoint(tmp.id, tmp));
+      result.insert(IdPoint2D(tmp.id, tmp));
     }
   }
 

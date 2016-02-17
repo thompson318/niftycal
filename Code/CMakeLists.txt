@@ -17,7 +17,7 @@ set(NIFTYCAL_SRCS
   niftkIOptimiser.cxx
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
-
+  niftkModel3D.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

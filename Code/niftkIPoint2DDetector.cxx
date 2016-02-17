@@ -24,7 +24,7 @@ PointSet CopyPoints(const PointSet& p)
   PointSet::const_iterator iter;
   for ( iter = p.begin(); iter != p.end(); ++iter )
   {
-    result.insert(IdPoint((*iter).first, (*iter).second));
+    result.insert(IdPoint2D((*iter).first, (*iter).second));
   }
 
   return result;
@@ -44,7 +44,7 @@ PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
     tmp.id = (*iter).second.id;
     tmp.point.x *= scaleFactor.x;
     tmp.point.y *= scaleFactor.y;
-    result.insert(IdPoint(tmp.id, tmp));
+    result.insert(IdPoint2D(tmp.id, tmp));
   }
 
   return result;

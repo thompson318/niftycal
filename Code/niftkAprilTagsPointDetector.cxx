@@ -100,29 +100,29 @@ PointSet AprilTagsPointDetector::GetPoints()
     tmp.point.x = (double) markers[i].cxy.first;
     tmp.point.y = (double) markers[i].cxy.second;
     tmp.id = markers[i].id;
-    result.insert(IdPoint(tmp.id, tmp));
+    result.insert(IdPoint2D(tmp.id, tmp));
 
     if (m_IncludeCorners)
     {
       tmp.point.x = (double) markers[i].p[3].first;
       tmp.point.y = (double) markers[i].p[3].second;
       tmp.id = markers[i].id + 1000;
-      result.insert(IdPoint(tmp.id, tmp));
+      result.insert(IdPoint2D(tmp.id, tmp));
 
       tmp.point.x = (double) markers[i].p[2].first;
       tmp.point.y = (double) markers[i].p[2].second;
       tmp.id = markers[i].id + 2000;
-      result.insert(IdPoint(tmp.id, tmp));
+      result.insert(IdPoint2D(tmp.id, tmp));
 
       tmp.point.x = (double) markers[i].p[1].first;
       tmp.point.y = (double) markers[i].p[1].second;
       tmp.id = markers[i].id + 3000;
-      result.insert(IdPoint(tmp.id, tmp));
+      result.insert(IdPoint2D(tmp.id, tmp));
 
       tmp.point.x = (double) markers[i].p[0].first;
       tmp.point.y = (double) markers[i].p[0].second;
       tmp.id = markers[i].id + 4000;
-      result.insert(IdPoint(tmp.id, tmp));
+      result.insert(IdPoint2D(tmp.id, tmp));
     }
   }
 
