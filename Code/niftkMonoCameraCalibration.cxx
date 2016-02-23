@@ -25,7 +25,8 @@ double MonoCameraCalibration(const Model3D& model,
                              cv::Mat& intrinsic,
                              cv::Mat& distortion,
                              std::vector<cv::Mat>& rvecs,
-                             std::vector<cv::Mat>& tvecs
+                             std::vector<cv::Mat>& tvecs,
+                             const bool& intrinsicsFixed
                              )
 {
   if (model.empty())
@@ -97,35 +98,43 @@ double MonoCameraCalibration(const Model3D& model,
 
   // Do calibration
 
-  cv::calibrateCamera(objectPoints,
-                      imagePoints,
-                      imageSize,
-                      intrinsic,
-                      distortion,
-                      rvecs,
-                      tvecs,
-                      CV_CALIB_FIX_PRINCIPAL_POINT | CV_CALIB_FIX_ASPECT_RATIO
-                      );
+  if (!intrinsicsFixed)
+  {
+    cv::calibrateCamera(objectPoints,
+                        imagePoints,
+                        imageSize,
+                        intrinsic,
+                        distortion,
+                        rvecs,
+                        tvecs,
+                        CV_CALIB_FIX_PRINCIPAL_POINT | CV_CALIB_FIX_ASPECT_RATIO
+                        );
 
-  cv::calibrateCamera(objectPoints,
-                      imagePoints,
-                      imageSize,
-                      intrinsic,
-                      distortion,
-                      rvecs,
-                      tvecs,
-                      CV_CALIB_FIX_PRINCIPAL_POINT
-                      );
+    cv::calibrateCamera(objectPoints,
+                        imagePoints,
+                        imageSize,
+                        intrinsic,
+                        distortion,
+                        rvecs,
+                        tvecs,
+                        CV_CALIB_FIX_PRINCIPAL_POINT
+                        );
 
-  rms = cv::calibrateCamera(objectPoints,
-                            imagePoints,
-                            imageSize,
-                            intrinsic,
-                            distortion,
-                            rvecs,
-                            tvecs,
-                            CV_CALIB_USE_INTRINSIC_GUESS
-                            );
+    rms = cv::calibrateCamera(objectPoints,
+                              imagePoints,
+                              imageSize,
+                              intrinsic,
+                              distortion,
+                              rvecs,
+                              tvecs,
+                              CV_CALIB_USE_INTRINSIC_GUESS
+                              );
+  }
+  else
+  {
+    // Just do extrinsics.
+    cv::solvePnP(objectPoints, imagePoints, intrinsic, distortion, rvecs, tvecs);
+  }
 
   return rms;
 }

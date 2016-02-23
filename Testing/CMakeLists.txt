@@ -17,6 +17,7 @@ set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkExtractChessboardPointsTest
   niftkMonoChessboardCameraCalibrationTest
+  niftkStereoChessboardCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -37,4 +38,38 @@ endforeach()
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612 35)
-add_test(CalibMonoLap1 niftkMonoChessboardCameraCalibrationTest 3 14 10 0.577703 2007.33 2013.72 945.486 619.07 -0.237351 -0.244029 0.00299158 -0.00141141 ${DATA_DIR}/Laparoscope/left-1095.png	${DATA_DIR}/Laparoscope/left-1338.png	${DATA_DIR}/Laparoscope/left-1884.png	${DATA_DIR}/Laparoscope/left-2520.png	${DATA_DIR}/Laparoscope/left-3083.png	${DATA_DIR}/Laparoscope/left-3335.png	${DATA_DIR}/Laparoscope/left-3685.png	${DATA_DIR}/Laparoscope/left-4848.png	${DATA_DIR}/Laparoscope/left-798.png)
+add_test(CalibMonoLap1 niftkMonoChessboardCameraCalibrationTest 3 14 10 0.577703 # RMS
+  2007.33 2013.72 945.486 619.07              # intrinsic
+  -0.237351 -0.244029 0.00299158 -0.00141141  # distortion
+  ${DATA_DIR}/Laparoscope/Left/left-1095.png
+  ${DATA_DIR}/Laparoscope/Left/left-1338.png
+  ${DATA_DIR}/Laparoscope/Left/left-1884.png
+  ${DATA_DIR}/Laparoscope/Left/left-2520.png
+  ${DATA_DIR}/Laparoscope/Left/left-3083.png
+  ${DATA_DIR}/Laparoscope/Left/left-3335.png
+  ${DATA_DIR}/Laparoscope/Left/left-3685.png
+  ${DATA_DIR}/Laparoscope/Left/left-4848.png
+  ${DATA_DIR}/Laparoscope/Left/left-798.png
+)
+add_test(CalibStereoLap1 niftkStereoChessboardCameraCalibrationTest 3 14 10 0.57777 # RMS
+  0.1 0.2 0.3 # rvec
+  0.4 0.5 0.6 # tvec
+  ${DATA_DIR}/Laparoscope/Left/left-1095.png
+  ${DATA_DIR}/Laparoscope/Left/left-1338.png
+  ${DATA_DIR}/Laparoscope/Left/left-1884.png
+  ${DATA_DIR}/Laparoscope/Left/left-2520.png
+  ${DATA_DIR}/Laparoscope/Left/left-3083.png
+  ${DATA_DIR}/Laparoscope/Left/left-3335.png
+  ${DATA_DIR}/Laparoscope/Left/left-3685.png
+  ${DATA_DIR}/Laparoscope/Left/left-4848.png
+  ${DATA_DIR}/Laparoscope/Left/left-798.png
+  ${DATA_DIR}/Laparoscope/Right/right-1095.png
+  ${DATA_DIR}/Laparoscope/Right/right-1338.png
+  ${DATA_DIR}/Laparoscope/Right/right-1884.png
+  ${DATA_DIR}/Laparoscope/Right/right-2520.png
+  ${DATA_DIR}/Laparoscope/Right/right-3083.png
+  ${DATA_DIR}/Laparoscope/Right/right-3335.png
+  ${DATA_DIR}/Laparoscope/Right/right-3685.png
+  ${DATA_DIR}/Laparoscope/Right/right-4848.png
+  ${DATA_DIR}/Laparoscope/Right/right-798.png
+)

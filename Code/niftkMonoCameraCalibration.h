@@ -35,7 +35,8 @@ NIFTYCAL_WINEXPORT double MonoCameraCalibration(const Model3D& model,
                                                 cv::Mat& intrinsic,
                                                 cv::Mat& distortion,
                                                 std::vector<cv::Mat>& rvecs,
-                                                std::vector<cv::Mat>& tvecs
+                                                std::vector<cv::Mat>& tvecs,
+                                                const bool& intrinsicsFixed = false
                                                );
 
 } // end namespace
