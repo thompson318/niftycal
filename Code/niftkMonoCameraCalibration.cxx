@@ -39,6 +39,8 @@ double MonoCameraCalibration(const Model3D& model,
   }
 
   double rms = 0;
+  rvecs.clear();
+  tvecs.clear();
 
   // Remember, each PointSet in listOfPointSets can have
   // a different number of points, and also each PointSet

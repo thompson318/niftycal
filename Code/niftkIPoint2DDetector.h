@@ -16,6 +16,7 @@
 #define niftkIPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
+#include "niftkModel3D.h"
 #include <cv.h>
 #include <map>
 
@@ -28,12 +29,12 @@ namespace niftk
 */
 struct NIFTYCAL_WINEXPORT Point2D
 {
-  unsigned int id;
+  IdType id;
   cv::Point2d  point;
 };
 
-typedef std::map<unsigned int, Point2D> PointSet;
-typedef std::pair<unsigned int, Point2D> IdPoint2D;
+typedef std::map<IdType, Point2D> PointSet;
+typedef std::pair<IdType, Point2D> IdPoint2D;
 
 /**
 * \brief Creates a new copy of the input list.

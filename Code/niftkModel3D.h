@@ -22,18 +22,20 @@
 namespace niftk
 {
 
+typedef unsigned int IdType;
+
 /**
 * \class Point3D
 * \brief Placeholder for a 3D point and its associated identifier.
 */
 struct NIFTYCAL_WINEXPORT Point3D
 {
-  unsigned int id;
+  IdType id;
   cv::Point3d point;
 };
 
-typedef std::map<unsigned int, Point3D> Model3D;
-typedef std::pair<unsigned int, Point3D> IdPoint3D;
+typedef std::map<IdType, Point3D> Model3D;
+typedef std::pair<IdType, Point3D> IdPoint3D;
 
 } // end namespace
 

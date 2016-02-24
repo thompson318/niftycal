@@ -26,7 +26,7 @@
 
 TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  14;
+  int expectedMinimumNumberOfArguments =  13;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
     std::cerr << "Usage: niftkStereChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
@@ -36,13 +36,12 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   float squareSizeInMillimetres = atof(niftk::argv[1]);
   int numberInternalCornersInX = atoi(niftk::argv[2]);
   int numberInternalCornersInY = atoi(niftk::argv[3]);
-  float eRMS = atof(niftk::argv[4]);
-  float eR1 = atof(niftk::argv[5]);
-  float eR2 = atof(niftk::argv[6]);
-  float eR3 = atof(niftk::argv[7]);
-  float eT1 = atof(niftk::argv[8]);
-  float eT2 = atof(niftk::argv[9]);
-  float eT3 = atof(niftk::argv[10]);
+  float eR1 = atof(niftk::argv[4]);
+  float eR2 = atof(niftk::argv[5]);
+  float eR3 = atof(niftk::argv[6]);
+  float eT1 = atof(niftk::argv[7]);
+  float eT2 = atof(niftk::argv[8]);
+  float eT3 = atof(niftk::argv[9]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -54,7 +53,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   }
 
   // Should have an even number of images left.
-  if ((niftk::argc - 11) % 2 != 0)
+  if ((niftk::argc - 10) % 2 != 0)
   {
     niftkNiftyCalThrow() << "Should have an even number of images.";
   }
@@ -86,7 +85,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::list<niftk::PointSet> listOfPointsLeft;
   std::list<niftk::PointSet> listOfPointsRight;
 
-  for (int i = 11; i < niftk::argc; i++)
+  for (int i = 10; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
@@ -104,7 +103,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
       if (pointSet.size() > 0)
       {
-        if (i-12 < (niftk::argc-12)/2)
+        if (i-10 < (niftk::argc-10)/2)
         {
           listOfPointsLeft.push_back(pointSet);
           std::cout << " left." << std::endl;
@@ -139,22 +138,23 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   cv::Mat left2RightRotation = cvCreateMat (1,3,CV_64FC1);
   cv::Mat left2RightTranslation = cvCreateMat (1,3,CV_64FC1);
 
-  double rms = niftk::StereoCameraCalibration(model,
-                                              listOfPointsLeft,
-                                              listOfPointsRight,
-                                              intrinsicLeft,
-                                              distortionLeft,
-                                              rvecsLeft,
-                                              tvecsLeft,
-                                              intrinsicRight,
-                                              distortionRight,
-                                              rvecsRight,
-                                              tvecsRight,
-                                              left2RightRotation,
-                                              left2RightTranslation,
-                                              essentialMatrix,
-                                              fundamentalMatrix
-                                              );
+  niftk::StereoCameraCalibration(model,
+                                 listOfPointsLeft,
+                                 listOfPointsRight,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft,
+                                 tvecsLeft,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 rvecsRight,
+                                 tvecsRight,
+                                 left2RightRotation,
+                                 left2RightTranslation,
+                                 essentialMatrix,
+                                 fundamentalMatrix
+                                );
 
   std::cout << "R1=" << left2RightRotation.at<double>(0,0) << std::endl;
   std::cout << "R2=" << left2RightRotation.at<double>(0,1) << std::endl;
@@ -162,10 +162,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "T1=" << left2RightTranslation.at<double>(0,0) << std::endl;
   std::cout << "T2=" << left2RightTranslation.at<double>(0,1) << std::endl;
   std::cout << "T3=" << left2RightTranslation.at<double>(0,2) << std::endl;
-  std::cout << "RMS=" << rms << std::endl;
 
   double tolerance = 0.005;
-  REQUIRE( fabs(rms - eRMS) < 0.001 );
   REQUIRE( fabs(left2RightRotation.at<double>(0,0) - eR1) < tolerance );
   REQUIRE( fabs(left2RightRotation.at<double>(0,1) - eR2) < tolerance );
   REQUIRE( fabs(left2RightRotation.at<double>(0,2) - eR3) < tolerance );

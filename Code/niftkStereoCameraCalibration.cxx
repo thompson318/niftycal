@@ -19,28 +19,160 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double StereoCameraCalibration(const Model3D& model,
-                               const std::list<PointSet>& listOfLeftHandPointSets,
-                               const std::list<PointSet>& listOfRightHandPointSets,
-                               cv::Mat& intrinsicLeft,
-                               cv::Mat& distortionLeft,
-                               std::vector<cv::Mat>& rvecsLeft,
-                               std::vector<cv::Mat>& tvecsLeft,
-                               cv::Mat& intrinsicRight,
-                               cv::Mat& distortionRight,
-                               std::vector<cv::Mat>& rvecsRight,
-                               std::vector<cv::Mat>& tvecsRight,
-                               cv::Mat& left2RightRotation,
-                               cv::Mat& left2RightTranslation,
-                               cv::Mat& essentialMatrix,
-                               cv::Mat& fundamentalMatrix
-                              )
+void StereoCameraCalibration(const Model3D& model,
+                             const std::list<PointSet>& listOfLeftHandPointSets,
+                             const std::list<PointSet>& listOfRightHandPointSets,
+                             const cv::Size2i& imageSize,
+                             cv::Mat& intrinsicLeft,
+                             cv::Mat& distortionLeft,
+                             std::vector<cv::Mat>& rvecsLeft,
+                             std::vector<cv::Mat>& tvecsLeft,
+                             cv::Mat& intrinsicRight,
+                             cv::Mat& distortionRight,
+                             std::vector<cv::Mat>& rvecsRight,
+                             std::vector<cv::Mat>& tvecsRight,
+                             cv::Mat& left2RightRotation,
+                             cv::Mat& left2RightTranslation,
+                             cv::Mat& essentialMatrix,
+                             cv::Mat& fundamentalMatrix,
+                             const int& cvFlags
+                            )
 {
+  rvecsLeft.clear();
+  tvecsLeft.clear();
+  rvecsRight.clear();
+  tvecsRight.clear();
+
   if (model.empty())
   {
     niftkNiftyCalThrow() << "Model should not be empty.";
   }
+  if (listOfLeftHandPointSets.size() < 2)
+  {
+    niftkNiftyCalThrow() << "Should have at least two views of calibration points for left camera.";
+  }
+  if (listOfRightHandPointSets.size() < 2)
+  {
+    niftkNiftyCalThrow() << "Should have at least two views of calibration points for right camera.";
+  }
+  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
+  {
+    niftkNiftyCalThrow() << "Should have the same number of views in left and right channel.";
+  }
 
+  std::list<PointSet>::const_iterator iter;
+  int counter = 0;
+  for (iter = listOfLeftHandPointSets.begin(); iter != listOfLeftHandPointSets.end(); ++iter)
+  {
+    counter++;
+    if ((*iter).size() == 0)
+    {
+      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th left camera view.";
+    }
+  }
+  counter = 0;
+  for (iter = listOfRightHandPointSets.begin(); iter != listOfRightHandPointSets.end(); ++iter)
+  {
+    counter++;
+    if ((*iter).size() == 0)
+    {
+      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th right camera view.";
+    }
+  }
+
+  std::vector<std::vector<cv::Vec3f> > objectPoints;
+  std::vector<std::vector<cv::Vec2f> > leftImagePoints;
+  std::vector<std::vector<cv::Vec2f> > rightImagePoints;
+
+  // Remember at this point, the number of PointSets in left and right is the same.
+
+  std::list<PointSet>::const_iterator leftListIter;
+  std::list<PointSet>::const_iterator rightListIter;
+  PointSet::const_iterator leftPointsIter;
+  PointSet::const_iterator rightPointsIter;
+
+  // Loop through each point set.
+  for (leftListIter = listOfLeftHandPointSets.begin(),
+       rightListIter = listOfRightHandPointSets.begin();
+       leftListIter != listOfLeftHandPointSets.end() &&
+       rightListIter != listOfRightHandPointSets.end();
+       ++leftListIter,
+       ++rightListIter
+       )
+  {
+    std::vector<cv::Vec3f> objectVectors3D;
+    std::vector<cv::Vec2f> leftVectors2D;
+    std::vector<cv::Vec2f> rightVectors2D;
+
+    // A point must be visible in both left and right view for it to be added.
+    for (leftPointsIter = (*leftListIter).begin(); leftPointsIter != (*leftListIter).end(); ++leftPointsIter)
+    {
+      niftk::IdType id = (*leftPointsIter).first;
+      rightPointsIter = (*rightListIter).find(id);
+
+      if (rightPointsIter != (*rightListIter).end())
+      {
+        // Found matching right hand point
+        cv::Point3d p3 = (model.at((*leftPointsIter).first)).point;
+        cv::Vec3f v3(p3.x, p3.y, p3.z);
+
+        cv::Point2d p2l = ((*leftPointsIter).second).point;
+        cv::Vec2f v2l(p2l.x, p2l.y);
+
+        cv::Point2d p2r = ((*rightPointsIter).second).point;
+        cv::Vec2f v2r(p2r.x, p2r.y);
+
+        objectVectors3D.push_back(v3);
+        leftVectors2D.push_back(v2l);
+        rightVectors2D.push_back(v2r);
+      }
+    }
+
+    if (objectVectors3D.size() > 0 && leftVectors2D.size() > 0 && rightVectors2D.size() > 0
+        && objectVectors3D.size() == leftVectors2D.size()
+        && objectVectors3D.size() == rightVectors2D.size()
+        )
+    {
+      objectPoints.push_back(objectVectors3D);
+      leftImagePoints.push_back(leftVectors2D);
+      rightImagePoints.push_back(rightVectors2D);
+      rvecsLeft.push_back(cv::Mat());
+      tvecsLeft.push_back(cv::Mat());
+      rvecsRight.push_back(cv::Mat());
+      tvecsRight.push_back(cv::Mat());
+    }
+  }
+
+  // Sanity check
+  if (objectPoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No object points extracted.";
+  }
+  if (leftImagePoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No left image points extracted.";
+  }
+  if (rightImagePoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No right image points extracted.";
+  }
+
+  // Do calibration
+  cv::stereoCalibrate(objectPoints,
+                      leftImagePoints,
+                      rightImagePoints,
+                      intrinsicLeft,
+                      distortionLeft,
+                      intrinsicRight,
+                      distortionRight,
+                      imageSize,
+                      left2RightRotation,
+                      left2RightTranslation,
+                      essentialMatrix,
+                      fundamentalMatrix,
+                      cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-6),
+                      cvFlags
+                      );
 }
 
 } // end namespace

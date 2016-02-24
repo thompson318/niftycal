@@ -51,9 +51,9 @@ add_test(CalibMonoLap1 niftkMonoChessboardCameraCalibrationTest 3 14 10 0.577703
   ${DATA_DIR}/Laparoscope/Left/left-4848.png
   ${DATA_DIR}/Laparoscope/Left/left-798.png
 )
-add_test(CalibStereoLap1 niftkStereoChessboardCameraCalibrationTest 3 14 10 0.57777 # RMS
-  0.1 0.2 0.3 # rvec
-  0.4 0.5 0.6 # tvec
+add_test(CalibStereoLap1 niftkStereoChessboardCameraCalibrationTest 3 14 10
+  0.99919 -0.000809931 0.0402285 # rvec
+  -4.64005 0.26403 0.297868 # tvec
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png
