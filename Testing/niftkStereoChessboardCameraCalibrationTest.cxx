@@ -125,19 +125,19 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   REQUIRE( listOfPointsLeft.size()  == listOfPointsRight.size());
 
   cv::Mat intrinsicLeft = cvCreateMat (3,3,CV_64FC1);
-  cv::Mat distortionLeft = cvCreateMat (0,4,CV_64FC1);
+  cv::Mat distortionLeft = cvCreateMat (1,4,CV_64FC1);
   std::vector<cv::Mat> rvecsLeft;
   std::vector<cv::Mat> tvecsLeft;
 
   cv::Mat intrinsicRight = cvCreateMat (3,3,CV_64FC1);
-  cv::Mat distortionRight = cvCreateMat (0,4,CV_64FC1);
+  cv::Mat distortionRight = cvCreateMat (1,4,CV_64FC1);
   std::vector<cv::Mat> rvecsRight;
   std::vector<cv::Mat> tvecsRight;
 
   cv::Mat essentialMatrix = cvCreateMat (3,3,CV_64FC1);
   cv::Mat fundamentalMatrix = cvCreateMat (3,3,CV_64FC1);
-  cv::Mat left2RightRotation = cvCreateMat (0,3,CV_64FC1);
-  cv::Mat left2RightTranslation = cvCreateMat (0,3,CV_64FC1);
+  cv::Mat left2RightRotation = cvCreateMat (1,3,CV_64FC1);
+  cv::Mat left2RightTranslation = cvCreateMat (1,3,CV_64FC1);
 
   double rms = niftk::StereoCameraCalibration(model,
                                               listOfPointsLeft,
