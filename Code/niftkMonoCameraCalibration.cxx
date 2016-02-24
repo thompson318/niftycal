@@ -42,16 +42,6 @@ double MonoCameraCalibration(const Model3D& model,
   rvecs.clear();
   tvecs.clear();
 
-  // Remember, each PointSet in listOfPointSets can have
-  // a different number of points, and also each PointSet
-  // can have different point IDs. Furthermore, assume
-  // that point IDs in a given PointSet may not be valid
-  // i.e. they are not contained in Model3D. So, we need
-  // to extract only the ones that match in 2D and 3D.
-  //
-  // Fortunately, the OpenCV calibration can do this.
-  // So we only have to convert the format.
-
   std::vector<std::vector<cv::Vec3f> > objectPoints;
   std::vector<std::vector<cv::Vec2f> > imagePoints;
 
@@ -100,8 +90,21 @@ double MonoCameraCalibration(const Model3D& model,
 
   // Do calibration
 
-  if (!intrinsicsFixed)
+  if (intrinsicsFixed)
   {
+    rms = cv::calibrateCamera(objectPoints,
+                              imagePoints,
+                              imageSize,
+                              intrinsic,
+                              distortion,
+                              rvecs,
+                              tvecs,
+                              CV_CALIB_FIX_INTRINSIC
+                              );
+  }
+  else
+  {
+
     cv::calibrateCamera(objectPoints,
                         imagePoints,
                         imageSize,
@@ -131,11 +134,6 @@ double MonoCameraCalibration(const Model3D& model,
                               tvecs,
                               CV_CALIB_USE_INTRINSIC_GUESS
                               );
-  }
-  else
-  {
-    // Just do extrinsics.
-    cv::solvePnP(objectPoints, imagePoints, intrinsic, distortion, rvecs, tvecs);
   }
 
   return rms;

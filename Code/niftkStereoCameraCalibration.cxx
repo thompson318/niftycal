@@ -19,25 +19,26 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-void StereoCameraCalibration(const Model3D& model,
-                             const std::list<PointSet>& listOfLeftHandPointSets,
-                             const std::list<PointSet>& listOfRightHandPointSets,
-                             const cv::Size2i& imageSize,
-                             cv::Mat& intrinsicLeft,
-                             cv::Mat& distortionLeft,
-                             std::vector<cv::Mat>& rvecsLeft,
-                             std::vector<cv::Mat>& tvecsLeft,
-                             cv::Mat& intrinsicRight,
-                             cv::Mat& distortionRight,
-                             std::vector<cv::Mat>& rvecsRight,
-                             std::vector<cv::Mat>& tvecsRight,
-                             cv::Mat& left2RightRotation,
-                             cv::Mat& left2RightTranslation,
-                             cv::Mat& essentialMatrix,
-                             cv::Mat& fundamentalMatrix,
-                             const int& cvFlags
-                            )
+double StereoCameraCalibration(const Model3D& model,
+                               const std::list<PointSet>& listOfLeftHandPointSets,
+                               const std::list<PointSet>& listOfRightHandPointSets,
+                               const cv::Size2i& imageSize,
+                               cv::Mat& intrinsicLeft,
+                               cv::Mat& distortionLeft,
+                               std::vector<cv::Mat>& rvecsLeft,
+                               std::vector<cv::Mat>& tvecsLeft,
+                               cv::Mat& intrinsicRight,
+                               cv::Mat& distortionRight,
+                               std::vector<cv::Mat>& rvecsRight,
+                               std::vector<cv::Mat>& tvecsRight,
+                               cv::Mat& left2RightRotation,
+                               cv::Mat& left2RightTranslation,
+                               cv::Mat& essentialMatrix,
+                               cv::Mat& fundamentalMatrix,
+                               const int& cvFlags
+                              )
 {
+  double rms = 0;
   rvecsLeft.clear();
   tvecsLeft.clear();
   rvecsRight.clear();
@@ -173,6 +174,28 @@ void StereoCameraCalibration(const Model3D& model,
                       cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-6),
                       cvFlags
                       );
+
+  // Additionally solve extrinsics
+  double rmsLeft = cv::calibrateCamera(objectPoints,
+                                       leftImagePoints,
+                                       imageSize,
+                                       intrinsicLeft,
+                                       distortionLeft,
+                                       rvecsLeft,
+                                       tvecsLeft,
+                                       CV_CALIB_USE_INTRINSIC_GUESS
+                                       );
+  double rmsRight = cv::calibrateCamera(objectPoints,
+                                        rightImagePoints,
+                                        imageSize,
+                                        intrinsicRight,
+                                        distortionRight,
+                                        rvecsRight,
+                                        tvecsRight,
+                                        CV_CALIB_USE_INTRINSIC_GUESS
+                                        );
+  rms = (rmsLeft + rmsRight) / 2.0;
+  return rms;
 }
 
 } // end namespace

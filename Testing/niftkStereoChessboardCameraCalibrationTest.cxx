@@ -138,23 +138,23 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   cv::Mat left2RightRotation = cvCreateMat (1,3,CV_64FC1);
   cv::Mat left2RightTranslation = cvCreateMat (1,3,CV_64FC1);
 
-  niftk::StereoCameraCalibration(model,
-                                 listOfPointsLeft,
-                                 listOfPointsRight,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 rvecsLeft,
-                                 tvecsLeft,
-                                 intrinsicRight,
-                                 distortionRight,
-                                 rvecsRight,
-                                 tvecsRight,
-                                 left2RightRotation,
-                                 left2RightTranslation,
-                                 essentialMatrix,
-                                 fundamentalMatrix
-                                );
+  double rms = niftk::StereoCameraCalibration(model,
+                                              listOfPointsLeft,
+                                              listOfPointsRight,
+                                              imageSize,
+                                              intrinsicLeft,
+                                              distortionLeft,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              intrinsicRight,
+                                              distortionRight,
+                                              rvecsRight,
+                                              tvecsRight,
+                                              left2RightRotation,
+                                              left2RightTranslation,
+                                              essentialMatrix,
+                                              fundamentalMatrix
+                                             );
 
   std::cout << "R1=" << left2RightRotation.at<double>(0,0) << std::endl;
   std::cout << "R2=" << left2RightRotation.at<double>(0,1) << std::endl;
@@ -162,6 +162,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "T1=" << left2RightTranslation.at<double>(0,0) << std::endl;
   std::cout << "T2=" << left2RightTranslation.at<double>(0,1) << std::endl;
   std::cout << "T3=" << left2RightTranslation.at<double>(0,2) << std::endl;
+  std::cout << "RMS=" << rms << std::endl;
 
   double tolerance = 0.005;
   REQUIRE( fabs(left2RightRotation.at<double>(0,0) - eR1) < tolerance );
