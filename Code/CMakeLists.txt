@@ -20,6 +20,7 @@ set(NIFTYCAL_SRCS
   niftkModel3D.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
+  niftkHomographyUtilities.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
