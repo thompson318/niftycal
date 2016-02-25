@@ -159,42 +159,42 @@ double StereoCameraCalibration(const Model3D& model,
   }
 
   // Do calibration
-  cv::stereoCalibrate(objectPoints,
-                      leftImagePoints,
-                      rightImagePoints,
-                      intrinsicLeft,
-                      distortionLeft,
-                      intrinsicRight,
-                      distortionRight,
-                      imageSize,
-                      left2RightRotation,
-                      left2RightTranslation,
-                      essentialMatrix,
-                      fundamentalMatrix,
-                      cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-6),
-                      cvFlags
-                      );
+  rms = cv::stereoCalibrate(objectPoints,
+                            leftImagePoints,
+                            rightImagePoints,
+                            intrinsicLeft,
+                            distortionLeft,
+                            intrinsicRight,
+                            distortionRight,
+                            imageSize,
+                            left2RightRotation,
+                            left2RightTranslation,
+                            essentialMatrix,
+                            fundamentalMatrix,
+                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-6),
+                            cvFlags
+                            );
 
   // Additionally solve extrinsics
-  double rmsLeft = cv::calibrateCamera(objectPoints,
-                                       leftImagePoints,
-                                       imageSize,
-                                       intrinsicLeft,
-                                       distortionLeft,
-                                       rvecsLeft,
-                                       tvecsLeft,
-                                       CV_CALIB_USE_INTRINSIC_GUESS
-                                       );
-  double rmsRight = cv::calibrateCamera(objectPoints,
-                                        rightImagePoints,
-                                        imageSize,
-                                        intrinsicRight,
-                                        distortionRight,
-                                        rvecsRight,
-                                        tvecsRight,
-                                        CV_CALIB_USE_INTRINSIC_GUESS
-                                        );
-  rms = (rmsLeft + rmsRight) / 2.0;
+  cv::calibrateCamera(objectPoints,
+                      leftImagePoints,
+                      imageSize,
+                      intrinsicLeft,
+                      distortionLeft,
+                      rvecsLeft,
+                      tvecsLeft,
+                      CV_CALIB_FIX_INTRINSIC
+                      );
+
+  cv::calibrateCamera(objectPoints,
+                      rightImagePoints,
+                      imageSize,
+                      intrinsicRight,
+                      distortionRight,
+                      rvecsRight,
+                      tvecsRight,
+                      CV_CALIB_FIX_INTRINSIC
+                      );
   return rms;
 }
 
