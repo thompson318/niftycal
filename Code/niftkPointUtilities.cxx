@@ -82,28 +82,65 @@ void ExtractCommonPoints(const PointSet& inputA,
 
 
 //-----------------------------------------------------------------------------
+void ConvertPoints(const PointSet& input,
+                   std::vector<cv::Point2f>& outputPoint,
+                   std::vector<niftk::IdType>& outputId
+                  )
+{
+  outputPoint.clear();
+  outputId.clear();
+
+  niftk::PointSet::const_iterator iter;
+  for(iter = input.begin(); iter != input.end(); ++iter)
+  {
+    cv::Point2f p;
+    p.x = (*iter).second.point.x;
+    p.y = (*iter).second.point.y;
+    outputPoint.push_back(p);
+    outputId.push_back((*iter).first);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
+                   const std::vector<niftk::IdType>& inputId,
+                   PointSet& output
+                   )
+{
+  output.clear();
+
+  if (inputPoint.size() != inputId.size())
+  {
+    niftkNiftyCalThrow() << "Different number of points and ids.";
+  }
+  for (size_t i = 0; i < inputPoint.size(); i++)
+  {
+    niftk::Point2D p2d;
+    cv::Point2d p;
+    p.x = inputPoint[i].x;
+    p.y = inputPoint[i].y;
+    p2d.point = p;
+    p2d.id = inputId[i];
+    output.insert(niftk::IdPoint2D(p2d.id, p2d));
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
                                                  const PointSet& inputB)
 {
-  niftk::PointSet::const_iterator iterA;
-  niftk::PointSet::const_iterator iterB;
+  std::vector<cv::Point2f> a;
+  std::vector<cv::Point2f> b;
 
-  double rms = 0;
-  IdType counter = 0;
-
-  for(iterA = inputA.begin(); iterA != inputA.end(); ++iterA)
-  {
-    iterB = inputB.find((*iterA).first);
-    if (iterB != inputB.end())
-    {
-
-    }
-  }
-
-  if (counter == 0)
+  niftk::ExtractCommonPoints(inputA, inputB, a, b);
+  if (a.size() == 0 || b.size() == 0)
   {
     niftkNiftyCalThrow() << "No common points.";
   }
+
+  double rms = 0;
   return rms;
 }
 
@@ -116,6 +153,10 @@ void UndistortPoints(const PointSet& distortedPoints,
                     )
 {
 
+  std::vector<cv::Point2f> distorted;
+  std::vector<niftk::IdType> ids;
+
+  niftk::ConvertPoints(distortedPoints, distorted, ids);
 }
 
 
@@ -126,6 +167,10 @@ void DistortPoints(const PointSet& undistortedPoints,
                    PointSet& distortedPoints
                   )
 {
+  std::vector<cv::Point2f> undistorted;
+  std::vector<niftk::IdType> ids;
+
+  niftk::ConvertPoints(undistortedPoints, undistorted, ids);
 
 }
 

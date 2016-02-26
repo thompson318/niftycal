@@ -39,6 +39,22 @@ NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& 
 
 
 /**
+* \brief Converts PointSet to vector for many OpenCV functions.
+*/
+NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,
+                                      std::vector<cv::Point2f>& outputPoint,
+                                      std::vector<niftk::IdType>& outputId
+                                     );
+
+/**
+* \brief Converts PointSet to vector for many OpenCV functions.
+*/
+NIFTYCAL_WINEXPORT void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
+                                      const std::vector<niftk::IdType>& inputId,
+                                      PointSet& output
+                                     );
+
+/**
 * \brief Extracts the common (same identifier) points in A and B.
 */
 NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
