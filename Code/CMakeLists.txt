@@ -15,11 +15,12 @@
 set(NIFTYCAL_SRCS
   niftkNiftyCalException.cxx
   niftkTypes.cxx
+  niftkPointUtilities.cxx
+  niftkHomographyUtilities.cxx
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
-  niftkHomographyUtilities.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

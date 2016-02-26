@@ -21,7 +21,7 @@
 
 /**
 * \file niftkTypes.h
-* \brief Defines all types used in this library.
+* \brief Defines types used in this library.
 */
 namespace niftk
 {
@@ -48,22 +48,10 @@ struct NIFTYCAL_WINEXPORT Point3D
   cv::Point3d point;
 };
 
-typedef std::map<IdType, Point2D> PointSet;
+typedef std::map <IdType, Point2D> PointSet;
 typedef std::pair<IdType, Point2D> IdPoint2D;
-typedef std::map<IdType, Point3D> Model3D;
+typedef std::map <IdType, Point3D> Model3D;
 typedef std::pair<IdType, Point3D> IdPoint3D;
-
-/**
-* \brief Creates a new copy of the input list.
-*/
-NIFTYCAL_WINEXPORT PointSet CopyPoints(const PointSet& p);
-
-
-/**
-* \brief Rescales by multiplying each point by the scale factor.
-* \param scaleFactor contains a multiplier for x,y.
-*/
-NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor);
 
 } // end namespace
 

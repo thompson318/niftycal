@@ -175,7 +175,13 @@ double StereoCameraCalibration(const Model3D& model,
                             cvFlags
                             );
 
-  // Additionally solve extrinsics
+  // Additionally solve extrinsics.
+  //
+  // This will give slightly different rvecs, tvecs
+  // than the above cv::stereoCalibrate, as the above
+  // routine optimises left extrinsics with left2Right
+  // transform, whereas the ones below don't.
+
   cv::calibrateCamera(objectPoints,
                       leftImagePoints,
                       imageSize,

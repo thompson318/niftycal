@@ -14,41 +14,49 @@
 
 #include "niftkHomographyUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkPointUtilities.h"
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
+void WarpPointsByHomography(const PointSet& src,
+                            const cv::Mat& homography,
+                            PointSet& target
+                           )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+void FindHomography(const PointSet& src,
+                    const PointSet& target,
+                    const cv::Mat& homography
+                   )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
 void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
-                                    const PointSet& sourcePoints,
+                                    const cv::Mat& cameraIntrinsics,
+                                    const cv::Mat& distortionCoefficients,
+                                    const PointSet& distortedPoints,
                                     const PointSet& targetPoints,
                                     const cv::Size2i outputImageSize,
+                                    cv::Mat& outputHomography,
                                     cv::Mat& outputImage
                                    )
 {
-  std::vector<cv::Point2f> source;
+  std::vector<cv::Point2f> distortedSource;
+  std::vector<cv::Point2f> undistortedSource;
   std::vector<cv::Point2f> target;
 
-  niftk::PointSet::const_iterator sourceIter;
-  niftk::PointSet::const_iterator targetIter;
+  niftk::ExtractCommonPoints(distortedPoints , targetPoints, distortedSource, target);
 
-  for(sourceIter = sourcePoints.begin(); sourceIter != sourcePoints.end(); ++sourceIter)
-  {
-    targetIter = targetPoints.find((*sourceIter).first);
-    if (targetIter != targetPoints.end())
-    {
-      cv::Point2f s;
-      s.x = (*sourceIter).second.point.x;
-      s.y = (*sourceIter).second.point.y;
-      source.push_back(s);
-
-      cv::Point2f t;
-      t.x = (*targetIter).second.point.x;
-      t.y = (*targetIter).second.point.y;
-      target.push_back(t);
-    }
-  }
-  if (source.size() == 0)
+  if (distortedSource.size() == 0)
   {
     niftkNiftyCalThrow() << "No source points.";
   }
@@ -56,13 +64,25 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
   {
     niftkNiftyCalThrow() << "No target points.";
   }
-  if (source.size() != target.size())
+  if (distortedSource.size() != target.size())
   {
     niftkNiftyCalThrow() << "Different number of source and target points.";
   }
 
-  cv::Mat homography = cv::findHomography(  source, target, 0 );
-  niftk::WarpImageByHomography(inputImage, homography, outputImageSize, outputImage);
+  if (cameraIntrinsics.rows == 3
+      && cameraIntrinsics.cols == 3
+      && distortionCoefficients.rows == 1
+      && distortionCoefficients.cols == 4
+      )
+  {
+    cv::undistortPoints(distortedSource, undistortedSource, cameraIntrinsics, distortionCoefficients);
+    outputHomography = cv::findHomography(undistortedSource, target, 0);
+  }
+  else
+  {
+    outputHomography = cv::findHomography(distortedSource, target, 0);
+  }
+  niftk::WarpImageByHomography(inputImage, outputHomography, outputImageSize, outputImage);
 }
 
 
@@ -73,7 +93,7 @@ void WarpImageByHomography(const cv::Mat& inputImage,
                            cv::Mat& outputImage
                           )
 {
-  cv::warpPerspective(inputImage,outputImage,homography,outputImageSize,cv::INTER_LINEAR);
+  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize,cv::INTER_LINEAR);
 }
 
 } // end namespace
