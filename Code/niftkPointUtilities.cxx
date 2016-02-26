@@ -59,6 +59,9 @@ void ExtractCommonPoints(const PointSet& inputA,
                          std::vector<cv::Point2f>& outputB
                          )
 {
+  outputA.clear();
+  outputB.clear();
+
   niftk::PointSet::const_iterator iterA;
   niftk::PointSet::const_iterator iterB;
 
@@ -139,8 +142,23 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
   {
     niftkNiftyCalThrow() << "No common points.";
   }
+  if (a.size() != b.size())
+  {
+    niftkNiftyCalThrow() << "Programming errors, invalid extraction of common points.";
+  }
 
   double rms = 0;
+  for (size_t i = 0; i < a.size(); i++)
+  {
+    rms += ((a[i].x - b[i].x) * (a[i].x - b[i].x)
+           +(a[i].y - b[i].y) * (a[i].y - b[i].y)
+           );
+  }
+  if (a.size() > 0)
+  {
+    rms /= static_cast<double>(a.size());
+  }
+  rms = sqrt(rms);
   return rms;
 }
 
@@ -153,6 +171,8 @@ void UndistortPoints(const PointSet& distortedPoints,
                     )
 {
 
+  undistortedPoints.clear();
+
   std::vector<cv::Point2f> distorted;
   std::vector<cv::Point2f> undistorted;
   std::vector<niftk::IdType> ids;
@@ -160,6 +180,25 @@ void UndistortPoints(const PointSet& distortedPoints,
   niftk::ConvertPoints(distortedPoints, distorted, ids);
   cv::undistort(distorted, undistorted, cameraIntrinsics, distortionCoefficients);
   niftk::ConvertPoints(undistorted, ids, undistortedPoints);
+}
+
+
+//-----------------------------------------------------------------------------
+void UndistortPoints(const std::vector<PointSet>& distortedPoints,
+                     const cv::Mat& cameraIntrinsics,
+                     const cv::Mat& distortionCoefficients,
+                     std::vector<PointSet>& undistortedPoints
+                     )
+
+{
+  undistortedPoints.clear();
+
+  for (size_t i = 0; i < distortedPoints.size(); i++)
+  {
+    PointSet uP;
+    UndistortPoints(distortedPoints[i], cameraIntrinsics, distortionCoefficients, uP);
+    undistortedPoints.push_back(uP);
+  }
 }
 
 
@@ -199,6 +238,24 @@ void DistortPoints(const PointSet& undistortedPoints,
     distorted.push_back(dist);
   }
   niftk::ConvertPoints(distorted, ids, distortedPoints);
+}
+
+
+//-----------------------------------------------------------------------------
+void DistortPoints(const std::vector<PointSet>& undistortedPoints,
+                   const cv::Mat& cameraIntrinsics,
+                   const cv::Mat& distortionCoefficients,
+                   std::vector<PointSet>& distortedPoints
+                   )
+{
+  distortedPoints.clear();
+
+  for (size_t i = 0; i < undistortedPoints.size(); i++)
+  {
+    PointSet dp;
+    DistortPoints(undistortedPoints[i], cameraIntrinsics, distortionCoefficients, dp);
+    distortedPoints.push_back(dp);
+  }
 }
 
 } // end namespace

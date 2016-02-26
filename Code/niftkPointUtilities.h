@@ -85,6 +85,15 @@ NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
 
 
 /**
+* \brief Maps all points in distortedPoints to undistortedPoints.
+*/
+NIFTYCAL_WINEXPORT void UndistortPoints(const std::vector<PointSet>& distortedPoints,
+                                        const cv::Mat& cameraIntrinsics,
+                                        const cv::Mat& distortionCoefficients,
+                                        std::vector<PointSet>& undistortedPoints
+                                       );
+
+/**
 * \brief Maps all points in undistortedPoints to distortedPoints.
 */
 NIFTYCAL_WINEXPORT void DistortPoints(const PointSet& undistortedPoints,
@@ -92,6 +101,16 @@ NIFTYCAL_WINEXPORT void DistortPoints(const PointSet& undistortedPoints,
                                       const cv::Mat& distortionCoefficients,
                                       PointSet& distortedPoints
                                      );
+
+/**
+* \brief Maps all points in undistortedPoints to distortedPoints.
+*/
+NIFTYCAL_WINEXPORT void DistortPoints(const std::vector<PointSet>& undistortedPoints,
+                                      const cv::Mat& cameraIntrinsics,
+                                      const cv::Mat& distortionCoefficients,
+                                      std::vector<PointSet>& distortedPoints
+                                     );
+
 
 } // end namespace
 
