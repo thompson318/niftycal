@@ -16,38 +16,10 @@
 #define niftkIPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkModel3D.h"
-#include <cv.h>
-#include <map>
+#include "niftkTypes.h"
 
 namespace niftk
 {
-
-/**
-* \class Point2D
-* \brief Placeholder for a 2D point and its associated identifier.
-*/
-struct NIFTYCAL_WINEXPORT Point2D
-{
-  IdType id;
-  cv::Point2d  point;
-};
-
-typedef std::map<IdType, Point2D> PointSet;
-typedef std::pair<IdType, Point2D> IdPoint2D;
-
-/**
-* \brief Creates a new copy of the input list.
-*/
-NIFTYCAL_WINEXPORT PointSet CopyPoints(const PointSet& p);
-
-
-/**
-* \brief Rescales by multiplying each point by the scale factor.
-* \param scaleFactor contains a multiplier for x,y.
-*/
-NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor);
-
 
 /**
 * \class IPoint2DDetector

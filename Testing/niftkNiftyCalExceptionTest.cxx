@@ -14,8 +14,9 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include "niftkNiftyCalException.h"
-#include "niftkNiftyCalExceptionMacro.h"
+#include <niftkNiftyCalException.h>
+#include <niftkNiftyCalExceptionMacro.h>
+
 #include <iostream>
 
 TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
@@ -36,7 +37,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   catch (const niftk::NiftyCalException& e)
   {
     REQUIRE( e.GetDescription() == msg);
-    REQUIRE( e.GetLineNumber() == 34);
+    REQUIRE( e.GetLineNumber() == 35);
     REQUIRE( e.GetFileName() == __FILE__);
   }
 
@@ -47,7 +48,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   catch (const niftk::NiftyCalException& e)
   {
     REQUIRE( e.GetDescription() == "Hello 1 2 3");
-    REQUIRE( e.GetLineNumber() == 45);
+    REQUIRE( e.GetLineNumber() == 46);
     REQUIRE( e.GetFileName() == __FILE__);
   }
 

@@ -14,12 +14,12 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <iostream>
+#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkHomographyUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
-#include <niftkOpenCVChessboardPointDetector.h>
-#include <niftkHomographyUtilities.h>
+#include <iostream>
 
 TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
 

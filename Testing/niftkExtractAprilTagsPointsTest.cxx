@@ -14,11 +14,11 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <iostream>
+#include <niftkAprilTagsPointDetector.h>
 
 #include <cv.h>
 #include <highgui.h>
-#include <niftkAprilTagsPointDetector.h>
+#include <iostream>
 
 TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 

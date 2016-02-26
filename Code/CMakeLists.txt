@@ -14,10 +14,9 @@
 
 set(NIFTYCAL_SRCS
   niftkNiftyCalException.cxx
-  niftkIOptimiser.cxx
+  niftkTypes.cxx
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
-  niftkModel3D.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
   niftkHomographyUtilities.cxx

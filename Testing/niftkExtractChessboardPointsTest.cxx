@@ -14,11 +14,11 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <iostream>
+#include <niftkOpenCVChessboardPointDetector.h>
 
 #include <cv.h>
 #include <highgui.h>
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <iostream>
 
 TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 

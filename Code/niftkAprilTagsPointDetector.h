@@ -16,7 +16,7 @@
 #define niftkAprilTagsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include <niftkIPoint2DDetector.h>
+#include "niftkIPoint2DDetector.h"
 #include <cv.h>
 
 namespace niftk

@@ -14,15 +14,14 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <iostream>
-#include <list>
-
-#include <cv.h>
-#include <highgui.h>
 #include <niftkOpenCVChessboardPointDetector.h>
 #include <niftkStereoCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
-#include <niftkModel3D.h>
+
+#include <cv.h>
+#include <highgui.h>
+#include <iostream>
+#include <list>
 
 TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 

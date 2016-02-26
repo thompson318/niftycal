@@ -14,15 +14,14 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <iostream>
-#include <list>
+#include <niftkNiftyCalExceptionMacro.h>
+#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkMonoCameraCalibration.h>
 
 #include <cv.h>
 #include <highgui.h>
-#include <niftkOpenCVChessboardPointDetector.h>
-#include <niftkMonoCameraCalibration.h>
-#include <niftkNiftyCalExceptionMacro.h>
-#include <niftkModel3D.h>
+#include <iostream>
+#include <list>
 
 TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
