@@ -154,9 +154,12 @@ void UndistortPoints(const PointSet& distortedPoints,
 {
 
   std::vector<cv::Point2f> distorted;
+  std::vector<cv::Point2f> undistorted;
   std::vector<niftk::IdType> ids;
 
   niftk::ConvertPoints(distortedPoints, distorted, ids);
+  cv::undistort(distorted, undistorted, cameraIntrinsics, distortionCoefficients);
+  niftk::ConvertPoints(undistorted, ids, undistortedPoints);
 }
 
 
@@ -168,10 +171,34 @@ void DistortPoints(const PointSet& undistortedPoints,
                   )
 {
   std::vector<cv::Point2f> undistorted;
+  std::vector<cv::Point2f> distorted;
   std::vector<niftk::IdType> ids;
 
   niftk::ConvertPoints(undistortedPoints, undistorted, ids);
 
+  // see: http://stackoverflow.com/questions/21615298/opencv-distort-back
+  for (size_t i = 0; i < undistorted.size(); i++)
+  {
+    cv::Point2f relative;
+    relative.x = (undistorted[i].x - cameraIntrinsics.at<double>(0,2))/cameraIntrinsics.at<double>(0,0);
+    relative.y = (undistorted[i].y - cameraIntrinsics.at<double>(1,2))/cameraIntrinsics.at<double>(1,1);
+
+    double r2 = relative.x*relative.x + relative.y*relative.y;
+    double radial = (1 + distortionCoefficients.at<double>(0,0) * r2 + distortionCoefficients.at<double>(0,1) * r2 * r2 );
+
+    cv::Point2d dist;
+    dist.x = relative.x * radial;
+    dist.y = relative.y * radial;
+
+    dist.x = dist.x + (2 * distortionCoefficients.at<double>(0,3) * relative.x * relative.y + distortionCoefficients.at<double>(0,4) * (r2 + 2 * relative.x * relative.x));
+    dist.y = dist.y + (distortionCoefficients.at<double>(0,3) * (r2 + 2 * relative.y * relative.y) + 2 * distortionCoefficients.at<double>(0,4) * relative.x * relative.y);
+
+    dist.x = dist.x * cameraIntrinsics.at<double>(0,0) + cameraIntrinsics.at<double>(0,2);
+    dist.y = dist.y * cameraIntrinsics.at<double>(1,1) + cameraIntrinsics.at<double>(1,2);
+
+    distorted.push_back(dist);
+  }
+  niftk::ConvertPoints(distorted, ids, distortedPoints);
 }
 
 } // end namespace

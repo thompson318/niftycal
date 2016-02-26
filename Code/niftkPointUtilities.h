@@ -46,6 +46,7 @@ NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,
                                       std::vector<niftk::IdType>& outputId
                                      );
 
+
 /**
 * \brief Converts PointSet to vector for many OpenCV functions.
 */
