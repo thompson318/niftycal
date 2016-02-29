@@ -17,6 +17,7 @@ set(NIFTYCAL_SRCS
   niftkTypes.cxx
   niftkPointUtilities.cxx
   niftkHomographyUtilities.cxx
+  niftkIOUtilities.cxx
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
   niftkMonoCameraCalibration.cxx
