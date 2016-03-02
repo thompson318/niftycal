@@ -19,6 +19,7 @@ set(TEST_CASES
   niftkMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
   niftkWarpChessboardByHomographyTest
+  niftkIterativeMonoChessboardCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -75,3 +76,16 @@ add_test(CalibStereoLap1 niftkStereoChessboardCameraCalibrationTest 3 14 10
   ${DATA_DIR}/Laparoscope/Right/right-798.png
 )
 add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
+add_test(CalibIterativeMonoLap1 niftkIterativeMonoChessboardCameraCalibrationTest 3 14 10 0.577703 # RMS
+  2007.33 2013.72 945.486 619.07              # intrinsic
+  -0.237351 -0.244029 0.00299158 -0.00141141  # distortion
+  ${DATA_DIR}/Laparoscope/Left/left-1095.png
+  ${DATA_DIR}/Laparoscope/Left/left-1338.png
+  ${DATA_DIR}/Laparoscope/Left/left-1884.png
+  ${DATA_DIR}/Laparoscope/Left/left-2520.png
+  ${DATA_DIR}/Laparoscope/Left/left-3083.png
+  ${DATA_DIR}/Laparoscope/Left/left-3335.png
+  ${DATA_DIR}/Laparoscope/Left/left-3685.png
+  ${DATA_DIR}/Laparoscope/Left/left-4848.png
+  ${DATA_DIR}/Laparoscope/Left/left-798.png
+)

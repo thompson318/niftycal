@@ -19,15 +19,11 @@ namespace niftk {
 
 //-----------------------------------------------------------------------------
 OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
-    cv::Mat* image,
+    const cv::Mat& image,
     cv::Size2i numberOfCorners)
 : m_NumberOfCorners(numberOfCorners)
 , m_Image(image)
 {
-  if (m_Image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Image should not be NULL.";
-  }
   if (m_NumberOfCorners.width < 2)
   {
     niftkNiftyCalThrow() << "Can't retrieve chessboards with < 2 corners in width.";
@@ -42,7 +38,6 @@ OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
 //-----------------------------------------------------------------------------
 OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 {
-  // Do NOT destroy m_Image, we don't own it.
 }
 
 
@@ -53,7 +48,7 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
   std::vector<cv::Point2f> corners;
 
   bool found = cv::findChessboardCorners(
-        *m_Image, m_NumberOfCorners, corners,
+        m_Image, m_NumberOfCorners, corners,
         CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 
   if ( corners.size() == 0 )
@@ -64,7 +59,7 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
   unsigned int numberOfCorners = m_NumberOfCorners.width * m_NumberOfCorners.height;
 
 
-  cv::cornerSubPix(*m_Image, corners, cv::Size(11,11), cv::Size(-1,-1),
+  cv::cornerSubPix(m_Image, corners, cv::Size(11,11), cv::Size(-1,-1),
                    cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
   if (found  && corners.size() == numberOfCorners)

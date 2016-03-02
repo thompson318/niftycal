@@ -64,6 +64,8 @@ double MonoCameraCalibration(const Model3D& model,
         cv::Point2d p2 = ((*pointsIter).second).point;
         cv::Vec2f v2(p2.x, p2.y);
 
+        std::cout << "Using id=" << (*pointsIter).first << ", v2=" << p2.x << ", " << p2.y << " v3=" << p3.x <<", " << p3.y << ", " << p3.z << std::endl;
+
         vectors3D.push_back(v3);
         vectors2D.push_back(v2);
       }

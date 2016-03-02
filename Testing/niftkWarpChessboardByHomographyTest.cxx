@@ -46,11 +46,11 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   cv::Mat warpedImage = greyImage1;
   cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
 
-  niftk::OpenCVChessboardPointDetector sourceDetector(&greyImage1, corners);
+  niftk::OpenCVChessboardPointDetector sourceDetector(greyImage1, corners);
   niftk::PointSet sourcePointSet = sourceDetector.GetPoints();
   REQUIRE(sourcePointSet.size() >= 4);
 
-  niftk::OpenCVChessboardPointDetector targetDetector(&greyImage2, corners);
+  niftk::OpenCVChessboardPointDetector targetDetector(greyImage2, corners);
   niftk::PointSet targetPointSet = targetDetector.GetPoints();
   REQUIRE(targetPointSet.size() >= 4);
   REQUIRE(targetPointSet.size() == sourcePointSet.size());
@@ -64,7 +64,7 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   REQUIRE(greyImage2.cols == warpedImage.cols);
 
   // Check we got points out of warped image
-  niftk::OpenCVChessboardPointDetector warpedDetector(&warpedImage, corners);
+  niftk::OpenCVChessboardPointDetector warpedDetector(warpedImage, corners);
   niftk::PointSet warpedPointSet = warpedDetector.GetPoints();
   REQUIRE(warpedPointSet.size() >= 4);
   REQUIRE(warpedPointSet.size() == sourcePointSet.size());

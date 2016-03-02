@@ -40,7 +40,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  niftk::AprilTagsPointDetector detector1(&greyImage,
+  niftk::AprilTagsPointDetector detector1(greyImage,
                                          false, // don't include corners
                                          "36h11",
                                          0,
@@ -49,7 +49,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   niftk::PointSet points = detector1.GetPoints();
   REQUIRE( points.size() == expectedNumberTags);
 
-  niftk::AprilTagsPointDetector detector2(&greyImage,
+  niftk::AprilTagsPointDetector detector2(greyImage,
                                          true, // do include corners
                                          "36h11",
                                          0,
