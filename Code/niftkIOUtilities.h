@@ -17,12 +17,13 @@
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkTypes.h"
-
-#include <iostream>
+#include <list>
 
 /**
 * \file niftkIOUtilities.h
 * \brief Defines various simple functions to read/write points/models/matrices as plain text files.
+*
+* If PointSet/Model3D has zero points, we read/write an empty file. Its not an error.
 */
 namespace niftk
 {
@@ -36,15 +37,14 @@ NIFTYCAL_WINEXPORT Model3D LoadModel3D(const std::string& fileName);
 NIFTYCAL_WINEXPORT void SaveMatrix(const cv::Mat& m, const std::string& fileName);
 NIFTYCAL_WINEXPORT cv::Mat LoadMatrix(const std::string& fileName);
 
-NIFTYCAL_WINEXPORT void SavePoints(const bool& all,
-                                   const Model3D& m,
-                                   const std::vector<PointSet>& p,
+NIFTYCAL_WINEXPORT void SavePoints(const Model3D& m,
+                                   const std::list<PointSet>& p,
                                    const std::string& fileName
                                    );
 
 NIFTYCAL_WINEXPORT void LoadPoints(const std::string& fileName,
                                    const Model3D& m,
-                                   const std::vector<PointSet>& p
+                                   const std::list<PointSet>& p
                                    );
 } // end namespace
 

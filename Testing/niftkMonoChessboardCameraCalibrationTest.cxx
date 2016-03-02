@@ -17,6 +17,7 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkOpenCVChessboardPointDetector.h>
 #include <niftkMonoCameraCalibration.h>
+#include <niftkIOUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -161,5 +162,4 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::cout << "K2=" << distortion.at<double>(0,1) << std::endl;
   std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
-
 }

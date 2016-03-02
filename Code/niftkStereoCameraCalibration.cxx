@@ -180,7 +180,8 @@ double StereoCameraCalibration(const Model3D& model,
   // This will give slightly different rvecs, tvecs
   // than the above cv::stereoCalibrate, as the above
   // routine optimises left extrinsics with left2Right
-  // transform, whereas the ones below don't.
+  // transform, whereas the ones below optimise rvecs
+  // and tvecs independent of left2Right.
 
   cv::calibrateCamera(objectPoints,
                       leftImagePoints,
