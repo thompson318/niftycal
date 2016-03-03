@@ -33,7 +33,7 @@ class NIFTYCAL_WINEXPORT OpenCVChessboardPointDetector : public IPoint2DDetector
 
 public:
 
-  OpenCVChessboardPointDetector(const cv::Mat& greyImage, cv::Size2i numberOfCorners);
+  OpenCVChessboardPointDetector(cv::Size2i numberOfCorners);
   virtual ~OpenCVChessboardPointDetector();
 
   /**
@@ -41,10 +41,12 @@ public:
   */
   virtual PointSet GetPoints();
 
+  void SetImage(cv::Mat* image);
+
 private:
 
   cv::Size2i m_NumberOfCorners;
-  cv::Mat    m_Image;
+  cv::Mat*   m_Image;
 };
 
 } // end namespace

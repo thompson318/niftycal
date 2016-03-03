@@ -26,7 +26,7 @@ double MonoCameraCalibration(const Model3D& model,
                              cv::Mat& distortion,
                              std::vector<cv::Mat>& rvecs,
                              std::vector<cv::Mat>& tvecs,
-                             const bool& intrinsicsFixed
+                             const int& cvFlags
                              )
 {
   if (model.empty())
@@ -64,8 +64,6 @@ double MonoCameraCalibration(const Model3D& model,
         cv::Point2d p2 = ((*pointsIter).second).point;
         cv::Vec2f v2(p2.x, p2.y);
 
-        std::cout << "Using id=" << (*pointsIter).first << ", v2=" << p2.x << ", " << p2.y << " v3=" << p3.x <<", " << p3.y << ", " << p3.z << std::endl;
-
         vectors3D.push_back(v3);
         vectors2D.push_back(v2);
       }
@@ -92,21 +90,8 @@ double MonoCameraCalibration(const Model3D& model,
 
   // Do calibration
 
-  if (intrinsicsFixed)
+  if (cvFlags == 0)
   {
-    rms = cv::calibrateCamera(objectPoints,
-                              imagePoints,
-                              imageSize,
-                              intrinsic,
-                              distortion,
-                              rvecs,
-                              tvecs,
-                              CV_CALIB_FIX_INTRINSIC
-                              );
-  }
-  else
-  {
-
     cv::calibrateCamera(objectPoints,
                         imagePoints,
                         imageSize,
@@ -114,17 +99,7 @@ double MonoCameraCalibration(const Model3D& model,
                         distortion,
                         rvecs,
                         tvecs,
-                        CV_CALIB_FIX_PRINCIPAL_POINT | CV_CALIB_FIX_ASPECT_RATIO
-                        );
-
-    cv::calibrateCamera(objectPoints,
-                        imagePoints,
-                        imageSize,
-                        intrinsic,
-                        distortion,
-                        rvecs,
-                        tvecs,
-                        CV_CALIB_FIX_PRINCIPAL_POINT
+                        CV_CALIB_FIX_PRINCIPAL_POINT | CV_CALIB_FIX_ASPECT_RATIO | CV_CALIB_ZERO_TANGENT_DIST
                         );
 
     rms = cv::calibrateCamera(objectPoints,
@@ -135,6 +110,18 @@ double MonoCameraCalibration(const Model3D& model,
                               rvecs,
                               tvecs,
                               CV_CALIB_USE_INTRINSIC_GUESS
+                              );
+  }
+  else
+  {
+    rms = cv::calibrateCamera(objectPoints,
+                              imagePoints,
+                              imageSize,
+                              intrinsic,
+                              distortion,
+                              rvecs,
+                              tvecs,
+                              cvFlags
                               );
   }
 

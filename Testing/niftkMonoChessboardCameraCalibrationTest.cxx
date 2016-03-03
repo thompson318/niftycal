@@ -92,7 +92,8 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
       imageSize.width = greyImage.cols;
       imageSize.height = greyImage.rows;
 
-      niftk::OpenCVChessboardPointDetector detector(greyImage, corners);
+      niftk::OpenCVChessboardPointDetector detector(corners);
+      detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 
       if (pointSet.size() > 0)
@@ -115,8 +116,7 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
                                             intrinsic,
                                             distortion,
                                             rvecs,
-                                            tvecs,
-                                            false
+                                            tvecs
                                             );
 
   std::cout << "RMS=" << rms << std::endl;
@@ -139,29 +139,4 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < tolerance );
   REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < tolerance );
   REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < tolerance );
-
-  intrinsic.at<double>(0,0) *= 1.1;
-  intrinsic.at<double>(1,1) *= 1.1;
-  intrinsic.at<double>(0,2) *= 1.1;
-  intrinsic.at<double>(1,2) *= 1.1;
-
-  rms = niftk::MonoCameraCalibration(model,
-                                     listOfPoints,
-                                     imageSize,
-                                     intrinsic,
-                                     distortion,
-                                     rvecs,
-                                     tvecs,
-                                     true
-                                     );
-
-  std::cout << "RMS=" << rms << std::endl;
-  std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
-  std::cout << "Fy=" << intrinsic.at<double>(1,1) << std::endl;
-  std::cout << "Cx=" << intrinsic.at<double>(0,2) << std::endl;
-  std::cout << "Cy=" << intrinsic.at<double>(1,2) << std::endl;
-  std::cout << "K1=" << distortion.at<double>(0,0) << std::endl;
-  std::cout << "K2=" << distortion.at<double>(0,1) << std::endl;
-  std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
-  std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
 }

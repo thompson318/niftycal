@@ -28,11 +28,12 @@ namespace niftk
 * \brief Given a list of images, performs mono camera
 * calibration according to: Dutta ICCV 2009.
 *
-* \throw if originalImages.size() != detectorAndWarpedImage.size()
+* \throw if detectorAndOriginalImages.size() != detectorAndWarpedImages.size()
 * \return rms re-projection error
 */
 NIFTYCAL_WINEXPORT double IterativeMonoCameraCalibration(
     const Model3D& model,
+    const std::pair< cv::Size2i, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImages,
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImages,
     cv::Size2i& imageSize,

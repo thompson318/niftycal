@@ -33,6 +33,19 @@ PointSet CopyPoints(const PointSet& p)
 
 
 //-----------------------------------------------------------------------------
+void CopyPointsInto(const PointSet& a, PointSet& b)
+{
+  b.clear();
+
+  PointSet::const_iterator iter;
+  for (iter = a.begin(); iter != a.end(); ++iter)
+  {
+    b.insert(IdPoint2D((*iter).first, (*iter).second));
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
 {
   PointSet result;
@@ -229,13 +242,14 @@ void DistortPoints(const PointSet& undistortedPoints,
     dist.x = relative.x * radial;
     dist.y = relative.y * radial;
 
-    dist.x = dist.x + (2 * distortionCoefficients.at<double>(0,3) * relative.x * relative.y + distortionCoefficients.at<double>(0,4) * (r2 + 2 * relative.x * relative.x));
-    dist.y = dist.y + (distortionCoefficients.at<double>(0,3) * (r2 + 2 * relative.y * relative.y) + 2 * distortionCoefficients.at<double>(0,4) * relative.x * relative.y);
+    dist.x = dist.x + (2 * distortionCoefficients.at<double>(0,2) * relative.x * relative.y + distortionCoefficients.at<double>(0,3) * (r2 + 2 * relative.x * relative.x));
+    dist.y = dist.y + (distortionCoefficients.at<double>(0,2) * (r2 + 2 * relative.y * relative.y) + 2 * distortionCoefficients.at<double>(0,3) * relative.x * relative.y);
 
     dist.x = dist.x * cameraIntrinsics.at<double>(0,0) + cameraIntrinsics.at<double>(0,2);
     dist.y = dist.y * cameraIntrinsics.at<double>(1,1) + cameraIntrinsics.at<double>(1,2);
 
     distorted.push_back(dist);
+//    if (i==0) std::cerr << "Matt, i=" << i << ", ud=" << undistorted[i].x << ", " << undistorted[i].y << ", dist=" << dist.x << ", " << dist.y << std::endl;
   }
   niftk::ConvertPoints(distorted, ids, distortedPoints);
 }

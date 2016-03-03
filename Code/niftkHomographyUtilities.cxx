@@ -21,11 +21,18 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 void WarpPointsByHomography(const PointSet& src,
-                            const cv::Mat& homography,
+                            const cv::Mat& h,
                             PointSet& target
                            )
 {
+  std::vector<cv::Point2f> srcP;
+  std::vector<niftk::IdType> srcId;
+  std::vector<cv::Point2f> targP;
+  target.clear();
 
+  niftk::ConvertPoints(src, srcP, srcId);
+  cv::perspectiveTransform(srcP, targP, h);
+  niftk::ConvertPoints(targP, srcId, target);
 }
 
 
@@ -35,7 +42,7 @@ void FindHomography(const PointSet& src,
                     const cv::Mat& homography
                    )
 {
-
+  niftkNiftyCalThrow() << "Not implemented yet";
 }
 
 

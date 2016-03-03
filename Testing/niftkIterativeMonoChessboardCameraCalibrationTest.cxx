@@ -27,25 +27,28 @@
 
 TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  15;
+  int expectedMinimumNumberOfArguments =  18;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkIterativeMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkIterativeMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY referenceWidth referenceHeight fileOfPoints eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
   float squareSizeInMillimetres = atof(niftk::argv[1]);
   int numberInternalCornersInX = atoi(niftk::argv[2]);
   int numberInternalCornersInY = atoi(niftk::argv[3]);
-  float eRMS = atof(niftk::argv[4]);
-  float eFx = atof(niftk::argv[5]);
-  float eFy = atof(niftk::argv[6]);
-  float eCx = atof(niftk::argv[7]);
-  float eCy = atof(niftk::argv[8]);
-  float eK1 = atof(niftk::argv[9]);
-  float eK2 = atof(niftk::argv[10]);
-  float eP1 = atof(niftk::argv[11]);
-  float eP2 = atof(niftk::argv[12]);
+  int widthOfReferenceImage = atoi(niftk::argv[4]);
+  int heightOfReferenceImage = atoi(niftk::argv[5]);
+  std::string fileOfReferencePoints = niftk::argv[6];
+  float eRMS = atof(niftk::argv[7]);
+  float eFx = atof(niftk::argv[8]);
+  float eFy = atof(niftk::argv[9]);
+  float eCx = atof(niftk::argv[10]);
+  float eCy = atof(niftk::argv[11]);
+  float eK1 = atof(niftk::argv[12]);
+  float eK2 = atof(niftk::argv[13]);
+  float eP1 = atof(niftk::argv[14]);
+  float eP2 = atof(niftk::argv[15]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -56,7 +59,7 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
     niftkNiftyCalThrow() << "numberInternalCornersInY < 2";
   }
 
-  // Generates "model", as we know its a chessboard!
+  // Generates "model", easy as we know its a regular chessboard!
   niftk::Model3D model;
   int counter = 0;
   for (int y = 0; y < numberInternalCornersInY; y++)
@@ -80,7 +83,7 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   // Loads all image data.
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImages;
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarping;
-  for (int i = 13; i < niftk::argc; i++)
+  for (int i = 16; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     imageSize.width = image.cols;
@@ -89,24 +92,30 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
     cv::Mat greyImage;
     cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVChessboardPointDetector(greyImage, corners));
+    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVChessboardPointDetector(corners));
     originalImages.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
+    dynamic_cast<niftk::OpenCVChessboardPointDetector*>(originalImages.back().first.get())->SetImage(&(originalImages.back().second));
 
     cv::Mat greyImageClone = greyImage.clone();
-    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVChessboardPointDetector(greyImageClone, corners));
+    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVChessboardPointDetector(corners));
     imagesForWarping.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
+    dynamic_cast<niftk::OpenCVChessboardPointDetector*>(imagesForWarping.back().first.get())->SetImage(&(imagesForWarping.back().second));
   }
 
-  REQUIRE(originalImages.size() == niftk::argc-13);
-  REQUIRE(imagesForWarping.size() == niftk::argc-13);
+  REQUIRE(originalImages.size() == niftk::argc-16);
+  REQUIRE(imagesForWarping.size() == niftk::argc-16);
 
   cv::Mat intrinsic;
   cv::Mat distortion;
   std::vector<cv::Mat> rvecs;
   std::vector<cv::Mat> tvecs;
+  std::pair< cv::Size2i, niftk::PointSet> referenceImageData;
+  referenceImageData.first = cv::Size2i(widthOfReferenceImage, heightOfReferenceImage);
+  referenceImageData.second = niftk::LoadPointSet(fileOfReferencePoints);
 
   double rms = niftk::IterativeMonoCameraCalibration(
         model,
+        referenceImageData,
         originalImages,
         imagesForWarping,
         imageSize,
@@ -115,16 +124,6 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
         rvecs,
         tvecs
         );
-
-  std::cout << "RMS=" << rms << std::endl;
-  std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
-  std::cout << "Fy=" << intrinsic.at<double>(1,1) << std::endl;
-  std::cout << "Cx=" << intrinsic.at<double>(0,2) << std::endl;
-  std::cout << "Cy=" << intrinsic.at<double>(1,2) << std::endl;
-  std::cout << "K1=" << distortion.at<double>(0,0) << std::endl;
-  std::cout << "K2=" << distortion.at<double>(0,1) << std::endl;
-  std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
-  std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
 
   double tolerance = 0.005;
   REQUIRE( fabs(rms - eRMS) < 0.001 );

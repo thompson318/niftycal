@@ -30,6 +30,10 @@ namespace niftk
 */
 NIFTYCAL_WINEXPORT PointSet CopyPoints(const PointSet& p);
 
+/**
+* \brief Copies from read a to b.
+*/
+NIFTYCAL_WINEXPORT void CopyPointsInto(const PointSet& a, PointSet& b);
 
 /**
 * \brief Rescales by multiplying each point by the scale factor.

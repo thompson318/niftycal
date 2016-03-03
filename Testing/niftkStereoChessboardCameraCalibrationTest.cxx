@@ -95,7 +95,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
       imageSize.width = greyImage.cols;
       imageSize.height = greyImage.rows;
 
-      niftk::OpenCVChessboardPointDetector detector(greyImage, corners);
+      niftk::OpenCVChessboardPointDetector detector(corners);
+      detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 
       std::cout << "i=" << i << ", file=" << niftk::argv[i] << ", points=" << pointSet.size();

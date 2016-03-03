@@ -67,7 +67,10 @@ PointSet LoadPointSet(const std::string& fileName)
     ifs >> tmp.id;
     ifs >> tmp.point.x;
     ifs >> tmp.point.y;
-    result.insert(IdPoint2D(tmp.id, tmp));
+    if (!ifs.bad() && !ifs.fail())
+    {
+      result.insert(IdPoint2D(tmp.id, tmp));
+    }
   }
 
   ifs.close();

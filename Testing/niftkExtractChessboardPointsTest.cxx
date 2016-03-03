@@ -42,13 +42,14 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
   cv::Size2i tooFewInternalCornersWidth(1, 2);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector1(greyImage, tooFewInternalCornersWidth));
+  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector1(tooFewInternalCornersWidth));
 
   cv::Size2i tooFewInternalCornersHeight(2, 1);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector2(greyImage, tooFewInternalCornersHeight));
+  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector2(tooFewInternalCornersHeight));
 
   cv::Size2i internalCorners(expectedInternalCornersX, expectedInternalCornersY);
-  niftk::OpenCVChessboardPointDetector detector(greyImage, internalCorners);
+  niftk::OpenCVChessboardPointDetector detector(internalCorners);
+  detector.SetImage(&greyImage);
   niftk::PointSet points = detector.GetPoints();
 
   REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
