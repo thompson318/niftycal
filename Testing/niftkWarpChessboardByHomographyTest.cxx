@@ -52,16 +52,16 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
 
   REQUIRE(sourcePointSet.size() >= 4);
 
+  cv::Mat dummyIntrinsics;
+  cv::Mat dummyDistortion;
+  cv::Mat outputHomography;
+
   niftk::OpenCVChessboardPointDetector targetDetector(corners);
   targetDetector.SetImage(&greyImage2);
   niftk::PointSet targetPointSet = targetDetector.GetPoints();
 
   REQUIRE(targetPointSet.size() >= 4);
   REQUIRE(targetPointSet.size() == sourcePointSet.size());
-
-  cv::Mat dummyIntrinsics;
-  cv::Mat dummyDistortion;
-  cv::Mat outputHomography;
 
   niftk::WarpImageByCorrespondingPoints(greyImage1, dummyIntrinsics, dummyDistortion, sourcePointSet, targetPointSet, greyImage1.size(), outputHomography, warpedImage);
   REQUIRE(greyImage2.rows == warpedImage.rows);
@@ -74,7 +74,7 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   REQUIRE(warpedPointSet.size() >= 4);
   REQUIRE(warpedPointSet.size() == sourcePointSet.size());
 
-  // Check that the RMS error is below a threshold.
+  // Transfer back, and check that RMS error is below a threshold.
   double rms = niftk::ComputeRMSDifferenceBetweenMatchingPoints(warpedPointSet, targetPointSet);
   REQUIRE(fabs(rms - expectedRMS) < 0.01);
 }

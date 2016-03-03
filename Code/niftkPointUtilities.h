@@ -31,7 +31,7 @@ namespace niftk
 NIFTYCAL_WINEXPORT PointSet CopyPoints(const PointSet& p);
 
 /**
-* \brief Copies from read a to b.
+* \brief Clears b and copies from a to b.
 */
 NIFTYCAL_WINEXPORT void CopyPointsInto(const PointSet& a, PointSet& b);
 
@@ -70,11 +70,11 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
 
 
 /**
-* \brief Computes the RMS error between common (same identifier) points in A and B.
+* \brief Computes the RMS error between common (same identifier) points in a and b.
 * \throw if no common points.
 */
-NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
-                                                                    const PointSet& inputB
+NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& a,
+                                                                    const PointSet& b
                                                                    );
 
 

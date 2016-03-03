@@ -82,7 +82,7 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
       && distortionCoefficients.cols == 4
       )
   {
-    cv::undistortPoints(distortedSource, undistortedSource, cameraIntrinsics, distortionCoefficients);
+    cv::undistortPoints(distortedSource, undistortedSource, cameraIntrinsics, distortionCoefficients, cv::Mat(), cameraIntrinsics);
     outputHomography = cv::findHomography(undistortedSource, target, 0);
   }
   else
@@ -100,7 +100,7 @@ void WarpImageByHomography(const cv::Mat& inputImage,
                            cv::Mat& outputImage
                           )
 {
-  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize,cv::INTER_LANCZOS4);
+  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize,cv::INTER_LINEAR);
 }
 
 } // end namespace

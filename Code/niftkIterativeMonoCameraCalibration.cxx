@@ -125,6 +125,7 @@ double IterativeMonoCameraCalibration(
          )
     {
 
+      cv::Mat undistortedImage;
       cv::Mat h;
       cv::Mat hInv;
       PointSet cp;
@@ -133,8 +134,9 @@ double IterativeMonoCameraCalibration(
 
       // 1. Undistort and Unproject: Use the camera parameters to
       // undistort and unproject input images to a canonical pattern.
+      cv::undistort((*originalIter).second, undistortedImage, intrinsic, distortion, intrinsic);
       niftk::WarpImageByCorrespondingPoints(
-            (*originalIter).second,             // input image
+            undistortedImage,
             intrinsic,                          // current estimate (updated each loop)
             distortion,                         // current estimate (updated each loop)
             (*pointsIter),                      // first time, its a copy of the original detected points,
@@ -150,28 +152,15 @@ double IterativeMonoCameraCalibration(
       cp = (*canonicalIter).first->GetPoints();
       if(cp.empty())
       {
-        cv::imwrite("/tmp/matt.png", (*canonicalIter).second);
         niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
       }
 
       // 3. Reproject: Project the control points using the estimated
       // camera parameters.
       hInv = h.inv(cv::DECOMP_SVD);
-
       niftk::WarpPointsByHomography(cp, hInv, cpi);
       niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
       niftk::CopyPointsInto(cpid, (*pointsIter));
-
-      // Sanity check, distorted points, should be close to original
-      /*
-      double correctionRMS = niftk::ComputeRMSDifferenceBetweenMatchingPoints((*originalPointsIter), cpid);
-      std::cout << "Correction rms=" << correctionRMS << std::endl;
-      if (correctionRMS > 10)
-      {
-        niftkNiftyCalThrow() << "Distorted points Vs original give rms=" << correctionRMS << std::endl;
-      }
-      */
-
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine
@@ -189,8 +178,8 @@ double IterativeMonoCameraCalibration(
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
 
-  } while (projectedRMS < previousRMS
-           && fabs(projectedRMS - previousRMS) > 0.00005);
+  } while (projectedRMS < previousRMS &&
+           fabs(projectedRMS - previousRMS) > 0.005);
 
   std::cout << "Final calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Final Fx=" << intrinsic.at<double>(0,0) << std::endl;

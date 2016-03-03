@@ -187,11 +187,12 @@ void UndistortPoints(const PointSet& distortedPoints,
   undistortedPoints.clear();
 
   std::vector<cv::Point2f> distorted;
-  std::vector<cv::Point2f> undistorted;
   std::vector<niftk::IdType> ids;
-
   niftk::ConvertPoints(distortedPoints, distorted, ids);
-  cv::undistort(distorted, undistorted, cameraIntrinsics, distortionCoefficients);
+
+  std::vector<cv::Point2f> undistorted(distorted.size());
+  cv::undistortPoints(distorted, undistorted, cameraIntrinsics, distortionCoefficients, cv::Mat(), cameraIntrinsics);
+
   niftk::ConvertPoints(undistorted, ids, undistortedPoints);
 }
 
@@ -249,7 +250,6 @@ void DistortPoints(const PointSet& undistortedPoints,
     dist.y = dist.y * cameraIntrinsics.at<double>(1,1) + cameraIntrinsics.at<double>(1,2);
 
     distorted.push_back(dist);
-//    if (i==0) std::cerr << "Matt, i=" << i << ", ud=" << undistorted[i].x << ", " << undistorted[i].y << ", dist=" << dist.x << ", " << dist.y << std::endl;
   }
   niftk::ConvertPoints(distorted, ids, distortedPoints);
 }

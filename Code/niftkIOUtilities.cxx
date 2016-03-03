@@ -128,7 +128,10 @@ Model3D LoadModel3D(const std::string& fileName)
     ifs >> tmp.point.x;
     ifs >> tmp.point.y;
     ifs >> tmp.point.z;
-    result.insert(IdPoint3D(tmp.id, tmp));
+    if (!ifs.bad() && !ifs.fail())
+    {
+      result.insert(IdPoint3D(tmp.id, tmp));
+    }
   }
 
   ifs.close();
@@ -175,16 +178,61 @@ cv::Mat LoadMatrix(const std::string& fileName)
     niftkNiftyCalThrow() << "Empty filename supplied.";
   }
 
-  std::ofstream ifs;
-  ifs.open (fileName, std::ofstream::in);
+  std::ifstream ifs;
+  ifs.open (fileName, std::ifstream::in);
   if (!ifs.is_open())
   {
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
   }
 
-  niftkNiftyCalThrow() << "Not implemented yet!";
+  std::vector< std::vector<double> > data;
 
+  std::string line;
+  while (std::getline(ifs, line))
+  {
+    line = line.append(" ");
+    std::istringstream iss(line);
+    std::vector<double> d;
+    while(iss.good())
+    {
+      double a;
+      iss >> a;
+      if (iss.good())
+      {
+        d.push_back(a);
+      }
+    }
+    if (d.size() > 0)
+    {
+      data.push_back(d);
+    }
+  }
   ifs.close();
+
+  if (data.empty())
+  {
+    return result;
+  }
+
+  unsigned int cols;
+  if (data[0].size() == 0)
+  {
+    niftkNiftyCalThrow() << "First line of matrix had no data.";
+  }
+  cols = data[0].size();
+
+  result = cvCreateMat(data.size(), cols, CV_64FC1);
+  for (int r = 0; r < data.size(); r++)
+  {
+    if (data[r].size() != cols)
+    {
+      niftkNiftyCalThrow() << "Row " << r << ", does not contain " << cols << " columns.";
+    }
+    for (int c = 0; c < data[r].size(); c++)
+    {
+      result.at<double>(r,c) = data[r][c];
+    }
+  }
 
   return result;
 }
