@@ -189,7 +189,8 @@ double IterativeMonoCameraCalibration(
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
 
-  } while (fabs(projectedRMS - previousRMS) > 0.00005);
+  } while (projectedRMS < previousRMS
+           && fabs(projectedRMS - previousRMS) > 0.00005);
 
   std::cout << "Final calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Final Fx=" << intrinsic.at<double>(0,0) << std::endl;
