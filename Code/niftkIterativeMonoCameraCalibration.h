@@ -40,7 +40,8 @@ NIFTYCAL_WINEXPORT double IterativeMonoCameraCalibration(
     cv::Mat& intrinsic,
     cv::Mat& distortion,
     std::vector<cv::Mat>& rvecs,
-    std::vector<cv::Mat>& tvecs
+    std::vector<cv::Mat>& tvecs,
+    const int& cvFlags = 0
     );
 
 } // end namespace

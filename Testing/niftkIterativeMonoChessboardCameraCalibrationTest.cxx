@@ -122,7 +122,11 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
         intrinsic,
         distortion,
         rvecs,
-        tvecs
+        tvecs,
+        cv::CALIB_ZERO_TANGENT_DIST
+        | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
+        | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
+        | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6
         );
 
   double tolerance = 0.005;

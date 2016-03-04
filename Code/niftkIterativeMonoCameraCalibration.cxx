@@ -32,7 +32,8 @@ double IterativeMonoCameraCalibration(
     cv::Mat& intrinsic,
     cv::Mat& distortion,
     std::vector<cv::Mat>& rvecs,
-    std::vector<cv::Mat>& tvecs
+    std::vector<cv::Mat>& tvecs,
+    const int& cvFlags
     )
 {
   if (model.empty())
@@ -86,7 +87,8 @@ double IterativeMonoCameraCalibration(
         intrinsic,
         distortion,
         rvecs,
-        tvecs
+        tvecs,
+        cvFlags
         );
 
   double previousRMS = std::numeric_limits<double>::max();
@@ -101,6 +103,8 @@ double IterativeMonoCameraCalibration(
   std::cout << "Initial K2=" << distortion.at<double>(0,1) << std::endl;
   std::cout << "Initial P1=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "Initial P2=" << distortion.at<double>(0,3) << std::endl;
+
+  int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
   do // until convergence
   {
@@ -174,7 +178,7 @@ double IterativeMonoCameraCalibration(
           distortion,
           rvecs,
           tvecs,
-          cv::CALIB_USE_INTRINSIC_GUESS
+          iterativeCvFlags
           );
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
