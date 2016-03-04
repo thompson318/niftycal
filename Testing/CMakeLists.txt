@@ -81,6 +81,7 @@ add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/
 add_test(CalibIterativeMonoLap1 niftkIterativeMonoChessboardCameraCalibrationTest 3 14 10
   960 540                                               # size of reference image
   ${DATA_DIR}/Laparoscope/reference_960_540_14_10.txt   # 2D points for reference image
+  0                                                     # zero distortion = false
   0.588097                                              # RMS
   2004.98 2012.29 945.409 621.189                       # intrinsic
   -0.237534 -0.212468 0.00267685 -0.00113922            # distortion
@@ -96,11 +97,12 @@ add_test(CalibIterativeMonoLap1 niftkIterativeMonoChessboardCameraCalibrationTes
 )
 
 add_test(CalibIterativeMonoLap2 niftkIterativeMonoChessboardCameraCalibrationTest 3 14 10
-  1280 940                                              # size of reference image
-  ${DATA_DIR}/Laparoscope/reference_960_540_14_10.txt   # 2D points for reference image
-  0.375789                                              # RMS
-  1538.7 1534.82 628.758 462.503                        # intrinsic
-  0.0238368 -0.276153 -0.00426867 -0.0028417            # distortion
+  480 270                                               # size of reference image
+  ${DATA_DIR}/Simulation2/reference_480_270_14_10.txt   # 2D points for reference image
+  1                                                     # zero distortion = false
+  0.222406                                              # RMS
+  1540.4 1536.42 641.863 478.554                        # intrinsic
+  0 0 0 0                                               # distortion
   ${DATA_DIR}/Simulation2/Left1.jpg
   ${DATA_DIR}/Simulation2/Left2.jpg
   ${DATA_DIR}/Simulation2/Left3.jpg

@@ -27,7 +27,7 @@
 
 TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  18;
+  int expectedMinimumNumberOfArguments =  19;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
     std::cerr << "Usage: niftkIterativeMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY referenceWidth referenceHeight fileOfPoints eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
@@ -40,15 +40,16 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   int widthOfReferenceImage = atoi(niftk::argv[4]);
   int heightOfReferenceImage = atoi(niftk::argv[5]);
   std::string fileOfReferencePoints = niftk::argv[6];
-  float eRMS = atof(niftk::argv[7]);
-  float eFx = atof(niftk::argv[8]);
-  float eFy = atof(niftk::argv[9]);
-  float eCx = atof(niftk::argv[10]);
-  float eCy = atof(niftk::argv[11]);
-  float eK1 = atof(niftk::argv[12]);
-  float eK2 = atof(niftk::argv[13]);
-  float eP1 = atof(niftk::argv[14]);
-  float eP2 = atof(niftk::argv[15]);
+  int zeroDistortion = atoi(niftk::argv[7]);
+  float eRMS = atof(niftk::argv[8]);
+  float eFx = atof(niftk::argv[9]);
+  float eFy = atof(niftk::argv[10]);
+  float eCx = atof(niftk::argv[11]);
+  float eCy = atof(niftk::argv[12]);
+  float eK1 = atof(niftk::argv[13]);
+  float eK2 = atof(niftk::argv[14]);
+  float eP1 = atof(niftk::argv[15]);
+  float eP2 = atof(niftk::argv[16]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -83,7 +84,7 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   // Loads all image data.
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImages;
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarping;
-  for (int i = 16; i < niftk::argc; i++)
+  for (int i = 17; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     imageSize.width = image.cols;
@@ -102,8 +103,8 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
     dynamic_cast<niftk::OpenCVChessboardPointDetector*>(imagesForWarping.back().first.get())->SetImage(&(imagesForWarping.back().second));
   }
 
-  REQUIRE(originalImages.size() == niftk::argc-16);
-  REQUIRE(imagesForWarping.size() == niftk::argc-16);
+  REQUIRE(originalImages.size() == niftk::argc-17);
+  REQUIRE(imagesForWarping.size() == niftk::argc-17);
 
   cv::Mat intrinsic;
   cv::Mat distortion;
@@ -112,6 +113,15 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   std::pair< cv::Size2i, niftk::PointSet> referenceImageData;
   referenceImageData.first = cv::Size2i(widthOfReferenceImage, heightOfReferenceImage);
   referenceImageData.second = niftk::LoadPointSet(fileOfReferencePoints);
+
+  int flags = 0;
+  if (zeroDistortion == 1)
+  {
+    flags = cv::CALIB_ZERO_TANGENT_DIST
+        | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
+        | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
+        | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6;
+  }
 
   double rms = niftk::IterativeMonoCameraCalibration(
         model,
@@ -123,10 +133,7 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
         distortion,
         rvecs,
         tvecs,
-        cv::CALIB_ZERO_TANGENT_DIST
-        | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
-        | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
-        | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6
+        flags
         );
 
   double tolerance = 0.005;
