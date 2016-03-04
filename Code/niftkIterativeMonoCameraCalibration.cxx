@@ -152,6 +152,7 @@ double IterativeMonoCameraCalibration(
       cp = (*canonicalIter).first->GetPoints();
       if(cp.empty())
       {
+        cv::imwrite("/tmp/matt.jpg", (*canonicalIter).second);
         niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
       }
 
