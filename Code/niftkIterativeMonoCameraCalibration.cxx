@@ -17,10 +17,83 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
-#include <highgui.h>
 
 namespace niftk
 {
+
+//-----------------------------------------------------------------------------
+void ExtractTwoCopiesOfControlPoints(
+    const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
+    std::list<PointSet>& a,
+    std::list<PointSet>& b
+    )
+{
+  a.clear();
+  b.clear();
+
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
+
+  for (iter = list.begin(); iter != list.end(); ++iter)
+  {
+    PointSet points = (*iter).first->GetPoints();
+    if(points.empty())
+    {
+      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points.";
+    }
+    a.push_back(points);
+    b.push_back(points);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ExtractDistortedControlPoints(
+    const std::pair< cv::Size2i, niftk::PointSet>& referenceData,
+    const cv::Mat& intrinsic,
+    const cv::Mat& distortion,
+    const cv::Mat& originalImage,
+    std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
+    PointSet& outputPoints
+    )
+{
+  cv::Mat undistortedImage;
+  cv::Mat h;
+  cv::Mat hInv;
+  PointSet cp;
+  PointSet cpi;
+  PointSet cpid;
+
+  // 1. Undistort and Unproject: Use the camera parameters to
+  // undistort and unproject input images to a canonical pattern.
+  cv::undistort(originalImage, undistortedImage, intrinsic, distortion, intrinsic);
+  niftk::WarpImageByCorrespondingPoints(
+        undistortedImage,
+        intrinsic,                     // current estimate (updated each loop)
+        distortion,                    // current estimate (updated each loop)
+        outputPoints,                  // first time, its a copy of the original detected points,
+                                       // after that, its updated, distorted points
+        referenceData.second,          // specifies the proposed size of warped image
+        referenceData.first,           // specifies the target point locations
+        h,                             // output homography, written into
+        outputDetectorAndImage.second  // output image, written into
+        );
+
+  // 2. Localize control points: Localize calibration pattern control
+  // points in the canonical pattern.
+  cp = outputDetectorAndImage.first->GetPoints();
+  if(cp.empty())
+  {
+    niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
+  }
+
+  // 3. Reproject: Project the control points using the estimated
+  // camera parameters.
+  hInv = h.inv(cv::DECOMP_SVD);
+  niftk::WarpPointsByHomography(cp, hInv, cpi);
+  niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
+  niftk::CopyPointsInto(cpid, outputPoints);
+}
+
 
 //-----------------------------------------------------------------------------
 double IterativeMonoCameraCalibration(
@@ -59,24 +132,11 @@ double IterativeMonoCameraCalibration(
 
   double projectedRMS = 0;
 
-  std::list<PointSet> pointsFromOriginalImages;
-  std::list<PointSet> distortedPointsFromCanonicalImages;
-
   // 1. Detect control points: Detect calibration pattern control
   // points (corners, circle or ring centers) in the input images.
-  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
-  for (originalIter = detectorAndOriginalImages.begin();
-       originalIter != detectorAndOriginalImages.end();
-       ++originalIter)
-  {
-    PointSet points = (*originalIter).first->GetPoints();
-    if(points.empty())
-    {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points.";
-    }
-    pointsFromOriginalImages.push_back(points);
-    distortedPointsFromCanonicalImages.push_back(points);
-  }
+  std::list<PointSet> pointsFromOriginalImages;
+  std::list<PointSet> distortedPointsFromCanonicalImages;
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImages, pointsFromOriginalImages, distortedPointsFromCanonicalImages);
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
@@ -91,9 +151,6 @@ double IterativeMonoCameraCalibration(
         cvFlags
         );
 
-  double previousRMS = std::numeric_limits<double>::max();
-  unsigned int count = 0;
-
   std::cout << "Initial calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Initial Fx=" << intrinsic.at<double>(0,0) << std::endl;
   std::cout << "Initial Fy=" << intrinsic.at<double>(1,1) << std::endl;
@@ -105,66 +162,36 @@ double IterativeMonoCameraCalibration(
   std::cout << "Initial P2=" << distortion.at<double>(0,3) << std::endl;
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
+  double previousRMS = std::numeric_limits<double>::max();
+  unsigned int count = 0;
 
   do // until convergence
   {
     previousRMS = projectedRMS;
 
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
-    std::list<PointSet>::iterator originalPointsIter;
     std::list<PointSet>::iterator pointsIter;
 
     for (originalIter = detectorAndOriginalImages.begin(),
          canonicalIter = detectorAndWarpedImages.begin(),
-         pointsIter = distortedPointsFromCanonicalImages.begin(),
-         originalPointsIter = pointsFromOriginalImages.begin();
+         pointsIter = distortedPointsFromCanonicalImages.begin();
          originalIter != detectorAndOriginalImages.end() &&
          canonicalIter != detectorAndWarpedImages.end() &&
-         pointsIter != distortedPointsFromCanonicalImages.end() &&
-         originalPointsIter != pointsFromOriginalImages.end();
+         pointsIter != distortedPointsFromCanonicalImages.end();
          ++originalIter,
          ++canonicalIter,
-         ++pointsIter,
-         ++originalPointsIter
+         ++pointsIter
          )
     {
-
-      cv::Mat undistortedImage;
-      cv::Mat h;
-      cv::Mat hInv;
-      PointSet cp;
-      PointSet cpi;
-      PointSet cpid;
-
-      // 1. Undistort and Unproject: Use the camera parameters to
-      // undistort and unproject input images to a canonical pattern.
-      cv::undistort((*originalIter).second, undistortedImage, intrinsic, distortion, intrinsic);
-      niftk::WarpImageByCorrespondingPoints(
-            undistortedImage,
-            intrinsic,                          // current estimate (updated each loop)
-            distortion,                         // current estimate (updated each loop)
-            (*pointsIter),                      // first time, its a copy of the original detected points,
-                                                // after that, its updated, distorted points
-            referenceImageData.second,          // specifies the proposed size of warped image
-            referenceImageData.first,           // specifies the target point locations
-            h,                                  // output homography, written into
-            (*canonicalIter).second             // output image, written into
+      niftk::ExtractDistortedControlPoints(
+            referenceImageData,
+            intrinsic,
+            distortion,
+            (*originalIter).second,
+            (*canonicalIter),
+            (*pointsIter)
             );
-
-      // 2. Localize control points: Localize calibration pattern control
-      // points in the canonical pattern.
-      cp = (*canonicalIter).first->GetPoints();
-      if(cp.empty())
-      {
-        niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
-      }
-
-      // 3. Reproject: Project the control points using the estimated
-      // camera parameters.
-      hInv = h.inv(cv::DECOMP_SVD);
-      niftk::WarpPointsByHomography(cp, hInv, cpi);
-      niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
-      niftk::CopyPointsInto(cpid, (*pointsIter));
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine

@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkDutta2009IterativeMonoCalib_h
-#define niftkDutta2009IterativeMonoCalib_h
+#ifndef niftkIterativeMonoCameraCalibration_h
+#define niftkIterativeMonoCameraCalibration_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkTypes.h"
@@ -24,11 +24,23 @@
 namespace niftk
 {
 
+NIFTYCAL_WINEXPORT void ExtractTwoCopiesOfControlPoints(
+    const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
+    std::list<PointSet>& a,
+    std::list<PointSet>& b);
+
+NIFTYCAL_WINEXPORT void ExtractDistortedControlPoints(
+    const std::pair< cv::Size2i, niftk::PointSet>& referenceData,
+    const cv::Mat& intrinsic,
+    const cv::Mat& distortion,
+    const cv::Mat& originalImage,
+    std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
+    PointSet& outputPoints
+    );
+
 /**
 * \brief Given a list of images, performs mono camera
 * calibration according to: Dutta ICCV 2009.
-*
-* \throw if detectorAndOriginalImages.size() != detectorAndWarpedImages.size()
 * \return rms re-projection error
 */
 NIFTYCAL_WINEXPORT double IterativeMonoCameraCalibration(

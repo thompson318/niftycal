@@ -15,12 +15,13 @@
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
 set(TEST_CASES
   niftkNiftyCalExceptionTest
-  niftkExtractChessboardPointsTest
-  niftkMonoChessboardCameraCalibrationTest
-  niftkStereoChessboardCameraCalibrationTest
-  niftkWarpChessboardByHomographyTest
-  niftkIterativeMonoChessboardCameraCalibrationTest
   niftkPointDistortionTest
+  niftkExtractChessboardPointsTest
+  niftkWarpChessboardByHomographyTest
+  niftkMonoChessboardCameraCalibrationTest
+  niftkIterativeMonoChessboardCameraCalibrationTest
+  niftkStereoChessboardCameraCalibrationTest
+  niftkIterativeStereoChessboardCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -111,4 +112,30 @@ add_test(CalibIterativeMonoLap2 niftkIterativeMonoChessboardCameraCalibrationTes
   ${DATA_DIR}/Simulation2/Left6.jpg
   ${DATA_DIR}/Simulation2/Left7.jpg
   ${DATA_DIR}/Simulation2/Left8.jpg
+)
+
+add_test(CalibIterativeStereoLap1 niftkIterativeStereoChessboardCameraCalibrationTest 3 14 10
+  960 540                                               # size of reference image
+  ${DATA_DIR}/Laparoscope/reference_960_540_14_10.txt   # 2D points for reference image
+  0                                                     # zero distortion = false
+  0.99919 -0.000809931 0.0402285 # rvec
+  -4.64005 0.26403 0.297868 # tvec
+  ${DATA_DIR}/Laparoscope/Left/left-1095.png
+  ${DATA_DIR}/Laparoscope/Left/left-1338.png
+  ${DATA_DIR}/Laparoscope/Left/left-1884.png
+  ${DATA_DIR}/Laparoscope/Left/left-2520.png
+  ${DATA_DIR}/Laparoscope/Left/left-3083.png
+  ${DATA_DIR}/Laparoscope/Left/left-3335.png
+  ${DATA_DIR}/Laparoscope/Left/left-3685.png
+  ${DATA_DIR}/Laparoscope/Left/left-4848.png
+  ${DATA_DIR}/Laparoscope/Left/left-798.png
+  ${DATA_DIR}/Laparoscope/Right/right-1095.png
+  ${DATA_DIR}/Laparoscope/Right/right-1338.png
+  ${DATA_DIR}/Laparoscope/Right/right-1884.png
+  ${DATA_DIR}/Laparoscope/Right/right-2520.png
+  ${DATA_DIR}/Laparoscope/Right/right-3083.png
+  ${DATA_DIR}/Laparoscope/Right/right-3335.png
+  ${DATA_DIR}/Laparoscope/Right/right-3685.png
+  ${DATA_DIR}/Laparoscope/Right/right-4848.png
+  ${DATA_DIR}/Laparoscope/Right/right-798.png
 )

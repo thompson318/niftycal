@@ -171,7 +171,7 @@ double StereoCameraCalibration(const Model3D& model,
                             left2RightTranslation,
                             essentialMatrix,
                             fundamentalMatrix,
-                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-6),
+                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1e-10),
                             cvFlags
                             );
 

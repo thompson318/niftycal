@@ -23,6 +23,7 @@ set(NIFTYCAL_SRCS
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
+  niftkIterativeStereoCameraCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

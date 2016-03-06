@@ -146,5 +146,4 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < tolerance );
   REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < tolerance );
   REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < tolerance );
-
 }
