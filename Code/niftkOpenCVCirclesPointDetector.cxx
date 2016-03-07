@@ -1,0 +1,93 @@
+/*=============================================================================
+
+  NiftyCal: A software package for camera calibration.
+
+  Copyright (c) University College London (UCL). All rights reserved.
+
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
+
+  See LICENSE.txt in the top level directory for details.
+
+=============================================================================*/
+
+#include "niftkOpenCVCirclesPointDetector.h"
+#include "niftkNiftyCalExceptionMacro.h"
+#include <cv.h>
+
+namespace niftk {
+
+//-----------------------------------------------------------------------------
+OpenCVCirclesPointDetector::OpenCVCirclesPointDetector(
+    cv::Size2i patternSize)
+: m_PatternSize(patternSize)
+, m_Image(nullptr)
+{
+  if (m_PatternSize.width < 2)
+  {
+    niftkNiftyCalThrow() << "Number of circles in width axes is too small.";
+  }
+  if (m_PatternSize.height < 2)
+  {
+    niftkNiftyCalThrow() << "Number of circles in height axes is too small.";
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+OpenCVCirclesPointDetector::~OpenCVCirclesPointDetector()
+{
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVCirclesPointDetector::SetImage(cv::Mat* image)
+{
+  if (image == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null image provided.";
+  }
+  m_Image = image;
+}
+
+
+//-----------------------------------------------------------------------------
+PointSet OpenCVCirclesPointDetector::GetPoints()
+{
+  if (m_Image == nullptr)
+  {
+    niftkNiftyCalThrow() << "Image is Null.";
+  }
+
+  bool found = false;
+  PointSet result;
+  std::vector<cv::Point2f> circles;
+  unsigned int numberOfCircles = m_PatternSize.width * m_PatternSize.height;
+
+  found = cv::findCirclesGrid(
+    *m_Image, m_PatternSize, circles,
+    cv::CALIB_CB_ASYMMETRIC_GRID);
+
+  if ( circles.size() == 0 )
+  {
+    return result;
+  }
+
+  if (found  && circles.size() == numberOfCircles)
+  {
+
+    for ( unsigned int k = 0; k < numberOfCircles; ++k)
+    {
+      Point2D tmp;
+      tmp.point.x = circles[k].x;
+      tmp.point.y = circles[k].y;
+      tmp.id = k;
+      result.insert(IdPoint2D(tmp.id, tmp));
+    }
+  }
+
+  return result;
+}
+
+} // end namespace
