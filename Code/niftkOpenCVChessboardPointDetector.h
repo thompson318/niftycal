@@ -24,7 +24,7 @@ namespace niftk
 
 /**
 * \class OpenCVChessboardPointDetector
-* \brief Detects complete chessboards in a grey scale image, using OpenCV.
+* \brief Detects complete OpenCV chessboards in a grey scale image, cv::findChessboardCorners.
 *
 * Note, this detector does no image conversion.
 */
