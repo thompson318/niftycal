@@ -245,9 +245,9 @@ add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
   720 480                                                 # size of reference image
   ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt # 2D points for reference image
   0                                                       # zero distortion (1==true)
-  0.222406                                                # RMS
-  1540.4 1536.42 641.863 478.554                          # intrinsic
-  0 0 0 0                                                 # distortion
+  0.119616                                                # RMS
+  1147.84 1148.33 360.431 239.511                         # intrinsic. Should be 1150, 1150, 360.5 240.5.
+  -0.755969 1.63178 0.000415281 -0.000288245              # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_-45_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_-45_0_.bmp
@@ -259,3 +259,20 @@ add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_45_-45_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_45_45_0_.bmp
 )
+
+add_test(CalibIterMonoCMU2 niftkIterativeMonoChessboardCameraCalibrationTest
+  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt      # Model description (chessboard points)
+  10 7                                                         # internal corners
+  1024 768                                                     # size of reference image
+  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt # 2D points for reference image
+  0                                                            # zero distortion (1==true)
+  0.153399                                                     # RMS
+  842.499 841.505 506.89 366.912                               # intrinsic
+  -0.432311 0.266436 0.000790595 0.000588942                   # distortion
+  ${DATA_DIR}/CMU/TestRealImage/checker/1/img1.bmp
+  ${DATA_DIR}/CMU/TestRealImage/checker/1/img2.bmp
+  ${DATA_DIR}/CMU/TestRealImage/checker/1/img3.bmp
+  ${DATA_DIR}/CMU/TestRealImage/checker/1/img4.bmp
+  ${DATA_DIR}/CMU/TestRealImage/checker/1/img5.bmp
+)
+
