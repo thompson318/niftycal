@@ -65,9 +65,16 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
   std::vector<cv::Point2f> circles;
   unsigned int numberOfCircles = m_PatternSize.width * m_PatternSize.height;
 
+  /** http://answers.opencv.org/question/3471/findcirclesgrid-not-working/ */
+  cv::SimpleBlobDetector::Params params;
+  params.maxArea = 10e4;
+  cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
+
   bool found = cv::findCirclesGrid(
     *m_Image, m_PatternSize, circles,
-    cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+    cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
+    , blobDetector
+    );
 
   if ( circles.size() == 0 )
   {
@@ -87,10 +94,10 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
 //      std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
-/*
-  cv::drawChessboardCorners(*m_Image, m_PatternSize, circles, found);
-  cv::imwrite("/tmp/matt.png", *m_Image);
-*/
+
+//  cv::drawChessboardCorners(*m_Image, m_PatternSize, circles, found);
+//  cv::imwrite("/tmp/matt2.png", *m_Image);
+
   return result;
 }
 

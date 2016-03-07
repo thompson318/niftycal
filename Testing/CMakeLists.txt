@@ -209,11 +209,11 @@ add_test(CalibLapStereoIter niftkIterativeStereoChessboardCameraCalibrationTest
 
 # Now try iterative on circles.
 add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
-  ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt           # Model description (chessboard points)
-  11 4                                                     # pattern size
-  1280 989                                                 # size of reference image
-  ${DATA_DIR}/SimulationDots1/reference_1280_989_11_4.txt  # 2D points for reference image
-  1                                                        # zero distortion (1==true)
+  ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt            # Model description (grid points 3D)
+  11 4                                                      # pattern size
+  2560 1978                                                 # size of reference image
+  ${DATA_DIR}/SimulationDots1/reference_2560_1978_11_4.txt  # 2D points for reference image
+  1                                                         # zero distortion (1==true)
   0.995869 0.00066861 -0.0907979 # rvec
   2.43657 -0.000460828 0.262795 # tvec
   ${DATA_DIR}/SimulationDots1/Left1.jpg
