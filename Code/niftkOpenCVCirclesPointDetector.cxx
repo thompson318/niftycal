@@ -15,6 +15,7 @@
 #include "niftkOpenCVCirclesPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <cv.h>
+#include <highgui.h>
 
 namespace niftk {
 
@@ -60,14 +61,13 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
     niftkNiftyCalThrow() << "Image is Null.";
   }
 
-  bool found = false;
   PointSet result;
   std::vector<cv::Point2f> circles;
   unsigned int numberOfCircles = m_PatternSize.width * m_PatternSize.height;
 
-  found = cv::findCirclesGrid(
+  bool found = cv::findCirclesGrid(
     *m_Image, m_PatternSize, circles,
-    cv::CALIB_CB_ASYMMETRIC_GRID);
+    cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
 
   if ( circles.size() == 0 )
   {
@@ -84,9 +84,13 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
       tmp.point.y = circles[k].y;
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
+//      std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
-
+/*
+  cv::drawChessboardCorners(*m_Image, m_PatternSize, circles, found);
+  cv::imwrite("/tmp/matt.png", *m_Image);
+*/
   return result;
 }
 

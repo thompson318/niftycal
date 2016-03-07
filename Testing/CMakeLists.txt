@@ -23,6 +23,7 @@ set(TEST_CASES
   niftkIterativeMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
   niftkIterativeStereoChessboardCameraCalibrationTest
+  niftkIterativeStereoCirclesCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -203,4 +204,34 @@ add_test(CalibLapStereoIter niftkIterativeStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/Right/right-3685.png
   ${DATA_DIR}/Laparoscope/Right/right-4848.png
   ${DATA_DIR}/Laparoscope/Right/right-798.png
+)
+
+
+# Now try iterative on circles.
+add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
+  ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt           # Model description (chessboard points)
+  11 4                                                     # pattern size
+  1280 989                                                 # size of reference image
+  ${DATA_DIR}/SimulationDots1/reference_1280_989_11_4.txt  # 2D points for reference image
+  1                                                        # zero distortion (1==true)
+  0.995869 0.00066861 -0.0907979 # rvec
+  2.43657 -0.000460828 0.262795 # tvec
+  ${DATA_DIR}/SimulationDots1/Left1.jpg
+  ${DATA_DIR}/SimulationDots1/Left2.jpg
+  ${DATA_DIR}/SimulationDots1/Left3.jpg
+  ${DATA_DIR}/SimulationDots1/Left4.jpg
+  ${DATA_DIR}/SimulationDots1/Left5.jpg
+  ${DATA_DIR}/SimulationDots1/Left6.jpg
+  ${DATA_DIR}/SimulationDots1/Left7.jpg
+  ${DATA_DIR}/SimulationDots1/Left8.jpg
+  ${DATA_DIR}/SimulationDots1/Left9.jpg
+  ${DATA_DIR}/SimulationDots1/Right1.jpg
+  ${DATA_DIR}/SimulationDots1/Right2.jpg
+  ${DATA_DIR}/SimulationDots1/Right3.jpg
+  ${DATA_DIR}/SimulationDots1/Right4.jpg
+  ${DATA_DIR}/SimulationDots1/Right5.jpg
+  ${DATA_DIR}/SimulationDots1/Right6.jpg
+  ${DATA_DIR}/SimulationDots1/Right7.jpg
+  ${DATA_DIR}/SimulationDots1/Right8.jpg
+  ${DATA_DIR}/SimulationDots1/Right9.jpg
 )

@@ -25,15 +25,15 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   int expectedNumberOfArguments =  6;
   if (niftk::argc != expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkExtractCirclesPointsTest image expectedImageWidth expectedImageHeight expectedCirclesPerColumn expectedColumns" << std::endl;
+    std::cerr << "Usage: niftkExtractCirclesPointsTest image expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn " << std::endl;
     REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
   int expectedWidth = atoi(niftk::argv[2]);
   int expectedHeight = atoi(niftk::argv[3]);
-  int expectedCirclesPerColumn = atoi(niftk::argv[4]);
-  int expectedColumns = atoi(niftk::argv[5]);
+  int expectedColumns = atoi(niftk::argv[4]);
+  int expectedCirclesPerColumn = atoi(niftk::argv[5]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -41,7 +41,7 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  cv::Size2i patternSize(expectedColumns, expectedCirclesPerColumn);
+  cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
   niftk::OpenCVCirclesPointDetector detector(patternSize);
   detector.SetImage(&greyImage);
   niftk::PointSet points = detector.GetPoints();

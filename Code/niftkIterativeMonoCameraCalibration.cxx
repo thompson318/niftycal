@@ -33,15 +33,18 @@ void ExtractTwoCopiesOfControlPoints(
 
   std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
 
+  int counter = 0;
   for (iter = list.begin(); iter != list.end(); ++iter)
   {
     PointSet points = (*iter).first->GetPoints();
     if(points.empty())
     {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points.";
+      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points, and " << counter << " isnt.";
     }
+
     a.push_back(points);
     b.push_back(points);
+    counter++;
   }
 }
 
