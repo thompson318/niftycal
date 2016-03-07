@@ -43,6 +43,7 @@ endforeach()
 
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
+add_test(ExtChessCMU1 niftkExtractChessboardPointsTest ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp 720 480 10 7)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612 35)
 add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.jpg 1280 989 11 4)
 add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
@@ -234,4 +235,27 @@ add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
   ${DATA_DIR}/SimulationDots1/Right7.jpg
   ${DATA_DIR}/SimulationDots1/Right8.jpg
   ${DATA_DIR}/SimulationDots1/Right9.jpg
+)
+
+
+# Now try iterative, mono, using CMU dataset.
+add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
+  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt # Model description (chessboard points)
+  10 7                                                    # internal corners
+  720 480                                                 # size of reference image
+  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt # 2D points for reference image
+  0                                                       # zero distortion (1==true)
+  0.222406                                                # RMS
+  1540.4 1536.42 641.863 478.554                          # intrinsic
+  0 0 0 0                                                 # distortion
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_-45_0_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_-45_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_45_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_45_0_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_-45_-45_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_-45_45_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_0_0_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_45_-45_0_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/1/checker_45_45_0_.bmp
 )
