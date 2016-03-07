@@ -26,7 +26,7 @@ namespace niftk
 /**
 * \file niftkMonoCameraCalibration.h
 * \brief Performs a mono camera calibration using the standard OpenCV approach.
-* \param cvFlags can be cv::CALIB_FIX_INTRINSIC, cv::CALIB_USE_INTRINSIC_GUESS, or 0 to guess intrinsic and optimise all params.
+* \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
 * \return rms error of re-projected 3D points onto 2D points
 */
 NIFTYCAL_WINEXPORT double MonoCameraCalibration(const Model3D& model,

@@ -29,11 +29,11 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   int expectedMinimumNumberOfArguments =  15;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest modelFileName cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
-  float squareSizeInMillimetres = atof(niftk::argv[1]);
+  std::string modelFileName = niftk::argv[1];
   int numberInternalCornersInX = atoi(niftk::argv[2]);
   int numberInternalCornersInY = atoi(niftk::argv[3]);
   float eRMS = atof(niftk::argv[4]);
@@ -55,23 +55,8 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
     niftkNiftyCalThrow() << "numberInternalCornersInY < 2";
   }
 
-  // Generates "model"
-  niftk::Model3D model;
-  int counter = 0;
-  for (int y = 0; y < numberInternalCornersInY; y++)
-  {
-    for (int x = 0; x < numberInternalCornersInX; x++)
-    {
-      niftk::Point3D tmp;
-      tmp.point.x = x*squareSizeInMillimetres;
-      tmp.point.y = y*squareSizeInMillimetres;
-      tmp.point.z = 0;
-      tmp.id = counter;
-
-      model.insert(niftk::IdPoint3D(tmp.id, tmp));
-      counter++;
-    }
-  }
+  // Loads "model"
+  niftk::Model3D model = niftk::LoadModel3D(modelFileName);
   REQUIRE( model.size() == numberInternalCornersInY*numberInternalCornersInX );
 
   // Loads image data.

@@ -121,14 +121,14 @@ Model3D LoadModel3D(const std::string& fileName)
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
   }
 
-  while (!ifs.eof())
+  while (ifs.good())
   {
     Point3D tmp;
     ifs >> tmp.id;
     ifs >> tmp.point.x;
     ifs >> tmp.point.y;
     ifs >> tmp.point.z;
-    if (!ifs.bad() && !ifs.fail())
+    if (ifs.good())
     {
       result.insert(IdPoint3D(tmp.id, tmp));
     }

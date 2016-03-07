@@ -26,11 +26,17 @@ namespace niftk
 /**
 * \file niftkStereoCameraCalibration.h
 * \brief Performs a stereo camera calibration using the standard OpenCV approach.
-* \param cvFlags can be cv::CALIB_FIX_INTRINSIC, cv::CALIB_USE_INTRINSIC_GUESS, or 0 to guess intrinsic and optimise all params.
+* \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
 * \return rms re-projection error over both views
+*
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
 * and that each corresponding point set has at least 1 corresponding points, meaning
 * the same point ID is visible in both left and right view. 
+*
+* This method, ONLY does the stereo calibration. Also, OpenCV notes that this
+* can be unstable, so you are advised to calibrate both left and right cameras
+* separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
+* or even CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC. etc.
 */
 NIFTYCAL_WINEXPORT double StereoCameraCalibration(const Model3D& model,
                                                   const std::list<PointSet>& listOfLeftHandPointSets,

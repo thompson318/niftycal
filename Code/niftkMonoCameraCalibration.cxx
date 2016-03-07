@@ -102,6 +102,16 @@ double MonoCameraCalibration(const Model3D& model,
                         CV_CALIB_FIX_PRINCIPAL_POINT | CV_CALIB_FIX_ASPECT_RATIO
                         );
 
+    cv::calibrateCamera(objectPoints,
+                        imagePoints,
+                        imageSize,
+                        intrinsic,
+                        distortion,
+                        rvecs,
+                        tvecs,
+                        CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_PRINCIPAL_POINT
+                        );
+
     rms = cv::calibrateCamera(objectPoints,
                               imagePoints,
                               imageSize,

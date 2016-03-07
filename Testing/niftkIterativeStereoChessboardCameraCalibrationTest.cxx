@@ -29,11 +29,11 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
   int expectedMinimumNumberOfArguments =  16;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkIterativeStereChessboardCameraCalibrationTest squareSizeInMillimetres cornersInX cornersInY referenceWidth referenceHeight fileOfPoints eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkIterativeStereChessboardCameraCalibrationTest modelFileName cornersInX cornersInY referenceWidth referenceHeight fileOfPoints eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
-  float squareSizeInMillimetres = atof(niftk::argv[1]);
+  std::string modelFileName = niftk::argv[1];
   int numberInternalCornersInX = atoi(niftk::argv[2]);
   int numberInternalCornersInY = atoi(niftk::argv[3]);
   int widthOfReferenceImage = atoi(niftk::argv[4]);
@@ -62,23 +62,8 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
     niftkNiftyCalThrow() << "Should have an even number of images.";
   }
 
-  // Generates "model"
-  niftk::Model3D model;
-  int counter = 0;
-  for (int y = 0; y < numberInternalCornersInY; y++)
-  {
-    for (int x = 0; x < numberInternalCornersInX; x++)
-    {
-      niftk::Point3D tmp;
-      tmp.point.x = x*squareSizeInMillimetres;
-      tmp.point.y = y*squareSizeInMillimetres;
-      tmp.point.z = 0;
-      tmp.id = counter;
-
-      model.insert(niftk::IdPoint3D(tmp.id, tmp));
-      counter++;
-    }
-  }
+  // Loads "model"
+  niftk::Model3D model = niftk::LoadModel3D(modelFileName);
   REQUIRE( model.size() == numberInternalCornersInY*numberInternalCornersInX );
 
   // Loads image data.

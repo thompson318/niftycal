@@ -26,8 +26,8 @@ namespace niftk
 
 /**
 * \brief Given a list of images, performs stereo camera
-* calibration, basically, according to: Dutta ICCV 2009,
-* using OpenCV's standard stereo calibration routine.
+* calibration according to: Dutta ICCV 2009.
+* \see niftk::StereoCameraCalibration
 * \return rms re-projection error
 */
 NIFTYCAL_WINEXPORT double IterativeStereoCameraCalibration(

@@ -117,6 +117,8 @@ double IterativeStereoCameraCalibration(
         cvFlags
         );
 
+  int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
+
   projectedRMS = niftk::StereoCameraCalibration(
         model,
         pointsFromOriginalImagesLeft,
@@ -133,7 +135,8 @@ double IterativeStereoCameraCalibration(
         left2RightRotation,
         left2RightTranslation,
         essentialMatrix,
-        fundamentalMatrix
+        fundamentalMatrix,
+        iterativeCvFlags
         );
 
   std::cout << "Initial stereo calibration, rms=" << projectedRMS << std::endl;
@@ -149,12 +152,11 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
   std::cout << "Initial Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
   std::cout << "Initial Cyr=" << intrinsicRight.at<double>(1,2) << std::endl;
-  std::cout << "Initial K1r=" << intrinsicRight.at<double>(0,0) << std::endl;
-  std::cout << "Initial K2r=" << intrinsicRight.at<double>(0,1) << std::endl;
-  std::cout << "Initial P1r=" << intrinsicRight.at<double>(0,2) << std::endl;
-  std::cout << "Initial P2r=" << intrinsicRight.at<double>(0,3) << std::endl;
+  std::cout << "Initial K1r=" << distortionRight.at<double>(0,0) << std::endl;
+  std::cout << "Initial K2r=" << distortionRight.at<double>(0,1) << std::endl;
+  std::cout << "Initial P1r=" << distortionRight.at<double>(0,2) << std::endl;
+  std::cout << "Initial P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
-  int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
   double previousRMS = std::numeric_limits<double>::max();
   unsigned int count = 0;
 
@@ -214,8 +216,8 @@ double IterativeStereoCameraCalibration(
     // the camera parameters using Levenberg-Marquardt.
     projectedRMS = niftk::StereoCameraCalibration(
           model,
-          pointsFromOriginalImagesLeft,
-          pointsFromOriginalImagesRight,
+          distortedPointsFromCanonicalImagesLeft,
+          distortedPointsFromCanonicalImagesRight,
           imageSize,
           intrinsicLeft,
           distortionLeft,
@@ -229,7 +231,7 @@ double IterativeStereoCameraCalibration(
           left2RightTranslation,
           essentialMatrix,
           fundamentalMatrix,
-          cv::CALIB_USE_INTRINSIC_GUESS
+          iterativeCvFlags
           );
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
@@ -250,10 +252,10 @@ double IterativeStereoCameraCalibration(
   std::cout << "Final Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
   std::cout << "Final Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
   std::cout << "Final Cyr=" << intrinsicRight.at<double>(1,2) << std::endl;
-  std::cout << "Final K1r=" << intrinsicRight.at<double>(0,0) << std::endl;
-  std::cout << "Final K2r=" << intrinsicRight.at<double>(0,1) << std::endl;
-  std::cout << "Final P1r=" << intrinsicRight.at<double>(0,2) << std::endl;
-  std::cout << "Final P2r=" << intrinsicRight.at<double>(0,3) << std::endl;
+  std::cout << "Final K1r=" << distortionRight.at<double>(0,0) << std::endl;
+  std::cout << "Final K2r=" << distortionRight.at<double>(0,1) << std::endl;
+  std::cout << "Final P1r=" << distortionRight.at<double>(0,2) << std::endl;
+  std::cout << "Final P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
   return projectedRMS;
 }

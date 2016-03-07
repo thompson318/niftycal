@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
+TEST_CASE( "Exception", "[Exception]" ) {
 
   int expectedNumberOfArguments =  1;
   if (niftk::argc != expectedNumberOfArguments)
