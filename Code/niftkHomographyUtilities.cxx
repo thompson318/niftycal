@@ -83,7 +83,7 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
       )
   {
     cv::undistortPoints(distortedSource, undistortedSource, cameraIntrinsics, distortionCoefficients, cv::Mat(), cameraIntrinsics);
-    outputHomography = cv::findHomography(undistortedSource, target, 0);
+    outputHomography = cv::findHomography(undistortedSource, target, CV_LMEDS);
   }
   else
   {

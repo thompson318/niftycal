@@ -157,16 +157,19 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Initial P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
-  double previousRMS = std::numeric_limits<double>::max();
   unsigned int count = 0;
+  double previousRMS = std::numeric_limits<double>::max();
 
-  do // until convergence
+  while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
   {
     previousRMS = projectedRMS;
 
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
+
+    std::list<PointSet> trimmedPointsLeft;
+    std::list<PointSet> trimmedPointsRight;
 
     // Do all left.
     for (originalIter = detectorAndOriginalImagesLeft.begin(),
@@ -180,14 +183,16 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
-      niftk::ExtractDistortedControlPoints(
+      trimmedPointsLeft.push_back(
+            niftk::ExtractDistortedControlPoints(
             referenceImageData,
             intrinsicLeft,
             distortionLeft,
             (*originalIter).second,
             (*canonicalIter),
             (*pointsIter)
-            );
+            )
+      );
     }
 
     // Do all right.
@@ -202,42 +207,67 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
-      niftk::ExtractDistortedControlPoints(
+      trimmedPointsRight.push_back(
+            niftk::ExtractDistortedControlPoints(
             referenceImageData,
             intrinsicRight,
             distortionRight,
             (*originalIter).second,
             (*canonicalIter),
             (*pointsIter)
-            );
+            )
+      );
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine
     // the camera parameters using Levenberg-Marquardt.
+    cv::Mat tmpIntrinsicLeft = intrinsicLeft.clone();
+    cv::Mat tmpDistortionLeft = distortionLeft.clone();
+    cv::Mat tmpIntrinsicRight = intrinsicRight.clone();
+    cv::Mat tmpDistortionRight = distortionRight.clone();
+    cv::Mat tmpLeft2RightRotation = left2RightRotation.clone();
+    cv::Mat tmpLeft2RightTranslation = left2RightTranslation.clone();
+    cv::Mat tmpEssentialMatrix = essentialMatrix.clone();
+    cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
+
     projectedRMS = niftk::StereoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImagesLeft,
-          distortedPointsFromCanonicalImagesRight,
+          distortedPointsFromCanonicalImagesLeft,  // or used trimmedPointsLeft?
+          distortedPointsFromCanonicalImagesRight, // or use trimmedPointsRight?
           imageSize,
-          intrinsicLeft,
-          distortionLeft,
+          tmpIntrinsicLeft,
+          tmpDistortionLeft,
           rvecsLeft,
           tvecsLeft,
-          intrinsicRight,
-          distortionRight,
+          tmpIntrinsicRight,
+          tmpDistortionRight,
           rvecsRight,
           tvecsRight,
-          left2RightRotation,
-          left2RightTranslation,
-          essentialMatrix,
-          fundamentalMatrix,
+          tmpLeft2RightRotation,
+          tmpLeft2RightTranslation,
+          tmpEssentialMatrix,
+          tmpFundamentalMatrix,
           iterativeCvFlags
           );
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
 
-  } while (projectedRMS < previousRMS &&
-           fabs(projectedRMS - previousRMS) > 0.005);
+    if (projectedRMS < previousRMS)
+    {
+      tmpIntrinsicLeft.copyTo(intrinsicLeft);
+      tmpDistortionLeft.copyTo(distortionLeft);
+      tmpIntrinsicRight.copyTo(intrinsicRight);
+      tmpDistortionRight.copyTo(distortionRight);
+      tmpLeft2RightRotation.copyTo(left2RightRotation);
+      tmpLeft2RightTranslation.copyTo(left2RightTranslation);
+      tmpEssentialMatrix.copyTo(essentialMatrix);
+      tmpFundamentalMatrix.copyTo(fundamentalMatrix);
+    }
+    else
+    {
+      projectedRMS = previousRMS;
+    }
+  } // end while
 
   std::cout << "Final stereo calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;

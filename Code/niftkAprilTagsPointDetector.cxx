@@ -26,13 +26,12 @@ namespace niftk {
 
 //-----------------------------------------------------------------------------
 AprilTagsPointDetector::AprilTagsPointDetector(
-    const cv::Mat& image,
     bool includeCorners,
     const std::string& name,
     float sigma,
     float segmentationSigma
     )
-: m_Image(image)
+: m_Image(nullptr)
 , m_IncludeCorners(includeCorners)
 , m_Name(name)
 , m_Sigma(sigma)
@@ -50,6 +49,16 @@ AprilTagsPointDetector::AprilTagsPointDetector(
   {
     niftkNiftyCalThrow() << "Segmentation sigma should not be negative.";
   }
+}
+
+//-----------------------------------------------------------------------------
+void AprilTagsPointDetector::SetImage(cv::Mat* image)
+{
+  if (image == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null image provided.";
+  }
+  m_Image = image;
 }
 
 
@@ -86,7 +95,7 @@ PointSet AprilTagsPointDetector::GetPoints()
   tagDetector.SetSegmentationSigma(m_SegmentationSigma);
   tagDetector.SetUseHybridMethod(false);
 
-  std::vector<AprilTags::TagDetection> markers = tagDetector.extractTags(m_Image);
+  std::vector<AprilTags::TagDetection> markers = tagDetector.extractTags(*m_Image);
 
   for (unsigned int i = 0; i < markers.size(); i++)
   {

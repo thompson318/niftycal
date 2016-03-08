@@ -90,17 +90,19 @@ double IterativeMonoCameraCalibration(
   std::cout << "Initial P1=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "Initial P2=" << distortion.at<double>(0,3) << std::endl;
 
+  unsigned int count = 0;
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
   double previousRMS = std::numeric_limits<double>::max();
-  unsigned int count = 0;
 
-  do // until convergence
+  while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
   {
     previousRMS = projectedRMS;
 
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
+
+    std::list<PointSet> trimmedPoints;
 
     for (originalIter = detectorAndOriginalImages.begin(),
          canonicalIter = detectorAndWarpedImages.begin(),
@@ -113,24 +115,28 @@ double IterativeMonoCameraCalibration(
          ++pointsIter
          )
     {
-      niftk::ExtractDistortedControlPoints(
+      trimmedPoints.push_back(
+            niftk::ExtractDistortedControlPoints(
             referenceImageData,
             intrinsic,
             distortion,
             (*originalIter).second,
             (*canonicalIter),
             (*pointsIter)
-            );
+            )
+       );
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine
     // the camera parameters using Levenberg-Marquardt.
+    cv::Mat tmpIntrinsic = intrinsic.clone();
+    cv::Mat tmpDistortion = distortion.clone();
     projectedRMS = niftk::MonoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImages,
+          distortedPointsFromCanonicalImages, // or used trimmedPoints?
           imageSize,
-          intrinsic,
-          distortion,
+          tmpIntrinsic,
+          tmpDistortion,
           rvecs,
           tvecs,
           iterativeCvFlags
@@ -138,8 +144,16 @@ double IterativeMonoCameraCalibration(
 
     std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
 
-  } while (projectedRMS < previousRMS &&
-           fabs(projectedRMS - previousRMS) > 0.005);
+    if (projectedRMS < previousRMS)
+    {
+      tmpIntrinsic.copyTo(intrinsic);
+      tmpDistortion.copyTo(distortion);
+    }
+    else
+    {
+      projectedRMS = previousRMS;
+    }
+  } // end while
 
   std::cout << "Final calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Final Fx=" << intrinsic.at<double>(0,0) << std::endl;

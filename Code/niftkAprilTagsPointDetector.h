@@ -33,8 +33,7 @@ class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public IPoint2DDetector
 
 public:
 
-  AprilTagsPointDetector(const cv::Mat& greyScaleImage,
-                         bool includeCorners,
+  AprilTagsPointDetector(bool includeCorners,
                          const std::string& name,
                          float sigma,
                          float segmentationSigma
@@ -46,9 +45,11 @@ public:
   */
   virtual PointSet GetPoints();
 
+  void SetImage(cv::Mat* image);
+
 private:
 
-  cv::Mat     m_Image;
+  cv::Mat*    m_Image;
   bool        m_IncludeCorners;
   std::string m_Name;
   float       m_Sigma;

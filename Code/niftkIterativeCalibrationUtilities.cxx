@@ -16,6 +16,7 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
+#include <highgui.h>
 
 namespace niftk
 {
@@ -49,7 +50,7 @@ void ExtractTwoCopiesOfControlPoints(
 
 
 //-----------------------------------------------------------------------------
-void ExtractDistortedControlPoints(
+PointSet ExtractDistortedControlPoints(
     const std::pair< cv::Mat, niftk::PointSet>& referenceData,
     const cv::Mat& intrinsic,
     const cv::Mat& distortion,
@@ -161,6 +162,13 @@ void ExtractDistortedControlPoints(
   niftk::WarpPointsByHomography(cp, hInv, cpi);
   niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
   niftk::CopyPointsInto(cpid, outputPoints);
+
+  PointSet trimmed = niftk::TrimPoints(cp, referenceData.second, 0.50);
+  niftk::WarpPointsByHomography(trimmed, hInv, cpi);
+  niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
+  niftk::CopyPointsInto(cpid, trimmed);
+
+  return trimmed;
 }
 
 } // end namespace

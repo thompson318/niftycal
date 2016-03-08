@@ -34,7 +34,7 @@ void ExtractTwoCopiesOfControlPoints(
     std::list<PointSet>& a,
     std::list<PointSet>& b);
 
-void ExtractDistortedControlPoints(
+PointSet ExtractDistortedControlPoints(
     const std::pair< cv::Mat, niftk::PointSet>& referenceData,
     const cv::Mat& intrinsic,
     const cv::Mat& distortion,

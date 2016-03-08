@@ -73,7 +73,6 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
 
   unsigned int numberOfCorners = m_NumberOfCorners.width * m_NumberOfCorners.height;
 
-
   cv::cornerSubPix(*m_Image, corners, cv::Size(11,11), cv::Size(-1,-1),
                    cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
@@ -88,7 +87,7 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
 
-      //std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
+//      std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
 

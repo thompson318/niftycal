@@ -91,13 +91,10 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
       tmp.point.y = circles[k].y;
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
-//      std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
+
+      //std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
-
-//  cv::drawChessboardCorners(*m_Image, m_PatternSize, circles, found);
-//  cv::imwrite("/tmp/matt2.png", *m_Image);
-
   return result;
 }
 
