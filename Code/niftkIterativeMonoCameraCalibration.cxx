@@ -15,93 +15,19 @@
 #include "niftkIterativeMonoCameraCalibration.h"
 #include "niftkMonoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkIterativeCalibrationUtilities_p.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
+
+#include <highgui.h>
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-void ExtractTwoCopiesOfControlPoints(
-    const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
-    std::list<PointSet>& a,
-    std::list<PointSet>& b
-    )
-{
-  a.clear();
-  b.clear();
-
-  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
-
-  int counter = 0;
-  for (iter = list.begin(); iter != list.end(); ++iter)
-  {
-    PointSet points = (*iter).first->GetPoints();
-    if(points.empty())
-    {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points, and " << counter << " isnt.";
-    }
-
-    a.push_back(points);
-    b.push_back(points);
-    counter++;
-  }
-}
-
-
-//-----------------------------------------------------------------------------
-void ExtractDistortedControlPoints(
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceData,
-    const cv::Mat& intrinsic,
-    const cv::Mat& distortion,
-    const cv::Mat& originalImage,
-    std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
-    PointSet& outputPoints
-    )
-{
-  cv::Mat undistortedImage;
-  cv::Mat h;
-  cv::Mat hInv;
-  PointSet cp;
-  PointSet cpi;
-  PointSet cpid;
-
-  // 1. Undistort and Unproject: Use the camera parameters to
-  // undistort and unproject input images to a canonical pattern.
-  cv::undistort(originalImage, undistortedImage, intrinsic, distortion, intrinsic);
-  niftk::WarpImageByCorrespondingPoints(
-        undistortedImage,
-        intrinsic,                     // current estimate (updated each loop)
-        distortion,                    // current estimate (updated each loop)
-        outputPoints,                  // first time, its a copy of the original detected points,
-                                       // after that, its updated, distorted points
-        referenceData.second,          // specifies the proposed size of warped image
-        referenceData.first,           // specifies the target point locations
-        h,                             // output homography, written into
-        outputDetectorAndImage.second  // output image, written into
-        );
-
-  // 2. Localize control points: Localize calibration pattern control
-  // points in the canonical pattern.
-  cp = outputDetectorAndImage.first->GetPoints();
-  if(cp.empty())
-  {
-    niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
-  }
-
-  // 3. Reproject: Project the control points using the estimated
-  // camera parameters.
-  hInv = h.inv(cv::DECOMP_SVD);
-  niftk::WarpPointsByHomography(cp, hInv, cpi);
-  niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
-  niftk::CopyPointsInto(cpid, outputPoints);
-}
-
-
-//-----------------------------------------------------------------------------
 double IterativeMonoCameraCalibration(
     const Model3D& model,
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceImageData,
+    const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImages,
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImages,
     cv::Size2i& imageSize,
@@ -124,7 +50,7 @@ double IterativeMonoCameraCalibration(
   {
     niftkNiftyCalThrow() << "detectorAndOriginalImages must be the same size as detectorAndWarpedImages.";
   }
-  if (referenceImageData.first.width == 0 || referenceImageData.first.height == 0)
+  if (referenceImageData.first.cols == 0 || referenceImageData.first.rows == 0)
   {
     niftkNiftyCalThrow() << "Invalid reference image size.";
   }

@@ -42,6 +42,7 @@ endforeach()
 ##################################################################################################
 
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
+add_test(ExtChessSim2 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/Left1.jpg 1280 940 14 10)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 640 480 9 6)
 add_test(ExtChessCMU1 niftkExtractChessboardPointsTest ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp 720 480 10 7)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612 35)
@@ -114,13 +115,13 @@ add_test(CalibLapStereo niftkStereoChessboardCameraCalibrationTest
 
 # Now try iterative. Using simulation. No distortion.
 add_test(CalibIterMonoSim2 niftkIterativeMonoChessboardCameraCalibrationTest
-  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
+  ${DATA_DIR}/Simulation2/Left1.jpg                     # Model image
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model points
   14 10                                                 # internal corners
-  480 270                                               # size of reference image
-  ${DATA_DIR}/Simulation2/reference_480_270_14_10.txt   # 2D points for reference image
+  ${DATA_DIR}/Simulation2/reference_14_10.txt           # 2D points for reference image
   1                                                     # zero distortion (1==true)
-  0.222406                                              # RMS
-  1540.4 1536.42 641.863 478.554                        # intrinsic
+  0.398766                                              # RMS
+  1540.87 1536.25 641.087 477.983                       # intrinsic
   0 0 0 0                                               # distortion
   ${DATA_DIR}/Simulation2/Left1.jpg
   ${DATA_DIR}/Simulation2/Left2.jpg
@@ -132,12 +133,13 @@ add_test(CalibIterMonoSim2 niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/Left8.jpg
 )
 
+
 # Now try iterative on stereo.
 add_test(CalibIterStereoSim2 niftkIterativeStereoChessboardCameraCalibrationTest
-  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
+  ${DATA_DIR}/Simulation2/Left1.jpg                     # Model image
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model points
   14 10                                                 # internal corners
-  480 270                                               # size of reference image
-  ${DATA_DIR}/Simulation2/reference_480_270_14_10.txt   # 2D points for reference image
+  ${DATA_DIR}/Simulation2/reference_14_10.txt           # 2D points for reference image
   1                                                     # zero distortion (1==true)
   0.996334 0.000453448 -0.0855442 # rvec
   5.98487 -0.000715996 0.504326 # tvec
@@ -160,15 +162,15 @@ add_test(CalibIterStereoSim2 niftkIterativeStereoChessboardCameraCalibrationTest
 )
 
 # Check iterative does something on laparoscope.
-add_test(CalibLapLeftIter niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(CalibIterLapLeft niftkIterativeMonoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Simulation2/Left1.jpg                     # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
   14 10                                                 # internal corners
-  960 540                                               # size of reference image
-  ${DATA_DIR}/Laparoscope/reference_960_540_14_10.txt   # 2D points for reference image
+  ${DATA_DIR}/Simulation2/reference_14_10.txt           # 2D points for reference image
   0                                                     # zero distortion (0==false)
-  0.588097                                              # RMS
-  2004.98 2012.29 945.409 621.189                       # intrinsic
-  -0.237534 -0.212468 0.00267685 -0.00113922            # distortion
+  0.749574                                              # RMS
+  2007.38 2013.31 946.042 619.686                       # intrinsic
+  -0.233778 -0.226803 0.00306691 -0.0013241             # distortion
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png
@@ -179,14 +181,16 @@ add_test(CalibLapLeftIter niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/Left/left-4848.png
   ${DATA_DIR}/Laparoscope/Left/left-798.png
 )
-add_test(CalibLapStereoIter niftkIterativeStereoChessboardCameraCalibrationTest
+
+
+add_test(CalibIterLapStereo niftkIterativeStereoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Simulation2/Left1.jpg                     # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
   14 10                                                 # internal corners
-  960 540                                               # size of reference image
-  ${DATA_DIR}/Laparoscope/reference_960_540_14_10.txt   # 2D points for reference image
+  ${DATA_DIR}/Simulation2/reference_14_10.txt           # 2D points for reference image
   0                                                     # zero distortion (1==true)
-  0.999096 -0.00102168 0.0424963 # rvec
-  -4.68027 0.272581 0.148799 # tvec
+  0.998899 -0.000514354 0.0469033 # rvec
+  -4.62666 0.289513 0.450488 # tvec
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png
@@ -207,13 +211,12 @@ add_test(CalibLapStereoIter niftkIterativeStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/Right/right-798.png
 )
 
-
 # Now try iterative on circles.
 add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
+  ${DATA_DIR}/SimulationDots1/Left1.jpg                     # Model image
   ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt            # Model description (grid points 3D)
   11 4                                                      # pattern size
-  2560 1978                                                 # size of reference image
-  ${DATA_DIR}/SimulationDots1/reference_2560_1978_11_4.txt  # 2D points for reference image
+  ${DATA_DIR}/SimulationDots1/reference_1280_989_11_4.txt   # 2D points for reference image
   1                                                         # zero distortion (1==true)
   0.995869 0.00066861 -0.0907979 # rvec
   2.43657 -0.000460828 0.262795 # tvec
@@ -240,14 +243,14 @@ add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
 
 # Now try iterative, mono, using CMU dataset.
 add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
-  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt # Model description (chessboard points)
-  10 7                                                    # internal corners
-  720 480                                                 # size of reference image
-  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt # 2D points for reference image
-  0                                                       # zero distortion (1==true)
-  0.119616                                                # RMS
-  1147.84 1148.33 360.431 239.511                         # intrinsic. Should be 1150, 1150, 360.5 240.5.
-  -0.755969 1.63178 0.000415281 -0.000288245              # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp # Model image
+  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt                # Model description (chessboard points)
+  10 7                                                                   # internal corners
+  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt           # 2D points for reference image
+  0                                                                      # zero distortion (1==true)
+  0.122441                                                               # RMS
+  1147.92 1148.41 360.718 239.471                                        # intrinsic. Should be 1150, 1150, 360.5 240.5.
+  -0.754944 1.45553 0.00041416 -0.000410494                              # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_-45_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_-45_0_.bmp
@@ -261,14 +264,14 @@ add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
 )
 
 add_test(CalibIterMonoCMU2 niftkIterativeMonoChessboardCameraCalibrationTest
-  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt      # Model description (chessboard points)
-  10 7                                                         # internal corners
-  1024 768                                                     # size of reference image
-  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt # 2D points for reference image
-  0                                                            # zero distortion (1==true)
-  0.153399                                                     # RMS
-  842.499 841.505 506.89 366.912                               # intrinsic
-  -0.432311 0.266436 0.000790595 0.000588942                   # distortion
+  ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp # Model image
+  ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt                # Model description (chessboard points)
+  10 7                                                                   # internal corners
+  ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt           # 2D points for reference image
+  0                                                                      # zero distortion (1==true)
+  0.158642                                                               # RMS
+  842.447 841.463 506.704 366.932                                        # intrinsic
+  -0.43184 0.263046 0.000798929 0.000597559                              # distortion
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img1.bmp
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img2.bmp
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img3.bmp

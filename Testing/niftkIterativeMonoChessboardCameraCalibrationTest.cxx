@@ -27,29 +27,28 @@
 
 TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  19;
+  int expectedMinimumNumberOfArguments =  18;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkIterativeMonoChessboardCameraCalibrationTest modelFileName cornersInX cornersInY referenceWidth referenceHeight fileOfPoints eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkIterativeMonoChessboardCameraCalibrationTest modelImage modelFileName cornersInX cornersInY fileOfPoints eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
-  std::string modelFileName = niftk::argv[1];
-  int numberInternalCornersInX = atoi(niftk::argv[2]);
-  int numberInternalCornersInY = atoi(niftk::argv[3]);
-  int widthOfReferenceImage = atoi(niftk::argv[4]);
-  int heightOfReferenceImage = atoi(niftk::argv[5]);
-  std::string fileOfReferencePoints = niftk::argv[6];
-  int zeroDistortion = atoi(niftk::argv[7]);
-  float eRMS = atof(niftk::argv[8]);
-  float eFx = atof(niftk::argv[9]);
-  float eFy = atof(niftk::argv[10]);
-  float eCx = atof(niftk::argv[11]);
-  float eCy = atof(niftk::argv[12]);
-  float eK1 = atof(niftk::argv[13]);
-  float eK2 = atof(niftk::argv[14]);
-  float eP1 = atof(niftk::argv[15]);
-  float eP2 = atof(niftk::argv[16]);
+  std::string modelImage = niftk::argv[1];
+  std::string modelFileName = niftk::argv[2];
+  int numberInternalCornersInX = atoi(niftk::argv[3]);
+  int numberInternalCornersInY = atoi(niftk::argv[4]);
+  std::string fileOfReferencePoints = niftk::argv[5];
+  int zeroDistortion = atoi(niftk::argv[6]);
+  float eRMS = atof(niftk::argv[7]);
+  float eFx = atof(niftk::argv[8]);
+  float eFy = atof(niftk::argv[9]);
+  float eCx = atof(niftk::argv[10]);
+  float eCy = atof(niftk::argv[11]);
+  float eK1 = atof(niftk::argv[12]);
+  float eK2 = atof(niftk::argv[13]);
+  float eP1 = atof(niftk::argv[14]);
+  float eP2 = atof(niftk::argv[15]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -59,6 +58,10 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   {
     niftkNiftyCalThrow() << "numberInternalCornersInY < 2";
   }
+
+  cv::Mat referenceImage = cv::imread(modelImage);
+  cv::Mat referenceImageGreyScale;
+  cv::cvtColor(referenceImage, referenceImageGreyScale, CV_BGR2GRAY);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -96,8 +99,8 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
   cv::Mat distortion;
   std::vector<cv::Mat> rvecs;
   std::vector<cv::Mat> tvecs;
-  std::pair< cv::Size2i, niftk::PointSet> referenceImageData;
-  referenceImageData.first = cv::Size2i(widthOfReferenceImage, heightOfReferenceImage);
+  std::pair< cv::Mat, niftk::PointSet> referenceImageData;
+  referenceImageData.first = referenceImageGreyScale;
   referenceImageData.second = niftk::LoadPointSet(fileOfReferencePoints);
 
   int flags = 0;

@@ -18,6 +18,7 @@ set(NIFTYCAL_SRCS
   niftkPointUtilities.cxx
   niftkHomographyUtilities.cxx
   niftkIOUtilities.cxx
+  niftkIterativeCalibrationUtilities.cxx
   niftkIPoint2DDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
   niftkOpenCVCirclesPointDetector.cxx

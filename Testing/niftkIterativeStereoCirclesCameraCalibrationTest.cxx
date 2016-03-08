@@ -26,26 +26,25 @@
 
 TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  16;
+  int expectedMinimumNumberOfArguments =  15;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkIterativeStereCirclesCameraCalibrationTest modelFileName expectedColumns expectedCirclesPerColumn referenceWidth referenceHeight fileOfPoints eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkIterativeStereCirclesCameraCalibrationTest modelImage modelFileName expectedColumns expectedCirclesPerColumn fileOfPoints eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
-  std::string modelFileName = niftk::argv[1];
-  int expectedColumns = atoi(niftk::argv[2]);
-  int expectedCirclesPerColumn = atoi(niftk::argv[3]);
-  int widthOfReferenceImage = atoi(niftk::argv[4]);
-  int heightOfReferenceImage = atoi(niftk::argv[5]);
-  std::string fileOfReferencePoints = niftk::argv[6];
-  int zeroDistortion = atoi(niftk::argv[7]);
-  float eR1 = atof(niftk::argv[8]);
-  float eR2 = atof(niftk::argv[9]);
-  float eR3 = atof(niftk::argv[10]);
-  float eT1 = atof(niftk::argv[11]);
-  float eT2 = atof(niftk::argv[12]);
-  float eT3 = atof(niftk::argv[13]);
+  std::string modelImage = niftk::argv[1];
+  std::string modelFileName = niftk::argv[2];
+  int expectedColumns = atoi(niftk::argv[3]);
+  int expectedCirclesPerColumn = atoi(niftk::argv[4]);
+  std::string fileOfReferencePoints = niftk::argv[5];
+  int zeroDistortion = atoi(niftk::argv[6]);
+  float eR1 = atof(niftk::argv[7]);
+  float eR2 = atof(niftk::argv[8]);
+  float eR3 = atof(niftk::argv[9]);
+  float eT1 = atof(niftk::argv[10]);
+  float eT2 = atof(niftk::argv[11]);
+  float eT3 = atof(niftk::argv[12]);
 
   if (expectedColumns < 2)
   {
@@ -57,10 +56,12 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
   }
 
   // Should have an even number of images left.
-  if ((niftk::argc - 14) % 2 != 0)
+  if ((niftk::argc - 13) % 2 != 0)
   {
     niftkNiftyCalThrow() << "Should have an even number of images.";
   }
+
+  cv::Mat referenceImage = cv::imread(modelImage);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -76,7 +77,7 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImagesRight;
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarpingRight;
 
-  for (int i = 14; i < niftk::argc; i++)
+  for (int i = 13; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     imageSize.width = image.cols;
@@ -87,7 +88,7 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
 
     std::cout << "i=" << i << ", file=" << niftk::argv[i] << std::endl;
 
-    if (i-14 < (niftk::argc-14)/2)
+    if (i-13 < (niftk::argc-13)/2)
     {
       std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVCirclesPointDetector(patternSize));
       originalImagesLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
@@ -121,8 +122,8 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
   REQUIRE( originalImagesRight.size() >= 1 );
   REQUIRE( originalImagesLeft.size()  == originalImagesRight.size());
 
-  std::pair< cv::Size2i, niftk::PointSet> referenceImageData;
-  referenceImageData.first = cv::Size2i(widthOfReferenceImage, heightOfReferenceImage);
+  std::pair< cv::Mat, niftk::PointSet> referenceImageData;
+  referenceImageData.first = referenceImage;
   referenceImageData.second = niftk::LoadPointSet(fileOfReferencePoints);
 
   int flags = 0;

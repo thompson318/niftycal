@@ -32,7 +32,7 @@ namespace niftk
 */
 NIFTYCAL_WINEXPORT double IterativeStereoCameraCalibration(
     const Model3D& model,
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceImageData,
+    const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesRight,
     const cv::Size2i& imageSize,

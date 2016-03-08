@@ -13,10 +13,10 @@
 =============================================================================*/
 
 #include "niftkIterativeStereoCameraCalibration.h"
-#include "niftkIterativeMonoCameraCalibration.h"
 #include "niftkMonoCameraCalibration.h"
 #include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkIterativeCalibrationUtilities_p.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
 #include <highgui.h>
@@ -27,7 +27,7 @@ namespace niftk
 //-----------------------------------------------------------------------------
 double IterativeStereoCameraCalibration(
     const Model3D& model,
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceImageData,
+    const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesRight,
     const cv::Size2i& imageSize,
@@ -71,7 +71,7 @@ double IterativeStereoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Inconsistent number of images and detector pairs.";
   }
-  if (referenceImageData.first.width == 0 || referenceImageData.first.height == 0)
+  if (referenceImageData.first.cols == 0 || referenceImageData.first.rows == 0)
   {
     niftkNiftyCalThrow() << "Invalid reference image size.";
   }

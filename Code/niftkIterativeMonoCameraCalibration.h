@@ -24,20 +24,6 @@
 namespace niftk
 {
 
-NIFTYCAL_WINEXPORT void ExtractTwoCopiesOfControlPoints(
-    const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
-    std::list<PointSet>& a,
-    std::list<PointSet>& b);
-
-NIFTYCAL_WINEXPORT void ExtractDistortedControlPoints(
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceData,
-    const cv::Mat& intrinsic,
-    const cv::Mat& distortion,
-    const cv::Mat& originalImage,
-    std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
-    PointSet& outputPoints
-    );
-
 /**
 * \brief Given a list of images, performs mono camera
 * calibration according to: Dutta ICCV 2009.
@@ -46,7 +32,7 @@ NIFTYCAL_WINEXPORT void ExtractDistortedControlPoints(
 */
 NIFTYCAL_WINEXPORT double IterativeMonoCameraCalibration(
     const Model3D& model,
-    const std::pair< cv::Size2i, niftk::PointSet>& referenceImageData,
+    const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImages,
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImages,
     cv::Size2i& imageSize,
