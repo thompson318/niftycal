@@ -14,6 +14,7 @@
 
 #include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include <queue>
 
 namespace niftk {
 
@@ -271,5 +272,48 @@ void DistortPoints(const std::vector<PointSet>& undistortedPoints,
     distortedPoints.push_back(dp);
   }
 }
+
+
+//-----------------------------------------------------------------------------
+PointSet TrimPoints(const PointSet& input,
+                    const PointSet& reference,
+                    const float& percentage
+                   )
+{
+  PointSet result;
+
+  typedef std::pair<double, niftk::IdType> P;
+  std::priority_queue< P, std::vector<P>, std::greater<P> > queue;
+
+  PointSet::const_iterator iter;
+  for (iter = input.begin(); iter != input.end(); ++iter)
+  {
+    PointSet::const_iterator refIter = reference.find((*iter).first);
+    if (refIter == reference.end())
+    {
+      niftkNiftyCalThrow() << "Reference data set does not contain point " << (*iter).first << std::endl;
+    }
+
+    double d2 = ((*iter).second.point.x - (*refIter).second.point.x)
+              * ((*iter).second.point.x - (*refIter).second.point.x)
+              + ((*iter).second.point.y - (*refIter).second.point.y)
+              * ((*iter).second.point.y - (*refIter).second.point.y);
+
+    queue.push(P(d2, (*iter).first));
+  }
+
+  unsigned int numberToKeep = queue.size() * percentage;
+  unsigned int numberIncluded = 0;
+  while (numberIncluded < numberToKeep)
+  {
+    P top = queue.top();
+    iter = input.find(top.second);
+    result.insert(*iter);
+    queue.pop();
+    numberIncluded++;
+  }
+  return result;
+}
+
 
 } // end namespace

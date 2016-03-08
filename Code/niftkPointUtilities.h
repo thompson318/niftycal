@@ -116,6 +116,16 @@ NIFTYCAL_WINEXPORT void DistortPoints(const std::vector<PointSet>& undistortedPo
                                      );
 
 
+/**
+* \brief Compares input with reference, and keeps the closest matching points,
+* determined by a percentage. (i.e. for trimmed least squares).
+* \param percentage number between 0 and 1.
+*/
+NIFTYCAL_WINEXPORT PointSet TrimPoints(const PointSet& input,
+                                       const PointSet& reference,
+                                       const float& percentage
+                                       );
+
 } // end namespace
 
 #endif
