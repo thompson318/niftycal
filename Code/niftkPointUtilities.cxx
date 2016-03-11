@@ -15,6 +15,8 @@
 #include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <queue>
+#include <vector>
+#include <niftkTypes.h>
 
 namespace niftk {
 
@@ -315,5 +317,45 @@ PointSet TrimPoints(const PointSet& input,
   return result;
 }
 
+
+//-----------------------------------------------------------------------------
+cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
+                     const cv::Mat&  leftIntrinsics,
+                     const cv::Mat&  leftDistortion,
+                     const int& whichImage,
+                     const cv::Mat&  fundamentalMatrix,
+                     const cv::Mat&  rightDistortedGreyImage,
+                     const cv::Mat&  rightIntrinsics,
+                     const cv::Mat&  rightDistortion
+                    )
+{
+  cv::Mat undistortedRightImage;
+  cv::undistort(rightDistortedGreyImage, undistortedRightImage, rightIntrinsics, rightDistortion, rightIntrinsics);
+
+  PointSet undistortedLeftPoints;
+  niftk::UndistortPoints(leftDistortedPoints, leftIntrinsics, leftDistortion, undistortedLeftPoints);
+
+  std::vector<cv::Point2f> leftUndistP;
+  std::vector<niftk::IdType> leftUndistId;
+  niftk::ConvertPoints(undistortedLeftPoints, leftUndistP, leftUndistId);
+
+  std::vector<cv::Point3f> epiLines;
+  cv::computeCorrespondEpilines(leftUndistP, whichImage, fundamentalMatrix, epiLines);
+
+  cv::Mat colouredUndistortedRightImage;
+  cv::cvtColor(undistortedRightImage, colouredUndistortedRightImage, CV_GRAY2BGR);
+
+  cv::RNG rng(0);
+  for (size_t i = 0; i < epiLines.size(); i++)
+  {
+    cv::Scalar colour(rng(256),rng(256),rng(256));
+    cv::line(colouredUndistortedRightImage,
+             cv::Point(0,-epiLines[i].z/epiLines[i].y),
+             cv::Point(colouredUndistortedRightImage.cols,-(epiLines[i].z+epiLines[i].x*colouredUndistortedRightImage.cols)/epiLines[i].y),
+             colour);
+  }
+
+  return colouredUndistortedRightImage;
+}
 
 } // end namespace

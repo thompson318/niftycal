@@ -126,6 +126,25 @@ NIFTYCAL_WINEXPORT PointSet TrimPoints(const PointSet& input,
                                        const float& percentage
                                        );
 
+/**
+* \brief For points in left image, draws epipolar lines on right image.
+*
+* This takes care of undistortion. So, you pass in distorted points, and
+* distorted images. The epi-polar lines are drawn on an undistorted image.
+*
+* \param set to 1 if you are passing in left hand points to draw on right image,
+* or 2 if you swap left for right.
+*/
+NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
+                                        const cv::Mat& leftIntrinsics,
+                                        const cv::Mat& leftDistortion,
+                                        const int& whichImage,
+                                        const cv::Mat& fundamentalMatrix,
+                                        const cv::Mat& rightDistortedGreyImage,
+                                        const cv::Mat& rightIntrinsics,
+                                        const cv::Mat& rightDistortion
+                                       );
+
 } // end namespace
 
 #endif

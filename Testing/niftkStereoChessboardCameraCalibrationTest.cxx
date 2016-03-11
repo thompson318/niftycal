@@ -160,7 +160,6 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS
-//                                              | CV_CALIB_FIX_INTRINSIC
                                              );
 
   std::cout << "Stereo RMS=" << rms << std::endl;
@@ -194,4 +193,5 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   REQUIRE( fabs(left2RightTranslation.at<double>(0,0) - eT1) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,1) - eT2) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,2) - eT3) < tolerance );
+
 }

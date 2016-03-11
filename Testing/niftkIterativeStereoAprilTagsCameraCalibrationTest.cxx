@@ -18,6 +18,7 @@
 #include <niftkIterativeStereoCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -187,4 +188,30 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   REQUIRE( fabs(left2RightTranslation.at<double>(0,0) - eT1) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,1) - eT2) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,2) - eT3) < tolerance );
+/*
+  cv::Mat imageLeft = cv::imread(niftk::argv[11]);
+  cv::Mat greyImageLeft;
+  cv::cvtColor(imageLeft, greyImageLeft, CV_BGR2GRAY);
+  niftk::AprilTagsPointDetector detectorLeft(true, // do include corners
+                                             "36h11",
+                                             0,
+                                             0.8);
+  detectorLeft.SetImage(&greyImageLeft);
+  niftk::PointSet pointSetLeft = detectorLeft.GetPoints();
+
+  cv::Mat imageRight = cv::imread(niftk::argv[20]);
+  cv::Mat greyImageRight;
+  cv::cvtColor(imageRight, greyImageRight, CV_BGR2GRAY);
+
+  cv::Mat rightImageWithLines = niftk::DrawEpiLines(pointSetLeft,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    1,
+                                                    fundamentalMatrix,
+                                                    greyImageRight,
+                                                    intrinsicRight,
+                                                    distortionRight
+                                                   );
+  cv::imwrite("/tmp/matt.epi.png", rightImageWithLines);
+  */
 }

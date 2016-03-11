@@ -18,6 +18,7 @@
 #include <niftkIterativeStereoCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -190,4 +191,28 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
   REQUIRE( fabs(left2RightTranslation.at<double>(0,0) - eT1) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,1) - eT2) < tolerance );
   REQUIRE( fabs(left2RightTranslation.at<double>(0,2) - eT3) < tolerance );
+
+/*
+  cv::Mat imageLeft = cv::imread(niftk::argv[13]);
+  cv::Mat greyImageLeft;
+  cv::cvtColor(imageLeft, greyImageLeft, CV_BGR2GRAY);
+  niftk::OpenCVChessboardPointDetector detectorLeft(corners);
+  detectorLeft.SetImage(&greyImageLeft);
+  niftk::PointSet pointSetLeft = detectorLeft.GetPoints();
+
+  cv::Mat imageRight = cv::imread(niftk::argv[21]);
+  cv::Mat greyImageRight;
+  cv::cvtColor(imageRight, greyImageRight, CV_BGR2GRAY);
+
+  cv::Mat rightImageWithLines = niftk::DrawEpiLines(pointSetLeft,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    1,
+                                                    fundamentalMatrix,
+                                                    greyImageRight,
+                                                    intrinsicRight,
+                                                    distortionRight
+                                                   );
+  cv::imwrite("/tmp/matt.epi.png", rightImageWithLines);
+*/
 }
