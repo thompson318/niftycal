@@ -27,6 +27,8 @@ namespace niftk
 * \brief Detects asymmetric circles pattern in grey scale images using cv::findCirclesGrid.
 *
 * Note, this detector does no image conversion.
+*
+* This detector is not thread safe.
 */
 class NIFTYCAL_WINEXPORT OpenCVCirclesPointDetector : public IPoint2DDetector
 {

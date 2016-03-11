@@ -27,6 +27,8 @@ namespace niftk
 * \brief Detects complete OpenCV chessboards in a grey scale image, cv::findChessboardCorners.
 *
 * Note, this detector does no image conversion.
+*
+* This detector is not thread safe.
 */
 class NIFTYCAL_WINEXPORT OpenCVChessboardPointDetector : public IPoint2DDetector
 {
