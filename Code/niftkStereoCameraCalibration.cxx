@@ -46,15 +46,15 @@ double StereoCameraCalibration(const Model3D& model,
 
   if (model.empty())
   {
-    niftkNiftyCalThrow() << "Model should not be empty.";
+    niftkNiftyCalThrow() << "Model is empty.";
   }
   if (listOfLeftHandPointSets.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two views of calibration points for left camera.";
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for left camera.";
   }
   if (listOfRightHandPointSets.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two views of calibration points for right camera.";
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for right camera.";
   }
   if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
   {

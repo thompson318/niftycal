@@ -31,11 +31,11 @@ double MonoCameraCalibration(const Model3D& model,
 {
   if (model.empty())
   {
-    niftkNiftyCalThrow() << "Model should not be empty.";
+    niftkNiftyCalThrow() << "Model is empty.";
   }
   if (listOfPointSets.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points.";
   }
 
   double rms = 0;

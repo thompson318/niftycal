@@ -50,15 +50,15 @@ double IterativeStereoCameraCalibration(
 {
   if (model.empty())
   {
-    niftkNiftyCalThrow() << "Model should not be empty.";
+    niftkNiftyCalThrow() << "Model is empty.";
   }
   if (detectorAndOriginalImagesLeft.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two left-hand views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 2 left-hand views of calibration points.";
   }
   if (detectorAndOriginalImagesRight.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two right-hand views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 2 right-hand views of calibration points.";
   }
 
   if (detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()

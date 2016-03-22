@@ -39,7 +39,7 @@ void ExtractTwoCopiesOfControlPoints(
     PointSet points = (*iter).first->GetPoints();
     if(points.empty())
     {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points, and " << counter << " isnt.";
+      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points, and " << counter << " isn't.";
     }
 
     a.push_back(points);
@@ -156,6 +156,7 @@ PointSet ExtractDistortedControlPoints(
     (*iter).second.point.y = static_cast<double>(matchLoc.y)/static_cast<double>(scaleFactor) + p.y -1;
   }
 */
+
   // 3. Reproject: Project the control points using the estimated
   // camera parameters.
   hInv = h.inv(cv::DECOMP_SVD);

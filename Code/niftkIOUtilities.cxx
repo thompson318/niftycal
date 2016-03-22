@@ -24,7 +24,7 @@ void SavePointSet(const PointSet& p, const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ofstream ofs;
@@ -51,7 +51,7 @@ PointSet LoadPointSet(const std::string& fileName)
 
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ifstream ifs;
@@ -84,7 +84,7 @@ void SaveModel3D(const Model3D& m, const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ofstream ofs;
@@ -111,7 +111,7 @@ Model3D LoadModel3D(const std::string& fileName)
 
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ifstream ifs;
@@ -145,7 +145,7 @@ void SaveMatrix(const cv::Mat& m, const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ofstream ofs;
@@ -175,7 +175,7 @@ cv::Mat LoadMatrix(const std::string& fileName)
 
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ifstream ifs;
@@ -246,7 +246,7 @@ void SavePoints(const Model3D& m,
 {
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ofstream ofs;
@@ -295,7 +295,7 @@ void LoadPoints(const std::string& fileName,
 {
   if (fileName.size() == 0)
   {
-    niftkNiftyCalThrow() << "Empty filename supplied.";
+    niftkNiftyCalThrow() << "Empty filename.";
   }
 
   std::ofstream ifs;

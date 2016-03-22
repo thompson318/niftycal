@@ -38,15 +38,15 @@ AprilTagsPointDetector::AprilTagsPointDetector(
 {
   if (m_Name.size() == 0)
   {
-    niftkNiftyCalThrow() << "Name should not be empty.";
+    niftkNiftyCalThrow() << "Name is empty.";
   }
   if (m_Sigma < 0)
   {
-    niftkNiftyCalThrow() << "Sigma should not be negative.";
+    niftkNiftyCalThrow() << "Sigma is < 0.";
   }
   if (m_SegmentationSigma < 0)
   {
-    niftkNiftyCalThrow() << "Segmentation sigma should not be negative.";
+    niftkNiftyCalThrow() << "Segmentation sigma is < 0.";
   }
 }
 

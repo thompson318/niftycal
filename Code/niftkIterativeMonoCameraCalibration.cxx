@@ -40,11 +40,11 @@ double IterativeMonoCameraCalibration(
 {
   if (model.empty())
   {
-    niftkNiftyCalThrow() << "Model should not be empty.";
+    niftkNiftyCalThrow() << "Model is empty.";
   }
   if (detectorAndOriginalImages.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least two views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points.";
   }
   if (detectorAndOriginalImages.size() != detectorAndWarpedImages.size())
   {

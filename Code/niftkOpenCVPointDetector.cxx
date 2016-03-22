@@ -49,11 +49,11 @@ void OpenCVPointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
 {
   if (scaleFactor.x <= 0)
   {
-    niftkNiftyCalThrow() << "X scale factor should be > 0.";
+    niftkNiftyCalThrow() << "X scale factor <= 0.";
   }
   if (scaleFactor.y <= 0)
   {
-    niftkNiftyCalThrow() << "Y scale factor should be > 0.";
+    niftkNiftyCalThrow() << "Y scale factor <= 0.";
   }
   m_ScaleFactors = scaleFactor;
 }
