@@ -18,10 +18,8 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(
-    cv::Size2i numberOfCorners)
+OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(cv::Size2i numberOfCorners)
 : m_NumberOfCorners(numberOfCorners)
-, m_Image(nullptr)
 {
   if (m_NumberOfCorners.width < 2)
   {
@@ -41,29 +39,13 @@ OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
 
 
 //-----------------------------------------------------------------------------
-void OpenCVChessboardPointDetector::SetImage(cv::Mat* image)
+PointSet OpenCVChessboardPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
-  if (image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null image provided.";
-  }
-  m_Image = image;
-}
-
-
-//-----------------------------------------------------------------------------
-PointSet OpenCVChessboardPointDetector::GetPoints()
-{
-  if (m_Image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Image is Null.";
-  }
-
   PointSet result;
   std::vector<cv::Point2f> corners;
 
   bool found = cv::findChessboardCorners(
-        *m_Image, m_NumberOfCorners, corners,
+        imageToUse, m_NumberOfCorners, corners,
         CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 
   if ( corners.size() == 0 )
@@ -73,7 +55,7 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
 
   unsigned int numberOfCorners = m_NumberOfCorners.width * m_NumberOfCorners.height;
 
-  cv::cornerSubPix(*m_Image, corners, cv::Size(11,11), cv::Size(-1,-1),
+  cv::cornerSubPix(imageToUse, corners, cv::Size(11,11), cv::Size(-1,-1),
                    cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
 
   if (found  && corners.size() == numberOfCorners)
@@ -86,8 +68,6 @@ PointSet OpenCVChessboardPointDetector::GetPoints()
       tmp.point.y = corners[k].y;
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
-
-//      std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
 

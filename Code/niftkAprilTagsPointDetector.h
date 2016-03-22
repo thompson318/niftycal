@@ -16,8 +16,7 @@
 #define niftkAprilTagsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkIPoint2DDetector.h"
-#include <cv.h>
+#include "niftkOpenCVPointDetector.h"
 
 namespace niftk
 {
@@ -26,11 +25,9 @@ namespace niftk
 * \class AprilTagsPointDetector
 * \brief Detects AprilTags markers in a grey scale image.
 *
-* Note, this detector does no image conversion.
-*
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public IPoint2DDetector
+class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public OpenCVPointDetector
 {
 
 public:
@@ -39,19 +36,16 @@ public:
                          const std::string& name,
                          float sigma,
                          float segmentationSigma
-                         );
+                        );
   virtual ~AprilTagsPointDetector();
 
+protected:
   /**
-  * \see IPointDetector::GetPoints()
+  * \see niftk::OpenCVPointDetector::InternalGetPoints()
   */
-  virtual PointSet GetPoints();
-
-  void SetImage(cv::Mat* image);
+  virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 
 private:
-
-  cv::Mat*    m_Image;
   bool        m_IncludeCorners;
   std::string m_Name;
   float       m_Sigma;

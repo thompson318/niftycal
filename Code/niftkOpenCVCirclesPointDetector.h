@@ -16,8 +16,7 @@
 #define niftkOpenCVCirclesPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include <niftkIPoint2DDetector.h>
-#include <cv.h>
+#include <niftkOpenCVPointDetector.h>
 
 namespace niftk
 {
@@ -26,11 +25,9 @@ namespace niftk
 * \class OpenCVCirclesPointDetector
 * \brief Detects asymmetric circles pattern in grey scale images using cv::findCirclesGrid.
 *
-* Note, this detector does no image conversion.
-*
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT OpenCVCirclesPointDetector : public IPoint2DDetector
+class NIFTYCAL_WINEXPORT OpenCVCirclesPointDetector : public OpenCVPointDetector
 {
 
 public:
@@ -38,17 +35,14 @@ public:
   OpenCVCirclesPointDetector(cv::Size2i patternSize);
   virtual ~OpenCVCirclesPointDetector();
 
+protected:
   /**
-  * \see IPointDetector::GetPoints()
+  * \see niftk::OpenCVPointDetector::InternalGetPoints()
   */
-  virtual PointSet GetPoints();
-
-  void SetImage(cv::Mat* image);
+  virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 
 private:
-
   cv::Size2i m_PatternSize;
-  cv::Mat*   m_Image;
 };
 
 } // end namespace

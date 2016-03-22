@@ -20,18 +20,16 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVCirclesPointDetector::OpenCVCirclesPointDetector(
-    cv::Size2i patternSize)
+OpenCVCirclesPointDetector::OpenCVCirclesPointDetector(cv::Size2i patternSize)
 : m_PatternSize(patternSize)
-, m_Image(nullptr)
 {
   if (m_PatternSize.width < 2)
   {
-    niftkNiftyCalThrow() << "Number of circles in width axes is too small.";
+    niftkNiftyCalThrow() << "Number of circles in width axes is < 2.";
   }
   if (m_PatternSize.height < 2)
   {
-    niftkNiftyCalThrow() << "Number of circles in height axes is too small.";
+    niftkNiftyCalThrow() << "Number of circles in height axes is < 2.";
   }
 }
 
@@ -43,24 +41,8 @@ OpenCVCirclesPointDetector::~OpenCVCirclesPointDetector()
 
 
 //-----------------------------------------------------------------------------
-void OpenCVCirclesPointDetector::SetImage(cv::Mat* image)
+PointSet OpenCVCirclesPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
-  if (image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null image provided.";
-  }
-  m_Image = image;
-}
-
-
-//-----------------------------------------------------------------------------
-PointSet OpenCVCirclesPointDetector::GetPoints()
-{
-  if (m_Image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Image is Null.";
-  }
-
   PointSet result;
   std::vector<cv::Point2f> circles;
   unsigned int numberOfCircles = m_PatternSize.width * m_PatternSize.height;
@@ -71,7 +53,7 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
   cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
 
   bool found = cv::findCirclesGrid(
-    *m_Image, m_PatternSize, circles,
+    imageToUse, m_PatternSize, circles,
     cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
     , blobDetector
     );
@@ -91,8 +73,6 @@ PointSet OpenCVCirclesPointDetector::GetPoints()
       tmp.point.y = circles[k].y;
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
-
-      //std::cerr << tmp.id << " " << tmp.point.x << " " << tmp.point.y << std::endl;
     }
   }
   return result;

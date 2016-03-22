@@ -31,8 +31,7 @@ AprilTagsPointDetector::AprilTagsPointDetector(
     float sigma,
     float segmentationSigma
     )
-: m_Image(nullptr)
-, m_IncludeCorners(includeCorners)
+: m_IncludeCorners(includeCorners)
 , m_Name(name)
 , m_Sigma(sigma)
 , m_SegmentationSigma(segmentationSigma)
@@ -51,16 +50,6 @@ AprilTagsPointDetector::AprilTagsPointDetector(
   }
 }
 
-//-----------------------------------------------------------------------------
-void AprilTagsPointDetector::SetImage(cv::Mat* image)
-{
-  if (image == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null image provided.";
-  }
-  m_Image = image;
-}
-
 
 //-----------------------------------------------------------------------------
 AprilTagsPointDetector::~AprilTagsPointDetector()
@@ -69,7 +58,7 @@ AprilTagsPointDetector::~AprilTagsPointDetector()
 
 
 //-----------------------------------------------------------------------------
-PointSet AprilTagsPointDetector::GetPoints()
+PointSet AprilTagsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
   PointSet result;
 
@@ -95,7 +84,7 @@ PointSet AprilTagsPointDetector::GetPoints()
   tagDetector.SetSegmentationSigma(m_SegmentationSigma);
   tagDetector.SetUseHybridMethod(false);
 
-  std::vector<AprilTags::TagDetection> markers = tagDetector.extractTags(*m_Image);
+  std::vector<AprilTags::TagDetection> markers = tagDetector.extractTags(imageToUse);
 
   for (unsigned int i = 0; i < markers.size(); i++)
   {
