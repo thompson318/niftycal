@@ -87,11 +87,19 @@ double IterativeStereoCameraCalibration(
 
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
-  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft, pointsFromOriginalImagesLeft, distortedPointsFromCanonicalImagesLeft);
+
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
+                                  pointsFromOriginalImagesLeft,
+                                  distortedPointsFromCanonicalImagesLeft
+                                  );
 
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
-  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight, pointsFromOriginalImagesRight, distortedPointsFromCanonicalImagesRight);
+
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
+                                  pointsFromOriginalImagesRight,
+                                  distortedPointsFromCanonicalImagesRight
+                                  );
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
@@ -250,7 +258,10 @@ double IterativeStereoCameraCalibration(
           iterativeCvFlags
           );
 
-    std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
+    std::cout << "Iterative calibration iter=" << count++
+              << ", prms=" << previousRMS
+              << ", rms=" << projectedRMS
+              << std::endl;
 
     if (projectedRMS < previousRMS)
     {

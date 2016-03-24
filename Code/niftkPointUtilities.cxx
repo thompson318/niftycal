@@ -240,14 +240,17 @@ void DistortPoints(const PointSet& undistortedPoints,
     relative.y = (undistorted[i].y - cameraIntrinsics.at<double>(1,2))/cameraIntrinsics.at<double>(1,1);
 
     double r2 = relative.x*relative.x + relative.y*relative.y;
-    double radial = (1 + distortionCoefficients.at<double>(0,0) * r2 + distortionCoefficients.at<double>(0,1) * r2 * r2 );
+    double radial = (1 + distortionCoefficients.at<double>(0,0) * r2
+                     + distortionCoefficients.at<double>(0,1) * r2 * r2 );
 
     cv::Point2d dist;
     dist.x = relative.x * radial;
     dist.y = relative.y * radial;
 
-    dist.x = dist.x + (2 * distortionCoefficients.at<double>(0,2) * relative.x * relative.y + distortionCoefficients.at<double>(0,3) * (r2 + 2 * relative.x * relative.x));
-    dist.y = dist.y + (distortionCoefficients.at<double>(0,2) * (r2 + 2 * relative.y * relative.y) + 2 * distortionCoefficients.at<double>(0,3) * relative.x * relative.y);
+    dist.x = dist.x + (2 * distortionCoefficients.at<double>(0,2) * relative.x * relative.y
+                       + distortionCoefficients.at<double>(0,3) * (r2 + 2 * relative.x * relative.x));
+    dist.y = dist.y + (distortionCoefficients.at<double>(0,2) * (r2 + 2 * relative.y * relative.y)
+                       + 2 * distortionCoefficients.at<double>(0,3) * relative.x * relative.y);
 
     dist.x = dist.x * cameraIntrinsics.at<double>(0,0) + cameraIntrinsics.at<double>(0,2);
     dist.y = dist.y * cameraIntrinsics.at<double>(1,1) + cameraIntrinsics.at<double>(1,2);
@@ -351,7 +354,8 @@ cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
     cv::Scalar colour(rng(256),rng(256),rng(256));
     cv::line(colouredUndistortedRightImage,
              cv::Point(0,-epiLines[i].z/epiLines[i].y),
-             cv::Point(colouredUndistortedRightImage.cols,-(epiLines[i].z+epiLines[i].x*colouredUndistortedRightImage.cols)/epiLines[i].y),
+             cv::Point(colouredUndistortedRightImage.cols,
+                       -(epiLines[i].z+epiLines[i].x*colouredUndistortedRightImage.cols)/epiLines[i].y),
              colour);
   }
 

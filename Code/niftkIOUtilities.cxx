@@ -97,7 +97,10 @@ void SaveModel3D(const Model3D& m, const std::string& fileName)
   Model3D::const_iterator iter;
   for (iter = m.begin(); iter != m.end(); ++iter)
   {
-    ofs << (*iter).first << " " << (*iter).second.point.x << " " << (*iter).second.point.y << " " << (*iter).second.point.z << std::endl;
+    ofs << (*iter).first << " "
+        << (*iter).second.point.x << " "
+        << (*iter).second.point.y << " "
+        << (*iter).second.point.z << std::endl;
   }
 
   ofs.close();

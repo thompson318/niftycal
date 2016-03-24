@@ -65,7 +65,11 @@ double IterativeMonoCameraCalibration(
   // points (corners, circle or ring centers) in the input images.
   std::list<PointSet> pointsFromOriginalImages;
   std::list<PointSet> distortedPointsFromCanonicalImages;
-  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImages, pointsFromOriginalImages, distortedPointsFromCanonicalImages);
+
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImages,
+                                  pointsFromOriginalImages,
+                                  distortedPointsFromCanonicalImages
+                                  );
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
@@ -142,7 +146,10 @@ double IterativeMonoCameraCalibration(
           iterativeCvFlags
           );
 
-    std::cout << "Iterative calibration iter=" << count++ << ", prms=" << previousRMS << ", rms=" << projectedRMS << std::endl;
+    std::cout << "Iterative calibration iter=" << count++
+              << ", prms=" << previousRMS
+              << ", rms=" << projectedRMS
+              << std::endl;
 
     if (projectedRMS < previousRMS)
     {

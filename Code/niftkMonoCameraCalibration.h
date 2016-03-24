@@ -42,4 +42,3 @@ NIFTYCAL_WINEXPORT double MonoCameraCalibration(const Model3D& model,
 } // end namespace
 
 #endif
-

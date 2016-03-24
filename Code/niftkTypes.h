@@ -34,8 +34,8 @@ typedef unsigned int IdType;
 */
 struct NIFTYCAL_WINEXPORT Point2D
 {
-  IdType id;
-  cv::Point2d  point;
+  IdType      id;
+  cv::Point2d point;
 };
 
 /**
@@ -44,7 +44,7 @@ struct NIFTYCAL_WINEXPORT Point2D
 */
 struct NIFTYCAL_WINEXPORT Point3D
 {
-  IdType id;
+  IdType      id;
   cv::Point3d point;
 };
 

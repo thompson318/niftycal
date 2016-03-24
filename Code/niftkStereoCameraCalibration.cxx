@@ -242,9 +242,9 @@ double StereoCameraCalibration(const Model3D& model,
     rvecsRight[i].at<double>(0, 1) = rightRotationVec.at<double>(0,1);
     rvecsRight[i].at<double>(0, 2) = rightRotationVec.at<double>(0,2);
 
-    tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3) ;
-    tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3) ;
-    tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3) ;
+    tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3);
+    tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
+    tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
   }
 
   return rms;

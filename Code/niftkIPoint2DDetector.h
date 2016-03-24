@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkIPointDetector_h
-#define niftkIPointDetector_h
+#ifndef niftkIPoint2DDetector_h
+#define niftkIPoint2DDetector_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkTypes.h"

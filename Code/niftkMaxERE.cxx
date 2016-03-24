@@ -42,7 +42,10 @@ double ComputeMaxEREFromCalibrations(
 
     for (size_t j = 0; j < calSamples.size(); j++)
     {
-      cv::projectPoints(tmpInput, cv::Mat(), cv::Mat(), calSamples[i].first, calSamples[i].second, projectedViaSampleCalibration);
+      cv::projectPoints(tmpInput, cv::Mat(), cv::Mat(),
+                        calSamples[i].first, calSamples[i].second,
+                        projectedViaSampleCalibration);
+
       squaredDiff = (projectedViaMeanCalibration[0].x - projectedViaSampleCalibration[0].x)
                   * (projectedViaMeanCalibration[0].x - projectedViaSampleCalibration[0].x)
                   + (projectedViaMeanCalibration[0].y - projectedViaSampleCalibration[0].y)

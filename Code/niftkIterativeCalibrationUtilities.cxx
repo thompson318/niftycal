@@ -39,7 +39,8 @@ void ExtractTwoCopiesOfControlPoints(
     PointSet points = (*iter).first->GetPoints();
     if(points.empty())
     {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing extractable points, and " << counter << " isn't.";
+      niftkNiftyCalThrow() << "All input images should be valid calibration images containing "
+                           << "extractable points, and " << counter << " isn't.";
     }
 
     a.push_back(points);
@@ -90,7 +91,8 @@ PointSet ExtractDistortedControlPoints(
   cp = outputDetectorAndImage.first->GetPoints();
   if(cp.empty())
   {
-    niftkNiftyCalThrow() << "All warped images should still contain valid calibration images containing extractable points.";
+    niftkNiftyCalThrow() << "All warped images should still contain valid "
+                         << "calibration images containing extractable points.";
   }
 
   // 2.5. Extract a window from the reference image, and do template matching.

@@ -31,7 +31,7 @@ namespace niftk
 *
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
 * and that each corresponding point set has at least 1 corresponding points, meaning
-* the same point ID is visible in both left and right view. 
+* the same point ID is visible in both left and right view.
 *
 * This method, ONLY does the stereo calibration. Also, OpenCV notes that this
 * can be unstable, so you are advised to calibrate both left and right cameras
@@ -60,4 +60,3 @@ NIFTYCAL_WINEXPORT double StereoCameraCalibration(const Model3D& model,
 } // end namespace
 
 #endif
-
