@@ -117,6 +117,13 @@ if(Eigen_FOUND)
   include_directories(${Eigen_INCLUDE_DIR})
 endif()
 
+
+######################################################################
+# Provide support for manually running Doxygen in build folder.
+######################################################################
+configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/niftkdoxygen.pl.in ${CMAKE_BINARY_DIR}/niftkdoxygen.pl)
+configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/doxygen.config.in ${CMAKE_BINARY_DIR}/doxygen.config)
+
 ######################################################################
 # Add code folders.
 ######################################################################
