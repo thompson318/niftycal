@@ -45,3 +45,11 @@ endif(BUILD_SHARED_LIBS)
 target_link_libraries(niftycal
   PRIVATE ${OpenCV_LIBS} ${AprilTags_LIBRARIES}
 )
+
+# To do: Implement minimal command line apps
+
+add_executable(niftkMonoCalibration niftkMonoCalibration.cxx)
+target_link_libraries(niftkMonoCalibration niftycal)
+add_executable(niftkStereoCalibration niftkStereoCalibration.cxx)
+target_link_libraries(niftkStereoCalibration niftycal)
+
