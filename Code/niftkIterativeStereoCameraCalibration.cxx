@@ -156,6 +156,7 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial K2l=" << distortionLeft.at<double>(0,1) << std::endl;
   std::cout << "Initial P1l=" << distortionLeft.at<double>(0,2) << std::endl;
   std::cout << "Initial P2l=" << distortionLeft.at<double>(0,3) << std::endl;
+  std::cout << std::endl;
   std::cout << "Initial Fxr=" << intrinsicRight.at<double>(0,0) << std::endl;
   std::cout << "Initial Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
   std::cout << "Initial Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
@@ -164,6 +165,16 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial K2r=" << distortionRight.at<double>(0,1) << std::endl;
   std::cout << "Initial P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Initial P2r=" << distortionRight.at<double>(0,3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "Initial R1=" << left2RightRotation.at<double>(0,0) << std::endl;
+  std::cout << "Initial R2=" << left2RightRotation.at<double>(0,1) << std::endl;
+  std::cout << "Initial R3=" << left2RightRotation.at<double>(0,2) << std::endl;
+  std::cout << "Initial T1=" << left2RightTranslation.at<double>(0,0) << std::endl;
+  std::cout << "Initial T2=" << left2RightTranslation.at<double>(0,1) << std::endl;
+  std::cout << "Initial T3=" << left2RightTranslation.at<double>(0,2) << std::endl;
+  std::cout << std::endl;
+
+  //return projectedRMS;
 
   unsigned int count = 0;
   double previousRMS = std::numeric_limits<double>::max();
@@ -289,6 +300,7 @@ double IterativeStereoCameraCalibration(
   std::cout << "Final K2l=" << distortionLeft.at<double>(0,1) << std::endl;
   std::cout << "Final P1l=" << distortionLeft.at<double>(0,2) << std::endl;
   std::cout << "Final P2l=" << distortionLeft.at<double>(0,3) << std::endl;
+  std::cout << std::endl;
   std::cout << "Final Fxr=" << intrinsicRight.at<double>(0,0) << std::endl;
   std::cout << "Final Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
   std::cout << "Final Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
@@ -297,6 +309,13 @@ double IterativeStereoCameraCalibration(
   std::cout << "Final K2r=" << distortionRight.at<double>(0,1) << std::endl;
   std::cout << "Final P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Final P2r=" << distortionRight.at<double>(0,3) << std::endl;
+  std::cout << std::endl;
+  std::cout << "Final R1=" << left2RightRotation.at<double>(0,0) << std::endl;
+  std::cout << "Final R2=" << left2RightRotation.at<double>(0,1) << std::endl;
+  std::cout << "Final R3=" << left2RightRotation.at<double>(0,2) << std::endl;
+  std::cout << "Final T1=" << left2RightTranslation.at<double>(0,0) << std::endl;
+  std::cout << "Final T2=" << left2RightTranslation.at<double>(0,1) << std::endl;
+  std::cout << "Final T3=" << left2RightTranslation.at<double>(0,2) << std::endl;
 
   return projectedRMS;
 }

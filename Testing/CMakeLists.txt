@@ -25,6 +25,7 @@ set(TEST_CASES
   niftkIterativeStereoChessboardCameraCalibrationTest
   niftkIterativeStereoCirclesCameraCalibrationTest
   niftkIterativeStereoAprilTagsCameraCalibrationTest
+  niftkIterativeMonoAprilTagsCameraCalibrationTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -313,11 +314,12 @@ add_test(CalibIterMonoCMU2 niftkIterativeMonoChessboardCameraCalibrationTest
 )
 
 # Now try iterative on AprilTags.
-add_test(CalibIterStereoApril niftkIterativeStereoAprilTagsCameraCalibrationTest
+add_test(CalibIterStereoAprilSim niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
+  1 1                                                       # Simulation has proper scale factors
   0.996357 -2.20494e-05 -0.0852827 # rvec
   5.97596 0.000262982 0.519377 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.jpg
@@ -338,4 +340,87 @@ add_test(CalibIterStereoApril niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/SimulationAprilTags/Right7.jpg
   ${DATA_DIR}/SimulationAprilTags/Right8.jpg
   ${DATA_DIR}/SimulationAprilTags/Right9.jpg
+)
+
+# Now try iterative AprilTags on real data.
+
+add_test(CalibIterStereoAprilReal1 niftkIterativeStereoAprilTagsCameraCalibrationTest
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
+  0                                                         # zero distortion (1==true)
+  1 2                                                       # Simulation has proper scale factors
+  0.999437 0.00263026 -0.0334586 # rvec
+  -2.73359 0.0348689 -0.0495921 # tvec
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252090016800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252154020400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252458038000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230253498097400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230256554272200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257324316200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257658335200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257722339000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230260762512800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230271146106800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230274842318200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230280181623600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230284714882800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296106534400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296330547200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296794573800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230320793946400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230251914006800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230251962009600_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230252058015000_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230252090016800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230252154020400_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230252458038000_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230253498097400_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230256554272200_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230257324316200_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230257658335200_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230257722339000_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230260762512800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230271146106800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230274842318200_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230280181623600_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230284714882800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230296106534400_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230296330547200_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230296794573800_right.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230320793946400_right.bmp
+)
+
+add_test(CalibIterMonoAprilReal1 niftkIterativeMonoAprilTagsCameraCalibrationTest
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
+  0                                                         # zero distortion (1==true)
+  1 2                                                       # Simulation has proper scale factors
+  0.638673                                                  # RMS
+  1750.62 872.376 893.401 236.981                           # intrinsic
+  -0.33334 0.333568 0.00770179 -0.00197536                  # distortion
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252090016800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252154020400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252458038000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230253498097400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230256554272200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257324316200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257658335200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257722339000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230260762512800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230271146106800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230274842318200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230280181623600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230284714882800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296106534400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296330547200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296794573800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230320793946400_left.bmp
 )
