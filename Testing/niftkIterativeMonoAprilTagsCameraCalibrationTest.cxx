@@ -119,14 +119,13 @@ TEST_CASE( "Iterative Mono AprilTags", "[MonoCalibration]" ) {
         flags
         );
 
-  double tolerance = 0.005;
-  REQUIRE( fabs(rms - eRMS) < 0.001 );
-  REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(1,1) - eFy) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(0,2) - eCx) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(1,2) - eCy) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,0) - eK1) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < tolerance );
+  REQUIRE( fabs(rms - eRMS) < 0.01 );
+  REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < 0.5 );
+  REQUIRE( fabs(intrinsic.at<double>(1,1) - eFy) < 0.5 );
+  REQUIRE( fabs(intrinsic.at<double>(0,2) - eCx) < 0.5 );
+  REQUIRE( fabs(intrinsic.at<double>(1,2) - eCy) < 0.5 );
+  REQUIRE( fabs(distortion.at<double>(0,0) - eK1) < 0.1 );
+  REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < 0.1 );
+  REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < 0.1 );
+  REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < 0.1 );
 }
