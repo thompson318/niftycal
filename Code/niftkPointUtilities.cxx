@@ -17,6 +17,7 @@
 #include <queue>
 #include <vector>
 #include <niftkTypes.h>
+#include <functional>
 
 namespace niftk {
 
