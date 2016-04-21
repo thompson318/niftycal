@@ -38,7 +38,7 @@ add_library(niftycal ${NIFTYCAL_SRCS})
 
 if(BUILD_SHARED_LIBS)
   if(WIN32)
-    add_definitions(-DNIFTYCAL_WINDOWS_EXPORT=1)
+    add_definitions(-DNIFTYCAL_WINDOWS_EXPORT)
   endif(WIN32)
 endif(BUILD_SHARED_LIBS)
 
