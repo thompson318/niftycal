@@ -25,8 +25,9 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
   if (niftk::argc != 8 && niftk::argc != 9)
   {
-    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberTags outputFile" << std::endl;
+    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberTags [outputFile]" << std::endl;
     REQUIRE( niftk::argc >= 8);
+    REQUIRE( niftk::argc <= 9);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -46,7 +47,6 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
-  niftk::PointSet points;
 
   niftk::AprilTagsPointDetector detector(true, // do include corners
                                          tagFamily,
@@ -54,8 +54,12 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
                                          0.8
                                         );
   detector.SetImage(&greyImage);
-  points = detector.GetPoints();
+  detector.SetImageScaleFactor(scaleFactors);
+
+  niftk::PointSet points = detector.GetPoints();
   REQUIRE( points.size() == expectedNumberTags*5);
+
+  std::cout << "niftkExtractAprilTagsPointsTest: " << points.size() << std::endl;
 
   if (niftk::argc == 9)
   {
