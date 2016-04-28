@@ -49,9 +49,9 @@ add_test(ExtChessSim2 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/r
 add_test(ExtChessSim3 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_375_275_14_10.png 1 1 375 275 14 10)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 1 1 640 480 9 6)
 add_test(ExtChessCMU1 niftkExtractChessboardPointsTest ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp 1 1 720 480 10 7)
-add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.jpg 1280 1024 11 4)
+add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 1280 1024 11 4)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35)
-add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.jpg 36h11 1 1 1280 1024 35)
+add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35)
 add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
 add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
 
@@ -130,14 +130,14 @@ add_test(CalibIterMonoSim1 niftkIterativeMonoChessboardCameraCalibrationTest
   0.276418                                              # RMS
   1750.43 1749.62 637.976 513.424                       # intrinsic (should be 1750, 1750, 639.5, 511.5)
   0 0 0 0                                               # distortion (should be 0, 0, 0, 0)
-  ${DATA_DIR}/Simulation2/Left1.jpg
-  ${DATA_DIR}/Simulation2/Left2.jpg
-  ${DATA_DIR}/Simulation2/Left3.jpg
-  ${DATA_DIR}/Simulation2/Left4.jpg
-  ${DATA_DIR}/Simulation2/Left5.jpg
-  ${DATA_DIR}/Simulation2/Left6.jpg
-  ${DATA_DIR}/Simulation2/Left7.jpg
-  ${DATA_DIR}/Simulation2/Left8.jpg
+  ${DATA_DIR}/Simulation2/Left1.png
+  ${DATA_DIR}/Simulation2/Left2.png
+  ${DATA_DIR}/Simulation2/Left3.png
+  ${DATA_DIR}/Simulation2/Left4.png
+  ${DATA_DIR}/Simulation2/Left5.png
+  ${DATA_DIR}/Simulation2/Left6.png
+  ${DATA_DIR}/Simulation2/Left7.png
+  ${DATA_DIR}/Simulation2/Left8.png
 )
 
 # Now try iterative. Using simulation 2. With distortion modelling, but should have no distortion.
@@ -150,14 +150,14 @@ add_test(CalibIterMonoSim2 niftkIterativeMonoChessboardCameraCalibrationTest
   0.274544                                              # RMS
   1751.04 1749.8 639.982 512.216                        # intrinsic (should be 1750, 1750, 639.5, 511.5)
   -0.00224263 0.0110163 -0.000324203 0.000544618        # distortion (should be 0, 0, 0, 0)
-  ${DATA_DIR}/Simulation2/Left1.jpg
-  ${DATA_DIR}/Simulation2/Left2.jpg
-  ${DATA_DIR}/Simulation2/Left3.jpg
-  ${DATA_DIR}/Simulation2/Left4.jpg
-  ${DATA_DIR}/Simulation2/Left5.jpg
-  ${DATA_DIR}/Simulation2/Left6.jpg
-  ${DATA_DIR}/Simulation2/Left7.jpg
-  ${DATA_DIR}/Simulation2/Left8.jpg
+  ${DATA_DIR}/Simulation2/Left1.png
+  ${DATA_DIR}/Simulation2/Left2.png
+  ${DATA_DIR}/Simulation2/Left3.png
+  ${DATA_DIR}/Simulation2/Left4.png
+  ${DATA_DIR}/Simulation2/Left5.png
+  ${DATA_DIR}/Simulation2/Left6.png
+  ${DATA_DIR}/Simulation2/Left7.png
+  ${DATA_DIR}/Simulation2/Left8.png
 )
 
 # Now try iterative on stereo, using simulation 2.
@@ -169,22 +169,22 @@ add_test(CalibIterStereoSim1 niftkIterativeStereoChessboardCameraCalibrationTest
   1                                                     # zero distortion (1==true)
   0.996335 8.27736e-05 -0.0855332 # rvec
   5.98069 0.00132401 0.519151 # tvec
-  ${DATA_DIR}/Simulation2/Left1.jpg
-  ${DATA_DIR}/Simulation2/Left2.jpg
-  ${DATA_DIR}/Simulation2/Left3.jpg
-  ${DATA_DIR}/Simulation2/Left4.jpg
-  ${DATA_DIR}/Simulation2/Left5.jpg
-  ${DATA_DIR}/Simulation2/Left6.jpg
-  ${DATA_DIR}/Simulation2/Left7.jpg
-  ${DATA_DIR}/Simulation2/Left8.jpg
-  ${DATA_DIR}/Simulation2/Right1.jpg
-  ${DATA_DIR}/Simulation2/Right2.jpg
-  ${DATA_DIR}/Simulation2/Right3.jpg
-  ${DATA_DIR}/Simulation2/Right4.jpg
-  ${DATA_DIR}/Simulation2/Right5.jpg
-  ${DATA_DIR}/Simulation2/Right6.jpg
-  ${DATA_DIR}/Simulation2/Right7.jpg
-  ${DATA_DIR}/Simulation2/Right8.jpg
+  ${DATA_DIR}/Simulation2/Left1.png
+  ${DATA_DIR}/Simulation2/Left2.png
+  ${DATA_DIR}/Simulation2/Left3.png
+  ${DATA_DIR}/Simulation2/Left4.png
+  ${DATA_DIR}/Simulation2/Left5.png
+  ${DATA_DIR}/Simulation2/Left6.png
+  ${DATA_DIR}/Simulation2/Left7.png
+  ${DATA_DIR}/Simulation2/Left8.png
+  ${DATA_DIR}/Simulation2/Right1.png
+  ${DATA_DIR}/Simulation2/Right2.png
+  ${DATA_DIR}/Simulation2/Right3.png
+  ${DATA_DIR}/Simulation2/Right4.png
+  ${DATA_DIR}/Simulation2/Right5.png
+  ${DATA_DIR}/Simulation2/Right6.png
+  ${DATA_DIR}/Simulation2/Right7.png
+  ${DATA_DIR}/Simulation2/Right8.png
 )
 
 # Check iterative does something on laparoscope.
@@ -247,31 +247,31 @@ add_test(CalibIterLapLeft niftkIterativeMonoChessboardCameraCalibrationTest
 # the same reference image produces to high distortion on one channel,
 # causing subsequent circle extraction to fail.
 #add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
-#  ${DATA_DIR}/SimulationDots1/Left1.jpg                     # Model image
+#  ${DATA_DIR}/SimulationDots1/Left1.png                     # Model image
 #  ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt            # Model description (grid points 3D)
 #  11 4                                                      # pattern size
 #  ${DATA_DIR}/SimulationDots1/reference_1280_1024_11_4.txt  # 2D points for reference image
 #  1                                                         # zero distortion (1==true)
 #  0.995869 0.00066861 -0.0907979 # rvec
 #  2.43657 -0.000460828 0.262795 # tvec
-#  ${DATA_DIR}/SimulationDots1/Left1.jpg
-#  ${DATA_DIR}/SimulationDots1/Left2.jpg
-#  ${DATA_DIR}/SimulationDots1/Left3.jpg
-#  ${DATA_DIR}/SimulationDots1/Left4.jpg
-#  ${DATA_DIR}/SimulationDots1/Left5.jpg
-#  ${DATA_DIR}/SimulationDots1/Left6.jpg
-#  ${DATA_DIR}/SimulationDots1/Left7.jpg
-#  ${DATA_DIR}/SimulationDots1/Left8.jpg
-#  ${DATA_DIR}/SimulationDots1/Left9.jpg
-#  ${DATA_DIR}/SimulationDots1/Right1.jpg
-#  ${DATA_DIR}/SimulationDots1/Right2.jpg
-#  ${DATA_DIR}/SimulationDots1/Right3.jpg
-#  ${DATA_DIR}/SimulationDots1/Right4.jpg
-#  ${DATA_DIR}/SimulationDots1/Right5.jpg
-#  ${DATA_DIR}/SimulationDots1/Right6.jpg
-#  ${DATA_DIR}/SimulationDots1/Right7.jpg
-#  ${DATA_DIR}/SimulationDots1/Right8.jpg
-#  ${DATA_DIR}/SimulationDots1/Right9.jpg
+#  ${DATA_DIR}/SimulationDots1/Left1.png
+#  ${DATA_DIR}/SimulationDots1/Left2.png
+#  ${DATA_DIR}/SimulationDots1/Left3.png
+#  ${DATA_DIR}/SimulationDots1/Left4.png
+#  ${DATA_DIR}/SimulationDots1/Left5.png
+#  ${DATA_DIR}/SimulationDots1/Left6.png
+#  ${DATA_DIR}/SimulationDots1/Left7.png
+#  ${DATA_DIR}/SimulationDots1/Left8.png
+#  ${DATA_DIR}/SimulationDots1/Left9.png
+#  ${DATA_DIR}/SimulationDots1/Right1.png
+#  ${DATA_DIR}/SimulationDots1/Right2.png
+#  ${DATA_DIR}/SimulationDots1/Right3.png
+#  ${DATA_DIR}/SimulationDots1/Right4.png
+#  ${DATA_DIR}/SimulationDots1/Right5.png
+#  ${DATA_DIR}/SimulationDots1/Right6.png
+#  ${DATA_DIR}/SimulationDots1/Right7.png
+#  ${DATA_DIR}/SimulationDots1/Right8.png
+#  ${DATA_DIR}/SimulationDots1/Right9.png
 #)
 
 # Now try iterative, mono, using CMU synthetic dataset.
@@ -322,24 +322,24 @@ add_test(CalibIterStereoAprilSim niftkIterativeStereoAprilTagsCameraCalibrationT
   1 1                                                       # Simulation has proper scale factors
   0.996357 -2.20494e-05 -0.0852827 # rvec
   5.97596 0.000262982 0.519377 # tvec
-  ${DATA_DIR}/SimulationAprilTags/Left1.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left2.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left3.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left4.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left5.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left6.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left7.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left8.jpg
-  ${DATA_DIR}/SimulationAprilTags/Left9.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right1.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right2.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right3.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right4.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right5.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right6.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right7.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right8.jpg
-  ${DATA_DIR}/SimulationAprilTags/Right9.jpg
+  ${DATA_DIR}/SimulationAprilTags/Left1.png
+  ${DATA_DIR}/SimulationAprilTags/Left2.png
+  ${DATA_DIR}/SimulationAprilTags/Left3.png
+  ${DATA_DIR}/SimulationAprilTags/Left4.png
+  ${DATA_DIR}/SimulationAprilTags/Left5.png
+  ${DATA_DIR}/SimulationAprilTags/Left6.png
+  ${DATA_DIR}/SimulationAprilTags/Left7.png
+  ${DATA_DIR}/SimulationAprilTags/Left8.png
+  ${DATA_DIR}/SimulationAprilTags/Left9.png
+  ${DATA_DIR}/SimulationAprilTags/Right1.png
+  ${DATA_DIR}/SimulationAprilTags/Right2.png
+  ${DATA_DIR}/SimulationAprilTags/Right3.png
+  ${DATA_DIR}/SimulationAprilTags/Right4.png
+  ${DATA_DIR}/SimulationAprilTags/Right5.png
+  ${DATA_DIR}/SimulationAprilTags/Right6.png
+  ${DATA_DIR}/SimulationAprilTags/Right7.png
+  ${DATA_DIR}/SimulationAprilTags/Right8.png
+  ${DATA_DIR}/SimulationAprilTags/Right9.png
 )
 
 # Now try iterative AprilTags on real data.
