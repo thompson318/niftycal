@@ -15,6 +15,7 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkAprilTagsPointDetector.h>
+#include <niftkIOUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -22,40 +23,43 @@
 
 TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
-  int expectedNumberOfArguments =  5;
-  if (niftk::argc != expectedNumberOfArguments)
+  if (niftk::argc != 8 && niftk::argc != 9)
   {
-    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image expectedImageWidth expectedImageHeight expectedNumberTags" << std::endl;
-    REQUIRE( niftk::argc == expectedNumberOfArguments);
+    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberTags outputFile" << std::endl;
+    REQUIRE( niftk::argc >= 8);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
-  int expectedWidth = atoi(niftk::argv[2]);
-  int expectedHeight = atoi(niftk::argv[3]);
-  int expectedNumberTags = atoi(niftk::argv[4]);
+  std::string tagFamily = niftk::argv[2];
+  int scaleX = atoi(niftk::argv[3]);
+  int scaleY = atoi(niftk::argv[4]);
+  int expectedWidth = atoi(niftk::argv[5]);
+  int expectedHeight = atoi(niftk::argv[6]);
+  int expectedNumberTags = atoi(niftk::argv[7]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
+
+  cv::Point2d scaleFactors;
+  scaleFactors.x = scaleX;
+  scaleFactors.y = scaleY;
 
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
   niftk::PointSet points;
 
-  niftk::AprilTagsPointDetector detector1(false, // don't include corners
-                                         "36h11",
+  niftk::AprilTagsPointDetector detector(true, // do include corners
+                                         tagFamily,
                                          0,
                                          0.8
-                                         );
-  detector1.SetImage(&greyImage);
-  points = detector1.GetPoints();
-  REQUIRE( points.size() == expectedNumberTags);
-
-  niftk::AprilTagsPointDetector detector2(true, // do include corners
-                                         "36h11",
-                                         0,
-                                         0.8
-                                         );
-  detector2.SetImage(&greyImage);
-  points = detector2.GetPoints();
+                                        );
+  detector.SetImage(&greyImage);
+  points = detector.GetPoints();
   REQUIRE( points.size() == expectedNumberTags*5);
+
+  if (niftk::argc == 9)
+  {
+    std::string outputFile = niftk::argv[8];
+    niftk::SavePointSet(points, outputFile);
+  }
 }
