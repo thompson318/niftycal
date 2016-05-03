@@ -61,7 +61,10 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   if (niftk::argc >= 8)
   {
     expectedNumberTags = atoi(niftk::argv[7]);
-    REQUIRE( points.size() == expectedNumberTags*5);
+    if (expectedNumberTags > 0)
+    {
+      REQUIRE( points.size() == expectedNumberTags*5);
+    }
   }
 
   std::cout << "niftkExtractAprilTagsPointsTest: " << points.size() << std::endl;
