@@ -23,10 +23,10 @@
 
 TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
-  if (niftk::argc != 8 && niftk::argc != 9)
+  if (niftk::argc != 7 && niftk::argc != 8 && niftk::argc != 9)
   {
-    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberTags [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 8);
+    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight [expectedNumberTags] [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 7);
     REQUIRE( niftk::argc <= 9);
   }
 
@@ -36,7 +36,6 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   int scaleY = atoi(niftk::argv[4]);
   int expectedWidth = atoi(niftk::argv[5]);
   int expectedHeight = atoi(niftk::argv[6]);
-  int expectedNumberTags = atoi(niftk::argv[7]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -57,11 +56,17 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   detector.SetImageScaleFactor(scaleFactors);
 
   niftk::PointSet points = detector.GetPoints();
-  REQUIRE( points.size() == expectedNumberTags*5);
+
+  int expectedNumberTags = 0;
+  if (niftk::argc >= 8)
+  {
+    expectedNumberTags = atoi(niftk::argv[7]);
+    REQUIRE( points.size() == expectedNumberTags*5);
+  }
 
   std::cout << "niftkExtractAprilTagsPointsTest: " << points.size() << std::endl;
 
-  if (niftk::argc == 9)
+  if (niftk::argc >= 9)
   {
     std::string outputFile = niftk::argv[8];
     niftk::SavePointSet(points, outputFile);
