@@ -1,12 +1,10 @@
 NiftyCal
 ---------
 
-NiftyCal is an open-source software library to perform
+NiftyCal is a software library to perform
 video camera calibration, largely based on OpenCV.
 
 NiftyCal was developed by the [Centre for Medical Image Computing][cmic] at [University College London (UCL)][ucl].
-
-If you use this software, please cite [this paper][citation]. 
 
 Useful Links
 ------------------
@@ -15,15 +13,14 @@ Useful Links
  - NiftyCal is part of [NifTK][niftk].
  - [NiftyCal home page][NiftyCalHome].
  - [Dashboard][dashboard].
- - [Nightly code documentation][doxygen].
 
 License
 -----------
 
 Copyright (c) 2016, [University College London][ucl].
 
-NiftyCal is available as free open-source software under a BSD license.
-Other licenses apply for the dependencies.
+This project is NOT open-source, and should NOT be distributed
+without the prior permission of [Prof. Sebastien Ourselin][seb].
 
 
 Supported Platforms
@@ -58,4 +55,4 @@ via the web interface.
 [citation]: http://link.springer.com/article/10.1007%2Fs11548-014-1124-7
 [niftk]: http://www.niftk.org
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
-[doxygen]: http://cmic.cs.ucl.ac.uk/NiftyCal-API
+[seb]: http://cmic.cs.ucl.ac.uk/staff/sebastien_ourselin
