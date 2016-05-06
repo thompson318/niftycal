@@ -45,3 +45,8 @@ endif(BUILD_SHARED_LIBS)
 target_link_libraries(niftycal
   PRIVATE ${OpenCV_LIBS} ${AprilTags_LIBRARIES}
 )
+
+add_executable(niftkMonoCalibrationFromPoints niftkMonoCalibrationFromPoints.cxx)
+target_link_libraries(niftkMonoCalibrationFromPoints niftycal ${OpenCV_LIBS} ${AprilTags_LIBRARIES})
+add_executable(niftkStereoCalibrationFromPoints niftkStereoCalibrationFromPoints.cxx)
+target_link_libraries(niftkStereoCalibrationFromPoints niftycal ${OpenCV_LIBS} ${AprilTags_LIBRARIES})
