@@ -44,7 +44,6 @@ int main(int argc, char ** argv)
     niftk::PointSet p = niftk::LoadPointSet(argv[i]);
     if (p.size() >= 4) // Deep within OpenCV lies a check for at least 4 points.
     {
-      std::cout << "Loaded " << argv[i] << ", with " << p.size() << " points." << std::endl;
       points.push_back(p);
     }
   }
