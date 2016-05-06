@@ -27,6 +27,7 @@ namespace niftk
 {
 
 typedef unsigned int IdType;
+typedef unsigned long long TimeType;
 
 /**
 * \class Point2D
