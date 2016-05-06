@@ -1,1 +1,2 @@
 niftkNiftyCalException\.h MemberFunctions Disable
+niftkNiftyCalException\.cxx Functions Disable
