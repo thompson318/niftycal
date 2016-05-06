@@ -64,7 +64,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
   std::cout << "niftkExtractChessboardPointsTest: " << points.size() << std::endl;
 
-  if (niftk::argc == 9)
+  if (niftk::argc == 9 && points.size() > 0)
   {
     std::string outputFile = niftk::argv[8];
     niftk::SavePointSet(points, outputFile);

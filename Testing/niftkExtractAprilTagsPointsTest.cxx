@@ -69,7 +69,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
   std::cout << "niftkExtractAprilTagsPointsTest: " << points.size() << std::endl;
 
-  if (niftk::argc >= 9)
+  if (niftk::argc >= 9 && points.size() > 0)
   {
     std::string outputFile = niftk::argv[8];
     niftk::SavePointSet(points, outputFile);
