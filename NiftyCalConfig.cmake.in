@@ -1,0 +1,49 @@
+#/*============================================================================
+#
+#  NiftyCal: A software package for camera calibration.
+#
+#  Copyright (c) University College London (UCL). All rights reserved.
+#
+#  This software is distributed WITHOUT ANY WARRANTY; without even
+#  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#  PURPOSE.
+#
+#  See LICENSE.txt in the top level directory for details.
+#
+#============================================================================*/
+
+#-----------------------------------------------------------------------------
+#
+# NiftyCalConfig.cmake - NiftyCal CMake configuration file for external projects.
+#
+# This file is configured by NiftyCal and used by the UseNiftyCal.cmake module
+# to load NiftyCal settings for an external project.
+#-----------------------------------------------------------------------------
+
+# The NiftyCal include file directories.
+set(NIFTYCAL_INCLUDE_DIRS
+   @CMAKE_SOURCE_DIR@/Code
+)
+
+# The NiftyCal library directories.
+set(NIFTYCAL_LIBRARY_DIRS
+   @CMAKE_BINARY_DIR@/Code/@NiftyCal_CFG_DIR@
+)
+
+# The NiftyCal Library version number
+set(NIFTYCAL_VERSION_MAJOR "@NIFTYCAL_VERSION_MAJOR@")
+set(NIFTYCAL_VERSION_MINOR "@NIFTYCAL_VERSION_MINOR@")
+set(NIFTYCAL_VERSION_PATCH "@NIFTYCAL_VERSION_PATCH@")
+
+# The location of the UseNiftyCal.cmake file.
+set(NIFTYCAL_USE_FILE "@CMAKE_BINARY_DIR@/UseNiftyCal.cmake")
+
+# Whether NiftyCal was built with shared libraries.
+set(NIFTYCAL_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+
+# A list of all libraries for NiftyCal.
+set(NIFTYCAL_LIBRARIES niftycal @OpenCV_LIBS@ @AprilTags_LIBRARIES@)
+
+# Additional documentation, to enable compliance with licenses.
+set(NIFTYCAL_README_FILE "@CMAKE_BINARY_DIR@/README.md")
+set(NIFTYCAL_LICENSE_FILE "@CMAKE_BINARY_DIR@/LICENSE.txt")

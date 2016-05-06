@@ -1,0 +1,39 @@
+#/*============================================================================
+#
+#  NiftyCal: A software package for camera calibration.
+#
+#  Copyright (c) University College London (UCL). All rights reserved.
+#
+#  This software is distributed WITHOUT ANY WARRANTY; without even
+#  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#  PURPOSE.
+#
+#  See LICENSE.txt in the top level directory for details.
+#
+#============================================================================*/
+
+#
+# This file sets up include directories, link directories, and
+# compiler settings for a project to compile against NiftyCal.
+# It should not be included directly, but rather through the 
+# NiftyCal_USE_FILE setting obtained from NiftyCalConfig.cmake.
+#
+
+if(NIFTYCAL_BUILD_SETTINGS_FILE AND NOT SKIP_NIFTYCAL_BUILD_SETTINGS_FILE)
+  include(${CMAKE_ROOT}/Modules/CMakeImportBuildSettings.cmake)
+  CMAKE_IMPORT_BUILD_SETTINGS(${NIFTYCAL_BUILD_SETTINGS_FILE})
+endif()
+
+# Add compiler flags needed to use NiftyCal.
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NIFTYCAL_REQUIRED_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NIFTYCAL_REQUIRED_CXX_FLAGS}")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${NIFTYCAL_REQUIRED_LINK_FLAGS}")
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${NIFTYCAL_REQUIRED_LINK_FLAGS}")
+SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${NIFTYCAL_REQUIRED_LINK_FLAGS}")
+
+# Add include directories needed to use NiftyCal.
+include_directories(BEFORE ${NIFTYCAL_INCLUDE_DIRS} )
+
+# Add link directories needed to use NiftyCal.
+link_directories(${NIFTYCAL_LIBRARY_DIRS})
+

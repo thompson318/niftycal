@@ -88,7 +88,7 @@ if(BUILD_TESTING)
   configure_file(CMake/CTestCustom.cmake.in ${CMAKE_BINARY_DIR}/CTestCustom.cmake @ONLY)
 
   # Setup continuous test script
-  CONFIGURE_FILE(CMake/CTestContinuous.cmake.in ${CMAKE_BINARY_DIR}/CTestContinuous.cmake @ONLY)
+  configure_file(CMake/CTestContinuous.cmake.in ${CMAKE_BINARY_DIR}/CTestContinuous.cmake @ONLY)
 
 endif(BUILD_TESTING)
 
@@ -140,5 +140,26 @@ if(BUILD_TESTING)
   include_directories(${CMAKE_SOURCE_DIR}/Testing/)
   add_subdirectory(Testing)
 endif()
+
+##################################################################################
+# Generate "Use" and "Configure" files so external projects can link to NiftyCal.
+# These go at or near the end, as all the variables need to be defined.
+##################################################################################
+
+configure_file(${CMAKE_SOURCE_DIR}/LICENSE.txt ${CMAKE_BINARY_DIR}/LICENSE.txt @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/README.md ${CMAKE_BINARY_DIR}/README.md @ONLY)
+
+set(NiftyCal_CFG_DIR)
+if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(NiftyCal_CFG_DIR "Release/")
+  endif()
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(NiftyCal_CFG_DIR "Debug/")
+  endif()
+endif()
+
+configure_file(${CMAKE_SOURCE_DIR}/UseNiftyCal.cmake.in ${CMAKE_BINARY_DIR}/UseNiftyCal.cmake @ONLY IMMEDIATE)
+configure_file(${CMAKE_SOURCE_DIR}/NiftyCalConfig.cmake.in ${CMAKE_BINARY_DIR}/NiftyCalConfig.cmake @ONLY IMMEDIATE)
 
 
