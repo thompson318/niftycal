@@ -42,7 +42,10 @@ int main(int argc, char ** argv)
   for (int i = 4; i < argc; i++)
   {
     niftk::PointSet p = niftk::LoadPointSet(argv[i]);
-    points.push_back(p);
+    if (!p.empty())
+    {
+      points.push_back(p);
+    }
   }
 
   cv::Mat intrinsic;

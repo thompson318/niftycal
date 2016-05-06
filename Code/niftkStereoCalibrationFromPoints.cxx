@@ -55,14 +55,16 @@ int main(int argc, char ** argv)
   for (int i = numberOfArgumentsBeforeImages; i < argc; i++)
   {
     niftk::PointSet p = niftk::LoadPointSet(argv[i]);
-
-    if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
+    if (!p.empty())
     {
-      leftPoints.push_back(p);
-    }
-    else
-    {
-      rightPoints.push_back(p);
+      if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
+      {
+        leftPoints.push_back(p);
+      }
+      else
+      {
+        rightPoints.push_back(p);
+      }
     }
   }
 
