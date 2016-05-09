@@ -14,7 +14,7 @@
 
 set(NIFTYCAL_SRCS
   niftkNiftyCalException.cxx
-  niftkTypes.cxx
+  niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
   niftkHomographyUtilities.cxx
   niftkIOUtilities.cxx

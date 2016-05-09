@@ -16,7 +16,7 @@
 #define niftkHomographyUtilities_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkTypes.h"
+#include "niftkNiftyCalTypes.h"
 
 /**
 * \file niftkHomographyUtilities.h
