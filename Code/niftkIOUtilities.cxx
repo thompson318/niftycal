@@ -268,7 +268,7 @@ void SavePoints(const Model3D& m,
   {
     for (pointIter = (*listIter).begin(); pointIter != (*listIter).end(); ++pointIter)
     {
-      IdType id = (*pointIter).first;
+      NiftyCalIdType id = (*pointIter).first;
       modelIter = m.find(id);
 
       if (modelIter != m.end())

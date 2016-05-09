@@ -47,7 +47,7 @@ NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& 
 */
 NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,
                                       std::vector<cv::Point2f>& outputPoint,
-                                      std::vector<niftk::IdType>& outputId
+                                      std::vector<niftk::NiftyCalIdType>& outputId
                                      );
 
 
@@ -55,7 +55,7 @@ NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,
 * \brief Converts vector of points to our PointSet data type.
 */
 NIFTYCAL_WINEXPORT void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
-                                      const std::vector<niftk::IdType>& inputId,
+                                      const std::vector<niftk::NiftyCalIdType>& inputId,
                                       PointSet& output
                                      );
 
