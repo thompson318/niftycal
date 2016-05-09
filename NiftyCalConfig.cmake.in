@@ -41,8 +41,8 @@ set(NIFTYCAL_USE_FILE "@CMAKE_BINARY_DIR@/UseNiftyCal.cmake")
 # Whether NiftyCal was built with shared libraries.
 set(NIFTYCAL_BUILD_SHARED "@BUILD_SHARED_LIBS@")
 
-# A list of all libraries for NiftyCal.
-set(NIFTYCAL_LIBRARIES niftycal @OpenCV_LIBS@ @AprilTags_LIBRARIES@)
+# A list of all libraries provided by NiftyCal.
+set(NIFTYCAL_LIBRARIES niftycal )
 
 # Additional documentation, to enable compliance with licenses.
 set(NIFTYCAL_README_FILE "@CMAKE_BINARY_DIR@/README.md")
