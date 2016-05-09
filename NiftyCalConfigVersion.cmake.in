@@ -1,0 +1,24 @@
+#/*============================================================================
+#
+#  NiftyCal: A software package for camera calibration.
+#
+#  Copyright (c) University College London (UCL). All rights reserved.
+#
+#  This software is distributed WITHOUT ANY WARRANTY; without even
+#  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#  PURPOSE.
+#
+#  See LICENSE.txt in the top level directory for details.
+#
+#============================================================================*/
+set(PACKAGE_VERSION "@NiftyCal_VERSION_MAJOR@.@NiftyCal_VERSION_MINOR@.@NiftyCal_VERSION_PATCH@")
+
+# Check whether the requested PACKAGE_FIND_VERSION is compatible
+if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
+  set(PACKAGE_VERSION_COMPATIBLE FALSE)
+else()
+  set(PACKAGE_VERSION_COMPATIBLE TRUE)
+  if ("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
+    set(PACKAGE_VERSION_EXACT TRUE)
+  endif()
+endif()

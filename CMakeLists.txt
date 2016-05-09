@@ -161,8 +161,7 @@ if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
     set(NiftyCal_CFG_DIR "Debug/")
   endif()
 endif()
-
-configure_file(${CMAKE_SOURCE_DIR}/UseNiftyCal.cmake.in ${CMAKE_BINARY_DIR}/UseNiftyCal.cmake @ONLY IMMEDIATE)
+export(TARGETS niftycal FILE "${CMAKE_BINARY_DIR}/NiftyCalTargets.cmake")
 configure_file(${CMAKE_SOURCE_DIR}/NiftyCalConfig.cmake.in ${CMAKE_BINARY_DIR}/NiftyCalConfig.cmake @ONLY IMMEDIATE)
-
+configure_file(${CMAKE_SOURCE_DIR}/NiftyCalConfigVersion.cmake.in ${CMAKE_BINARY_DIR}/NiftyCalConfigVersion.cmake @ONLY IMMEDIATE)
 

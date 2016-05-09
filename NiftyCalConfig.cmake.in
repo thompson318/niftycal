@@ -13,37 +13,35 @@
 #============================================================================*/
 
 #-----------------------------------------------------------------------------
-#
 # NiftyCalConfig.cmake - NiftyCal CMake configuration file for external projects.
-#
-# This file is configured by NiftyCal and used by the UseNiftyCal.cmake module
-# to load NiftyCal settings for an external project.
 #-----------------------------------------------------------------------------
-
-# The NiftyCal include file directories.
-set(NiftyCal_INCLUDE_DIRS
-   @CMAKE_SOURCE_DIR@/Code
-)
-
-# The NiftyCal library directories.
-set(NiftyCal_LIBRARY_DIRS
-   @CMAKE_BINARY_DIR@/Code/@NiftyCal_CFG_DIR@
-)
 
 # The NiftyCal Library version number
 set(NiftyCal_VERSION_MAJOR "@NiftyCal_VERSION_MAJOR@")
 set(NiftyCal_VERSION_MINOR "@NiftyCal_VERSION_MINOR@")
 set(NiftyCal_VERSION_PATCH "@NiftyCal_VERSION_PATCH@")
-
-# The location of the UseNiftyCal.cmake file.
-set(NiftyCal_USE_FILE "@CMAKE_BINARY_DIR@/UseNiftyCal.cmake")
-
-# Whether NiftyCal was built with shared libraries.
-set(NiftyCal_BUILD_SHARED "@BUILD_SHARED_LIBS@")
-
-# A list of all libraries provided by NiftyCal.
-set(NiftyCal_LIBRARIES niftycal )
+set(NiftyCal_VERSION "@NiftyCal_VERSION_MAJOR@.@NiftyCal_VERSION_MINOR@.@NiftyCal_VERSION_PATCH@")
 
 # Additional documentation, to enable compliance with licenses.
 set(NiftyCal_README_FILE "@CMAKE_BINARY_DIR@/README.md")
 set(NiftyCal_LICENSE_FILE "@CMAKE_BINARY_DIR@/LICENSE.txt")
+
+# Whether NiftyCal was built with shared libraries.
+set(NiftyCal_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+
+# The NiftyCal include file directories.
+set(NiftyCal_INCLUDE_DIRS @CMAKE_SOURCE_DIR@/Code)
+
+# The NiftyCal library directories.
+set(NiftyCal_LIBRARY_DIRS @CMAKE_BINARY_DIR@/Code/@NiftyCal_CFG_DIR@
+)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+get_filename_component(NiftyCal_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(NOT TARGET niftycal AND NOT NiftyCal_BINARY_DIR)
+  include("${NiftyCal_CMAKE_DIR}/NiftyCalTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by NiftyCalTargets.cmake
+set(NiftyCal_LIBRARIES niftycal)
+
