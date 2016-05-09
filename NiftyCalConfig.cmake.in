@@ -21,29 +21,29 @@
 #-----------------------------------------------------------------------------
 
 # The NiftyCal include file directories.
-set(NIFTYCAL_INCLUDE_DIRS
+set(NiftyCal_INCLUDE_DIRS
    @CMAKE_SOURCE_DIR@/Code
 )
 
 # The NiftyCal library directories.
-set(NIFTYCAL_LIBRARY_DIRS
+set(NiftyCal_LIBRARY_DIRS
    @CMAKE_BINARY_DIR@/Code/@NiftyCal_CFG_DIR@
 )
 
 # The NiftyCal Library version number
-set(NIFTYCAL_VERSION_MAJOR "@NIFTYCAL_VERSION_MAJOR@")
-set(NIFTYCAL_VERSION_MINOR "@NIFTYCAL_VERSION_MINOR@")
-set(NIFTYCAL_VERSION_PATCH "@NIFTYCAL_VERSION_PATCH@")
+set(NiftyCal_VERSION_MAJOR "@NiftyCal_VERSION_MAJOR@")
+set(NiftyCal_VERSION_MINOR "@NiftyCal_VERSION_MINOR@")
+set(NiftyCal_VERSION_PATCH "@NiftyCal_VERSION_PATCH@")
 
 # The location of the UseNiftyCal.cmake file.
-set(NIFTYCAL_USE_FILE "@CMAKE_BINARY_DIR@/UseNiftyCal.cmake")
+set(NiftyCal_USE_FILE "@CMAKE_BINARY_DIR@/UseNiftyCal.cmake")
 
 # Whether NiftyCal was built with shared libraries.
-set(NIFTYCAL_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+set(NiftyCal_BUILD_SHARED "@BUILD_SHARED_LIBS@")
 
 # A list of all libraries provided by NiftyCal.
-set(NIFTYCAL_LIBRARIES niftycal )
+set(NiftyCal_LIBRARIES niftycal )
 
 # Additional documentation, to enable compliance with licenses.
-set(NIFTYCAL_README_FILE "@CMAKE_BINARY_DIR@/README.md")
-set(NIFTYCAL_LICENSE_FILE "@CMAKE_BINARY_DIR@/LICENSE.txt")
+set(NiftyCal_README_FILE "@CMAKE_BINARY_DIR@/README.md")
+set(NiftyCal_LICENSE_FILE "@CMAKE_BINARY_DIR@/LICENSE.txt")

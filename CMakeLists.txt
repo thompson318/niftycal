@@ -30,7 +30,7 @@ foreach(policy ${project_policies})
   endif()
 endforeach()
 
-project(NIFTYCAL VERSION 00.00.1)
+project(NiftyCal VERSION 00.00.1)
 
 ######################################################################
 # Setting supported build types. Should ONLY be Release or Debug.
