@@ -57,7 +57,7 @@ endif()
 # Setup the path to load CMake macros, and extra CMake files.
 ######################################################################
 set(CMAKE_MODULE_PATH
-    ${CMAKE_SOURCE_DIR}/CMake
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}
    )
 
@@ -113,16 +113,19 @@ list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
 ######################################################################
 # Add Optional Requirements
 ######################################################################
-find_package(AprilTags)
-if(AprilTags_FOUND)
-  include_directories(${AprilTags_INCLUDE_DIR})
-  list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
-endif()
+configure_file(${CMAKE_SOURCE_DIR}/CMake/FindAprilTags.cmake ${CMAKE_BINARY_DIR}/FindAprilTags.cmake @ONLY IMMEDIATE)
+configure_file(${CMAKE_SOURCE_DIR}/CMake/FindEigen.cmake ${CMAKE_BINARY_DIR}/FindEigen.cmake @ONLY IMMEDIATE)
+
 find_package(Eigen)
 if(Eigen_FOUND)
   include_directories(${Eigen_INCLUDE_DIR})
-endif()
 
+  find_package(AprilTags)
+  if(AprilTags_FOUND)
+    include_directories(${AprilTags_INCLUDE_DIR})
+    list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
+  endif()
+endif()
 
 ######################################################################
 # Provide support for manually running Doxygen in build folder.
