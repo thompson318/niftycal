@@ -16,7 +16,7 @@
 #define niftkIterativeStereoCameraCalibration_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkTypes.h"
+#include "niftkNiftyCalTypes.h"
 #include "niftkIPoint2DDetector.h"
 #include <list>
 #include <memory>

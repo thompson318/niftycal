@@ -62,8 +62,8 @@
     <regex>[A-Z]</regex>
     <length>100</length>
   </MemberFunctions>
-  <!--Functions>
+  <Functions>
     <regex>[A-Z]</regex>
-    <length>100</length>
-  </Functions-->
+    <length>500</length>
+  </Functions>
 </Description>

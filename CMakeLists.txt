@@ -30,7 +30,7 @@ foreach(policy ${project_policies})
   endif()
 endforeach()
 
-project(NIFTYCAL VERSION 00.00.1)
+project(NiftyCal VERSION 00.00.1)
 
 ######################################################################
 # Setting supported build types. Should ONLY be Release or Debug.
@@ -57,7 +57,7 @@ endif()
 # Setup the path to load CMake macros, and extra CMake files.
 ######################################################################
 set(CMAKE_MODULE_PATH
-    ${CMAKE_SOURCE_DIR}/CMake
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}
    )
 
@@ -88,7 +88,7 @@ if(BUILD_TESTING)
   configure_file(CMake/CTestCustom.cmake.in ${CMAKE_BINARY_DIR}/CTestCustom.cmake @ONLY)
 
   # Setup continuous test script
-  CONFIGURE_FILE(CMake/CTestContinuous.cmake.in ${CMAKE_BINARY_DIR}/CTestContinuous.cmake @ONLY)
+  configure_file(CMake/CTestContinuous.cmake.in ${CMAKE_BINARY_DIR}/CTestContinuous.cmake @ONLY)
 
 endif(BUILD_TESTING)
 
@@ -113,16 +113,19 @@ list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
 ######################################################################
 # Add Optional Requirements
 ######################################################################
-find_package(AprilTags)
-if(AprilTags_FOUND)
-  include_directories(${AprilTags_INCLUDE_DIR})
-  list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
-endif()
+configure_file(${CMAKE_SOURCE_DIR}/CMake/FindAprilTags.cmake ${CMAKE_BINARY_DIR}/FindAprilTags.cmake @ONLY IMMEDIATE)
+configure_file(${CMAKE_SOURCE_DIR}/CMake/FindEigen.cmake ${CMAKE_BINARY_DIR}/FindEigen.cmake @ONLY IMMEDIATE)
+
 find_package(Eigen)
 if(Eigen_FOUND)
   include_directories(${Eigen_INCLUDE_DIR})
-endif()
 
+  find_package(AprilTags)
+  if(AprilTags_FOUND)
+    include_directories(${AprilTags_INCLUDE_DIR})
+    list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
+  endif()
+endif()
 
 ######################################################################
 # Provide support for manually running Doxygen in build folder.
@@ -141,4 +144,24 @@ if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif()
 
+##################################################################################
+# Generate "Use" and "Configure" files so external projects can link to NiftyCal.
+# These go at or near the end, as all the variables need to be defined.
+##################################################################################
+
+configure_file(${CMAKE_SOURCE_DIR}/LICENSE.txt ${CMAKE_BINARY_DIR}/LICENSE.txt @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/README.md ${CMAKE_BINARY_DIR}/README.md @ONLY)
+
+set(NiftyCal_CFG_DIR)
+if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(NiftyCal_CFG_DIR "Release/")
+  endif()
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(NiftyCal_CFG_DIR "Debug/")
+  endif()
+endif()
+export(TARGETS niftycal FILE "${CMAKE_BINARY_DIR}/NiftyCalTargets.cmake")
+configure_file(${CMAKE_SOURCE_DIR}/NiftyCalConfig.cmake.in ${CMAKE_BINARY_DIR}/NiftyCalConfig.cmake @ONLY IMMEDIATE)
+configure_file(${CMAKE_SOURCE_DIR}/NiftyCalConfigVersion.cmake.in ${CMAKE_BINARY_DIR}/NiftyCalConfigVersion.cmake @ONLY IMMEDIATE)
 

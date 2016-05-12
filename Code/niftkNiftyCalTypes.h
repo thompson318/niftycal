@@ -26,7 +26,8 @@
 namespace niftk
 {
 
-typedef unsigned int IdType;
+typedef unsigned int NiftyCalIdType;
+typedef unsigned long long NiftyCalTimeType;
 
 /**
 * \class Point2D
@@ -34,8 +35,8 @@ typedef unsigned int IdType;
 */
 struct NIFTYCAL_WINEXPORT Point2D
 {
-  IdType      id;
-  cv::Point2d point;
+  NiftyCalIdType id;
+  cv::Point2d    point;
 };
 
 /**
@@ -44,14 +45,14 @@ struct NIFTYCAL_WINEXPORT Point2D
 */
 struct NIFTYCAL_WINEXPORT Point3D
 {
-  IdType      id;
-  cv::Point3d point;
+  NiftyCalIdType id;
+  cv::Point3d    point;
 };
 
-typedef std::map <IdType, Point2D> PointSet;
-typedef std::pair<IdType, Point2D> IdPoint2D;
-typedef std::map <IdType, Point3D> Model3D;
-typedef std::pair<IdType, Point3D> IdPoint3D;
+typedef std::map <NiftyCalIdType, Point2D> PointSet;
+typedef std::pair<NiftyCalIdType, Point2D> IdPoint2D;
+typedef std::map <NiftyCalIdType, Point3D> Model3D;
+typedef std::pair<NiftyCalIdType, Point3D> IdPoint3D;
 
 } // end namespace
 

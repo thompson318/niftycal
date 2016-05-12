@@ -11,16 +11,14 @@
 #  See LICENSE.txt in the top level directory for details.
 #
 #============================================================================*/
+set(PACKAGE_VERSION "@NiftyCal_VERSION_MAJOR@.@NiftyCal_VERSION_MINOR@.@NiftyCal_VERSION_PATCH@")
 
-set(Eigen_FOUND 0)
-
-find_path(Eigen_INCLUDE_DIR
-  NAMES Eigen/Eigen
-  PATHS ${Eigen_DIR} ${CMAKE_PREFIX_PATH}
-  PATH_SUFFIXES include include/eigen3
-)
-
-if(Eigen_INCLUDE_DIR)
-  set(Eigen_FOUND 1)
+# Check whether the requested PACKAGE_FIND_VERSION is compatible
+if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
+  set(PACKAGE_VERSION_COMPATIBLE FALSE)
+else()
+  set(PACKAGE_VERSION_COMPATIBLE TRUE)
+  if ("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
+    set(PACKAGE_VERSION_EXACT TRUE)
+  endif()
 endif()
-

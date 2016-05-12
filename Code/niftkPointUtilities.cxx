@@ -16,7 +16,6 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include <queue>
 #include <vector>
-#include <niftkTypes.h>
 #include <functional>
 
 namespace niftk {
@@ -104,7 +103,7 @@ void ExtractCommonPoints(const PointSet& inputA,
 //-----------------------------------------------------------------------------
 void ConvertPoints(const PointSet& input,
                    std::vector<cv::Point2f>& outputPoint,
-                   std::vector<niftk::IdType>& outputId
+                   std::vector<niftk::NiftyCalIdType>& outputId
                   )
 {
   outputPoint.clear();
@@ -124,7 +123,7 @@ void ConvertPoints(const PointSet& input,
 
 //-----------------------------------------------------------------------------
 void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
-                   const std::vector<niftk::IdType>& inputId,
+                   const std::vector<niftk::NiftyCalIdType>& inputId,
                    PointSet& output
                    )
 {
@@ -191,7 +190,7 @@ void UndistortPoints(const PointSet& distortedPoints,
   undistortedPoints.clear();
 
   std::vector<cv::Point2f> distorted;
-  std::vector<niftk::IdType> ids;
+  std::vector<niftk::NiftyCalIdType> ids;
   niftk::ConvertPoints(distortedPoints, distorted, ids);
 
   std::vector<cv::Point2f> undistorted(distorted.size());
@@ -229,7 +228,7 @@ void DistortPoints(const PointSet& undistortedPoints,
 {
   std::vector<cv::Point2f> undistorted;
   std::vector<cv::Point2f> distorted;
-  std::vector<niftk::IdType> ids;
+  std::vector<niftk::NiftyCalIdType> ids;
 
   niftk::ConvertPoints(undistortedPoints, undistorted, ids);
 
@@ -288,7 +287,7 @@ PointSet TrimPoints(const PointSet& input,
 {
   PointSet result;
 
-  typedef std::pair<double, niftk::IdType> P;
+  typedef std::pair<double, niftk::NiftyCalIdType> P;
   std::priority_queue< P, std::vector<P>, std::greater<P> > queue;
 
   PointSet::const_iterator iter;
@@ -340,7 +339,7 @@ cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
   niftk::UndistortPoints(leftDistortedPoints, leftIntrinsics, leftDistortion, undistortedLeftPoints);
 
   std::vector<cv::Point2f> leftUndistP;
-  std::vector<niftk::IdType> leftUndistId;
+  std::vector<niftk::NiftyCalIdType> leftUndistId;
   niftk::ConvertPoints(undistortedLeftPoints, leftUndistP, leftUndistId);
 
   std::vector<cv::Point3f> epiLines;

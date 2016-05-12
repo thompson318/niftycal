@@ -16,7 +16,7 @@
 #define niftkIPoint2DDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkTypes.h"
+#include "niftkNiftyCalTypes.h"
 
 namespace niftk
 {

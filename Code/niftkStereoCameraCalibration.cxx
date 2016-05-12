@@ -108,7 +108,7 @@ double StereoCameraCalibration(const Model3D& model,
     // A point must be visible in both left and right view for it to be added.
     for (leftPointsIter = (*leftListIter).begin(); leftPointsIter != (*leftListIter).end(); ++leftPointsIter)
     {
-      niftk::IdType id = (*leftPointsIter).first;
+      niftk::NiftyCalIdType id = (*leftPointsIter).first;
       rightPointsIter = (*rightListIter).find(id);
 
       if (rightPointsIter != (*rightListIter).end())

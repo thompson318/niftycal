@@ -26,7 +26,7 @@ void WarpPointsByHomography(const PointSet& src,
                            )
 {
   std::vector<cv::Point2f> srcP;
-  std::vector<niftk::IdType> srcId;
+  std::vector<niftk::NiftyCalIdType> srcId;
   std::vector<cv::Point2f> targP;
   target.clear();
 

@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkTypes.h"
+#include "niftkNiftyCalTypes.h"
 
 namespace niftk {
 

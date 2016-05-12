@@ -15,7 +15,7 @@
 #ifndef niftkIterativeCalibrationUtilities_p_h
 #define niftkIterativeCalibrationUtilities_p_h
 
-#include "niftkTypes.h"
+#include "niftkNiftyCalTypes.h"
 #include "niftkIPoint2DDetector.h"
 #include <list>
 #include <memory>
