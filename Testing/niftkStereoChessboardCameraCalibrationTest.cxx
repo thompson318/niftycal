@@ -194,4 +194,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   REQUIRE( fabs(rightToLeftTranslation.at<double>(0,1) - eT2) < tolerance );
   REQUIRE( fabs(rightToLeftTranslation.at<double>(0,2) - eT3) < tolerance );
 
+  // Don't have a unit test yet.
+  //niftk::SaveNifTKIntrinsics(intrinsicLeft, distortionLeft, "/tmp/calib.left.intrinsics.txt");
+  //niftk::SaveNifTKIntrinsics(intrinsicRight, distortionRight, "/tmp/calib.right.intrinsics.txt");
+  //niftk::SaveNifTKStereoExtrinsics(rightToLeftRotation, rightToLeftTranslation, "/tmp/calib.r2l.txt");
+
 }
