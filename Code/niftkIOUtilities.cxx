@@ -14,6 +14,8 @@
 
 #include "niftkIOUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkMatrixUtilities.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -47,8 +49,6 @@ void SavePointSet(const PointSet& p, const std::string& fileName)
 //-----------------------------------------------------------------------------
 PointSet LoadPointSet(const std::string& fileName)
 {
-  niftk::PointSet result;
-
   if (fileName.size() == 0)
   {
     niftkNiftyCalThrow() << "Empty filename.";
@@ -60,6 +60,8 @@ PointSet LoadPointSet(const std::string& fileName)
   {
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
   }
+
+  niftk::PointSet result;
 
   while (!ifs.eof())
   {
@@ -110,8 +112,6 @@ void SaveModel3D(const Model3D& m, const std::string& fileName)
 //-----------------------------------------------------------------------------
 Model3D LoadModel3D(const std::string& fileName)
 {
-  Model3D result;
-
   if (fileName.size() == 0)
   {
     niftkNiftyCalThrow() << "Empty filename.";
@@ -123,6 +123,8 @@ Model3D LoadModel3D(const std::string& fileName)
   {
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
   }
+
+  Model3D result;
 
   while (ifs.good())
   {
@@ -152,6 +154,9 @@ void SaveMatrix(const cv::Mat& m, const std::string& fileName)
   }
 
   std::ofstream ofs;
+  ofs.precision(10);
+  ofs.width(10);
+
   ofs.open (fileName, std::ofstream::out);
   if (!ofs.is_open())
   {
@@ -174,8 +179,6 @@ void SaveMatrix(const cv::Mat& m, const std::string& fileName)
 //-----------------------------------------------------------------------------
 cv::Mat LoadMatrix(const std::string& fileName)
 {
-  cv::Mat result;
-
   if (fileName.size() == 0)
   {
     niftkNiftyCalThrow() << "Empty filename.";
@@ -188,6 +191,7 @@ cv::Mat LoadMatrix(const std::string& fileName)
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
   }
 
+  cv::Mat result;
   std::vector< std::vector<double> > data;
 
   std::string line;
@@ -311,6 +315,140 @@ void LoadPoints(const std::string& fileName,
   niftkNiftyCalThrow() << "Not implemented yet!";
 
   ifs.close();
+}
+
+
+//-----------------------------------------------------------------------------
+void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
+                         const cv::Mat &distortion,
+                         const std::string fileName
+                        )
+{
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  if (intrinsics.rows != 3 || intrinsics.cols != 3)
+  {
+    niftkNiftyCalThrow() << "Invalid intrinsics matrix size.";
+  }
+
+  if (distortion.rows != 1)
+  {
+    niftkNiftyCalThrow() << "Invalid distortion matrix size.";
+  }
+
+  std::ofstream ofs;
+  ofs.precision(10);
+  ofs.width(10);
+
+  ofs.open (fileName, std::ofstream::out);
+  if (!ofs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for writing.";
+  }
+
+  for (int r = 0; r < intrinsics.rows; r++)
+  {
+    for (int c = 0; c < intrinsics.cols; c++)
+    {
+      ofs << intrinsics.at<double>(r, c) << " ";
+    }
+    ofs << std::endl;
+  }
+  for (int c = 0; c < distortion.cols; c++)
+  {
+    ofs << distortion.at<double>(0,c) << " ";
+  }
+  ofs << std::endl;
+
+  ofs.close();
+}
+
+
+//-----------------------------------------------------------------------------
+void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
+                               const cv::Mat& rightToLeftTranslationVector,
+                               const std::string fileName
+                              )
+{
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  std::ofstream ofs;
+  ofs.precision(10);
+  ofs.width(10);
+
+  ofs.open (fileName, std::ofstream::out);
+  if (!ofs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for writing.";
+  }
+
+  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
+                                                          rightToLeftTranslationVector);
+  cv::Matx44d matInv = mat.inv();
+
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      ofs << matInv(r,c) << " ";
+    }
+    ofs << std::endl;
+  }
+  ofs << matInv(0,3) << " " << matInv(1,3) << " " << matInv(2,3) << std::endl;
+
+  ofs.close();
+}
+
+
+//-----------------------------------------------------------------------------
+void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
+                   const cv::Mat& rightToLeftTranslationVector,
+                   const std::string fileName
+                  )
+{
+  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
+                                                          rightToLeftTranslationVector);
+
+  niftk::Save4x4Matrix(mat, fileName);
+}
+
+
+//-----------------------------------------------------------------------------
+void Save4x4Matrix(const cv::Matx44d& matrix,
+                   const std::string fileName
+                  )
+{
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  std::ofstream ofs;
+  ofs.precision(10);
+  ofs.width(10);
+
+  ofs.open (fileName, std::ofstream::out);
+  if (!ofs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for writing.";
+  }
+
+  for (int r = 0; r < 4; r++)
+  {
+    for (int c = 0; c < 4; c++)
+    {
+      ofs << matrix(r,c) << " ";
+    }
+    ofs << std::endl;
+  }
+
+  ofs.close();
 }
 
 } // end namespace

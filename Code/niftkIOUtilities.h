@@ -46,6 +46,43 @@ NIFTYCAL_WINEXPORT void LoadPoints(const std::string& fileName,
                                    const Model3D& m,
                                    const std::list<PointSet>& p
                                    );
+
+/**
+* \brief Saves NifTK format intrinsics file.
+*
+* This output format is a 3x3 matrix, followed by 1x[4,5] distortion coefficients as a row vector.
+*/
+NIFTYCAL_WINEXPORT void SaveNifTKIntrinsics(const cv::Mat& intrinsics,
+                                            const cv::Mat& distortion,
+                                            const std::string fileName
+                                           );
+
+/**
+* \brief Saves NifTK format left-to-right stereo extrinsics transform.
+*
+* Note: OpenCV and NiftyCal naturally uses right-to-left. NifTK uses left-to-right.
+* This output form is a 3x3 rotation matrix, followed by a translation as a row vector.
+*/
+NIFTYCAL_WINEXPORT void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
+                                                  const cv::Mat& rightToLeftTranslationVector,
+                                                  const std::string fileName
+                                                 );
+
+/**
+* \brief Simply writes a 4x4 matrix to file as 4 numbers per line.
+*/
+NIFTYCAL_WINEXPORT void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
+                                      const cv::Mat& rightToLeftTranslationVector,
+                                      const std::string fileName
+                                     );
+
+/**
+* \brief Simply writes a 4x4 matrix to file as 4 numbers per line.
+*/
+NIFTYCAL_WINEXPORT void Save4x4Matrix(const cv::Matx44d& matrix,
+                                      const std::string fileName
+                                     );
+
 } // end namespace
 
 #endif

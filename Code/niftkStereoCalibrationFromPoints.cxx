@@ -78,10 +78,10 @@ int main(int argc, char ** argv)
   std::vector<cv::Mat> rvecsRight;
   std::vector<cv::Mat> tvecsRight;
 
-  cv::Mat essentialMatrix = cvCreateMat (3,3,CV_64FC1);
-  cv::Mat fundamentalMatrix = cvCreateMat (3,3,CV_64FC1);
-  cv::Mat left2RightRotation = cvCreateMat (1,3,CV_64FC1);
-  cv::Mat left2RightTranslation = cvCreateMat (1,3,CV_64FC1);
+  cv::Mat essentialMatrix;
+  cv::Mat fundamentalMatrix;
+  cv::Mat rightToLeftRotation;
+  cv::Mat rightToLeftTranslation;
 
   niftk::MonoCameraCalibration(model,
                                leftPoints,
@@ -113,8 +113,8 @@ int main(int argc, char ** argv)
                                               distortionRight,
                                               rvecsRight,
                                               tvecsRight,
-                                              left2RightRotation,
-                                              left2RightTranslation,
+                                              rightToLeftRotation,
+                                              rightToLeftTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS
@@ -138,12 +138,12 @@ int main(int argc, char ** argv)
             << distortionRight.at<double>(0,1) << " "
             << distortionRight.at<double>(0,2) << " "
             << distortionRight.at<double>(0,3) << " "
-            << left2RightRotation.at<double>(0,0) << " "
-            << left2RightRotation.at<double>(0,1) << " "
-            << left2RightRotation.at<double>(0,2) << " "
-            << left2RightTranslation.at<double>(0,0) << " "
-            << left2RightTranslation.at<double>(0,1) << " "
-            << left2RightTranslation.at<double>(0,2) << " "
+            << rightToLeftRotation.at<double>(0,0) << " "
+            << rightToLeftRotation.at<double>(0,1) << " "
+            << rightToLeftRotation.at<double>(0,2) << " "
+            << rightToLeftTranslation.at<double>(0,0) << " "
+            << rightToLeftTranslation.at<double>(0,1) << " "
+            << rightToLeftTranslation.at<double>(0,2) << " "
             << rms
             << std::endl;
 

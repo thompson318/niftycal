@@ -147,8 +147,8 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
 
   cv::Mat essentialMatrix;
   cv::Mat fundamentalMatrix;
-  cv::Mat left2RightRotation;
-  cv::Mat left2RightTranslation;
+  cv::Mat rightToLeftRotation;
+  cv::Mat rightToleftTranslation;
 
   double rms = niftk::IterativeStereoCameraCalibration(
         model,
@@ -166,26 +166,26 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
         distortionRight,
         rvecsRight,
         tvecsRight,
-        left2RightRotation,
-        left2RightTranslation,
+        rightToLeftRotation,
+        rightToleftTranslation,
         essentialMatrix,
         fundamentalMatrix,
         flags
         );
 
-  std::cout << "R1=" << left2RightRotation.at<double>(0,0) << std::endl;
-  std::cout << "R2=" << left2RightRotation.at<double>(0,1) << std::endl;
-  std::cout << "R3=" << left2RightRotation.at<double>(0,2) << std::endl;
-  std::cout << "T1=" << left2RightTranslation.at<double>(0,0) << std::endl;
-  std::cout << "T2=" << left2RightTranslation.at<double>(0,1) << std::endl;
-  std::cout << "T3=" << left2RightTranslation.at<double>(0,2) << std::endl;
+  std::cout << "R1=" << rightToLeftRotation.at<double>(0,0) << std::endl;
+  std::cout << "R2=" << rightToLeftRotation.at<double>(0,1) << std::endl;
+  std::cout << "R3=" << rightToLeftRotation.at<double>(0,2) << std::endl;
+  std::cout << "T1=" << rightToleftTranslation.at<double>(0,0) << std::endl;
+  std::cout << "T2=" << rightToleftTranslation.at<double>(0,1) << std::endl;
+  std::cout << "T3=" << rightToleftTranslation.at<double>(0,2) << std::endl;
   std::cout << "RMS=" << rms << std::endl;
 
   double tolerance = 0.005;
-  REQUIRE( fabs(left2RightRotation.at<double>(0,0) - eR1) < tolerance );
-  REQUIRE( fabs(left2RightRotation.at<double>(0,1) - eR2) < tolerance );
-  REQUIRE( fabs(left2RightRotation.at<double>(0,2) - eR3) < tolerance );
-  REQUIRE( fabs(left2RightTranslation.at<double>(0,0) - eT1) < tolerance );
-  REQUIRE( fabs(left2RightTranslation.at<double>(0,1) - eT2) < tolerance );
-  REQUIRE( fabs(left2RightTranslation.at<double>(0,2) - eT3) < tolerance );
+  REQUIRE( fabs(rightToLeftRotation.at<double>(0,0) - eR1) < tolerance );
+  REQUIRE( fabs(rightToLeftRotation.at<double>(0,1) - eR2) < tolerance );
+  REQUIRE( fabs(rightToLeftRotation.at<double>(0,2) - eR3) < tolerance );
+  REQUIRE( fabs(rightToleftTranslation.at<double>(0,0) - eT1) < tolerance );
+  REQUIRE( fabs(rightToleftTranslation.at<double>(0,1) - eT2) < tolerance );
+  REQUIRE( fabs(rightToleftTranslation.at<double>(0,2) - eT3) < tolerance );
 }

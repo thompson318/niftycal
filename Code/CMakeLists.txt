@@ -17,6 +17,7 @@ set(NIFTYCAL_SRCS
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
   niftkHomographyUtilities.cxx
+  niftkMatrixUtilities.cxx
   niftkIOUtilities.cxx
   niftkIterativeCalibrationUtilities.cxx
   niftkIPoint2DDetector.cxx
