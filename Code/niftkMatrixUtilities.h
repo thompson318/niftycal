@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkMatrixtilities_h
-#define niftkMatrixtilities_h
+#ifndef niftkMatrixUtilities_h
+#define niftkMatrixUtilities_h
 
 #include "niftkWin32ExportHeader.h"
 

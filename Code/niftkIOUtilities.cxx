@@ -321,7 +321,7 @@ void LoadPoints(const std::string& fileName,
 //-----------------------------------------------------------------------------
 void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
                          const cv::Mat &distortion,
-                         const std::string fileName
+                         const std::string& fileName
                         )
 {
   if (fileName.size() == 0)
@@ -370,7 +370,7 @@ void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
 //-----------------------------------------------------------------------------
 void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
                                const cv::Mat& rightToLeftTranslationVector,
-                               const std::string fileName
+                               const std::string& fileName
                               )
 {
   if (fileName.size() == 0)
@@ -413,7 +413,7 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
 //-----------------------------------------------------------------------------
 void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
                    const cv::Mat& rightToLeftTranslationVector,
-                   const std::string fileName
+                   const std::string& fileName
                   )
 {
   cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
@@ -425,7 +425,7 @@ void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
 
 //-----------------------------------------------------------------------------
 void Save4x4Matrix(const cv::Matx44d& matrix,
-                   const std::string fileName
+                   const std::string& fileName
                   )
 {
   if (fileName.size() == 0)
