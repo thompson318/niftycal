@@ -26,6 +26,7 @@ set(TEST_CASES
   niftkIterativeStereoCirclesCameraCalibrationTest
   niftkIterativeStereoAprilTagsCameraCalibrationTest
   niftkIterativeMonoAprilTagsCameraCalibrationTest
+  niftkMatrixAverageTest
 )
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -54,6 +55,9 @@ add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5
 add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35)
 add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
 add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
+add_test(AveMatrix1 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
+add_test(AveMatrix2 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(AveMatrix3 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
 
 # For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera.
 add_test(CalibLapMonoLeft niftkMonoChessboardCameraCalibrationTest

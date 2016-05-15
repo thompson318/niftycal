@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkTypes_h
-#define niftkTypes_h
+#ifndef niftkNiftyCalTypes_h
+#define niftkNiftyCalTypes_h
 
 #include "niftkWin32ExportHeader.h"
 #include <cv.h>

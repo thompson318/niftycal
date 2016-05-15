@@ -321,7 +321,7 @@ void LoadPoints(const std::string& fileName,
 //-----------------------------------------------------------------------------
 void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
                          const cv::Mat &distortion,
-                         const std::string fileName
+                         const std::string& fileName
                         )
 {
   if (fileName.size() == 0)
@@ -370,7 +370,7 @@ void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
 //-----------------------------------------------------------------------------
 void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
                                const cv::Mat& rightToLeftTranslationVector,
-                               const std::string fileName
+                               const std::string& fileName
                               )
 {
   if (fileName.size() == 0)
@@ -390,8 +390,12 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
 
   cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
                                                           rightToLeftTranslationVector);
+
+  // Beware: OpenCV and NiftyCalculate "right to left".
+  //         NifTK uses "left to right", so here we deliberately invert.
   cv::Matx44d matInv = mat.inv();
 
+  // And here we deliberately output the inverted matrix.
   for (int r = 0; r < 3; r++)
   {
     for (int c = 0; c < 3; c++)
@@ -409,7 +413,7 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
 //-----------------------------------------------------------------------------
 void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
                    const cv::Mat& rightToLeftTranslationVector,
-                   const std::string fileName
+                   const std::string& fileName
                   )
 {
   cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
@@ -421,7 +425,7 @@ void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
 
 //-----------------------------------------------------------------------------
 void Save4x4Matrix(const cv::Matx44d& matrix,
-                   const std::string fileName
+                   const std::string& fileName
                   )
 {
   if (fileName.size() == 0)
