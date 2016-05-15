@@ -390,8 +390,12 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
 
   cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
                                                           rightToLeftTranslationVector);
+
+  // Beware: OpenCV and NiftyCalculate "right to left".
+  //         NifTK uses "left to right", so here we deliberately invert.
   cv::Matx44d matInv = mat.inv();
 
+  // And here we deliberately output the inverted matrix.
   for (int r = 0; r < 3; r++)
   {
     for (int c = 0; c < 3; c++)
