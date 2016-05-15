@@ -50,4 +50,12 @@ cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector,
   return RotationAndTranslationToMatrix(rotationMatrix, translationVector);
 }
 
+
+//-----------------------------------------------------------------------------
+cv::Matx44d AverageMatrices(const std::list<cv::Matx44d >&)
+{
+  cv::Matx44d average;
+  return average;
+}
+
 } // end namespace

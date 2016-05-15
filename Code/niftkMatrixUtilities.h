@@ -31,6 +31,14 @@ NIFTYCAL_WINEXPORT cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x
                                                  const cv::Mat& translationVector1x3);
 
 
+/**
+* \brief Averages a list of rigid body matrices.
+*
+* Originally implemented by Steve Thompson in NifTK, but converted
+* to use lists and cv::Matx44d for NiftyCal.
+*/
+NIFTYCAL_WINEXPORT cv::Matx44d AverageMatrices(const std::list<cv::Matx44d >&);
+
 } // end namespace
 
 #endif
