@@ -33,6 +33,10 @@ NIFTYCAL_WINEXPORT cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x
                                                  const cv::Mat& translationVector1x3);
 
 
+NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
+                                          cv::Mat& rotationVector1x3,
+                                          cv::Mat& translationVector1x3);
+
 /**
 * \brief Averages a list of rigid body matrices.
 *
