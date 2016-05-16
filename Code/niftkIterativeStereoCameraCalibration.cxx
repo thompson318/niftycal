@@ -41,8 +41,8 @@ double IterativeStereoCameraCalibration(
     cv::Mat& distortionRight,
     std::vector<cv::Mat>& rvecsRight,
     std::vector<cv::Mat>& tvecsRight,
-    cv::Mat& rightToLeftRotation,
-    cv::Mat& rightToLeftTranslation,
+    cv::Mat& rightToLeftRotationMatrix,
+    cv::Mat& rightToLeftTranslationVector,
     cv::Mat& essentialMatrix,
     cv::Mat& fundamentalMatrix,
     const int& cvFlags
@@ -140,8 +140,8 @@ double IterativeStereoCameraCalibration(
         distortionRight,
         rvecsRight,
         tvecsRight,
-        rightToLeftRotation,
-        rightToLeftTranslation,
+        rightToLeftRotationMatrix,
+        rightToLeftTranslationVector,
         essentialMatrix,
         fundamentalMatrix,
         iterativeCvFlags
@@ -166,12 +166,14 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Initial P2r=" << distortionRight.at<double>(0,3) << std::endl;
   std::cout << std::endl;
-  std::cout << "Initial R1=" << rightToLeftRotation.at<double>(0,0) << std::endl;
-  std::cout << "Initial R2=" << rightToLeftRotation.at<double>(0,1) << std::endl;
-  std::cout << "Initial R3=" << rightToLeftRotation.at<double>(0,2) << std::endl;
-  std::cout << "Initial T1=" << rightToLeftTranslation.at<double>(0,0) << std::endl;
-  std::cout << "Initial T2=" << rightToLeftTranslation.at<double>(0,1) << std::endl;
-  std::cout << "Initial T3=" << rightToLeftTranslation.at<double>(0,2) << std::endl;
+  cv::Mat rvec;
+  cv::Rodrigues(rightToLeftRotationMatrix, rvec);
+  std::cout << "Initial R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "Initial R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "Initial R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "Initial T1=" << rightToLeftTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "Initial T2=" << rightToLeftTranslationVector.at<double>(0,1) << std::endl;
+  std::cout << "Initial T3=" << rightToLeftTranslationVector.at<double>(0,2) << std::endl;
   std::cout << std::endl;
 
   //return projectedRMS;
@@ -244,8 +246,8 @@ double IterativeStereoCameraCalibration(
     cv::Mat tmpDistortionLeft = distortionLeft.clone();
     cv::Mat tmpIntrinsicRight = intrinsicRight.clone();
     cv::Mat tmpDistortionRight = distortionRight.clone();
-    cv::Mat tmpRightToLeftRotation = rightToLeftRotation.clone();
-    cv::Mat tmpRightToLeftTranslation = rightToLeftTranslation.clone();
+    cv::Mat tmpRightToLeftRotationMatrix = rightToLeftRotationMatrix.clone();
+    cv::Mat tmpRightToLeftTranslationVector = rightToLeftTranslationVector.clone();
     cv::Mat tmpEssentialMatrix = essentialMatrix.clone();
     cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
 
@@ -262,8 +264,8 @@ double IterativeStereoCameraCalibration(
           tmpDistortionRight,
           rvecsRight,
           tvecsRight,
-          tmpRightToLeftRotation,
-          tmpRightToLeftTranslation,
+          tmpRightToLeftRotationMatrix,
+          tmpRightToLeftTranslationVector,
           tmpEssentialMatrix,
           tmpFundamentalMatrix,
           iterativeCvFlags
@@ -280,8 +282,8 @@ double IterativeStereoCameraCalibration(
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
       tmpDistortionRight.copyTo(distortionRight);
-      tmpRightToLeftRotation.copyTo(rightToLeftRotation);
-      tmpRightToLeftTranslation.copyTo(rightToLeftTranslation);
+      tmpRightToLeftRotationMatrix.copyTo(rightToLeftRotationMatrix);
+      tmpRightToLeftTranslationVector.copyTo(rightToLeftTranslationVector);
       tmpEssentialMatrix.copyTo(essentialMatrix);
       tmpFundamentalMatrix.copyTo(fundamentalMatrix);
     }
@@ -310,12 +312,13 @@ double IterativeStereoCameraCalibration(
   std::cout << "Final P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Final P2r=" << distortionRight.at<double>(0,3) << std::endl;
   std::cout << std::endl;
-  std::cout << "Final R1=" << rightToLeftRotation.at<double>(0,0) << std::endl;
-  std::cout << "Final R2=" << rightToLeftRotation.at<double>(0,1) << std::endl;
-  std::cout << "Final R3=" << rightToLeftRotation.at<double>(0,2) << std::endl;
-  std::cout << "Final T1=" << rightToLeftTranslation.at<double>(0,0) << std::endl;
-  std::cout << "Final T2=" << rightToLeftTranslation.at<double>(0,1) << std::endl;
-  std::cout << "Final T3=" << rightToLeftTranslation.at<double>(0,2) << std::endl;
+  cv::Rodrigues(rightToLeftRotationMatrix, rvec);
+  std::cout << "Final R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "Final R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "Final R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "Final T1=" << rightToLeftTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "Final T2=" << rightToLeftTranslationVector.at<double>(0,1) << std::endl;
+  std::cout << "Final T3=" << rightToLeftTranslationVector.at<double>(0,2) << std::endl;
 
   return projectedRMS;
 }

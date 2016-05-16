@@ -31,8 +31,8 @@ double StereoCameraCalibration(const Model3D& model,
                                cv::Mat& distortionRight,
                                std::vector<cv::Mat>& rvecsRight,
                                std::vector<cv::Mat>& tvecsRight,
-                               cv::Mat& rightToLeftRotation,
-                               cv::Mat& rightToLeftTranslation,
+                               cv::Mat& rightToLeftRotationMatrix,
+                               cv::Mat& rightToLeftTranslationVector,
                                cv::Mat& essentialMatrix,
                                cv::Mat& fundamentalMatrix,
                                const int& cvFlags
@@ -167,8 +167,8 @@ double StereoCameraCalibration(const Model3D& model,
                             intrinsicRight,
                             distortionRight,
                             imageSize,
-                            rightToLeftRotation,
-                            rightToLeftTranslation,
+                            rightToLeftRotationMatrix,
+                            rightToLeftTranslationVector,
                             essentialMatrix,
                             fundamentalMatrix,
                             cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1e-10),
@@ -218,10 +218,10 @@ double StereoCameraCalibration(const Model3D& model,
       for (int c = 0; c < 3; c++)
       {
         leftExtrinsic(r, c) = leftRot.at<double>(r,c);
-        rightToLeft(r, c) = rightToLeftRotation.at<double>(r, c);
+        rightToLeft(r, c) = rightToLeftRotationMatrix.at<double>(r, c);
       }
       leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
-      rightToLeft(r, 3) = rightToLeftTranslation.at<double>(0, r);
+      rightToLeft(r, 3) = rightToLeftTranslationVector.at<double>(0, r);
     }
 
     cv::Matx44d rightExtrinsic = rightToLeft * leftExtrinsic;

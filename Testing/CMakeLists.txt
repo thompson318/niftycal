@@ -102,7 +102,7 @@ add_test(CalibLapMonoRight niftkMonoChessboardCameraCalibrationTest
 add_test(CalibLapStereo niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
-  0.99919 -0.000809931 0.0402285                 # rvec
+  -0.0198931 0.0402461 0.000409826               # rvec
   -4.64005 0.26403 0.297868                      # tvec
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
@@ -171,7 +171,7 @@ add_test(CalibIterStereoSim1 niftkIterativeStereoChessboardCameraCalibrationTest
   14 10                                                 # internal corners
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.txt # 2D points for reference image
   1                                                     # zero distortion (1==true)
-  0.996335 8.27736e-05 -0.0855332 # rvec
+  -3.36426e-05 -0.0856378 -8.14416e-05 # rvec
   5.98069 0.00132401 0.519151 # tvec
   ${DATA_DIR}/Simulation2/Left1.png
   ${DATA_DIR}/Simulation2/Left2.png
@@ -324,7 +324,7 @@ add_test(CalibIterStereoAprilSim niftkIterativeStereoAprilTagsCameraCalibrationT
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
   1 1                                                       # Simulation has proper scale factors
-  0.996357 -2.20494e-05 -0.0852827 # rvec
+  2.77247e-05 -0.0853894 2.02478e-05 # rvec
   5.97596 0.000262982 0.519377 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.png
   ${DATA_DIR}/SimulationAprilTags/Left2.png
@@ -354,7 +354,7 @@ add_test(CalibIterStereoAprilReal1 niftkIterativeStereoAprilTagsCameraCalibratio
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Simulation has proper scale factors
-  0.999437 0.00263026 -0.0334586 # rvec
+  0.00367244 -0.03346 -0.00269221 # rvec
   -2.73359 0.0348689 -0.0495921 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp

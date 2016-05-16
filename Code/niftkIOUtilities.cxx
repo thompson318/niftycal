@@ -411,6 +411,51 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
 
 
 //-----------------------------------------------------------------------------
+void SaveRigidParams(const cv::Matx44d& matrix,
+                     const std::string& fileName
+                    )
+{
+  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+
+  niftk::MatrixToRodrigues(matrix, rvec, tvec);
+  niftk::SaveRigidParams(rvec, tvec, fileName);
+}
+
+
+//-----------------------------------------------------------------------------
+void SaveRigidParams(const cv::Mat& rvec,
+                     const cv::Mat& tvec,
+                     const std::string& fileName
+                    )
+{
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  std::ofstream ofs;
+  ofs.precision(10);
+  ofs.width(10);
+
+  ofs.open (fileName, std::ofstream::out);
+  if (!ofs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for writing.";
+  }
+
+  ofs << rvec.at<double>(0, 0) << " "
+      << rvec.at<double>(0, 1) << " "
+      << rvec.at<double>(0, 2) << " "
+      << tvec.at<double>(0, 0) << " "
+      << tvec.at<double>(0, 1) << " "
+      << tvec.at<double>(0, 2) << std::endl;
+
+  ofs.close();
+}
+
+
+//-----------------------------------------------------------------------------
 void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
                    const cv::Mat& rightToLeftTranslationVector,
                    const std::string& fileName

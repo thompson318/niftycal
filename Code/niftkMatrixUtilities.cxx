@@ -52,6 +52,24 @@ cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector,
 
 
 //-----------------------------------------------------------------------------
+void MatrixToRodrigues(const cv::Matx44d& mat,
+                       cv::Mat& rotationVector1x3,
+                       cv::Mat& translationVector1x3)
+{
+  cv::Mat rotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      rotationMatrix.at<double>(r, c) = mat(r, c);
+    }
+    translationVector1x3.at<double>(0, r) = mat(r, 3);
+  }
+  cv::Rodrigues(rotationMatrix, rotationVector1x3);
+}
+
+
+//-----------------------------------------------------------------------------
 cv::Matx44d AverageMatricesUsingEigenValues(const std::list<cv::Matx44d >& matrices)
 {
   if (matrices.empty())

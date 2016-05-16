@@ -150,8 +150,8 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
 
   cv::Mat essentialMatrix;
   cv::Mat fundamentalMatrix;
-  cv::Mat rightToLeftRotation;
-  cv::Mat rightToleftTranslation;
+  cv::Mat rightToLeftRotationMatrix;
+  cv::Mat rightToleftTranslationVector;
 
   double rms = niftk::IterativeStereoCameraCalibration(
         model,
@@ -169,28 +169,32 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
         distortionRight,
         rvecsRight,
         tvecsRight,
-        rightToLeftRotation,
-        rightToleftTranslation,
+        rightToLeftRotationMatrix,
+        rightToleftTranslationVector,
         essentialMatrix,
         fundamentalMatrix,
         flags
         );
 
-  std::cout << "R1=" << rightToLeftRotation.at<double>(0,0) << std::endl;
-  std::cout << "R2=" << rightToLeftRotation.at<double>(0,1) << std::endl;
-  std::cout << "R3=" << rightToLeftRotation.at<double>(0,2) << std::endl;
-  std::cout << "T1=" << rightToleftTranslation.at<double>(0,0) << std::endl;
-  std::cout << "T2=" << rightToleftTranslation.at<double>(0,1) << std::endl;
-  std::cout << "T3=" << rightToleftTranslation.at<double>(0,2) << std::endl;
+  double tolerance = 0.005;
+
+  cv::Mat rvec;
+  cv::Rodrigues(rightToLeftRotationMatrix, rvec);
+
+  std::cout << "R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "T1=" << rightToleftTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "T2=" << rightToleftTranslationVector.at<double>(1,0) << std::endl;
+  std::cout << "T3=" << rightToleftTranslationVector.at<double>(2,0) << std::endl;
   std::cout << "RMS=" << rms << std::endl;
 
-  double tolerance = 0.005;
-  REQUIRE( fabs(rightToLeftRotation.at<double>(0,0) - eR1) < tolerance );
-  REQUIRE( fabs(rightToLeftRotation.at<double>(0,1) - eR2) < tolerance );
-  REQUIRE( fabs(rightToLeftRotation.at<double>(0,2) - eR3) < tolerance );
-  REQUIRE( fabs(rightToleftTranslation.at<double>(0,0) - eT1) < tolerance );
-  REQUIRE( fabs(rightToleftTranslation.at<double>(0,1) - eT2) < tolerance );
-  REQUIRE( fabs(rightToleftTranslation.at<double>(0,2) - eT3) < tolerance );
+  REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < tolerance );
+  REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < tolerance );
+  REQUIRE( fabs(rvec.at<double>(0,2) - eR3) < tolerance );
+  REQUIRE( fabs(rightToleftTranslationVector.at<double>(0,0) - eT1) < tolerance );
+  REQUIRE( fabs(rightToleftTranslationVector.at<double>(1,0) - eT2) < tolerance );
+  REQUIRE( fabs(rightToleftTranslationVector.at<double>(2,0) - eT3) < tolerance );
 
 /*
   cv::Mat imageLeft = cv::imread(niftk::argv[13]);
