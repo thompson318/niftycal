@@ -66,6 +66,16 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
     const std::list<cv::Matx44d >& eyeMatrices
     );
 
+/**
+* \brief Given a hand-eye matrix, and tracking matrices, gives an average
+* estimate of the modelToWorld transform.
+*/
+NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
+    const cv::Matx44d&             handEyeMatrix,
+    const std::list<cv::Matx44d >& handMatrices,
+    const std::list<cv::Matx44d >& eyeMatrices
+    );
+
 } // end namespace
 
 #endif
