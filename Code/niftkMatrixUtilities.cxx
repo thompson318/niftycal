@@ -151,10 +151,12 @@ cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
   {
     niftkNiftyCalThrow() << "Empty hand matrices provided.";
   }
+
   if (eyeMatrices.empty())
   {
     niftkNiftyCalThrow() << "Empty eye matrices provided.";
   }
+
   if (handMatrices.size() != eyeMatrices.size())
   {
     niftkNiftyCalThrow() << "Mismatching number of hand(" << handMatrices.size()
@@ -173,18 +175,66 @@ cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
        ++eyeIter
        )
   {
-    cv::Matx44d trackerMatrix = *handIter;
-    cv::Matx44d handToTracker = trackerMatrix.inv();
+    cv::Matx44d handToTracker = *handIter;
 
     cv::Matx44d trackerToModel = modelToTrackerTransform.inv();
     cv::Matx44d modelToEye = *eyeIter;
 
-    cv::Matx44d sampleHandEye = modelToEye * trackerToModel * handToTracker;
-    handEyes.push_back(sampleHandEye);
+    cv::Matx44d handEye = modelToEye * trackerToModel * handToTracker;
+    handEyes.push_back(handEye);
   }
 
   finalHandEye = AverageMatricesUsingEigenValues(handEyes);
   return finalHandEye;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Matx44d CalculateAverageModelToWorld(
+    const cv::Matx44d&             handEyeMatrix,
+    const std::list<cv::Matx44d >& handMatrices,
+    const std::list<cv::Matx44d >& eyeMatrices
+    )
+{
+  if (handMatrices.empty())
+  {
+    niftkNiftyCalThrow() << "Empty hand matrices provided.";
+  }
+
+  if (eyeMatrices.empty())
+  {
+    niftkNiftyCalThrow() << "Empty eye matrices provided.";
+  }
+
+  if (handMatrices.size() != eyeMatrices.size())
+  {
+    niftkNiftyCalThrow() << "Mismatching number of hand(" << handMatrices.size()
+                         << ") and eye(" << eyeMatrices.size() << ") matrices provided.";
+  }
+
+  cv::Matx44d finalModelToWorld;
+  std::list<cv::Matx44d > modelToWorlds;
+  std::list<cv::Matx44d >::const_iterator handIter;
+  std::list<cv::Matx44d >::const_iterator eyeIter;
+
+  for (handIter = handMatrices.begin(),
+       eyeIter = eyeMatrices.begin();
+       handIter != handMatrices.end() && eyeIter != eyeMatrices.end();
+       ++handIter,
+       ++eyeIter
+       )
+  {
+    cv::Matx44d handToTracker = *handIter;
+
+    cv::Matx44d eyeToHand = handEyeMatrix.inv();
+    cv::Matx44d modelToEye = *eyeIter;
+
+    cv::Matx44d modelToWorld = handToTracker * eyeToHand * modelToEye;
+    modelToWorlds.push_back(modelToWorld);
+  }
+
+  finalModelToWorld = AverageMatricesUsingEigenValues(modelToWorlds);
+  return finalModelToWorld;
 }
 
 } // end namespace
