@@ -237,4 +237,33 @@ cv::Matx44d CalculateAverageModelToWorld(
   return finalModelToWorld;
 }
 
+
+//-----------------------------------------------------------------------------
+cv::Matx44d CalculateHandEyeUsingTsaisMethod(
+    const std::list<cv::Matx44d >& handMatrices,
+    const std::list<cv::Matx44d >& eyeMatrices
+    )
+{
+  if (handMatrices.empty())
+  {
+    niftkNiftyCalThrow() << "Empty hand matrices provided.";
+  }
+
+  if (eyeMatrices.empty())
+  {
+    niftkNiftyCalThrow() << "Empty eye matrices provided.";
+  }
+
+  if (handMatrices.size() != eyeMatrices.size())
+  {
+    niftkNiftyCalThrow() << "Mismatching number of hand(" << handMatrices.size()
+                         << ") and eye(" << eyeMatrices.size() << ") matrices provided.";
+  }
+
+  niftkNiftyCalThrow() << "Not implemented yet.";
+
+  cv::Matx44d handEye = cv::Matx44d::eye();
+  return handEye;
+}
+
 } // end namespace
