@@ -105,10 +105,10 @@ include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
 ######################################################################
 # Add Mandatory Requirements
 ######################################################################
-set(ALL_LIBRARIES niftycal)
+set(ALL_THIRD_PARTY_LIBRARIES)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
+list(APPEND ALL_THIRD_PARTY_LIBRARIES ${OpenCV_LIBS})
 
 ######################################################################
 # Add Optional Requirements
@@ -123,9 +123,17 @@ if(Eigen_FOUND)
   find_package(AprilTags)
   if(AprilTags_FOUND)
     include_directories(${AprilTags_INCLUDE_DIR})
-    list(APPEND ALL_LIBRARIES ${AprilTags_LIBRARIES})
+    list(APPEND ALL_THIRD_PARTY_LIBRARIES ${AprilTags_LIBRARIES})
   endif()
 endif()
+
+find_package(ITK COMPONENTS ITKOptimizers)
+if(ITK_FOUND)
+  include_directories(${ITK_INCLUDE_DIRS})
+  list(APPEND ALL_THIRD_PARTY_LIBRARIES ${ITK_LIBRARIES})
+endif()
+
+set(ALL_LIBRARIES niftycal ${ALL_THIRD_PARTY_LIBRARIES})
 
 ######################################################################
 # Provide support for manually running Doxygen in build folder.

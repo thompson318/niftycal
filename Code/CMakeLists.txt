@@ -36,6 +36,11 @@ if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND NIFTYCAL_SRCS niftkAprilTagsPointDetector.cxx)
 endif()
 
+if(ITK_FOUND)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearHandEyeOptimiser.cxx)
+endif()
+
 add_library(niftycal ${NIFTYCAL_SRCS})
 
 if(BUILD_SHARED_LIBS)
@@ -44,11 +49,9 @@ if(BUILD_SHARED_LIBS)
   endif(WIN32)
 endif(BUILD_SHARED_LIBS)
 
-target_link_libraries(niftycal
-  PRIVATE ${OpenCV_LIBS} ${AprilTags_LIBRARIES}
-)
+target_link_libraries(niftycal PRIVATE ${ALL_THIRD_PARTY_LIBRARIES})
 
 add_executable(niftkMonoCalibrationFromPoints niftkMonoCalibrationFromPoints.cxx)
-target_link_libraries(niftkMonoCalibrationFromPoints niftycal ${OpenCV_LIBS} ${AprilTags_LIBRARIES})
+target_link_libraries(niftkMonoCalibrationFromPoints niftycal ${ALL_THIRD_PARTY_LIBRARIES})
 add_executable(niftkStereoCalibrationFromPoints niftkStereoCalibrationFromPoints.cxx)
-target_link_libraries(niftkStereoCalibrationFromPoints niftycal ${OpenCV_LIBS} ${AprilTags_LIBRARIES})
+target_link_libraries(niftkStereoCalibrationFromPoints niftycal ${ALL_THIRD_PARTY_LIBRARIES})
