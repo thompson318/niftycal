@@ -34,7 +34,7 @@ NonLinearHandEyeCostFunction::~NonLinearHandEyeCostFunction()
 //-----------------------------------------------------------------------------
 unsigned int NonLinearHandEyeCostFunction::GetNumberOfValues(void) const
 {
-
+  return 0;
 }
 
 
@@ -56,6 +56,8 @@ void NonLinearHandEyeCostFunction::GetDerivative(const ParametersType& parameter
 NonLinearHandEyeCostFunction::MeasureType
 NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
 {
+  MeasureType result;
+  return result;
 }
 
 

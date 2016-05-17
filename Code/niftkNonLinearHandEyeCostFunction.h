@@ -47,13 +47,13 @@ public:
   typedef Superclass::DerivativeType            DerivativeType;
   typedef Superclass::MeasureType               MeasureType;
 
-  virtual unsigned int GetNumberOfValues(void) const override;
+  virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
 
-  virtual unsigned int GetNumberOfParameters() const override;
+  virtual unsigned int GetNumberOfParameters() const ITK_OVERRIDE;
 
-  virtual void GetDerivative( const ParametersType & parameters, DerivativeType  & derivative ) const override;
+  virtual void GetDerivative( const ParametersType & parameters, DerivativeType  & derivative ) const ITK_OVERRIDE;
 
-  virtual MeasureType GetValue( const ParametersType & parameters ) const override;
+  virtual MeasureType GetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
 
