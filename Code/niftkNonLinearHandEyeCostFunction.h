@@ -27,9 +27,11 @@ namespace niftk
 *
 * Cost function for non-linear optimisation as per Malti 2013
 * paper "Hand-eye and radial distortion calibration for rigid endoscopes",
-* http://dx.doi.org/10.1002/rcs.1478".
+* http://dx.doi.org/10.1002/rcs.1478.
 *
 * Deliberately not exported for external libraries.
+*
+* \see niftk::NonLinearHandEyeOptimiser
 */
 class NonLinearHandEyeCostFunction : public itk::MultipleValuedCostFunction
 {

@@ -28,9 +28,9 @@ namespace niftk
 *
 * Does non-linear (Levenberg-Marquart) optimisation as per Malti 2013
 * paper "Hand-eye and radial distortion calibration for rigid endoscopes",
-* http://dx.doi.org/10.1002/rcs.1478".
+* http://dx.doi.org/10.1002/rcs.1478.
 *
-* \see niftk::NonLinearHandEyeOptimizer
+* \see niftk::NonLinearHandEyeCostFunction
 */
 class NIFTYCAL_WINEXPORT NonLinearHandEyeOptimiser : public itk::Object
 {
