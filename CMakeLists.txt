@@ -146,6 +146,7 @@ configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/doxygen.config.in ${CMAKE_B
 ######################################################################
 include_directories(${CMAKE_SOURCE_DIR}/Code/)
 add_subdirectory(Code)
+add_subdirectory(Documentation)
 if(BUILD_TESTING)
   set(TEMP_DIR ${CMAKE_BINARY_DIR}/Testing/Temporary)
   include_directories(${CMAKE_SOURCE_DIR}/Testing/)
