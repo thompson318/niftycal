@@ -18,14 +18,14 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearHandEyeOptimizer::NonLinearHandEyeOptimizer()
+NonLinearHandEyeOptimiser::NonLinearHandEyeOptimiser()
 {
 
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearHandEyeOptimizer::~NonLinearHandEyeOptimizer()
+NonLinearHandEyeOptimiser::~NonLinearHandEyeOptimiser()
 {
 
 }

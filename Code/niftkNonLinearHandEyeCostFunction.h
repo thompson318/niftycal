@@ -26,8 +26,8 @@ namespace niftk
 * as per Malti 2013 paper.
 *
 * Cost function for non-linear optimisation as per Malti 2013
-* paper <a href="http://dx.doi.org/10.1002/rcs.1478">
-* Hand–eye and radial distortion calibration for rigid endoscopes</a>.
+* paper "Hand-eye and radial distortion calibration for rigid endoscopes",
+* http://dx.doi.org/10.1002/rcs.1478".
 *
 * Deliberately not exported for external libraries.
 */

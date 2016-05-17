@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearHandEyeOptimizer_h
-#define niftkNonLinearHandEyeOptimizer_h
+#ifndef niftkNonLinearHandEyeOptimiser_h
+#define niftkNonLinearHandEyeOptimiser_h
 
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
@@ -27,28 +27,28 @@ namespace niftk
 * as per Malti 2013 paper.
 *
 * Does non-linear (Levenberg-Marquart) optimisation as per Malti 2013
-* paper <a href="http://dx.doi.org/10.1002/rcs.1478">
-* Hand–eye and radial distortion calibration for rigid endoscopes</a>.
+* paper "Hand-eye and radial distortion calibration for rigid endoscopes",
+* http://dx.doi.org/10.1002/rcs.1478".
 *
 * \see niftk::NonLinearHandEyeOptimizer
 */
-class NIFTYCAL_WINEXPORT NonLinearHandEyeOptimizer : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinearHandEyeOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearHandEyeOptimizer Self;
+  typedef  NonLinearHandEyeOptimiser Self;
   typedef  itk::Command              Superclass;
   typedef  itk::SmartPointer<Self>   Pointer;
   itkNewMacro(Self);
 
 protected:
 
-  NonLinearHandEyeOptimizer();
-  virtual ~NonLinearHandEyeOptimizer();
+  NonLinearHandEyeOptimiser();
+  virtual ~NonLinearHandEyeOptimiser();
 
-  NonLinearHandEyeOptimizer(const NonLinearHandEyeOptimizer&); // Purposefully not implemented.
-  NonLinearHandEyeOptimizer& operator=(const NonLinearHandEyeOptimizer&); // Purposefully not implemented.
+  NonLinearHandEyeOptimiser(const NonLinearHandEyeOptimiser&); // Purposefully not implemented.
+  NonLinearHandEyeOptimiser& operator=(const NonLinearHandEyeOptimiser&); // Purposefully not implemented.
 
 private:
 
@@ -57,4 +57,3 @@ private:
 } // end namespace
 
 #endif
-
