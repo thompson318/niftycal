@@ -70,6 +70,26 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
 
 
 //-----------------------------------------------------------------------------
+void MatrixToThetaAndPr(const cv::Matx44d& mat,
+                         cv::Matx31d &axis,
+                         double& angle
+                         )
+{
+  cv::Mat rotationVector;
+  cv::Mat translationVector;
+  niftk::MatrixToRodrigues(mat, rotationVector, translationVector);
+  double norm = cv::norm(rotationVector);
+  rotationVector /= norm;                // gives unit vector.
+  rotationVector *= (2.0*sin(norm/2.0)); // see eqn. (9) in Tsai's 1989 hand-eye paper.
+
+  angle = norm;
+  axis(0, 0) = rotationVector.at<double>(0, 0);
+  axis(1, 0) = rotationVector.at<double>(0, 1);
+  axis(2, 0) = rotationVector.at<double>(0, 2);
+}
+
+
+//-----------------------------------------------------------------------------
 cv::Matx44d AverageMatricesUsingEigenValues(const std::list<cv::Matx44d >& matrices)
 {
   if (matrices.empty())

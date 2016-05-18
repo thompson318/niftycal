@@ -38,6 +38,15 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& translationVector1x3);
 
 /**
+* \brief Returns theta and P_r from equation 9 in Tsai's 1989 hand-eye paper.
+*/
+NIFTYCAL_WINEXPORT void MatrixToThetaAndPr(const cv::Matx44d& mat,
+                                           cv::Matx31d &axis,
+                                           double& angle
+                                           );
+
+
+/**
 * \brief Averages a list of rigid body matrices.
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
