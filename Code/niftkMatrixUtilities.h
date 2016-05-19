@@ -37,7 +37,8 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& rotationVector1x3,
                                           cv::Mat& translationVector1x3);
 
-NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>&);
+NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices);
+
 
 /**
 * \brief Returns theta and P_r from equation 9 in Tsai's 1989 hand-eye paper.
@@ -46,6 +47,14 @@ NIFTYCAL_WINEXPORT void MatrixToThetaAndPr(const cv::Matx44d& mat,
                                            cv::Matx31d &axis,
                                            double& angle
                                            );
+
+
+/**
+* \brief Returns a vector of matrices indexes, to maximumise interstation angle,
+* as shown in Tsai's 1989 hand-eye paper, Figure 6.
+* \param matrices must be an odd number of matrices.
+*/
+NIFTYCAL_WINEXPORT std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Matx44d>& matrices);
 
 
 /**

@@ -14,6 +14,7 @@
 
 #include "niftkIOUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include <set>
 
 namespace niftk {
 
@@ -87,9 +88,9 @@ std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& list)
 
 //-----------------------------------------------------------------------------
 void MatrixToThetaAndPr(const cv::Matx44d& mat,
-                         cv::Matx31d &axis,
-                         double& angle
-                         )
+                        cv::Matx31d &axis,
+                        double& angle
+                       )
 {
   cv::Mat rotationVector;
   cv::Mat translationVector;
@@ -102,6 +103,55 @@ void MatrixToThetaAndPr(const cv::Matx44d& mat,
   axis(0, 0) = rotationVector.at<double>(0, 0);
   axis(1, 0) = rotationVector.at<double>(0, 1);
   axis(2, 0) = rotationVector.at<double>(0, 2);
+}
+
+
+//-----------------------------------------------------------------------------
+std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Matx44d>& matrices)
+{
+  if (matrices.size() % 2 != 1)
+  {
+    niftkNiftyCalThrow() << "Must be an odd number of entries.";
+  }
+
+  std::vector<unsigned int> result;
+  std::set<unsigned int> alreadyChosen;
+
+  result.push_back(0);
+
+  if (matrices.size() == 1)
+  {
+    return result;
+  }
+
+
+  double angle = 0;
+  double maximumAngle = 0;
+  unsigned int maximumAngleIndex = 0;
+  cv::Matx31d notNeeded;
+
+  alreadyChosen.insert(0);
+  for (unsigned int i = 0; i < matrices.size(); i++)
+  {
+    maximumAngle = 0;
+    for (unsigned int j = 1; j < matrices.size(); j++)
+    {
+      if (alreadyChosen.find(j) == alreadyChosen.end())
+      {
+        cv::Matx44d movementMatrix = matrices[j] * matrices[i].inv();
+        niftk::MatrixToThetaAndPr(movementMatrix, notNeeded, angle);
+        if (angle > maximumAngle)
+        {
+          maximumAngleIndex = j;
+          maximumAngle = angle;
+        }
+      }
+    }
+    result.push_back(maximumAngleIndex);
+    alreadyChosen.insert(maximumAngleIndex);
+  }
+
+  return result;
 }
 
 
@@ -280,14 +330,14 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& eyeMatrices
     )
 {
-  if (handMatrices.empty())
+  if (handMatrices.size() < 3)
   {
-    niftkNiftyCalThrow() << "Empty hand matrices provided.";
+    niftkNiftyCalThrow() << "Not enough hand matrices provided.";
   }
 
-  if (eyeMatrices.empty())
+  if (eyeMatrices.size() < 3)
   {
-    niftkNiftyCalThrow() << "Empty eye matrices provided.";
+    niftkNiftyCalThrow() << "Not enough eye matrices provided.";
   }
 
   if (handMatrices.size() != eyeMatrices.size())
