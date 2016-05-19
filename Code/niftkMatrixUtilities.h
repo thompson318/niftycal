@@ -54,6 +54,17 @@ NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<c
 
 
 /**
+* \brief Given a hand-eye matrix, and tracking matrices, gives an average
+* estimate of the modelToWorld transform.
+*/
+NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
+    const cv::Matx44d&             handEyeMatrix,
+    const std::list<cv::Matx44d >& handMatrices,
+    const std::list<cv::Matx44d >& eyeMatrices
+    );
+
+
+/**
 * \brief Calculates Hand-Eye by matrix multiplication.
 *
 * Rather than have a tracked calibration object, we assume here that
@@ -69,8 +80,8 @@ NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<c
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
     const cv::Matx44d&             modelToTrackerTransform,
-    const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices
     );
 
 
@@ -85,22 +96,33 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 * \return cv::Matx44d hand-eye matrix
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
-    const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices,
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
     double& residualRotation,
     double& residualTranslation
     );
 
 
 /**
-* \brief Given a hand-eye matrix, and tracking matrices, gives an average
-* estimate of the modelToWorld transform.
+* \brief Calculates Hand-Eye by <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
+*
+* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
+* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
+* \param initialHandEye you need a good starting estimate
+* \param initialModelToWorld you need a good starting estimate
+* \return cv::Matx44d hand-eye matrix
 */
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
-    const cv::Matx44d&             handEyeMatrix,
-    const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices
+NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingMaltisMethod(
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
+    const cv::Matx44d& initialHandEye,
+    const cv::Matx44d& initialModelToWorld,
+    cv::Mat& intrinsic,
+    cv::Mat& distortion,
+    double& residualProjectionError
     );
+
+
 
 } // end namespace
 
