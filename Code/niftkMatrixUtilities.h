@@ -37,6 +37,8 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& rotationVector1x3,
                                           cv::Mat& translationVector1x3);
 
+NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>&);
+
 /**
 * \brief Returns theta and P_r from equation 9 in Tsai's 1989 hand-eye paper.
 */

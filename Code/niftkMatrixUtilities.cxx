@@ -70,6 +70,22 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
 
 
 //-----------------------------------------------------------------------------
+std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& list)
+{
+  std::vector<cv::Matx44d> result;
+  std::list<cv::Matx44d>::const_iterator iter;
+  for (iter = list.begin();
+       iter != list.end();
+       ++iter
+       )
+  {
+    result.push_back(*iter);
+  }
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
 void MatrixToThetaAndPr(const cv::Matx44d& mat,
                          cv::Matx31d &axis,
                          double& angle
