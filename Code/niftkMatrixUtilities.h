@@ -78,6 +78,10 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
 * in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
+*
+* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
+* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
+* \return cv::Matx44d hand-eye matrix
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& handMatrices,
