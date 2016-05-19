@@ -90,6 +90,9 @@ std::vector<cv::Matx44d> MatrixListToVector(
 
 
 //-----------------------------------------------------------------------------
+/**
+* \brief Returns theta and P_r from equation 9 in Tsai's 1989 hand-eye paper.
+*/
 void MatrixToThetaAndPr(const cv::Matx44d& mat,
                         cv::Matx31d &axis,
                         double& angle
@@ -110,6 +113,11 @@ void MatrixToThetaAndPr(const cv::Matx44d& mat,
 
 
 //-----------------------------------------------------------------------------
+/**
+* \brief Returns a vector of matrices indexes, to maximumise interstation angle,
+* as shown in Tsai's 1989 hand-eye paper, Figure 6.
+* \param matrices must be an odd number of matrices.
+*/
 std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Matx44d>& matrices)
 {
   if (matrices.size() % 2 != 1)
