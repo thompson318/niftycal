@@ -38,7 +38,7 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& translationVector1x3);
 
 /**
-* \brief Converts a list to a vector, enabling you to set a maximum size.
+* \brief Converts a list to a vector, enabling you to set a limit to how many you convert.
 */
 NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices, const unsigned int& maximumSize);
 

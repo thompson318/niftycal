@@ -98,8 +98,8 @@ void MatrixToThetaAndPr(const cv::Matx44d& mat,
                         double& angle
                        )
 {
-  cv::Mat rotationVector;
-  cv::Mat translationVector;
+  cv::Mat rotationVector = cvCreateMat ( 1, 3, CV_64FC1 );
+  cv::Mat translationVector = cvCreateMat ( 1, 3, CV_64FC1 );
   niftk::MatrixToRodrigues(mat, rotationVector, translationVector);
   double norm = cv::norm(rotationVector);
   rotationVector /= norm;                // gives unit vector.
@@ -141,15 +141,18 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
   unsigned int maximumAngleIndex = 0;
   cv::Matx31d notNeeded;
 
+  unsigned int previouslyChosenIndex = 0;
   alreadyChosen.insert(0);
-  for (unsigned int i = 0; i < matrices.size(); i++)
+  std::cout << "Inserted:0" << std::endl;
+
+  while(alreadyChosen.size() < matrices.size())
   {
     maximumAngle = 0;
-    for (unsigned int j = 1; j < matrices.size(); j++)
+    for (unsigned int j = 0; j < matrices.size(); j++)
     {
       if (alreadyChosen.find(j) == alreadyChosen.end())
       {
-        cv::Matx44d movementMatrix = matrices[j] * matrices[i].inv();
+        cv::Matx44d movementMatrix = matrices[j] * matrices[previouslyChosenIndex].inv();
         niftk::MatrixToThetaAndPr(movementMatrix, notNeeded, angle);
         if (angle > maximumAngle)
         {
@@ -160,6 +163,7 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
     }
     result.push_back(maximumAngleIndex);
     alreadyChosen.insert(maximumAngleIndex);
+    previouslyChosenIndex = maximumAngleIndex;
     std::cout << "Inserted:" << maximumAngleIndex << std::endl;
   }
 
@@ -445,7 +449,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   cv::mulTransposed (pcg, pcgMulTransposed, false);
 
   // Eqn. 10, giving us the rotation we are looking for.
-  double normPcgSquared = cv::norm(pcg);
+  double normPcgSquared = cv::norm(pcg)*cv::norm(pcg);
   double alpha = sqrt(4 - normPcgSquared);
   cv::Mat rcg = ( 1 - (normPcgSquared/2.0) ) * id3
       + 0.5 * ( pcgMulTransposed + alpha*pcgCrossProduct);
@@ -503,7 +507,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     eyeHand(r, 3) = tcg.at<double>(r, 0);
   }
 
-  return eyeHand.inv();
+  return eyeHand.inv(cv::DECOMP_SVD);
 }
 
 } // end namespace
