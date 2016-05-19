@@ -137,17 +137,15 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 
 
   double angle = 0;
-  double maximumAngle = 0;
   unsigned int maximumAngleIndex = 0;
   cv::Matx31d notNeeded;
 
   unsigned int previouslyChosenIndex = 0;
   alreadyChosen.insert(0);
-  std::cout << "Inserted:0" << std::endl;
 
   while(alreadyChosen.size() < matrices.size())
   {
-    maximumAngle = 0;
+    double maximumAngle = 0;
     for (unsigned int j = 0; j < matrices.size(); j++)
     {
       if (alreadyChosen.find(j) == alreadyChosen.end())
@@ -164,7 +162,6 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
     result.push_back(maximumAngleIndex);
     alreadyChosen.insert(maximumAngleIndex);
     previouslyChosenIndex = maximumAngleIndex;
-    std::cout << "Inserted:" << maximumAngleIndex << std::endl;
   }
 
   return result;
