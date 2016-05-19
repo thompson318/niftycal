@@ -37,7 +37,7 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& rotationVector1x3,
                                           cv::Mat& translationVector1x3);
 
-NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices);
+NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices, const unsigned int& maximumSize);
 
 
 /**
@@ -95,7 +95,9 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices
+    const std::list<cv::Matx44d >& eyeMatrices,
+    double& residualRotation,
+    double& residualTranslation
     );
 
 
