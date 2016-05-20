@@ -25,14 +25,12 @@ NonLinearHandEyeCostFunction::NonLinearHandEyeCostFunction()
 , m_EyeMatrices(nullptr)
 , m_NumberOfParameters(0)
 {
-
 }
 
 
 //-----------------------------------------------------------------------------
 NonLinearHandEyeCostFunction::~NonLinearHandEyeCostFunction()
 {
-
 }
 
 
@@ -81,7 +79,7 @@ unsigned int NonLinearHandEyeCostFunction::GetNumberOfValues(void) const
   {
     numberOfValues += (*iter).size();
   }
-  return numberOfValues;
+  return numberOfValues * 2; // For each point, we have deltaX and deltaY.
 }
 
 
@@ -100,9 +98,20 @@ void NonLinearHandEyeCostFunction::GetDerivative(const ParametersType& parameter
 
 
 //-----------------------------------------------------------------------------
-double NonLinearHandEyeCostFunction::GetRMS() const
+double NonLinearHandEyeCostFunction::GetRMS(const MeasureType& values) const
 {
-  return 0;
+  double rms = 0;
+  if (values.GetSize() == 0)
+  {
+    return rms;
+  }
+
+  for (unsigned int i = 0; i < values.GetSize(); i++)
+  {
+    rms += (values[i] * values[i]);
+  }
+  rms /= static_cast<double>(values.GetSize());
+  return sqrt(rms);
 }
 
 
@@ -111,6 +120,8 @@ NonLinearHandEyeCostFunction::MeasureType
 NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
 {
   MeasureType result;
+  result.SetSize(this->GetNumberOfValues());
+  result.Fill(0);
   return result;
 }
 

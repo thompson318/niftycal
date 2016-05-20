@@ -120,6 +120,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   {
     initialParameters[16+c] = distortion.at<double>(0, c);
   }
+  m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
   // Setup optimiser.
   itk::LevenbergMarquardtOptimizer::Pointer optimiser = itk::LevenbergMarquardtOptimizer::New();
@@ -131,7 +132,8 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->SetEpsilonFunction(0.000000005);
   optimiser->SetValueTolerance(0.000000005);
 
-  double initialRMS = m_CostFunction->GetRMS();
+  niftk::NonLinearHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  double initialRMS = m_CostFunction->GetRMS(initialValues);
   std::cout << "NonLinearHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
 
   // Do optimisation.
@@ -162,7 +164,8 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 
-  double finalRMS = m_CostFunction->GetRMS();
+  niftk::NonLinearHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  double finalRMS = m_CostFunction->GetRMS(finalValues);
   std::cout << "NonLinearHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;

@@ -59,7 +59,7 @@ public:
   virtual unsigned int GetNumberOfParameters() const ITK_OVERRIDE;
   virtual void GetDerivative( const ParametersType & parameters, DerivativeType  & derivative ) const ITK_OVERRIDE;
   virtual MeasureType GetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
-  double GetRMS() const;
+  double GetRMS(const MeasureType& values) const;
 
 protected:
 
@@ -70,6 +70,7 @@ protected:
   NonLinearHandEyeCostFunction& operator=(const NonLinearHandEyeCostFunction&); // Purposefully not implemented.
 
 private:
+
   Model3D                *m_Model;
   std::list<PointSet>    *m_Points;
   std::list<cv::Matx44d> *m_HandMatrices;
