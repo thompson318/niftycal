@@ -18,6 +18,8 @@
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+#include <niftkNiftyCalTypes.h>
+#include <niftkNonLinearHandEyeCostFunction.h>
 
 namespace niftk
 {
@@ -42,6 +44,16 @@ public:
   typedef  itk::SmartPointer<Self>   Pointer;
   itkNewMacro(Self);
 
+  void SetModel(Model3D* const model);
+  void SetPoints(std::list<PointSet>* const points);
+  void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
+  void SetEyeMatrices(std::list<cv::Matx44d>* const matrices);
+  double Optimise(cv::Matx44d& modelToWorld,
+                  cv::Matx44d& initialHandEye,
+                  cv::Mat& intrinsic,
+                  cv::Mat& distortion
+                 );
+
 protected:
 
   NonLinearHandEyeOptimiser();
@@ -51,7 +63,7 @@ protected:
   NonLinearHandEyeOptimiser& operator=(const NonLinearHandEyeOptimiser&); // Purposefully not implemented.
 
 private:
-
+  niftk::NonLinearHandEyeCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

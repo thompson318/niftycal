@@ -507,20 +507,4 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   return eyeHand.inv(cv::DECOMP_SVD);
 }
 
-
-//-----------------------------------------------------------------------------
-cv::Matx44d CalculateHandEyeUsingMaltisMethod(
-    const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
-    const cv::Matx44d& initialHandEye,
-    const cv::Matx44d& initialModelToWorld,
-    cv::Mat& intrinsic,
-    cv::Mat& distortion,
-    double& residualProjectionError
-    )
-{
-  cv::Matx44d handEye = cv::Matx44d::eye();
-  return handEye;
-}
-
 } // end namespace

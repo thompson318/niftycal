@@ -19,6 +19,10 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearHandEyeCostFunction::NonLinearHandEyeCostFunction()
+: m_Model(nullptr)
+, m_Points(nullptr)
+, m_HandMatrices(nullptr)
+, m_EyeMatrices(nullptr)
 {
 
 }
@@ -28,6 +32,38 @@ NonLinearHandEyeCostFunction::NonLinearHandEyeCostFunction()
 NonLinearHandEyeCostFunction::~NonLinearHandEyeCostFunction()
 {
 
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearHandEyeCostFunction::SetModel(Model3D* const model)
+{
+  m_Model = model;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearHandEyeCostFunction::SetPoints(std::list<PointSet>* const points)
+{
+  m_Points = points;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearHandEyeCostFunction::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+{
+  m_HandMatrices = matrices;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearHandEyeCostFunction::SetEyeMatrices(std::list<cv::Matx44d>* const matrices)
+{
+  m_EyeMatrices = matrices;
+  this->Modified();
 }
 
 

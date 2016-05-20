@@ -102,28 +102,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     double& residualTranslation
     );
 
-
-/**
-* \brief Calculates Hand-Eye by <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
-*
-* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
-* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
-* \param initialHandEye you need a good starting estimate
-* \param initialModelToWorld you need a good starting estimate
-* \return cv::Matx44d hand-eye matrix
-*/
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingMaltisMethod(
-    const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
-    const cv::Matx44d& initialHandEye,
-    const cv::Matx44d& initialModelToWorld,
-    cv::Mat& intrinsic,
-    cv::Mat& distortion,
-    double& residualProjectionError
-    );
-
-
-
 } // end namespace
 
 #endif
