@@ -169,6 +169,8 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
     }
   }
 
+  double reprojectionRMS = 0;
+
 #ifdef NIFTYCAL_WITH_ITK
 
   cv::Matx44d modelToWorld = niftk::CalculateAverageModelToWorld(handEye, trackingMatrices, cameraMatrices);
@@ -181,7 +183,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::cerr << "Doing non-linear optimisation." << std::endl;
 
-  double reprojectionRMS = optimiser->Optimise(
+  reprojectionRMS = optimiser->Optimise(
         modelToWorld,
         handEye,
         intrinsic,
@@ -189,7 +191,8 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         );
 
   std::cerr << "Doing non-linear optimisation - DONE, rms=" << reprojectionRMS << std::endl;
-  REQUIRE(reprojectionRMS < 0.5);
 
 #endif
+
+  REQUIRE(reprojectionRMS < 0.25);
 }
