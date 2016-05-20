@@ -25,6 +25,10 @@
 #include <iostream>
 #include <list>
 
+#ifdef NIFTYCAL_WITH_ITK
+#include <niftkNonLinearHandEyeOptimiser.h>
+#endif
+
 TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   int expectedMinimumNumberOfArguments =  11;
@@ -164,4 +168,28 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
       REQUIRE(fabs(expectedEyeHand(r, c) - eyeHand(r, c)) < 0.001);
     }
   }
+
+#ifdef NIFTYCAL_WITH_ITK
+
+  cv::Matx44d modelToWorld = niftk::CalculateAverageModelToWorld(handEye, trackingMatrices, cameraMatrices);
+
+  niftk::NonLinearHandEyeOptimiser::Pointer optimiser = niftk::NonLinearHandEyeOptimiser::New();
+  optimiser->SetModel(&model);
+  optimiser->SetPoints(&listOfPoints);
+  optimiser->SetHandMatrices(&trackingMatrices);
+  optimiser->SetEyeMatrices(&cameraMatrices);
+
+  std::cerr << "Doing non-linear optimisation." << std::endl;
+
+  double reprojectionRMS = optimiser->Optimise(
+        modelToWorld,
+        handEye,
+        intrinsic,
+        distortion
+        );
+
+  std::cerr << "Doing non-linear optimisation - DONE, rms=" << reprojectionRMS << std::endl;
+  REQUIRE(reprojectionRMS < 0.5);
+
+#endif
 }

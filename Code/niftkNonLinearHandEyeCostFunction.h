@@ -53,11 +53,13 @@ public:
   void SetPoints(std::list<PointSet>* const points);
   void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
   void SetEyeMatrices(std::list<cv::Matx44d>* const matrices);
+  itkSetMacro(NumberOfParameters, unsigned int);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
   virtual unsigned int GetNumberOfParameters() const ITK_OVERRIDE;
   virtual void GetDerivative( const ParametersType & parameters, DerivativeType  & derivative ) const ITK_OVERRIDE;
   virtual MeasureType GetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
+  double GetRMS() const;
 
 protected:
 
@@ -72,7 +74,7 @@ private:
   std::list<PointSet>    *m_Points;
   std::list<cv::Matx44d> *m_HandMatrices;
   std::list<cv::Matx44d> *m_EyeMatrices;
-
+  unsigned int            m_NumberOfParameters;
 };
 
 } // end namespace

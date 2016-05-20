@@ -131,6 +131,7 @@ find_package(ITK COMPONENTS ITKOptimizers)
 if(ITK_FOUND)
   include_directories(${ITK_INCLUDE_DIRS})
   list(APPEND ALL_THIRD_PARTY_LIBRARIES ${ITK_LIBRARIES})
+  add_definitions(-DNIFTYCAL_WITH_ITK)
 endif()
 
 set(ALL_LIBRARIES niftycal ${ALL_THIRD_PARTY_LIBRARIES})
