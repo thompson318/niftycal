@@ -13,6 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearHandEyeCostFunction.h"
+#include "niftkNiftyCalExceptionMacro.h"
 
 namespace niftk
 {
@@ -93,7 +94,7 @@ unsigned int NonLinearHandEyeCostFunction::GetNumberOfParameters() const
 //-----------------------------------------------------------------------------
 void NonLinearHandEyeCostFunction::GetDerivative(const ParametersType& parameters, DerivativeType& derivative ) const
 {
-
+  niftkNiftyCalThrow() << "Not implemented yet, use vnl derivative.";
 }
 
 
