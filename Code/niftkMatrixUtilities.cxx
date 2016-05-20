@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkIOUtilities.h"
+#include "niftkMatrixUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <set>
 
