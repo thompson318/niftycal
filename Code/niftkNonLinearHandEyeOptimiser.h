@@ -47,7 +47,6 @@ public:
   void SetModel(Model3D* const model);
   void SetPoints(std::list<PointSet>* const points);
   void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
-  void SetEyeMatrices(std::list<cv::Matx44d>* const matrices);
   double Optimise(cv::Matx44d& modelToWorld,
                   cv::Matx44d& handEye,
                   cv::Mat& intrinsic,

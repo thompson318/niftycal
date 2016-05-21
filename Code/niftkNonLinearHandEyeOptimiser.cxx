@@ -59,14 +59,6 @@ void NonLinearHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const ma
 
 
 //-----------------------------------------------------------------------------
-void NonLinearHandEyeOptimiser::SetEyeMatrices(std::list<cv::Matx44d>* const matrices)
-{
-  m_CostFunction->SetEyeMatrices(matrices);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
 double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
                                            cv::Matx44d& handEye,
                                            cv::Mat& intrinsic,
@@ -124,7 +116,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
 
   // Setup optimiser.
   itk::LevenbergMarquardtOptimizer::Pointer optimiser = itk::LevenbergMarquardtOptimizer::New();
-  optimiser->UseCostFunctionGradientOn(); // use default VNL derivative, not our one.
+  optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
   optimiser->SetNumberOfIterations(20000000);

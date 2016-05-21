@@ -52,7 +52,6 @@ public:
   void SetModel(Model3D* const model);
   void SetPoints(std::list<PointSet>* const points);
   void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
-  void SetEyeMatrices(std::list<cv::Matx44d>* const matrices);
   itkSetMacro(NumberOfParameters, unsigned int);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
@@ -74,8 +73,8 @@ private:
   Model3D                *m_Model;
   std::list<PointSet>    *m_Points;
   std::list<cv::Matx44d> *m_HandMatrices;
-  std::list<cv::Matx44d> *m_EyeMatrices;
   unsigned int            m_NumberOfParameters;
+  unsigned int            m_NumberOfValues;
 };
 
 } // end namespace
