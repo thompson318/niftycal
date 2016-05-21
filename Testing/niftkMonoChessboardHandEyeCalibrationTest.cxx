@@ -167,7 +167,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
       std::cerr << "Expected (" << r << ", " << c << ")="
                 << expectedEyeHand(r, c) << ", actual="
                 << eyeHand(r, c) << std::endl;
-      //REQUIRE(fabs(expectedEyeHand(r, c) - eyeHand(r, c)) < 0.001);
+      REQUIRE(fabs(expectedEyeHand(r, c) - eyeHand(r, c)) < 0.001);
     }
   }
 
@@ -194,6 +194,4 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   std::cerr << "Doing non-linear optimisation - DONE, rms=" << reprojectionRMS << std::endl;
 
 #endif
-
-  REQUIRE(reprojectionRMS < 0.25);
 }
