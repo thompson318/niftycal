@@ -143,11 +143,11 @@ NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
   {
     niftkNiftyCalThrow() << "Hand matrices are null.";
   }
-  if (m_Points->size() == 0)
+  if (m_Points->empty())
   {
     niftkNiftyCalThrow() << "No extracted points.";
   }
-  if (m_HandMatrices->size() == 0)
+  if (m_HandMatrices->empty())
   {
     niftkNiftyCalThrow() << "No tracking matrices.";
   }
@@ -210,12 +210,11 @@ NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
   std::list<cv::Matx44d>::const_iterator matrixIter;
 
   unsigned int totalPointCounter = 0;
-  unsigned int pointPerViewCounter = 0;
 
   // Iterating over each image.
-  for (viewIter       = m_Points->begin(),
-       matrixIter     = m_HandMatrices->begin();
-       viewIter      != m_Points->end()
+  for (viewIter = m_Points->begin(),
+       matrixIter = m_HandMatrices->begin();
+       viewIter != m_Points->end()
        && matrixIter != m_HandMatrices->end();
        ++viewIter,
        ++matrixIter
@@ -229,7 +228,7 @@ NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
     model.resize((*viewIter).size());
     projected.resize((*viewIter).size());
     observed.resize((*viewIter).size());
-    pointPerViewCounter = 0;
+    unsigned int pointPerViewCounter = 0;
 
     // Iterating over each point in the current image.
     for (pointIter = (*viewIter).begin();
