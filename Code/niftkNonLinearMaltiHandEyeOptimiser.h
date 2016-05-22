@@ -12,14 +12,13 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearHandEyeOptimiser_h
-#define niftkNonLinearHandEyeOptimiser_h
+#ifndef niftkNonLinearMaltiHandEyeOptimiser_h
+#define niftkNonLinearMaltiHandEyeOptimiser_h
 
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNiftyCalTypes.h>
-#include <niftkNonLinearHandEyeCostFunction.h>
+#include <niftkNonLinearMaltiHandEyeCostFunction.h>
 
 namespace niftk
 {
@@ -32,16 +31,16 @@ namespace niftk
 * paper <a href="http://dx.doi.org/10.1002/rcs.1478">
 * Hand-eye and radial distortion calibration for rigid endoscopes</a>.
 *
-* \see niftk::NonLinearHandEyeCostFunction
+* \see niftk::NonLinearMaltiHandEyeCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearHandEyeOptimiser : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinearMaltiHandEyeOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearHandEyeOptimiser Self;
-  typedef  itk::Command              Superclass;
-  typedef  itk::SmartPointer<Self>   Pointer;
+  typedef  NonLinearMaltiHandEyeOptimiser Self;
+  typedef  itk::Object                    Superclass;
+  typedef  itk::SmartPointer<Self>        Pointer;
   itkNewMacro(Self);
 
   void SetModel(Model3D* const model);
@@ -55,14 +54,14 @@ public:
 
 protected:
 
-  NonLinearHandEyeOptimiser();
-  virtual ~NonLinearHandEyeOptimiser();
+  NonLinearMaltiHandEyeOptimiser();
+  virtual ~NonLinearMaltiHandEyeOptimiser();
 
-  NonLinearHandEyeOptimiser(const NonLinearHandEyeOptimiser&); // Purposefully not implemented.
-  NonLinearHandEyeOptimiser& operator=(const NonLinearHandEyeOptimiser&); // Purposefully not implemented.
+  NonLinearMaltiHandEyeOptimiser(const NonLinearMaltiHandEyeOptimiser&); // Purposefully not implemented.
+  NonLinearMaltiHandEyeOptimiser& operator=(const NonLinearMaltiHandEyeOptimiser&); // Purposefully not implemented.
 
 private:
-  niftk::NonLinearHandEyeCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearMaltiHandEyeCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

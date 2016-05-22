@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearHandEyeOptimiser.h"
+#include "niftkNonLinearMaltiHandEyeOptimiser.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
@@ -21,21 +21,21 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearHandEyeOptimiser::NonLinearHandEyeOptimiser()
+NonLinearMaltiHandEyeOptimiser::NonLinearMaltiHandEyeOptimiser()
 {
-  m_CostFunction = niftk::NonLinearHandEyeCostFunction::New();
+  m_CostFunction = niftk::NonLinearMaltiHandEyeCostFunction::New();
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearHandEyeOptimiser::~NonLinearHandEyeOptimiser()
+NonLinearMaltiHandEyeOptimiser::~NonLinearMaltiHandEyeOptimiser()
 {
 
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearHandEyeOptimiser::SetModel(Model3D* const model)
+void NonLinearMaltiHandEyeOptimiser::SetModel(Model3D* const model)
 {
   m_CostFunction->SetModel(model);
   this->Modified();
@@ -43,7 +43,7 @@ void NonLinearHandEyeOptimiser::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
+void NonLinearMaltiHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
 {
   m_CostFunction->SetPoints(points);
   this->Modified();
@@ -51,7 +51,7 @@ void NonLinearHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+void NonLinearMaltiHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
 {
   m_CostFunction->SetHandMatrices(matrices);
   this->Modified();
@@ -59,11 +59,11 @@ void NonLinearHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const ma
 
 
 //-----------------------------------------------------------------------------
-double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
-                                           cv::Matx44d& handEye,
-                                           cv::Mat& intrinsic,
-                                           cv::Mat& distortion
-                                          )
+double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
+                                                cv::Matx44d& handEye,
+                                                cv::Mat& intrinsic,
+                                                cv::Mat& distortion
+                                               )
 {
 
   if (intrinsic.rows != 3 || intrinsic.cols != 3)
@@ -84,7 +84,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   cv::Mat handEyeTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
-  niftk::NonLinearHandEyeCostFunction::ParametersType initialParameters;
+  niftk::NonLinearMaltiHandEyeCostFunction::ParametersType initialParameters;
   initialParameters.SetSize(  6               // model to world
                             + 6               // hand eye
                             + intrinsic.cols  // normally 4
@@ -124,7 +124,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->SetEpsilonFunction(0.000000005);
   optimiser->SetValueTolerance(0.000000005);
 
-  niftk::NonLinearHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  niftk::NonLinearMaltiHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
   std::cout << "NonLinearHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
 
@@ -132,7 +132,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearHandEyeCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
+  niftk::NonLinearMaltiHandEyeCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
   handEyeRotationVector.at<double>(0, 0) = finalParameters[0];
   handEyeRotationVector.at<double>(0, 1) = finalParameters[1];
   handEyeRotationVector.at<double>(0, 2) = finalParameters[2];
@@ -156,7 +156,7 @@ double NonLinearHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 
-  niftk::NonLinearHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearMaltiHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
   std::cout << "NonLinearHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 

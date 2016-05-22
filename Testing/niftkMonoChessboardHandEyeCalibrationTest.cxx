@@ -26,7 +26,7 @@
 #include <list>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearHandEyeOptimiser.h>
+#include <niftkNonLinearMaltiHandEyeOptimiser.h>
 #endif
 
 TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
@@ -177,7 +177,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   cv::Matx44d modelToWorld = niftk::CalculateAverageModelToWorld(handEye, trackingMatrices, cameraMatrices);
 
-  niftk::NonLinearHandEyeOptimiser::Pointer optimiser = niftk::NonLinearHandEyeOptimiser::New();
+  niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser = niftk::NonLinearMaltiHandEyeOptimiser::New();
   optimiser->SetModel(&model);
   optimiser->SetPoints(&listOfPoints);
   optimiser->SetHandMatrices(&trackingMatrices);
