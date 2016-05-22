@@ -26,6 +26,7 @@
 #include <list>
 
 #ifdef NIFTYCAL_WITH_ITK
+#include <niftkNonLinearMalti12DOFHandEyeOptimiser.h>
 #include <niftkNonLinearMaltiHandEyeOptimiser.h>
 #endif
 
@@ -177,14 +178,30 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   cv::Matx44d modelToWorld = niftk::CalculateAverageModelToWorld(handEye, trackingMatrices, cameraMatrices);
 
-  niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser = niftk::NonLinearMaltiHandEyeOptimiser::New();
-  optimiser->SetModel(&model);
-  optimiser->SetPoints(&listOfPoints);
-  optimiser->SetHandMatrices(&trackingMatrices);
+  std::cerr << "Doing non-linear optimisation - 12 DOF" << std::endl;
+
+  niftk::NonLinearMalti12DOFHandEyeOptimiser::Pointer optimiser12DOF = niftk::NonLinearMalti12DOFHandEyeOptimiser::New();
+  optimiser12DOF->SetModel(&model);
+  optimiser12DOF->SetPoints(&listOfPoints);
+  optimiser12DOF->SetHandMatrices(&trackingMatrices);
+  optimiser12DOF->SetIntrinsic(&intrinsic);
+  optimiser12DOF->SetDistortion(&distortion);
+
+  reprojectionRMS = optimiser12DOF->Optimise(
+        modelToWorld,
+        handEye
+        );
+
+  std::cerr << "Doing non-linear optimisation - 12 DOF - DONE, rms=" << reprojectionRMS << std::endl;
 
   std::cerr << "Doing non-linear optimisation." << std::endl;
 
-  reprojectionRMS = optimiser->Optimise(
+  niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser21DOF = niftk::NonLinearMaltiHandEyeOptimiser::New();
+  optimiser21DOF->SetModel(&model);
+  optimiser21DOF->SetPoints(&listOfPoints);
+  optimiser21DOF->SetHandMatrices(&trackingMatrices);
+
+  reprojectionRMS = optimiser21DOF->Optimise(
         modelToWorld,
         handEye,
         intrinsic,
