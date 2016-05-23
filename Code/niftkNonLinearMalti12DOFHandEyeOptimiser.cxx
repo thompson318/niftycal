@@ -13,8 +13,8 @@
 =============================================================================*/
 
 #include "niftkNonLinearMalti12DOFHandEyeOptimiser.h"
-#include <niftkMatrixUtilities.h>
-#include <niftkNiftyCalExceptionMacro.h>
+#include "niftkMatrixUtilities.h"
+#include "niftkNiftyCalExceptionMacro.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
 namespace niftk
@@ -61,12 +61,6 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>
 //-----------------------------------------------------------------------------
 void NonLinearMalti12DOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
 {
-  if (intrinsic->rows != 3 || intrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
-                         << intrinsic->cols << ", " << intrinsic->rows << ")";
-  }
-
   m_CostFunction->SetIntrinsic(intrinsic);
   this->Modified();
 }
@@ -75,11 +69,6 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
 //-----------------------------------------------------------------------------
 void NonLinearMalti12DOFHandEyeOptimiser::SetDistortion(cv::Mat* const distortion)
 {
-  if (distortion->rows != 1)
-  {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
-  }
-
   m_CostFunction->SetDistortion(distortion);
   this->Modified();
 }
@@ -155,6 +144,23 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   niftk::NonLinearMalti12DOFHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
   std::cout << "NonLinearMalti12DOFHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+
+  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: hand-eye="
+            << handEyeRotationVector.at<double>(0, 0) << ", "
+            << handEyeRotationVector.at<double>(0, 1) << ", "
+            << handEyeRotationVector.at<double>(0, 2) << ", "
+            << handEyeTranslationVector.at<double>(0, 0) << ", "
+            << handEyeTranslationVector.at<double>(0, 1) << ", "
+            << handEyeTranslationVector.at<double>(0, 2) << std::endl;
+  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: model-to-world="
+            << modelToWorldRotationVector.at<double>(0, 0) << ", "
+            << modelToWorldRotationVector.at<double>(0, 1) << ", "
+            << modelToWorldRotationVector.at<double>(0, 2) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 0) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 1) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
+
+  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

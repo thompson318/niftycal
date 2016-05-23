@@ -15,8 +15,7 @@
 #ifndef niftkNonLinearMaltiHandEyeCostFunction_h
 #define niftkNonLinearMaltiHandEyeCostFunction_h
 
-#include <cv.h>
-#include "niftkNiftyCalTypes.h"
+#include "niftkWin32ExportHeader.h"
 #include "niftkNonLinearHandEyeCostFunction.h"
 
 namespace niftk
@@ -30,11 +29,10 @@ namespace niftk
 * paper <a href="http://dx.doi.org/10.1002/rcs.1478">
 * Hand-eye and radial distortion calibration for rigid endoscopes</a>.
 *
-* Deliberately not exported for external libraries.
-*
 * \see niftk::NonLinearMaltiHandEyeOptimiser
 */
-class NonLinearMaltiHandEyeCostFunction : public niftk::NonLinearHandEyeCostFunction
+class NIFTYCAL_WINEXPORT NonLinearMaltiHandEyeCostFunction :
+    public niftk::NonLinearHandEyeCostFunction
 {
 
 public:

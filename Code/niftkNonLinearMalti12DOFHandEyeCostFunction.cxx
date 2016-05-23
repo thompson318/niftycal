@@ -35,6 +35,12 @@ NonLinearMalti12DOFHandEyeCostFunction::~NonLinearMalti12DOFHandEyeCostFunction(
 //-----------------------------------------------------------------------------
 void NonLinearMalti12DOFHandEyeCostFunction::SetIntrinsic(cv::Mat* const intrinsic)
 {
+  if (intrinsic->rows != 3 || intrinsic->cols != 3)
+  {
+    niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
+                         << intrinsic->cols << ", " << intrinsic->rows << ")";
+  }
+
   m_Intrinsic = intrinsic;
   this->Modified();
 }
@@ -43,6 +49,11 @@ void NonLinearMalti12DOFHandEyeCostFunction::SetIntrinsic(cv::Mat* const intrins
 //-----------------------------------------------------------------------------
 void NonLinearMalti12DOFHandEyeCostFunction::SetDistortion(cv::Mat* const distortion)
 {
+  if (distortion->rows != 1)
+  {
+    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
+  }
+
   m_Distortion = distortion;
   this->Modified();
 }

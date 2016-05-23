@@ -89,6 +89,13 @@ void NonLinearHandEyeCostFunction::SetHandMatrices(std::list<cv::Matx44d>* const
 
 
 //-----------------------------------------------------------------------------
+std::list<cv::Matx44d>* NonLinearHandEyeCostFunction::GetHandMatrices() const
+{
+  return m_HandMatrices;
+}
+
+
+//-----------------------------------------------------------------------------
 unsigned int NonLinearHandEyeCostFunction::GetNumberOfValues(void) const
 {
   return m_NumberOfValues;

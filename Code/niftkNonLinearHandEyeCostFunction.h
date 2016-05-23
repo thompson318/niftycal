@@ -15,6 +15,7 @@
 #ifndef niftkNonLinearHandEyeCostFunction_h
 #define niftkNonLinearHandEyeCostFunction_h
 
+#include "niftkWin32ExportHeader.h"
 #include <cv.h>
 #include <itkMultipleValuedCostFunction.h>
 #include <niftkNiftyCalTypes.h>
@@ -25,7 +26,8 @@ namespace niftk
 /**
 * \brief Base class for non-linear hand-eye cost functions.
 */
-class NonLinearHandEyeCostFunction : public itk::MultipleValuedCostFunction
+class NIFTYCAL_WINEXPORT NonLinearHandEyeCostFunction :
+    public itk::MultipleValuedCostFunction
 {
 
 public:
@@ -42,6 +44,7 @@ public:
   void SetModel(Model3D* const model);
   void SetPoints(std::list<PointSet>* const points);
   void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
+  std::list<cv::Matx44d>* GetHandMatrices() const;
   itkSetMacro(NumberOfParameters, unsigned int);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;

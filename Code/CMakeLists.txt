@@ -44,6 +44,8 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMalti12DOFHandEyeOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiNDOFHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiNDOFHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiStereoHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiStereoHandEyeOptimiser.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})

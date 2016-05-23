@@ -13,8 +13,8 @@
 =============================================================================*/
 
 #include "niftkNonLinearMaltiHandEyeOptimiser.h"
-#include <niftkMatrixUtilities.h>
-#include <niftkNiftyCalExceptionMacro.h>
+#include "niftkMatrixUtilities.h"
+#include "niftkNiftyCalExceptionMacro.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
 namespace niftk
@@ -159,6 +159,23 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearMaltiHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
   std::cout << "NonLinearHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+
+  std::cout << "NonLinearHandEyeOptimiser: hand-eye="
+            << handEyeRotationVector.at<double>(0, 0) << ", "
+            << handEyeRotationVector.at<double>(0, 1) << ", "
+            << handEyeRotationVector.at<double>(0, 2) << ", "
+            << handEyeTranslationVector.at<double>(0, 0) << ", "
+            << handEyeTranslationVector.at<double>(0, 1) << ", "
+            << handEyeTranslationVector.at<double>(0, 2) << std::endl;
+  std::cout << "NonLinearHandEyeOptimiser: model-to-world="
+            << modelToWorldRotationVector.at<double>(0, 0) << ", "
+            << modelToWorldRotationVector.at<double>(0, 1) << ", "
+            << modelToWorldRotationVector.at<double>(0, 2) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 0) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 1) << ", "
+            << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
+
+  std::cout << "NonLinearHandEyeOptimiser: rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

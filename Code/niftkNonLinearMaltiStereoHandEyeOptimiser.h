@@ -12,13 +12,13 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearMaltiNDOFHandEyeOptimiser_h
-#define niftkNonLinearMaltiNDOFHandEyeOptimiser_h
+#ifndef niftkNonLinearMaltiStereoHandEyeOptimiser_h
+#define niftkNonLinearMaltiStereoHandEyeOptimiser_h
 
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNonLinearMaltiNDOFHandEyeCostFunction.h>
+#include <niftkNonLinearMaltiStereoHandEyeCostFunction.h>
 
 namespace niftk
 {
@@ -26,37 +26,42 @@ namespace niftk
 /**
 * \brief Optimises camera extrinsic, hand-eye and model-to-world.
 *
-* \see niftk::NonLinearMaltiNDOFHandEyeCostFunction
+* \see niftk::NonLinearMaltiStereoHandEyeCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearMaltiNDOFHandEyeOptimiser : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinearMaltiStereoHandEyeOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearMaltiNDOFHandEyeOptimiser Self;
+  typedef  NonLinearMaltiStereoHandEyeOptimiser Self;
   typedef  itk::Object                        Superclass;
   typedef  itk::SmartPointer<Self>            Pointer;
   itkNewMacro(Self);
 
   void SetModel(Model3D* const model);
   void SetPoints(std::list<PointSet>* const points);
+  void SetRightHandPoints(std::list<PointSet>* const points);
   void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
-  void SetIntrinsic(cv::Mat* const intrinsic);
-  void SetDistortion(cv::Mat* const distortion);
+  void SetLeftIntrinsic(cv::Mat* const intrinsic);
+  void SetLeftDistortion(cv::Mat* const distortion);
+  void SetRightIntrinsic(cv::Mat* const intrinsic);
+  void SetRightDistortion(cv::Mat* const distortion);
+
   double Optimise(cv::Matx44d& modelToWorld,
-                  cv::Matx44d& handEye
+                  cv::Matx44d& handEye,
+                  cv::Matx44d& stereoExtrinsics
                  );
 
 protected:
 
-  NonLinearMaltiNDOFHandEyeOptimiser();
-  virtual ~NonLinearMaltiNDOFHandEyeOptimiser();
+  NonLinearMaltiStereoHandEyeOptimiser();
+  virtual ~NonLinearMaltiStereoHandEyeOptimiser();
 
-  NonLinearMaltiNDOFHandEyeOptimiser(const NonLinearMaltiNDOFHandEyeOptimiser&);
-  NonLinearMaltiNDOFHandEyeOptimiser& operator=(const NonLinearMaltiNDOFHandEyeOptimiser&);
+  NonLinearMaltiStereoHandEyeOptimiser(const NonLinearMaltiStereoHandEyeOptimiser&);
+  NonLinearMaltiStereoHandEyeOptimiser& operator=(const NonLinearMaltiStereoHandEyeOptimiser&);
 
 private:
-  niftk::NonLinearMaltiNDOFHandEyeCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearMaltiStereoHandEyeCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

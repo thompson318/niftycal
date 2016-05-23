@@ -15,8 +15,7 @@
 #ifndef niftkNonLinearMaltiNDOFHandEyeCostFunction_h
 #define niftkNonLinearMaltiNDOFHandEyeCostFunction_h
 
-#include <cv.h>
-#include "niftkNiftyCalTypes.h"
+#include "niftkWin32ExportHeader.h"
 #include "niftkNonLinearHandEyeCostFunction.h"
 
 namespace niftk
@@ -25,11 +24,10 @@ namespace niftk
 /**
 * \brief RMS re-projection error for intrinsic, extrinsic, hand-eye and model-to-world optimisation.
 *
-* Deliberately not exported for external libraries.
-*
 * \see niftk::NonLinearMaltiNDOFHandEyeOptimiser
 */
-class NonLinearMaltiNDOFHandEyeCostFunction : public niftk::NonLinearHandEyeCostFunction
+class NIFTYCAL_WINEXPORT NonLinearMaltiNDOFHandEyeCostFunction :
+    public niftk::NonLinearHandEyeCostFunction
 {
 
 public:
