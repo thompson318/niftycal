@@ -22,6 +22,8 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearMalti12DOFHandEyeCostFunction::NonLinearMalti12DOFHandEyeCostFunction()
+: m_Intrinsic(nullptr)
+, m_Distortion(nullptr)
 {
 }
 

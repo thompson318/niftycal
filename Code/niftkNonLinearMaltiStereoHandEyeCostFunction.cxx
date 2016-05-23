@@ -22,6 +22,12 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearMaltiStereoHandEyeCostFunction::NonLinearMaltiStereoHandEyeCostFunction()
+: m_LeftIntrinsic(nullptr)
+, m_LeftDistortion(nullptr)
+, m_RightIntrinsic(nullptr)
+, m_RightDistortion(nullptr)
+, m_RightHandPoints(nullptr)
+, m_NumberOfRightHandValues(0)
 {
 }
 
@@ -130,7 +136,6 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
   cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
 
-  NiftyCalIdType id;
   cv::Point3d    modelPoint;
   cv::Point3f    m;
   cv::Point2f    p;
@@ -150,7 +155,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
        ++pointIter
        )
   {
-    id = (*pointIter).first;
+    NiftyCalIdType id = (*pointIter).first;
     modelPoint = (*m_Model)[id].point;
     m.x = modelPoint.x;
     m.y = modelPoint.y;
@@ -220,7 +225,8 @@ NonLinearMaltiStereoHandEyeCostFunction::InternalGetValue(const ParametersType& 
 
   cv::Matx44d modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   cv::Matx44d handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
-  cv::Matx44d stereoExtrinsics = niftk::RodriguesToMatrix(stereoExtrinsicsRotationVector, stereoExtrinsicsTranslationVector);
+  cv::Matx44d stereoExtrinsics = niftk::RodriguesToMatrix(stereoExtrinsicsRotationVector,
+                                                          stereoExtrinsicsTranslationVector);
 
   std::list<PointSet>::const_iterator leftViewIter;
   std::list<PointSet>::const_iterator rightViewIter;
@@ -252,8 +258,13 @@ NonLinearMaltiStereoHandEyeCostFunction::InternalGetValue(const ParametersType& 
     cv::Matx44d leftCameraMatrix = handEye * worldToHand * modelToWorld;
     cv::Matx44d rightCameraMatrix = stereoExtrinsics * leftCameraMatrix;
 
-    this->ProjectPoints(*leftViewIter, leftCameraMatrix, *m_LeftIntrinsic, *m_LeftDistortion, result, totalPointCounter);
-    this->ProjectPoints(*rightViewIter, rightCameraMatrix, *m_RightIntrinsic, *m_RightDistortion, result, totalPointCounter);
+    this->ProjectPoints(*leftViewIter, leftCameraMatrix,
+                        *m_LeftIntrinsic, *m_LeftDistortion,
+                        result, totalPointCounter);
+
+    this->ProjectPoints(*rightViewIter, rightCameraMatrix,
+                        *m_RightIntrinsic, *m_RightDistortion,
+                        result, totalPointCounter);
   }
 
   return result;

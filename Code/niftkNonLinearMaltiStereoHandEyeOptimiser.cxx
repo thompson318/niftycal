@@ -180,7 +180,9 @@ double NonLinearMaltiStereoHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->SetEpsilonFunction(0.000000005);
   optimiser->SetValueTolerance(0.000000005);
 
-  niftk::NonLinearMaltiStereoHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  niftk::NonLinearMaltiStereoHandEyeCostFunction::MeasureType initialValues =
+      m_CostFunction->GetValue(initialParameters);
+
   double initialRMS = m_CostFunction->GetRMS(initialValues);
 
   for (int i = 18; i < initialParameters.GetSize(); i++)
