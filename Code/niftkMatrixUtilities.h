@@ -38,12 +38,30 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& translationVector1x3);
 
 /**
+* \brief Converts a list to a vector, enabling you to set a limit to how many you convert.
+*/
+NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices,
+                                                               const unsigned int& maximumSize);
+
+
+/**
 * \brief Averages a list of rigid body matrices.
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
 * in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
 */
 NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<cv::Matx44d >&);
+
+
+/**
+* \brief Given a hand-eye matrix, and tracking matrices, gives an average
+* estimate of the modelToWorld transform.
+*/
+NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
+    const cv::Matx44d&             handEyeMatrix,
+    const std::list<cv::Matx44d >& handMatrices,
+    const std::list<cv::Matx44d >& eyeMatrices
+    );
 
 
 /**
@@ -62,18 +80,26 @@ NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<c
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
     const cv::Matx44d&             modelToTrackerTransform,
-    const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices
     );
 
+
 /**
-* \brief Given a hand-eye matrix, and tracking matrices, gives an average
-* estimate of the modelToWorld transform.
+* \brief Calculates Hand-Eye by <a href="http://dx.doi.org/10.1109/70.34770">Tsai's 1989 method</a>.
+*
+* Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
+* in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
+*
+* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
+* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
+* \return cv::Matx44d hand-eye matrix
 */
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
-    const cv::Matx44d&             handEyeMatrix,
-    const std::list<cv::Matx44d >& handMatrices,
-    const std::list<cv::Matx44d >& eyeMatrices
+NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
+    double& residualRotation,
+    double& residualTranslation
     );
 
 } // end namespace

@@ -27,7 +27,9 @@ set(TEST_CASES
   niftkIterativeStereoAprilTagsCameraCalibrationTest
   niftkIterativeMonoAprilTagsCameraCalibrationTest
   niftkMatrixAverageTest
+  niftkMonoChessboardHandEyeCalibrationTest
 )
+
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
 endif()
@@ -427,4 +429,76 @@ add_test(CalibIterMonoAprilReal1 niftkIterativeMonoAprilTagsCameraCalibrationTes
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296330547200_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296794573800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230320793946400_left.bmp
+)
+
+add_test(CalibHandEyeMono niftkMonoChessboardHandEyeCalibrationTest
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
+  14 10                                          # internal corners
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/calib.left.handeye.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame1.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame2.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame3.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame4.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame5.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame6.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame7.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame8.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame9.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame10.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame11.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame12.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame13.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame14.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame15.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame16.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame17.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame18.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame19.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame20.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame21.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame22.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame23.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame24.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame25.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame26.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame27.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame28.png
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame29.png
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame30.png
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame31.png
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame32.png
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/LeftFrame33.png
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/0.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/1.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/2.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/3.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/4.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/5.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/6.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/7.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/8.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/9.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/10.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/11.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/12.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/13.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/14.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/15.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/16.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/17.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/18.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/19.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/20.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/21.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/22.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/23.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/24.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/25.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/26.txt
+  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/27.txt
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/28.txt
+#   ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/29.txt
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/30.txt
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
+#  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
 )

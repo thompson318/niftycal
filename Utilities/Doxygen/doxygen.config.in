@@ -20,7 +20,7 @@ PROJECT_NAME          = NiftyCal
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER        = "@NIFTYCAL_VERSION_MAJOR@.@NIFTYCAL_VERSION_MINOR@.@NIFTYCAL_VERSION_PATCH@"
+PROJECT_NUMBER        = "@NiftyCal_VERSION_MAJOR@.@NiftyCal_VERSION_MINOR@.@NiftyCal_VERSION_PATCH@"
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -255,7 +255,7 @@ WARN_FORMAT           = "$file:$line: $text"
 # or directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT    = @CMAKE_SOURCE_DIR@/Code
+INPUT    = @CMAKE_SOURCE_DIR@/Code @CMAKE_BINARY_DIR@/Doxygen
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cxx 
