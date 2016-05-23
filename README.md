@@ -20,7 +20,7 @@ License
 Copyright (c) 2016, [University College London][ucl].
 
 This project is NOT open-source, and should NOT be distributed
-without the prior permission of [Prof. Sebastien Ourselin][seb].
+without the prior permission of [Dr. Matt Clarkson][matt].
 
 
 Supported Platforms
@@ -55,4 +55,5 @@ via the web interface.
 [citation]: http://link.springer.com/article/10.1007%2Fs11548-014-1124-7
 [niftk]: http://www.niftk.org
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
-[seb]: http://cmic.cs.ucl.ac.uk/staff/sebastien_ourselin
+[matt]: http://www.mattclarkson.co.uk
+
