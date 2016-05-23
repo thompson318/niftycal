@@ -116,9 +116,12 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   optimiser->SetEpsilonFunction(0.000000005);
   optimiser->SetValueTolerance(0.000000005);
 
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  niftk::NonLinearMalti12DOFHandEyeCostFunction::MeasureType initialValues =
+      m_CostFunction->GetValue(initialParameters);
+
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
+  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: initial=" << initialParameters
+            << ", rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();

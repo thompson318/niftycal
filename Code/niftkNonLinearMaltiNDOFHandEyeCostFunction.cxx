@@ -22,6 +22,8 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearMaltiNDOFHandEyeCostFunction::NonLinearMaltiNDOFHandEyeCostFunction()
+: m_Intrinsic(nullptr)
+, m_Distortion(nullptr)
 {
 }
 
@@ -154,7 +156,8 @@ NonLinearMaltiNDOFHandEyeCostFunction::InternalGetValue(const ParametersType& pa
     }
 
     // Project all points for that image.
-    cv::projectPoints(model, extrinsicRotationVector, extrinsicTranslationVector, *m_Intrinsic, *m_Distortion, projected);
+    cv::projectPoints(model, extrinsicRotationVector, extrinsicTranslationVector,
+                      *m_Intrinsic, *m_Distortion, projected);
 
     // Now measure diff.
     for (unsigned int i = 0; i < observed.size(); i++)
