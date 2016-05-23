@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearMalti12DOFHandEyeOptimiser.h"
+#include "niftkNonLinearMaltiNDOFHandEyeOptimiser.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
@@ -21,21 +21,21 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearMalti12DOFHandEyeOptimiser::NonLinearMalti12DOFHandEyeOptimiser()
+NonLinearMaltiNDOFHandEyeOptimiser::NonLinearMaltiNDOFHandEyeOptimiser()
 {
-  m_CostFunction = niftk::NonLinearMalti12DOFHandEyeCostFunction::New();
+  m_CostFunction = niftk::NonLinearMaltiNDOFHandEyeCostFunction::New();
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearMalti12DOFHandEyeOptimiser::~NonLinearMalti12DOFHandEyeOptimiser()
+NonLinearMaltiNDOFHandEyeOptimiser::~NonLinearMaltiNDOFHandEyeOptimiser()
 {
 
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMalti12DOFHandEyeOptimiser::SetModel(Model3D* const model)
+void NonLinearMaltiNDOFHandEyeOptimiser::SetModel(Model3D* const model)
 {
   m_CostFunction->SetModel(model);
   this->Modified();
@@ -43,7 +43,7 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMalti12DOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
+void NonLinearMaltiNDOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
 {
   m_CostFunction->SetPoints(points);
   this->Modified();
@@ -51,7 +51,7 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const p
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMalti12DOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+void NonLinearMaltiNDOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
 {
   m_CostFunction->SetHandMatrices(matrices);
   this->Modified();
@@ -59,7 +59,7 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMalti12DOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
+void NonLinearMaltiNDOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -73,7 +73,7 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMalti12DOFHandEyeOptimiser::SetDistortion(cv::Mat* const distortion)
+void NonLinearMaltiNDOFHandEyeOptimiser::SetDistortion(cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
@@ -86,7 +86,10 @@ void NonLinearMalti12DOFHandEyeOptimiser::SetDistortion(cv::Mat* const distortio
 
 
 //-----------------------------------------------------------------------------
-double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, cv::Matx44d& handEye)
+double NonLinearMaltiNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
+                                                    cv::Matx44d& handEye,
+                                                    std::list<cv::Matx44d>* const matrices
+                                                    )
 {
   cv::Mat modelToWorldRotationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Mat modelToWorldTranslationVector = cvCreateMat(1, 3, CV_64FC1);
@@ -96,9 +99,10 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   cv::Mat handEyeTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(  6 // model to world
-                            + 6 // hand eye
+  niftk::NonLinearMaltiNDOFHandEyeCostFunction::ParametersType initialParameters;
+  initialParameters.SetSize(  6                    // model to world
+                            + 6                    // hand eye
+                            + 6 * matrices->size() // extrinsics for each view.
                            );
 
   // Set initial parameters.
@@ -115,6 +119,25 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   initialParameters[10] = modelToWorldTranslationVector.at<double>(0, 1);
   initialParameters[11] = modelToWorldTranslationVector.at<double>(0, 2);
 
+  unsigned int counter = 12;
+  std::list<cv::Matx44d>::const_iterator iter;
+  for (iter = (*matrices).begin();
+       iter != (*matrices).end();
+       ++iter
+       )
+  {
+    cv::Mat trackingRotationVector = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat trackingTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+    niftk::MatrixToRodrigues(*iter, trackingRotationVector, trackingTranslationVector);
+
+    initialParameters[counter++] = trackingRotationVector.at<double>(0, 0);
+    initialParameters[counter++] = trackingRotationVector.at<double>(0, 1);
+    initialParameters[counter++] = trackingRotationVector.at<double>(0, 2);
+    initialParameters[counter++] = trackingTranslationVector.at<double>(0, 0);
+    initialParameters[counter++] = trackingTranslationVector.at<double>(0, 1);
+    initialParameters[counter++] = trackingTranslationVector.at<double>(0, 2);
+  }
+
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
   // Setup optimiser.
@@ -127,15 +150,24 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   optimiser->SetEpsilonFunction(0.000000005);
   optimiser->SetValueTolerance(0.000000005);
 
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  niftk::NonLinearMaltiNDOFHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
+
+  for (int i = 12; i < initialParameters.GetSize(); i++)
+  {
+    std::cout << "NonLinearHandEyeOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
+    if ((i - 12) % 6 == 5)
+    {
+      std::cout << std::endl;
+    }
+  }
+  std::cout << ", rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
+  niftk::NonLinearMaltiNDOFHandEyeCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
   handEyeRotationVector.at<double>(0, 0) = finalParameters[0];
   handEyeRotationVector.at<double>(0, 1) = finalParameters[1];
   handEyeRotationVector.at<double>(0, 2) = finalParameters[2];
@@ -152,9 +184,21 @@ double NonLinearMalti12DOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld, 
   modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearMaltiNDOFHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-  std::cout << "NonLinearMalti12DOFHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+
+  for (int i = 12; i < finalParameters.GetSize(); i++)
+  {
+    std::cout << "NonLinearHandEyeOptimiser: final(" << i << ")=" << finalParameters[i]
+                 << ", initial=" << initialParameters[i]
+                 << ", diff=" << finalParameters[i] - initialParameters[i]
+                 << std::endl;
+    if ((i - 12) % 6 == 5)
+    {
+      std::cout << std::endl;
+    }
+  }
+  std::cout << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

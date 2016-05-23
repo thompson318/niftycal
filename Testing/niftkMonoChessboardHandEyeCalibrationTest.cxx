@@ -27,6 +27,7 @@
 
 #ifdef NIFTYCAL_WITH_ITK
 #include <niftkNonLinearMalti12DOFHandEyeOptimiser.h>
+#include <niftkNonLinearMaltiNDOFHandEyeOptimiser.h>
 #include <niftkNonLinearMaltiHandEyeOptimiser.h>
 #endif
 
@@ -190,6 +191,23 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   reprojectionRMS = optimiser12DOF->Optimise(
         modelToWorld,
         handEye
+        );
+
+  std::cerr << "Doing non-linear optimisation - 12 DOF - DONE, rms=" << reprojectionRMS << std::endl;
+
+  std::cerr << "Doing non-linear optimisation - N DOF" << std::endl;
+
+  niftk::NonLinearMaltiNDOFHandEyeOptimiser::Pointer optimiserNDOF = niftk::NonLinearMaltiNDOFHandEyeOptimiser::New();
+  optimiserNDOF->SetModel(&model);
+  optimiserNDOF->SetPoints(&listOfPoints);
+  optimiserNDOF->SetHandMatrices(&trackingMatrices);
+  optimiserNDOF->SetIntrinsic(&intrinsic);
+  optimiserNDOF->SetDistortion(&distortion);
+
+  reprojectionRMS = optimiserNDOF->Optimise(
+        modelToWorld,
+        handEye,
+        &trackingMatrices
         );
 
   std::cerr << "Doing non-linear optimisation - 12 DOF - DONE, rms=" << reprojectionRMS << std::endl;
