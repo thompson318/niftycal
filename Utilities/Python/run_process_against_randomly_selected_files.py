@@ -2,21 +2,17 @@
 
 import os
 import sys
+import subprocess
 from random import sample
 
-if len(sys.argv) != 3:
-    print 'Usage: launch_point_calibration_test.py dirName numberOfSamples'
+if len(sys.argv) < 5:
+    print 'Usage: launch_point_calibration_test.py dirName numberOfSamples endsWith [command]'
     exit()
-
-print 'Number of arguments:', len(sys.argv)
-print 'Argument List:', str(sys.argv)
-print 'Path to scan:', sys.argv[1]
-print 'Number to pick:', sys.argv[2]
 
 # Get all bmp files in the specified path.
 fileNames = []
 for f in os.listdir(sys.argv[1]):
-    if f.endswith(".bmp"):
+    if f.endswith(sys.argv[3]):
         fileNames.append(f)
 
 # Get a sample of file indexes.
@@ -28,5 +24,13 @@ selectedFileNames = []
 for f in fileSamples:
     selectedFileNames.append(fileNames[f])
 
-# Now run calibration.
-returnCode = subprocess.call()
+# Sort out command
+command = sys.argv
+command.pop(0)
+command.pop(0)
+command.pop(0)
+command.pop(0)
+command.extend(selectedFileNames)
+
+# Now run process.
+returnCode = subprocess.call(command)
