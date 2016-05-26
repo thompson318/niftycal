@@ -9,10 +9,18 @@ if len(sys.argv) < 5:
     print 'Usage: launch_point_calibration_test.py dirName numberOfSamples endsWith [command]'
     exit()
 
+def file_len(fname):
+    p = subprocess.Popen(['wc', '-l', fname], stdout=subprocess.PIPE, 
+                                              stderr=subprocess.PIPE)
+    result, err = p.communicate()
+    if p.returncode != 0:
+        raise IOError(err)
+    return int(result.strip().split()[0])
+
 # Get all bmp files in the specified path.
 fileNames = []
 for f in os.listdir(sys.argv[1]):
-    if f.endswith(sys.argv[3]):
+    if f.endswith(sys.argv[3]) and file_len(f) > 50:
         fileNames.append(f)
 
 # Get a sample of file indexes.
