@@ -22,6 +22,8 @@ namespace niftk {
 //-----------------------------------------------------------------------------
 OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize)
 : m_PatternSize(patternSize)
+, m_UseContours(true)
+, m_UseTemplateMatching(false)
 {
   if (m_PatternSize.width < 2)
   {
@@ -37,6 +39,20 @@ OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize)
 //-----------------------------------------------------------------------------
 OpenCVRingsPointDetector::~OpenCVRingsPointDetector()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetUseContours(bool useContours)
+{
+  m_UseContours = useContours;
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetUseTemplateMatching(bool useTemplateMatching)
+{
+  m_UseTemplateMatching = useTemplateMatching;
 }
 
 
@@ -160,9 +176,33 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 
 
 //-----------------------------------------------------------------------------
+PointSet OpenCVRingsPointDetector::GetPointsUsingTemplateMatching(
+    const cv::Mat& image, const niftk::PointSet& startingGuess)
+{
+  return m_CachedPoints;
+}
+
+
+//-----------------------------------------------------------------------------
 PointSet OpenCVRingsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
-  return this->GetPointsUsingContours(imageToUse);
+  niftk::PointSet result;
+  if (!m_UseContours && !m_UseTemplateMatching)
+  {
+    return result;
+  }
+
+  if (m_CachedPoints.size() == 0 || m_UseContours)
+  {
+    m_CachedPoints = this->GetPointsUsingContours(imageToUse);
+  }
+
+  if (m_UseTemplateMatching)
+  {
+    m_CachedPoints = this->GetPointsUsingTemplateMatching(imageToUse, m_CachedPoints);
+  }
+  result = m_CachedPoints;
+  return result;
 }
 
 } // end namespace

@@ -43,6 +43,9 @@ protected:
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 
+  void SetUseContours(bool useContours);
+  void SetUseTemplateMatching(bool useTemplateMatching);
+
 private:
 
   void ExtractBlobs(const cv::Mat& image,
@@ -51,8 +54,12 @@ private:
                    );
 
   PointSet GetPointsUsingContours(const cv::Mat& image);
+  PointSet GetPointsUsingTemplateMatching(const cv::Mat& image, const niftk::PointSet& startingGuess);
 
-  cv::Size2i m_PatternSize;
+  cv::Size2i      m_PatternSize;
+  bool            m_UseContours;
+  bool            m_UseTemplateMatching;
+  niftk::PointSet m_CachedPoints;
 };
 
 } // end namespace
