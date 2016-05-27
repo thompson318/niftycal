@@ -18,6 +18,7 @@ set(TEST_CASES
   niftkPointDistortionTest
   niftkExtractChessboardPointsTest
   niftkExtractCirclesPointsTest
+  niftkExtractRingsPointsTest
   niftkWarpChessboardByHomographyTest
   niftkMonoChessboardCameraCalibrationTest
   niftkIterativeMonoChessboardCameraCalibrationTest
@@ -53,6 +54,8 @@ add_test(ExtChessSim3 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/r
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 1 1 640 480 9 6)
 add_test(ExtChessCMU1 niftkExtractChessboardPointsTest ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp 1 1 720 480 10 7)
 add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 1280 1024 11 4)
+add_test(ExtRings1 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp 720 480 10 7 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.txt)
+add_test(ExtRings2 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/ring_0_0_0_no_edge.bmp 487 339 10 7 ${DATA_DIR}/CMU/ring_0_0_0_no_edge.txt)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35)
 add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35)
 add_test(ExtAprilTags3 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72)

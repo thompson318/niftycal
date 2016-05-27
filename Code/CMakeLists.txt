@@ -24,6 +24,7 @@ set(NIFTYCAL_SRCS
   niftkOpenCVPointDetector.cxx
   niftkOpenCVChessboardPointDetector.cxx
   niftkOpenCVCirclesPointDetector.cxx
+  niftkOpenCVRingsPointDetector.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
