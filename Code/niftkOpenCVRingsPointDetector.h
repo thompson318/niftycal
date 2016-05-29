@@ -33,8 +33,18 @@ class NIFTYCAL_WINEXPORT OpenCVRingsPointDetector : public OpenCVPointDetector
 
 public:
 
-  OpenCVRingsPointDetector(cv::Size2i patternSize);
+  OpenCVRingsPointDetector(cv::Size2i patternSize,      // i.e. how many rings in x,y.
+                           cv::Size2i offsetForTemplate // how many pixels to search in x,y.
+                           );
   virtual ~OpenCVRingsPointDetector();
+
+  void SetMaxAreaInPixels(unsigned long int& pixels);
+  void SetUseContours(bool useContours);
+  void SetUseInternalResampling(bool useResampling);
+  void SetUseTemplateMatching(bool useTemplateMatching);
+  void SetReferencePoints(const niftk::PointSet& points);
+  void SetReferenceImage(cv::Mat* image);
+  void SetTemplateImage(cv::Mat* image);
 
 protected:
 
@@ -42,9 +52,6 @@ protected:
   * \see niftk::OpenCVPointDetector::InternalGetPoints()
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
-
-  void SetUseContours(bool useContours);
-  void SetUseTemplateMatching(bool useTemplateMatching);
 
 private:
 
@@ -55,11 +62,20 @@ private:
 
   PointSet GetPointsUsingContours(const cv::Mat& image);
   PointSet GetPointsUsingTemplateMatching(const cv::Mat& image, const niftk::PointSet& startingGuess);
-
-  cv::Size2i      m_PatternSize;
-  bool            m_UseContours;
-  bool            m_UseTemplateMatching;
-  niftk::PointSet m_CachedPoints;
+  PointSet DoTemplateMatchingForAllPoints(const cv::Mat& image,
+                                          const cv::Mat& templateImage,
+                                          const niftk::PointSet& startingPoints
+                                          );
+  cv::Size2i        m_PatternSize;
+  cv::Size2i        m_OffsetForTemplate;
+  unsigned long int m_MaxAreaInPixels;
+  bool              m_UseContours;
+  bool              m_UseInternalResampling;
+  bool              m_UseTemplateMatching;
+  niftk::PointSet   m_ReferencePoints;
+  cv::Mat*          m_ReferenceImage;
+  cv::Mat*          m_TemplateImage;
+  niftk::PointSet   m_CachedPoints;
 };
 
 } // end namespace

@@ -40,7 +40,7 @@ NIFTYCAL_WINEXPORT void WarpPointsByHomography(const PointSet& src,
 */
 NIFTYCAL_WINEXPORT void FindHomography(const PointSet& src,
                                        const PointSet& target,
-                                       const cv::Mat& homography
+                                       cv::Mat& homography
                                       );
 
 

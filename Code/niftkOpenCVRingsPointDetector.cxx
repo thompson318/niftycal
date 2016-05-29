@@ -14,16 +14,25 @@
 
 #include "niftkOpenCVRingsPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkHomographyUtilities.h"
+#include "niftkMatrixUtilities.h"
 #include <cv.h>
 #include <highgui.h>
 
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize)
+OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize,
+                                                   cv::Size2i offsetForTemplate
+                                                   )
 : m_PatternSize(patternSize)
+, m_OffsetForTemplate(offsetForTemplate)
+, m_MaxAreaInPixels(10000)
 , m_UseContours(true)
-, m_UseTemplateMatching(false)
+, m_UseInternalResampling(true)
+, m_UseTemplateMatching(true)
+, m_ReferenceImage(nullptr)
+, m_TemplateImage(nullptr)
 {
   if (m_PatternSize.width < 2)
   {
@@ -33,12 +42,27 @@ OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize)
   {
     niftkNiftyCalThrow() << "Number of circles in height axes is < 2.";
   }
+  if (offsetForTemplate.width < 1)
+  {
+    niftkNiftyCalThrow() << "Offset width must be >= 1";
+  }
+  if (offsetForTemplate.height < 1)
+  {
+    niftkNiftyCalThrow() << "Offset height must be >= 1";
+  }
 }
 
 
 //-----------------------------------------------------------------------------
 OpenCVRingsPointDetector::~OpenCVRingsPointDetector()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetMaxAreaInPixels(unsigned long int& pixels)
+{
+  m_MaxAreaInPixels = pixels;
 }
 
 
@@ -53,6 +77,34 @@ void OpenCVRingsPointDetector::SetUseContours(bool useContours)
 void OpenCVRingsPointDetector::SetUseTemplateMatching(bool useTemplateMatching)
 {
   m_UseTemplateMatching = useTemplateMatching;
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetUseInternalResampling(bool useResampling)
+{
+  m_UseInternalResampling = useResampling;
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetReferencePoints(const niftk::PointSet& points)
+{
+  m_ReferencePoints = points;
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetReferenceImage(cv::Mat* image)
+{
+  m_ReferenceImage = image;
+}
+
+
+//-----------------------------------------------------------------------------
+void OpenCVRingsPointDetector::SetTemplateImage(cv::Mat* image)
+{
+  m_TemplateImage = image;
 }
 
 
@@ -133,7 +185,7 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
   this->ExtractBlobs(image, bigBlobs, littleBlobs);
 
   cv::SimpleBlobDetector::Params params;
-  params.maxArea = 10e4;
+  params.maxArea = m_MaxAreaInPixels;
   cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
 
   std::vector<cv::Point2f> bigCentres;
@@ -157,7 +209,6 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 
   assert(littleCentres.size() == bigCentres.size());
 
-  // Output
   if (   littleCentres.size() == numberOfRings
       && bigCentres.size() == numberOfRings
       )
@@ -179,28 +230,134 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 PointSet OpenCVRingsPointDetector::GetPointsUsingTemplateMatching(
     const cv::Mat& image, const niftk::PointSet& startingGuess)
 {
-  return m_CachedPoints;
+  niftk::PointSet result;
+
+  if (m_UseInternalResampling)
+  {
+    cv::Mat homography;
+    niftk::FindHomography(startingGuess, m_ReferencePoints, homography);
+
+    cv::Mat warpedImage;
+    cv::warpPerspective(image, warpedImage, homography, m_ReferenceImage->size(), cv::INTER_LINEAR);
+
+    niftk::PointSet warpedPoints;
+    niftk::WarpPointsByHomography(startingGuess, homography, warpedPoints);
+
+    niftk::PointSet matchedPoints = this->DoTemplateMatchingForAllPoints(warpedImage, *m_TemplateImage, warpedPoints);
+    niftk::WarpPointsByHomography(matchedPoints, homography.inv(), result);
+  }
+  else
+  {
+    result = this->DoTemplateMatchingForAllPoints(image, *m_TemplateImage, startingGuess);
+  }
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
+PointSet OpenCVRingsPointDetector::DoTemplateMatchingForAllPoints(
+    const cv::Mat& image, const cv::Mat& templateImage, const niftk::PointSet& startingPoints)
+{
+  // This is the output.
+  niftk::PointSet updatedPoints;
+
+  cv::Size2i templateSize = templateImage.size();
+
+  cv::Point2d halfTemplateSize;
+  halfTemplateSize.x = (templateSize.width - 1)/2.0;
+  halfTemplateSize.y = (templateSize.height - 1)/2.0;
+
+  // Copy template into float image - once.
+  cv::Mat templateAsFloat = cvCreateMat(templateImage.cols, templateImage.rows, CV_32F);
+  templateImage.convertTo(templateAsFloat, CV_32F);
+
+  // This is to store a copy of the image data, as we need float.
+  cv::Mat regionAsFloat = cvCreateMat(2 * m_OffsetForTemplate.width + templateSize.width,
+                                      2 * m_OffsetForTemplate.height + templateSize.height,
+                                      CV_32F
+                                     );
+
+  // This is the results array, temporary storage, for output of template matching.
+  cv::Mat result = cvCreateMat(regionAsFloat.cols - templateAsFloat.cols + 1,
+                               regionAsFloat.rows - templateAsFloat.rows + 1,
+                               CV_32F
+                              );
+
+  cv::Point2d startingOffset;
+  startingOffset.x = m_OffsetForTemplate.width + halfTemplateSize.x;
+  startingOffset.y = m_OffsetForTemplate.height + halfTemplateSize.y;
+
+  double minVal = 0;
+  double maxVal = 0;
+  cv::Point minLoc;
+  cv::Point maxLoc;
+  cv::Point matchLoc;
+  cv::Point2d originalPoint;
+  cv::Point2d interpolatedPoint;
+  niftk::Point2D p;
+  cv::Matx33d surface;
+
+  niftk::PointSet::const_iterator iter;
+  for (iter  = startingPoints.begin();
+       iter != startingPoints.end();
+       ++iter
+       )
+  {
+    originalPoint = (*iter).second.point;
+    niftk::NiftyCalIdType id = (*iter).first;
+
+    cv::Rect rect(static_cast<int>(originalPoint.x - startingOffset.x),
+                  static_cast<int>(originalPoint.y - startingOffset.y),
+                  regionAsFloat.cols,
+                  regionAsFloat.rows
+                  );
+
+    cv::Mat region(image, rect);
+    region.convertTo(regionAsFloat, CV_32F);
+
+    cv::matchTemplate( regionAsFloat, templateAsFloat, result, cv::TM_CCOEFF_NORMED );
+    cv::minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );
+    matchLoc = maxLoc;
+
+    for (int r = 0; r < 3; r++)
+    {
+      for (int c = 0; c < 3; c++)
+      {
+        surface(r, c) = result.at<float>(matchLoc.y - 1 + r, matchLoc.x - 1 + c);
+      }
+    }
+    niftk::InterpolateMaximumOfQuadraticSurface(surface, interpolatedPoint);
+
+    p.id = id;
+    p.point.x = rect.x + matchLoc.x + interpolatedPoint.x + halfTemplateSize.x;
+    p.point.y = rect.y + matchLoc.y + interpolatedPoint.y + halfTemplateSize.y;
+
+    updatedPoints.insert(niftk::IdPoint2D(id, p));
+  }
+  return updatedPoints;
 }
 
 
 //-----------------------------------------------------------------------------
 PointSet OpenCVRingsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
-  niftk::PointSet result;
   if (!m_UseContours && !m_UseTemplateMatching)
   {
-    return result;
+    niftkNiftyCalThrow() << "You must chose contour detection or template matching.";
   }
+
+  niftk::PointSet result;
 
   if (m_CachedPoints.size() == 0 || m_UseContours)
   {
     m_CachedPoints = this->GetPointsUsingContours(imageToUse);
   }
 
-  if (m_UseTemplateMatching)
+  if (m_UseTemplateMatching && m_CachedPoints.size() > 0)
   {
     m_CachedPoints = this->GetPointsUsingTemplateMatching(imageToUse, m_CachedPoints);
   }
+
   result = m_CachedPoints;
   return result;
 }

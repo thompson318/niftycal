@@ -16,10 +16,12 @@ set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
 set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkPointDistortionTest
+  niftkMatrixAverageTest
+  niftkWarpChessboardByHomographyTest
+  niftkInterpolateQuadraticSurfaceTest
   niftkExtractChessboardPointsTest
   niftkExtractCirclesPointsTest
   niftkExtractRingsPointsTest
-  niftkWarpChessboardByHomographyTest
   niftkMonoChessboardCameraCalibrationTest
   niftkIterativeMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
@@ -27,7 +29,6 @@ set(TEST_CASES
   niftkIterativeStereoCirclesCameraCalibrationTest
   niftkIterativeStereoAprilTagsCameraCalibrationTest
   niftkIterativeMonoAprilTagsCameraCalibrationTest
-  niftkMatrixAverageTest
   niftkMonoChessboardHandEyeCalibrationTest
 )
 
@@ -48,22 +49,23 @@ endforeach()
 ##################################################################################################
 
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
+add_test(InterpSurf1 niftkInterpolateQuadraticSurfaceTest)
+add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
+add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
+add_test(AveMatrix1 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
+add_test(AveMatrix2 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(AveMatrix3 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
 add_test(ExtChessSim1 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png 1 1 1500 1100 14 10)
 add_test(ExtChessSim2 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10)
 add_test(ExtChessSim3 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_375_275_14_10.png 1 1 375 275 14 10)
 add_test(ExtChessZhang1 niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png 1 1 640 480 9 6)
 add_test(ExtChessCMU1 niftkExtractChessboardPointsTest ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp 1 1 720 480 10 7)
 add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 1280 1024 11 4)
-add_test(ExtRings1 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp 720 480 10 7 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.txt)
-add_test(ExtRings2 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/ring_0_0_0_no_edge.bmp 487 339 10 7 ${DATA_DIR}/CMU/ring_0_0_0_no_edge.txt)
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35)
 add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35)
 add_test(ExtAprilTags3 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72)
-add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
-add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
-add_test(AveMatrix1 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
-add_test(AveMatrix2 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
-add_test(AveMatrix3 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(ExtRings1 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/ring_12_9.bmp ${DATA_DIR}/CMU/ring_12_9.bmp ${DATA_DIR}/CMU/ring_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 8496 6372 10 7 ${DATA_DIR}/CMU/ring_10_7_on_12_9.txt 260000 1 0.1)
+add_test(ExtRings2 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp ${DATA_DIR}/CMU/ring_12_9.bmp ${DATA_DIR}/CMU/ring_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 720 480 10 7 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_test.txt 10000 0 2.0)
 
 # For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera.
 add_test(CalibLapMonoLeft niftkMonoChessboardCameraCalibrationTest

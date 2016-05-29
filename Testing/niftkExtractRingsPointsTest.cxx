@@ -14,7 +14,9 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
+#include <niftkIOUtilities.h>
 #include <niftkOpenCVRingsPointDetector.h>
+#include <niftkNiftyCalExceptionMacro.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -22,19 +24,25 @@
 
 TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
-  int expectedNumberOfArguments =  7;
+  int expectedNumberOfArguments =  13;
   if (niftk::argc != expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkExtractRingsPointsTest image expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedPoints" << std::endl;
+    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedPoints maxArea method tolerance" << std::endl;
     REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
-  int expectedWidth = atoi(niftk::argv[2]);
-  int expectedHeight = atoi(niftk::argv[3]);
-  int expectedColumns = atoi(niftk::argv[4]);
-  int expectedCirclesPerColumn = atoi(niftk::argv[5]);
-  std::string expectedPointsFile = niftk::argv[6];
+  cv::Mat referenceImage = cv::imread(niftk::argv[2]);
+  std::string referencePointsFileName = niftk::argv[3];
+  cv::Mat templateImage = cv::imread(niftk::argv[4]);
+  int expectedWidth = atoi(niftk::argv[5]);
+  int expectedHeight = atoi(niftk::argv[6]);
+  int expectedColumns = atoi(niftk::argv[7]);
+  int expectedCirclesPerColumn = atoi(niftk::argv[8]);
+  std::string expectedPointsFileName = niftk::argv[9];
+  unsigned long int maxArea = atoi(niftk::argv[10]);
+  int method = atoi(niftk::argv[11]);
+  double tolerance = atof(niftk::argv[12]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -42,10 +50,61 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
-  niftk::OpenCVRingsPointDetector detector(patternSize);
-  detector.SetImage(&greyImage);
-  niftk::PointSet points = detector.GetPoints();
+  cv::Mat greyReference;
+  cv::cvtColor(referenceImage, greyReference, CV_BGR2GRAY);
 
+  cv::Mat greyTemplate;
+  cv::cvtColor(templateImage, greyTemplate, CV_BGR2GRAY);
+
+  niftk::PointSet referencePoints = niftk::LoadPointSet(referencePointsFileName);
+  REQUIRE( referencePoints.size() == expectedCirclesPerColumn * expectedColumns );
+
+  niftk::PointSet expectedPoints = niftk::LoadPointSet(expectedPointsFileName);
+  REQUIRE( expectedPoints.size() == expectedCirclesPerColumn * expectedColumns );
+
+  cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
+  cv::Size2i offsetSize(10, 10);
+
+  niftk::OpenCVRingsPointDetector detector(patternSize, offsetSize);
+  detector.SetImage(&greyImage);
+  detector.SetTemplateImage(&greyTemplate);
+  detector.SetReferenceImage(&greyReference);
+  detector.SetReferencePoints(referencePoints);
+  detector.SetMaxAreaInPixels(maxArea);
+
+  if (method == 0)
+  {
+    detector.SetUseContours(true);
+    detector.SetUseTemplateMatching(false);
+  }
+  else
+  {
+    detector.SetUseContours(true);
+    detector.SetUseTemplateMatching(true);
+  }
+
+  niftk::PointSet points = detector.GetPoints();
   REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
+
+  // check expected points
+  niftk::PointSet::const_iterator iter;
+  niftk::PointSet::const_iterator actualIter;
+
+  for (iter = expectedPoints.begin();
+       iter != expectedPoints.end();
+       ++iter
+       )
+  {
+    niftk::Point2D exp = (*iter).second;
+    actualIter = points.find((*iter).first);
+
+    if (actualIter == points.end())
+    {
+      niftkNiftyCalThrow() << "Failed to find point:" << (*iter).first;
+    }
+
+    niftk::Point2D actual = (*actualIter).second;
+    REQUIRE(fabs((*iter).second.point.x - (*actualIter).second.point.x) < tolerance);
+    REQUIRE(fabs((*iter).second.point.y - (*actualIter).second.point.y) < tolerance);
+  }
 }

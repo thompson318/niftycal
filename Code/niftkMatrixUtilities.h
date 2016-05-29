@@ -102,6 +102,19 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     double& residualTranslation
     );
 
+
+/**
+* \brief Given a 3x3 matrix, where the middle entry is the
+* maximum of that neighbourhood, will fit a quadratic surface
+* and then find the maximum, for sub-pixel resolution.
+*
+* Assumes the middle entry is coordinate (0, 0), so the
+* outputPoint is a (dx, dy) from the centre.
+*/
+NIFTYCAL_WINEXPORT void InterpolateMaximumOfQuadraticSurface(
+    const cv::Matx33d& matrix, cv::Point2d& outputPoint
+    );
+
 } // end namespace
 
 #endif

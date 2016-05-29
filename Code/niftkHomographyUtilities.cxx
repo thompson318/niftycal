@@ -39,10 +39,27 @@ void WarpPointsByHomography(const PointSet& src,
 //-----------------------------------------------------------------------------
 void FindHomography(const PointSet& src,
                     const PointSet& target,
-                    const cv::Mat& homography
+                    cv::Mat& homography
                    )
 {
-  niftkNiftyCalThrow() << "Not implemented yet";
+  std::vector<cv::Point2f> srcPoint;
+  std::vector<cv::Point2f> targetPoint;
+  niftk::ExtractCommonPoints(src , target, srcPoint, targetPoint);
+
+  if (srcPoint.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No source points.";
+  }
+  if (targetPoint.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No target points.";
+  }
+  if (srcPoint.size() != targetPoint.size())
+  {
+    niftkNiftyCalThrow() << "Different number of source and target points.";
+  }
+
+  homography = cv::findHomography(srcPoint, targetPoint, 0);
 }
 
 

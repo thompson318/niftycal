@@ -507,4 +507,79 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   return eyeHand.inv(cv::DECOMP_SVD);
 }
 
+
+//-----------------------------------------------------------------------------
+void InterpolateMaximumOfQuadraticSurface(
+    const cv::Matx33d& matrix, cv::Point2d& outputPoint
+    )
+{
+  outputPoint.x = 0;
+  outputPoint.y = 0;
+
+  cv::Point maxIndex;
+  double maxValue = std::numeric_limits<double>::lowest();
+
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      double value = matrix(r,c);
+
+      if (value > maxValue)
+      {
+        maxIndex.x = c;
+        maxIndex.y = r;
+        maxValue = value;
+      }
+    }
+  }
+  // If the maximum of the given matrix is not the middle
+  // pixel, give up, as interpolation will fail.
+  if (maxIndex.x != 1 || maxIndex.y != 1)
+  {
+    return;
+  }
+
+  cv::Mat A = cvCreateMat ( 9, 6, CV_64FC1 );
+  cv::Mat B = cvCreateMat ( 9, 1, CV_64FC1 );
+  int rowCounter = 0;
+  for (int y = -1; y <= 1; y++)
+  {
+    for (int x = -1; x <= 1; x++)
+    {
+      A.at<double>(rowCounter, 0) = x*x;
+      A.at<double>(rowCounter, 1) = y*y;
+      A.at<double>(rowCounter, 2) = x;
+      A.at<double>(rowCounter, 3) = y;
+      A.at<double>(rowCounter, 4) = x*y;
+      A.at<double>(rowCounter, 5) = 1;
+      B.at<double>(rowCounter, 0) = matrix(y+1, x+1);
+      rowCounter++;
+    }
+  }
+  cv::Mat invA = cvCreateMat ( 6, 9, CV_64FC1 );
+  cv::invert(A, invA, cv::DECOMP_SVD);
+
+  cv::Mat X = invA * B;
+
+  double a = X.at<double>(0, 0);
+  double b = X.at<double>(1, 0);
+  double c = X.at<double>(2, 0);
+  double d = X.at<double>(3, 0);
+  double e = X.at<double>(4, 0);
+//  double f = X.at<double>(5, 0); - not needed in 2nd deriv.
+
+  double dxx = -1*(2*b*c - d*e)/(4*a*b - e*e);
+  double dyy = -1*(2*a*d - c*e)/(4*a*b - e*e);
+
+  // If offset > 1, interpolation must be a poor fit.
+  if (fabs(dxx) > 1 || fabs(dyy) > 1)
+  {
+    return;
+  }
+
+  outputPoint.x = dxx;
+  outputPoint.y = dyy;
+}
+
 } // end namespace
