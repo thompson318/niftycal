@@ -106,8 +106,6 @@ double IterativeMonoCameraCalibration(
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
 
-    std::list<PointSet> trimmedPoints;
-
     for (originalIter = detectorAndOriginalImages.begin(),
          canonicalIter = detectorAndWarpedImages.begin(),
          pointsIter = distortedPointsFromCanonicalImages.begin();
@@ -119,16 +117,14 @@ double IterativeMonoCameraCalibration(
          ++pointsIter
          )
     {
-      trimmedPoints.push_back(
-            niftk::ExtractDistortedControlPoints(
-            referenceImageData,
-            intrinsic,
-            distortion,
-            (*originalIter).second,
-            (*canonicalIter),
-            (*pointsIter)
-            )
-       );
+      niftk::ExtractDistortedControlPoints(
+        referenceImageData,
+        intrinsic,
+        distortion,
+        (*originalIter).second,
+        (*canonicalIter),
+        (*pointsIter)
+      );
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine

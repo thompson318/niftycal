@@ -19,9 +19,7 @@ namespace niftk
 {
 
 //-------------------------------------------------------------------
-double CalibrateTimingOffset(
-    std::list< std::pair<cv::Point2d, cv::Matx44d> >
-    )
+double CalibrateTimingOffset(std::list< std::pair<cv::Point2d, cv::Matx44d> >& data)
 {
   niftkNiftyCalThrow() << "Not implemented yet";
   return 0;

@@ -36,9 +36,7 @@ namespace niftk
  * calculates that time offset. The offset is additive, meaning it should be added
  * to the actual timestamp associated with any given video frame.
  */
-NIFTYCAL_WINEXPORT double CalibrateTimingOffset(
-    std::list< std::pair<cv::Point2d, cv::Matx44d> >
-    );
+NIFTYCAL_WINEXPORT double CalibrateTimingOffset(std::list< std::pair<cv::Point2d, cv::Matx44d> >& data);
 
 } // end namespace
 

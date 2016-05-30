@@ -25,14 +25,14 @@ void WarpPointsByHomography(const PointSet& src,
                             PointSet& target
                            )
 {
-  std::vector<cv::Point2f> srcP;
+  std::vector<cv::Point2f> srcPoint;
   std::vector<niftk::NiftyCalIdType> srcId;
-  std::vector<cv::Point2f> targP;
+  std::vector<cv::Point2f> targetPoint;
   target.clear();
 
-  niftk::ConvertPoints(src, srcP, srcId);
-  cv::perspectiveTransform(srcP, targP, h);
-  niftk::ConvertPoints(targP, srcId, target);
+  niftk::ConvertPoints(src, srcPoint, srcId);
+  cv::perspectiveTransform(srcPoint, targetPoint, h);
+  niftk::ConvertPoints(targetPoint, srcId, target);
 }
 
 
@@ -58,8 +58,7 @@ void FindHomography(const PointSet& src,
   {
     niftkNiftyCalThrow() << "Different number of source and target points.";
   }
-
-  homography = cv::findHomography(srcPoint, targetPoint, 0);
+  homography = cv::findHomography(srcPoint, targetPoint);
 }
 
 
@@ -132,7 +131,7 @@ void WarpImageByHomography(const cv::Mat& inputImage,
                            cv::Mat& outputImage
                           )
 {
-  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize,cv::INTER_LINEAR);
+  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize, cv::INTER_LINEAR);
 }
 
 } // end namespace

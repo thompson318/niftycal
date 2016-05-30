@@ -40,6 +40,7 @@ public:
   virtual ~AprilTagsPointDetector();
 
 protected:
+
   /**
   * \see niftk::OpenCVPointDetector::InternalGetPoints()
   */

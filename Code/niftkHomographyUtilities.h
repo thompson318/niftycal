@@ -20,7 +20,7 @@
 
 /**
 * \file niftkHomographyUtilities.h
-* \brief Utilities for mapping images between homographies.
+* \brief Utilities for mapping images and points using homographies.
 */
 namespace niftk
 {

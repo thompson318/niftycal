@@ -189,9 +189,6 @@ double IterativeStereoCameraCalibration(
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
 
-    std::list<PointSet> trimmedPointsLeft;
-    std::list<PointSet> trimmedPointsRight;
-
     // Do all left.
     for (originalIter = detectorAndOriginalImagesLeft.begin(),
          canonicalIter = detectorAndWarpedImagesLeft.begin(),
@@ -204,15 +201,13 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
-      trimmedPointsLeft.push_back(
-            niftk::ExtractDistortedControlPoints(
-            referenceImageData,
-            intrinsicLeft,
-            distortionLeft,
-            (*originalIter).second,
-            (*canonicalIter),
-            (*pointsIter)
-            )
+      niftk::ExtractDistortedControlPoints(
+        referenceImageData,
+        intrinsicLeft,
+        distortionLeft,
+        (*originalIter).second,
+        (*canonicalIter),
+        (*pointsIter)
       );
     }
 
@@ -228,15 +223,13 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
-      trimmedPointsRight.push_back(
-            niftk::ExtractDistortedControlPoints(
-            referenceImageData,
-            intrinsicRight,
-            distortionRight,
-            (*originalIter).second,
-            (*canonicalIter),
-            (*pointsIter)
-            )
+      niftk::ExtractDistortedControlPoints(
+        referenceImageData,
+        intrinsicRight,
+        distortionRight,
+        (*originalIter).second,
+        (*canonicalIter),
+        (*pointsIter)
       );
     }
 
