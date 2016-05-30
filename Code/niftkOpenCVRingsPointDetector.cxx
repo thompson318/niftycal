@@ -336,6 +336,16 @@ PointSet OpenCVRingsPointDetector::DoTemplateMatchingForAllPoints(
     p.point.y = rect.y + matchLoc.y + interpolatedPoint.y + halfTemplateSize.y;
 
     updatedPoints.insert(niftk::IdPoint2D(id, p));
+/*
+    std::cerr << "Size=" << updatedPoints.size()
+              << ", id=" << id
+              << ", ip=" << originalPoint
+              << ", op=" << p.point
+              << ", ml=" << matchLoc
+              << ", ip=" << interpolatedPoint
+              << ", r=" << rect
+              << std::endl;
+*/
   }
   return updatedPoints;
 }

@@ -71,14 +71,15 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
                                     const PointSet& targetPoints,
                                     const cv::Size2i outputImageSize,
                                     cv::Mat& outputHomography,
-                                    cv::Mat& outputImage
+                                    cv::Mat& outputImage,
+                                    PointSet& outputPoints
                                    )
 {
   std::vector<cv::Point2f> distortedSource;
   std::vector<cv::Point2f> undistortedSource;
   std::vector<cv::Point2f> target;
 
-  niftk::ExtractCommonPoints(distortedPoints , targetPoints, distortedSource, target);
+  niftk::ExtractCommonPoints(distortedPoints, targetPoints, distortedSource, target);
 
   if (distortedSource.size() == 0)
   {
@@ -93,10 +94,15 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
     niftkNiftyCalThrow() << "Different number of source and target points.";
   }
 
+  std::vector<niftk::NiftyCalIdType> ids;
+  std::vector<cv::Point2f> convertedSource;
+  std::vector<cv::Point2f> convertedSourceTransformed;
+  niftk::ConvertPoints(distortedPoints, convertedSource, ids);
+
   if (cameraIntrinsics.rows == 3
       && cameraIntrinsics.cols == 3
-      && distortionCoefficients.rows == 1
-      && distortionCoefficients.cols == 4
+      && distortionCoefficients.rows > 0
+      && distortionCoefficients.cols > 0
       )
   {
     cv::undistortPoints(distortedSource,
@@ -107,11 +113,14 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
                         cameraIntrinsics);
 
     outputHomography = cv::findHomography(undistortedSource, target);
+    cv::perspectiveTransform(undistortedSource, convertedSourceTransformed, outputHomography);
   }
   else
   {
-    outputHomography = cv::findHomography(distortedSource, target, 0);
+    outputHomography = cv::findHomography(distortedSource, target);
+    cv::perspectiveTransform(convertedSource, convertedSourceTransformed, outputHomography);
   }
+  niftk::ConvertPoints(convertedSourceTransformed, ids, outputPoints);
   niftk::WarpImageByHomography(inputImage, outputHomography, outputImageSize, outputImage);
 }
 

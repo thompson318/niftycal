@@ -47,6 +47,9 @@ NIFTYCAL_WINEXPORT void FindHomography(const PointSet& src,
 /**
 * \brief Warps inputImage to outputImage, depending on
 * homography that maps between distortedPoints and targetPoints.
+* \param distortedPoints points detected in the original video image
+* \param targetPoints reference points in the canonical/reference image
+* \param outputPoints warped points, that should be very close to the reference points
 */
 NIFTYCAL_WINEXPORT void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
                                                        const cv::Mat& cameraIntrinsics,
@@ -55,7 +58,8 @@ NIFTYCAL_WINEXPORT void WarpImageByCorrespondingPoints(const cv::Mat& inputImage
                                                        const PointSet& targetPoints,
                                                        const cv::Size2i outputImageSize,
                                                        cv::Mat& outputHomography,
-                                                       cv::Mat& outputImage
+                                                       cv::Mat& outputImage,
+                                                       PointSet& outputPoints
                                                       );
 
 

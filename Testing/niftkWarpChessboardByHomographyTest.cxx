@@ -63,7 +63,18 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   REQUIRE(targetPointSet.size() >= 4);
   REQUIRE(targetPointSet.size() == sourcePointSet.size());
 
-  niftk::WarpImageByCorrespondingPoints(greyImage1, dummyIntrinsics, dummyDistortion, sourcePointSet, targetPointSet, greyImage1.size(), outputHomography, warpedImage);
+  niftk::PointSet transformedPoints;
+  niftk::WarpImageByCorrespondingPoints(greyImage1,
+                                        dummyIntrinsics,
+                                        dummyDistortion,
+                                        sourcePointSet,
+                                        targetPointSet,
+                                        greyImage1.size(),
+                                        outputHomography,
+                                        warpedImage,
+                                        transformedPoints
+                                       );
+
   REQUIRE(greyImage2.rows == warpedImage.rows);
   REQUIRE(greyImage2.cols == warpedImage.cols);
 

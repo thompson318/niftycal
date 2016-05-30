@@ -66,6 +66,7 @@ PointSet ExtractDistortedControlPoints(
   PointSet cp;
   PointSet cpi;
   PointSet cpid;
+  PointSet initialGuess;
 
   cv::Size2i outputImageSize;
   outputImageSize.width = referenceData.first.cols;
@@ -83,8 +84,15 @@ PointSet ExtractDistortedControlPoints(
         referenceData.second,          // specifies the target point locations
         outputImageSize,               // specifies the proposed size of warped image
         h,                             // output homography, written into
-        outputDetectorAndImage.second  // output image, written into
+        outputDetectorAndImage.second, // output image, written into
+        initialGuess
         );
+
+  // IF the point detector supports it, we can tell it a hint
+  // as to indicate what the initial guess should be for whatever
+  // point extraction it does in the canonical image space.
+  // Probably no use for corner detection, but good for template matching.
+  outputDetectorAndImage.first->SetInitialGuess(initialGuess);
 
   // 2. Localize control points: Localize calibration pattern control
   // points in the canonical pattern.

@@ -294,9 +294,9 @@ add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
   10 7                                                                   # internal corners
   ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt           # 2D points for reference image
   0                                                                      # zero distortion (1==true)
-  0.120261                                                              # RMS
-  1148.16 1148.52 360.429 239.556                                        # intrinsic. Should be 1150, 1150, 360.5 240.5.
-  -0.76516 1.96134 0.000388442 -0.000313784                             # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
+  0.121773                                                               # RMS
+  1147.76 1148.09 361.835 239.6                                          # intrinsic. Should be 1150, 1150, 360.5 240.5.
+  -0.737653 1.13968 0.000389667 -0.000417089                             # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_-45_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_-45_0_.bmp
@@ -413,9 +413,9 @@ add_test(CalibIterMonoAprilReal1 niftkIterativeMonoAprilTagsCameraCalibrationTes
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Simulation has proper scale factors
-  0.638673                                                  # RMS
-  1750.62 872.376 893.401 236.981                           # intrinsic
-  -0.33334 0.333568 0.00770179 -0.00197536                  # distortion
+  0.642218                                                  # RMS
+  1747.17 870.803 894.99 236.136                            # intrinsic
+  -0.331478 0.316505 0.00741399 -0.00205115                 # distortion
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
@@ -517,9 +517,9 @@ add_test(CalibIterMonoRingsSim1 niftkIterativeMonoRingsCameraCalibrationTest
   ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp
   10 7                                                  # number rings
   0                                                     # zero distortion (1==true)
-  0.276418                                              # RMS
-  1750.43 1749.62 637.976 513.424                       # intrinsic (should be 1750, 1750, 639.5, 511.5)
-  0 0 0 0                                               # distortion (should be 0, 0, 0, 0)
+  0.0127745                                             # RMS
+  1150.06 1150.06 359.523 239.518                       # intrinsic (should be 1750, 1750, 639.5, 511.5)
+  -0.719492 0.228066 0.000388386 3.21593e-05            # distortion (should be 0, 0, 0, 0)
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
