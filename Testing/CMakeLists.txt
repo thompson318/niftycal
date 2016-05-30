@@ -257,7 +257,7 @@ add_test(CalibIterLapLeft niftkIterativeMonoChessboardCameraCalibrationTest
 # Now try iterative on circles.
 # This currently fails. The problem is that the left and right
 # camera get calibrated differently. Then warping them to
-# the same reference image produces to high distortion on one channel,
+# the same reference image produces too high distortion on one channel,
 # causing subsequent circle extraction to fail.
 #add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
 #  ${DATA_DIR}/SimulationDots1/Left1.png                     # Model image
@@ -356,7 +356,6 @@ add_test(CalibIterStereoAprilSim niftkIterativeStereoAprilTagsCameraCalibrationT
 )
 
 # Now try iterative AprilTags on real data.
-
 add_test(CalibIterStereoAprilReal1 niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
