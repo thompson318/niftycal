@@ -56,7 +56,14 @@ public:
   */
   virtual PointSet GetPoints();
 
+  /**
+  * \brief Saves the initial guess internally.
+  */
+  virtual void SetInitialGuess(const PointSet& guess);
+
 protected:
+
+  niftk::PointSet m_InitialGuess;
 
   /**
   * \brief Derived classes should implement this to extract points.
@@ -64,9 +71,9 @@ protected:
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse) = 0;
 
 private:
-  cv::Mat*    m_Image;
-  cv::Mat     m_RescaledImage;
-  cv::Point2d m_ScaleFactors;
+  cv::Mat*        m_Image;
+  cv::Mat         m_RescaledImage;
+  cv::Point2d     m_ScaleFactors;
 };
 
 } // end namespace

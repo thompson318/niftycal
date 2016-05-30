@@ -37,8 +37,8 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::Mat templateImage = cv::imread(niftk::argv[4]);
   int expectedWidth = atoi(niftk::argv[5]);
   int expectedHeight = atoi(niftk::argv[6]);
-  int expectedColumns = atoi(niftk::argv[7]);
-  int expectedCirclesPerColumn = atoi(niftk::argv[8]);
+  int ringsInX = atoi(niftk::argv[7]);
+  int ringsInY = atoi(niftk::argv[8]);
   std::string expectedPointsFileName = niftk::argv[9];
   unsigned long int maxArea = atoi(niftk::argv[10]);
   int method = atoi(niftk::argv[11]);
@@ -57,12 +57,12 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::cvtColor(templateImage, greyTemplate, CV_BGR2GRAY);
 
   niftk::PointSet referencePoints = niftk::LoadPointSet(referencePointsFileName);
-  REQUIRE( referencePoints.size() == expectedCirclesPerColumn * expectedColumns );
+  REQUIRE( referencePoints.size() == ringsInX * ringsInY );
 
   niftk::PointSet expectedPoints = niftk::LoadPointSet(expectedPointsFileName);
-  REQUIRE( expectedPoints.size() == expectedCirclesPerColumn * expectedColumns );
+  REQUIRE( expectedPoints.size() == ringsInX * ringsInY );
 
-  cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
+  cv::Size2i patternSize(ringsInY, ringsInX);
   cv::Size2i offsetSize(10, 10);
 
   niftk::OpenCVRingsPointDetector detector(patternSize, offsetSize);
@@ -75,16 +75,18 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   if (method == 0)
   {
     detector.SetUseContours(true);
+    detector.SetUseInternalResampling(false);
     detector.SetUseTemplateMatching(false);
   }
   else
   {
     detector.SetUseContours(true);
+    detector.SetUseInternalResampling(true);
     detector.SetUseTemplateMatching(true);
   }
 
   niftk::PointSet points = detector.GetPoints();
-  REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
+  REQUIRE( points.size() == ringsInX * ringsInY );
 
   // check expected points
   niftk::PointSet::const_iterator iter;

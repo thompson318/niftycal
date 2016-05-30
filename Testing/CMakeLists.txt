@@ -30,6 +30,7 @@ set(TEST_CASES
   niftkIterativeStereoAprilTagsCameraCalibrationTest
   niftkIterativeMonoAprilTagsCameraCalibrationTest
   niftkMonoChessboardHandEyeCalibrationTest
+  niftkIterativeMonoRingsCameraCalibrationTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -507,4 +508,21 @@ add_test(CalibHandEyeMono niftkMonoChessboardHandEyeCalibrationTest
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/30.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
+)
+
+add_test(CalibIterMonoRingsSim1 niftkIterativeMonoRingsCameraCalibrationTest
+  ${DATA_DIR}/CMU/ring_12_9.bmp                         # Model image
+  ${DATA_DIR}/CMU/rings_10_7_3.txt                      # Model points
+  ${DATA_DIR}/CMU/ring_10_7_on_12_9.txt                 # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.276418                                              # RMS
+  1750.43 1749.62 637.976 513.424                       # intrinsic (should be 1750, 1750, 639.5, 511.5)
+  0 0 0 0                                               # distortion (should be 0, 0, 0, 0)
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_15_0_-5_.bmp
 )

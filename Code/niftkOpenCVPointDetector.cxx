@@ -60,6 +60,13 @@ void OpenCVPointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
 
 
 //-----------------------------------------------------------------------------
+void OpenCVPointDetector::SetInitialGuess(const PointSet& guess)
+{
+  m_InitialGuess = guess;
+}
+
+
+//-----------------------------------------------------------------------------
 PointSet OpenCVPointDetector::GetPoints()
 {
   if (m_Image == nullptr)

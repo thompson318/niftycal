@@ -184,6 +184,9 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
   cv::Mat littleBlobs; // inner circle
   this->ExtractBlobs(image, bigBlobs, littleBlobs);
 
+  cv::imwrite("/tmp/matt.little.png", littleBlobs);
+  cv::imwrite("/tmp/matt.big.png", bigBlobs);
+
   cv::SimpleBlobDetector::Params params;
   params.maxArea = m_MaxAreaInPixels;
   cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
@@ -348,17 +351,27 @@ PointSet OpenCVRingsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 
   niftk::PointSet result;
 
-  if (m_CachedPoints.size() == 0 || m_UseContours)
+  if (m_UseContours || m_InitialGuess.size() == 0)
   {
-    m_CachedPoints = this->GetPointsUsingContours(imageToUse);
+    result = this->GetPointsUsingContours(imageToUse);
   }
 
-  if (m_UseTemplateMatching && m_CachedPoints.size() > 0)
+  if (m_UseTemplateMatching)
   {
-    m_CachedPoints = this->GetPointsUsingTemplateMatching(imageToUse, m_CachedPoints);
-  }
+    if (m_InitialGuess.size() > 0)
+    {
+      if (m_InitialGuess.size() != m_PatternSize.width * m_PatternSize.height)
+      {
+        niftkNiftyCalThrow() << "Initial guess contains the wrong number of points.";
+      }
 
-  result = m_CachedPoints;
+      result = this->GetPointsUsingTemplateMatching(imageToUse, m_InitialGuess);
+    }
+    else
+    {
+      result = this->GetPointsUsingTemplateMatching(imageToUse, result);
+    }
+  }
   return result;
 }
 

@@ -38,13 +38,14 @@ public:
                            );
   virtual ~OpenCVRingsPointDetector();
 
+  void SetReferenceImage(cv::Mat* image);
+  void SetTemplateImage(cv::Mat* image);
+  void SetReferencePoints(const niftk::PointSet& points);
+
   void SetMaxAreaInPixels(unsigned long int& pixels);
   void SetUseContours(bool useContours);
   void SetUseInternalResampling(bool useResampling);
   void SetUseTemplateMatching(bool useTemplateMatching);
-  void SetReferencePoints(const niftk::PointSet& points);
-  void SetReferenceImage(cv::Mat* image);
-  void SetTemplateImage(cv::Mat* image);
 
 protected:
 
@@ -75,7 +76,6 @@ private:
   niftk::PointSet   m_ReferencePoints;
   cv::Mat*          m_ReferenceImage;
   cv::Mat*          m_TemplateImage;
-  niftk::PointSet   m_CachedPoints;
 };
 
 } // end namespace
