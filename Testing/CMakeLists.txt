@@ -480,9 +480,9 @@ add_test(CalibIterMonoRingsSim1 niftkIterativeTemplateMatchingCameraCalibrationT
   ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
   10 7                                                  # number rings
   0                                                     # zero distortion (1==true)
-  0.0127767                                             # RMS
-  1150.06 1150.06 359.526 239.518                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
-  -0.71945 0.226364 0.000387836 3.11357e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  0.0129552                                             # RMS
+  1150.11 1150.1 359.568 239.511                        # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718422 0.194674 0.000395073 1.73756e-05            # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
@@ -495,12 +495,12 @@ add_test(CalibIterMonoCirclesSim1 niftkIterativeTemplateMatchingCameraCalibratio
   ${DATA_DIR}/CMU/circles_10_7.png                      # Model image
   ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
   ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
-  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gcircleFilter.bmp # Template
   10 7                                                  # number rings
   0                                                     # zero distortion (1==true)
-  0.0129552                                             # RMS
-  1150.11 1150.1 359.568 239.511                        # intrinsic (should be 1150, 1150, 360.5, 240.5)
-  -0.718422 0.194674 0.000395073 1.73756e-05            # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  0.0171658                                             # RMS
+  1149.72 1149.72 359.545 239.527                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718669 0.204146 0.000387022 2.4678e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_-15_0_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_-15_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_0_-5_.bmp
