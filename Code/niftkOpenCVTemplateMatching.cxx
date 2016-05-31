@@ -34,19 +34,19 @@ PointSet DoTemplateMatchingForAllPoints(const cv::Mat& image,
   halfTemplateSize.y = (templateSize.height - 1)/2.0;
 
   // Copy template into float image - once.
-  cv::Mat templateAsFloat = cvCreateMat(templateImage.cols, templateImage.rows, CV_32F);
-  templateImage.convertTo(templateAsFloat, CV_32F);
+  cv::Mat templateAsFloat = cvCreateMat(templateImage.cols, templateImage.rows, CV_8U);
+  templateImage.convertTo(templateAsFloat, CV_8U);
 
   // This is to store a copy of the image data, as we need float.
   cv::Mat regionAsFloat = cvCreateMat(2 * offset.width + templateSize.width,
                                       2 * offset.height + templateSize.height,
-                                      CV_32F
+                                      CV_8U
                                      );
 
   // This is the results array, temporary storage, for output of template matching.
   cv::Mat result = cvCreateMat(regionAsFloat.cols - templateAsFloat.cols + 1,
                                regionAsFloat.rows - templateAsFloat.rows + 1,
-                               CV_32F
+                               CV_8U
                               );
 
   cv::Point2d startingOffset;
@@ -79,7 +79,7 @@ PointSet DoTemplateMatchingForAllPoints(const cv::Mat& image,
                   );
 
     cv::Mat region(image, rect);
-    region.convertTo(regionAsFloat, CV_32F);
+    region.convertTo(regionAsFloat, CV_8U);
 
     cv::matchTemplate( regionAsFloat, templateAsFloat, result, cv::TM_CCOEFF_NORMED );
     cv::minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );
