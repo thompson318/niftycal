@@ -38,7 +38,7 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& translationVector1x3);
 
 /**
-* \brief Converts a list to a vector, enabling you to set a limit to how many you convert.
+* \brief Converts a list to a vector, in order, enabling you to set a limit to how many you convert.
 */
 NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices,
                                                                const unsigned int& maximumSize);
@@ -79,7 +79,7 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
 * \return cv::Matx44d hand-eye matrix
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
-    const cv::Matx44d&             modelToTrackerTransform,
+    const cv::Matx44d&            modelToTrackerTransform,
     const std::list<cv::Matx44d>& handMatrices,
     const std::list<cv::Matx44d>& eyeMatrices
     );
@@ -98,9 +98,22 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d>& handMatrices,
     const std::list<cv::Matx44d>& eyeMatrices,
-    double& residualRotation,
-    double& residualTranslation
+    double&                       residualRotation,
+    double&                       residualTranslation
     );
+
+
+/**
+* \brief Given a 3x3 matrix, where the middle entry is the
+* maximum of that neighbourhood, will fit a quadratic surface
+* and then find the maximum, for sub-pixel resolution.
+*
+* Assumes the middle entry is coordinate (0, 0), so the
+* outputPoint is a (dx, dy) from the centre.
+*/
+NIFTYCAL_WINEXPORT void InterpolateMaximumOfQuadraticSurface(const cv::Matx33d& matrix,
+                                                             cv::Point2d& outputPoint
+                                                            );
 
 } // end namespace
 

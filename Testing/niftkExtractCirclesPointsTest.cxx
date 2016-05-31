@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <niftkOpenCVCirclesPointDetector.h>
+#include <niftkCirclesPointDetector.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -42,7 +42,7 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
   cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
-  niftk::OpenCVCirclesPointDetector detector(patternSize);
+  niftk::CirclesPointDetector detector(patternSize);
   detector.SetImage(&greyImage);
   niftk::PointSet points = detector.GetPoints();
 

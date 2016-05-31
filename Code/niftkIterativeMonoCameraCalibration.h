@@ -25,8 +25,7 @@ namespace niftk
 {
 
 /**
-* \brief Given a list of images, performs mono camera
-* calibration according to: Dutta ICCV 2009.
+* \brief Given a list of images, performs mono camera calibration according to: Dutta ICCV 2009.
 * \see niftk::MonoCameraCalibration
 * \return rms re-projection error
 */

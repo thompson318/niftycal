@@ -16,9 +16,12 @@ set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
 set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkPointDistortionTest
+  niftkMatrixAverageTest
+  niftkWarpChessboardByHomographyTest
+  niftkInterpolateQuadraticSurfaceTest
   niftkExtractChessboardPointsTest
   niftkExtractCirclesPointsTest
-  niftkWarpChessboardByHomographyTest
+  niftkExtractRingsPointsTest
   niftkMonoChessboardCameraCalibrationTest
   niftkIterativeMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
@@ -26,8 +29,8 @@ set(TEST_CASES
   niftkIterativeStereoCirclesCameraCalibrationTest
   niftkIterativeStereoAprilTagsCameraCalibrationTest
   niftkIterativeMonoAprilTagsCameraCalibrationTest
-  niftkMatrixAverageTest
   niftkMonoChessboardHandEyeCalibrationTest
+  niftkIterativeTemplateMatchingCameraCalibrationTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -47,6 +50,12 @@ endforeach()
 ##################################################################################################
 
 add_test(NiftyCalExcept niftkNiftyCalExceptionTest)
+add_test(InterpSurf1 niftkInterpolateQuadraticSurfaceTest)
+add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
+add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
+add_test(AveMatrix1 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
+add_test(AveMatrix2 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(AveMatrix3 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
 add_test(ExtChessSim1 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png 1 1 1500 1100 14 10)
 add_test(ExtChessSim2 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10)
 add_test(ExtChessSim3 niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_375_275_14_10.png 1 1 375 275 14 10)
@@ -56,11 +65,8 @@ add_test(ExtCircles1 niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/L
 add_test(ExtAprilTags1 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35)
 add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35)
 add_test(ExtAprilTags3 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72)
-add_test(PointDist niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
-add_test(WarpHomog1 niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
-add_test(AveMatrix1 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
-add_test(AveMatrix2 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
-add_test(AveMatrix3 niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(ExtRings1 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 8496 6372 10 7 ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt 260000 1 0.1)
+add_test(ExtRings2 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 720 480 10 7 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_test.txt 10000 0 2.0)
 
 # For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera.
 add_test(CalibLapMonoLeft niftkMonoChessboardCameraCalibrationTest
@@ -194,7 +200,7 @@ add_test(CalibIterStereoSim1 niftkIterativeStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/Right8.png
 )
 
-# Check iterative does something on laparoscope.
+# Check iterative does something on mono laparoscope.
 add_test(CalibIterLapLeft niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_750_550_14_10.png   # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
@@ -216,70 +222,33 @@ add_test(CalibIterLapLeft niftkIterativeMonoChessboardCameraCalibrationTest
 )
 
 # Check iterative does something on stereo laparoscope.
-# This currently fails. The problem is that the left and right
-# camera get calibrated differently. Then warping them to
-# the same reference image produces too high distortion on one channel,
-# causing subsequent chessboard extraction to fail.
-#add_test(CalibIterLapStereo niftkIterativeStereoChessboardCameraCalibrationTest
-#  ${DATA_DIR}/Simulation2/reference_375_275_14_10.png   # Model image
-#  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
-#  14 10                                                 # internal corners
-#  ${DATA_DIR}/Simulation2/reference_375_275_14_10.txt   # 2D points for reference image
-#  0                                                     # zero distortion (1==true)
-#  0.998899 -0.000514354 0.0469033 # rvec                # c.f. none iterative: 0.99919 -0.000809931 0.0402285
-#  -4.62666 0.289513 0.450488 # tvec                     # c.f. none iterative: -4.64005 0.26403 0.297868
-#  ${DATA_DIR}/Laparoscope/Left/left-1095.png
-#  ${DATA_DIR}/Laparoscope/Left/left-1338.png
-#  ${DATA_DIR}/Laparoscope/Left/left-1884.png
-#  ${DATA_DIR}/Laparoscope/Left/left-2520.png
-#  ${DATA_DIR}/Laparoscope/Left/left-3083.png
-#  ${DATA_DIR}/Laparoscope/Left/left-3335.png
-#  ${DATA_DIR}/Laparoscope/Left/left-3685.png
-#  ${DATA_DIR}/Laparoscope/Left/left-4848.png
-#  ${DATA_DIR}/Laparoscope/Left/left-798.png
-#  ${DATA_DIR}/Laparoscope/Right/right-1095.png
-#  ${DATA_DIR}/Laparoscope/Right/right-1338.png
-#  ${DATA_DIR}/Laparoscope/Right/right-1884.png
-#  ${DATA_DIR}/Laparoscope/Right/right-2520.png
-#  ${DATA_DIR}/Laparoscope/Right/right-3083.png
-#  ${DATA_DIR}/Laparoscope/Right/right-3335.png
-#  ${DATA_DIR}/Laparoscope/Right/right-3685.png
-#  ${DATA_DIR}/Laparoscope/Right/right-4848.png
-#  ${DATA_DIR}/Laparoscope/Right/right-798.png
-#)
-
-# Now try iterative on circles.
-# This currently fails. The problem is that the left and right
-# camera get calibrated differently. Then warping them to
-# the same reference image produces to high distortion on one channel,
-# causing subsequent circle extraction to fail.
-#add_test(CalibIterStereoCircles niftkIterativeStereoCirclesCameraCalibrationTest
-#  ${DATA_DIR}/SimulationDots1/Left1.png                     # Model image
-#  ${DATA_DIR}/SimulationDots1/circles_11_4_3.txt            # Model description (grid points 3D)
-#  11 4                                                      # pattern size
-#  ${DATA_DIR}/SimulationDots1/reference_1280_1024_11_4.txt  # 2D points for reference image
-#  1                                                         # zero distortion (1==true)
-#  0.995869 0.00066861 -0.0907979 # rvec
-#  2.43657 -0.000460828 0.262795 # tvec
-#  ${DATA_DIR}/SimulationDots1/Left1.png
-#  ${DATA_DIR}/SimulationDots1/Left2.png
-#  ${DATA_DIR}/SimulationDots1/Left3.png
-#  ${DATA_DIR}/SimulationDots1/Left4.png
-#  ${DATA_DIR}/SimulationDots1/Left5.png
-#  ${DATA_DIR}/SimulationDots1/Left6.png
-#  ${DATA_DIR}/SimulationDots1/Left7.png
-#  ${DATA_DIR}/SimulationDots1/Left8.png
-#  ${DATA_DIR}/SimulationDots1/Left9.png
-#  ${DATA_DIR}/SimulationDots1/Right1.png
-#  ${DATA_DIR}/SimulationDots1/Right2.png
-#  ${DATA_DIR}/SimulationDots1/Right3.png
-#  ${DATA_DIR}/SimulationDots1/Right4.png
-#  ${DATA_DIR}/SimulationDots1/Right5.png
-#  ${DATA_DIR}/SimulationDots1/Right6.png
-#  ${DATA_DIR}/SimulationDots1/Right7.png
-#  ${DATA_DIR}/SimulationDots1/Right8.png
-#  ${DATA_DIR}/SimulationDots1/Right9.png
-#)
+add_test(CalibIterLapStereo niftkIterativeStereoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Simulation2/reference_750_550_14_10.png   # Model image
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
+  14 10                                                 # internal corners
+  ${DATA_DIR}/Simulation2/reference_750_550_14_10.txt   # 2D points for reference image
+  0                                                     # zero distortion (1==true)
+  -0.0198931 0.0402461 0.000409826 # rvec               # c.f. none iterative: 0.99919 -0.000809931 0.0402285
+  -4.64005 0.26403 0.297868 # tvec                      # c.f. none iterative: -4.64005 0.26403 0.297868
+  ${DATA_DIR}/Laparoscope/Left/left-1095.png
+  ${DATA_DIR}/Laparoscope/Left/left-1338.png
+  ${DATA_DIR}/Laparoscope/Left/left-1884.png
+  ${DATA_DIR}/Laparoscope/Left/left-2520.png
+  ${DATA_DIR}/Laparoscope/Left/left-3083.png
+  ${DATA_DIR}/Laparoscope/Left/left-3335.png
+  ${DATA_DIR}/Laparoscope/Left/left-3685.png
+  ${DATA_DIR}/Laparoscope/Left/left-4848.png
+  ${DATA_DIR}/Laparoscope/Left/left-798.png
+  ${DATA_DIR}/Laparoscope/Right/right-1095.png
+  ${DATA_DIR}/Laparoscope/Right/right-1338.png
+  ${DATA_DIR}/Laparoscope/Right/right-1884.png
+  ${DATA_DIR}/Laparoscope/Right/right-2520.png
+  ${DATA_DIR}/Laparoscope/Right/right-3083.png
+  ${DATA_DIR}/Laparoscope/Right/right-3335.png
+  ${DATA_DIR}/Laparoscope/Right/right-3685.png
+  ${DATA_DIR}/Laparoscope/Right/right-4848.png
+  ${DATA_DIR}/Laparoscope/Right/right-798.png
+)
 
 # Now try iterative, mono, using CMU synthetic dataset.
 add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
@@ -288,9 +257,9 @@ add_test(CalibIterMonoCMU1 niftkIterativeMonoChessboardCameraCalibrationTest
   10 7                                                                   # internal corners
   ${DATA_DIR}/CMU/TestSyntheticData/reference_720_480_10_7.txt           # 2D points for reference image
   0                                                                      # zero distortion (1==true)
-  0.120261                                                              # RMS
-  1148.16 1148.52 360.429 239.556                                        # intrinsic. Should be 1150, 1150, 360.5 240.5.
-  -0.76516 1.96134 0.000388442 -0.000313784                             # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
+  0.121773                                                               # RMS
+  1147.76 1148.09 361.835 239.6                                          # intrinsic. Should be 1150, 1150, 360.5 240.5.
+  -0.737653 1.13968 0.000389667 -0.000417089                             # distortion. Should be -0.7, -0.3, 0.004, 0.00005, 8.
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_-45_0_0_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_-45_0_.bmp
@@ -350,7 +319,6 @@ add_test(CalibIterStereoAprilSim niftkIterativeStereoAprilTagsCameraCalibrationT
 )
 
 # Now try iterative AprilTags on real data.
-
 add_test(CalibIterStereoAprilReal1 niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
@@ -407,9 +375,9 @@ add_test(CalibIterMonoAprilReal1 niftkIterativeMonoAprilTagsCameraCalibrationTes
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Simulation has proper scale factors
-  0.638673                                                  # RMS
-  1750.62 872.376 893.401 236.981                           # intrinsic
-  -0.33334 0.333568 0.00770179 -0.00197536                  # distortion
+  0.642218                                                  # RMS
+  1747.17 870.803 894.99 236.136                            # intrinsic
+  -0.331478 0.316505 0.00741399 -0.00205115                 # distortion
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
@@ -502,4 +470,40 @@ add_test(CalibHandEyeMono niftkMonoChessboardHandEyeCalibrationTest
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/30.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
+)
+
+add_test(CalibIterMonoRingsSim1 niftkIterativeTemplateMatchingCameraCalibrationTest
+  0                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0127767                                             # RMS
+  1150.06 1150.06 359.526 239.518                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.71945 0.226364 0.000387836 3.11357e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_15_0_-5_.bmp
+)
+
+add_test(CalibIterMonoCirclesSim1 niftkIterativeTemplateMatchingCameraCalibrationTest
+  1                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/circles_10_7.png                      # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0171658                                             # RMS
+  1149.72 1149.72 359.545 239.527                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718669 0.204146 0.000387022 2.4678e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_-15_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_-15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_15_0_-5_.bmp
 )

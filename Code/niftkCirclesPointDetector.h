@@ -12,32 +12,28 @@
 
 =============================================================================*/
 
-#ifndef niftkAprilTagsPointDetector_h
-#define niftkAprilTagsPointDetector_h
+#ifndef niftkCirclesPointDetector_h
+#define niftkCirclesPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkPointDetector.h"
+#include <niftkPointDetector.h>
 
 namespace niftk
 {
 
 /**
-* \class AprilTagsPointDetector
-* \brief Detects AprilTags markers in a grey scale image.
+* \class CirclesPointDetector
+* \brief Detects asymmetric circles pattern in grey scale images using cv::findCirclesGrid.
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public PointDetector
+class NIFTYCAL_WINEXPORT CirclesPointDetector : public PointDetector
 {
 
 public:
 
-  AprilTagsPointDetector(bool includeCorners,
-                         const std::string& name,
-                         float sigma,
-                         float segmentationSigma
-                        );
-  virtual ~AprilTagsPointDetector();
+  CirclesPointDetector(cv::Size2i patternSize);
+  virtual ~CirclesPointDetector();
 
 protected:
 
@@ -48,10 +44,7 @@ protected:
 
 private:
 
-  bool        m_IncludeCorners;
-  std::string m_Name;
-  float       m_Sigma;
-  float       m_SegmentationSigma;
+  cv::Size2i m_PatternSize;
 };
 
 } // end namespace

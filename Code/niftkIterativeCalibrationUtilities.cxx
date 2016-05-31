@@ -51,7 +51,7 @@ void ExtractTwoCopiesOfControlPoints(
 
 
 //-----------------------------------------------------------------------------
-PointSet ExtractDistortedControlPoints(
+void ExtractDistortedControlPoints(
     const std::pair< cv::Mat, niftk::PointSet>& referenceData,
     const cv::Mat& intrinsic,
     const cv::Mat& distortion,
@@ -66,6 +66,7 @@ PointSet ExtractDistortedControlPoints(
   PointSet cp;
   PointSet cpi;
   PointSet cpid;
+  PointSet initialGuess;
 
   cv::Size2i outputImageSize;
   outputImageSize.width = referenceData.first.cols;
@@ -83,8 +84,15 @@ PointSet ExtractDistortedControlPoints(
         referenceData.second,          // specifies the target point locations
         outputImageSize,               // specifies the proposed size of warped image
         h,                             // output homography, written into
-        outputDetectorAndImage.second  // output image, written into
+        outputDetectorAndImage.second, // output image, written into
+        initialGuess
         );
+
+  // IF the point detector supports it, we can tell it a hint
+  // as to indicate what the initial guess should be for whatever
+  // point extraction it does in the canonical image space.
+  // Probably no use for corner detection, but good for template matching.
+  outputDetectorAndImage.first->SetInitialGuess(initialGuess);
 
   // 2. Localize control points: Localize calibration pattern control
   // points in the canonical pattern.
@@ -95,83 +103,12 @@ PointSet ExtractDistortedControlPoints(
                          << "calibration images containing extractable points.";
   }
 
-  // 2.5. Extract a window from the reference image, and do template matching.
-/*
-  int windowSize = 0;
-  int scaleFactor = 10;
-  cv::Mat referenceImageWindow;
-  cv::Mat referenceImageResized;
-  cv::Mat sourceImageWindow;
-  cv::Mat sourceImageResized;
-  cv::Mat result;
-
-  niftk::PointSet::iterator iter;
-  for (iter = cp.begin(); iter != cp.end(); ++iter)
-  {
-    cv::Point2d p = (*iter).second.point;
-
-    if (windowSize == 0)
-    {
-      // Work out distance (pixels) to next reference point.
-      // Assumption is that they are probably ordered in some way.
-      niftk::PointSet::iterator iter2 = iter;
-      ++iter2;
-      cv::Point2d q = (*iter2).second.point;
-      double distance = sqrt((p.x - q.x)*(p.x-q.x) + (p.y - q.y)*(p.y-q.y));
-      windowSize = static_cast<int>(distance/3);
-    }
-
-    cv::Rect referenceRoi(static_cast<int>(p.x) - windowSize,  // x
-                          static_cast<int>(p.y) - windowSize,  // y
-                          2*windowSize + 1, // width
-                          2*windowSize + 1 // height
-                          );
-    cv::Rect sourceRoi   (static_cast<int>(p.x) - windowSize -1,  // x
-                          static_cast<int>(p.y) - windowSize -1,  // y
-                          2*windowSize + 3, // width
-                          2*windowSize + 3 // height
-                          );
-
-    referenceImageWindow = referenceData.first(referenceRoi);
-    cv::resize(referenceImageWindow, referenceImageResized, cv::Size(), scaleFactor, scaleFactor);
-
-    sourceImageWindow = outputDetectorAndImage.second(sourceRoi);
-    cv::resize(sourceImageWindow, sourceImageResized, cv::Size(), scaleFactor, scaleFactor);
-
-    result = cvCreateMat(
-          sourceImageResized.cols - referenceImageResized.cols + 1,
-          sourceImageResized.rows - referenceImageResized.rows + 1,
-          CV_32FC1
-          );
-
-    cv::matchTemplate(sourceImageResized, referenceImageResized, result, CV_TM_CCORR_NORMED );
-    cv::normalize( result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
-
-    double minVal; double maxVal; cv::Point2i minLoc; cv::Point2i maxLoc;
-    cv::Point2i matchLoc;
-
-    minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );
-    matchLoc = maxLoc;
-
-    // Convert match loc back to a real image location.
-    (*iter).second.point.x = static_cast<double>(matchLoc.x)/static_cast<double>(scaleFactor) + p.x -1;
-    (*iter).second.point.y = static_cast<double>(matchLoc.y)/static_cast<double>(scaleFactor) + p.y -1;
-  }
-*/
-
   // 3. Reproject: Project the control points using the estimated
   // camera parameters.
   hInv = h.inv(cv::DECOMP_SVD);
   niftk::WarpPointsByHomography(cp, hInv, cpi);
   niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
   niftk::CopyPointsInto(cpid, outputPoints);
-
-  PointSet trimmed = niftk::TrimPoints(cp, referenceData.second, 0.50);
-  niftk::WarpPointsByHomography(trimmed, hInv, cpi);
-  niftk::DistortPoints(cpi, intrinsic, distortion, cpid);
-  niftk::CopyPointsInto(cpid, trimmed);
-
-  return trimmed;
 }
 
 } // end namespace

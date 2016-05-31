@@ -64,20 +64,20 @@ PointSet AprilTagsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 
   AprilTags::TagCodes tagCodes(AprilTags::tagCodes36h11);
   if (m_Name == "16h5") {
-     tagCodes = AprilTags::tagCodes16h5;
-   } else if (m_Name == "25h7") {
-     tagCodes = AprilTags::tagCodes25h7;
-   } else if (m_Name == "25h9") {
-     tagCodes = AprilTags::tagCodes25h9;
-   } else if (m_Name == "36h9") {
-     tagCodes = AprilTags::tagCodes36h9;
-   } else if (m_Name == "36h11"){
-     tagCodes = AprilTags::tagCodes36h11;
-   }
-   else
-   {
-    niftkNiftyCalThrow() << "Invalid tag name:" << m_Name;
-   }
+    tagCodes = AprilTags::tagCodes16h5;
+  } else if (m_Name == "25h7") {
+    tagCodes = AprilTags::tagCodes25h7;
+  } else if (m_Name == "25h9") {
+    tagCodes = AprilTags::tagCodes25h9;
+  } else if (m_Name == "36h9") {
+    tagCodes = AprilTags::tagCodes36h9;
+  } else if (m_Name == "36h11"){
+    tagCodes = AprilTags::tagCodes36h11;
+  }
+  else
+  {
+   niftkNiftyCalThrow() << "Invalid tag name:" << m_Name;
+  }
 
   AprilTags::TagDetector tagDetector(tagCodes);
   tagDetector.SetSigma(m_Sigma);

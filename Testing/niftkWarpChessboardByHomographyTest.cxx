@@ -16,7 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkPointUtilities.h>
 #include <niftkHomographyUtilities.h>
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -46,7 +46,7 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   cv::Mat warpedImage = greyImage1;
   cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
 
-  niftk::OpenCVChessboardPointDetector sourceDetector(corners);
+  niftk::ChessboardPointDetector sourceDetector(corners);
   sourceDetector.SetImage(&greyImage1);
   niftk::PointSet sourcePointSet = sourceDetector.GetPoints();
 
@@ -56,19 +56,30 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   cv::Mat dummyDistortion;
   cv::Mat outputHomography;
 
-  niftk::OpenCVChessboardPointDetector targetDetector(corners);
+  niftk::ChessboardPointDetector targetDetector(corners);
   targetDetector.SetImage(&greyImage2);
   niftk::PointSet targetPointSet = targetDetector.GetPoints();
 
   REQUIRE(targetPointSet.size() >= 4);
   REQUIRE(targetPointSet.size() == sourcePointSet.size());
 
-  niftk::WarpImageByCorrespondingPoints(greyImage1, dummyIntrinsics, dummyDistortion, sourcePointSet, targetPointSet, greyImage1.size(), outputHomography, warpedImage);
+  niftk::PointSet transformedPoints;
+  niftk::WarpImageByCorrespondingPoints(greyImage1,
+                                        dummyIntrinsics,
+                                        dummyDistortion,
+                                        sourcePointSet,
+                                        targetPointSet,
+                                        greyImage1.size(),
+                                        outputHomography,
+                                        warpedImage,
+                                        transformedPoints
+                                       );
+
   REQUIRE(greyImage2.rows == warpedImage.rows);
   REQUIRE(greyImage2.cols == warpedImage.cols);
 
   // Check we got points out of warped image
-  niftk::OpenCVChessboardPointDetector warpedDetector(corners);
+  niftk::ChessboardPointDetector warpedDetector(corners);
   warpedDetector.SetImage(&warpedImage);
   niftk::PointSet warpedPointSet = warpedDetector.GetPoints();
   REQUIRE(warpedPointSet.size() >= 4);

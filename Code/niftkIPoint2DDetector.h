@@ -44,6 +44,12 @@ public:
   */
   virtual PointSet GetPoints() = 0;
 
+  /**
+  * \brief May be necessary to provide some method (e.g. template matching)
+  * with a reasonable starting guess.
+  */
+  virtual void SetInitialGuess(const PointSet& guess) = 0;
+
 };
 
 } // end namespace

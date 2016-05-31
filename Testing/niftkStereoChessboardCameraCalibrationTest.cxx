@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -83,7 +83,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
       imageSize.width = greyImage.cols;
       imageSize.height = greyImage.rows;
 
-      niftk::OpenCVChessboardPointDetector detector(corners);
+      niftk::ChessboardPointDetector detector(corners);
       detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 

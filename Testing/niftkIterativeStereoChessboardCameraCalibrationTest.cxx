@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 #include <niftkIterativeStereoCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
@@ -93,27 +93,27 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
 
     if (i-13 < (niftk::argc-13)/2)
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVChessboardPointDetector(corners));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::ChessboardPointDetector(corners));
       originalImagesLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
-      dynamic_cast<niftk::OpenCVChessboardPointDetector*>(originalImagesLeft.back().first.get())->SetImage(&(originalImagesLeft.back().second));
+      dynamic_cast<niftk::ChessboardPointDetector*>(originalImagesLeft.back().first.get())->SetImage(&(originalImagesLeft.back().second));
 
       cv::Mat greyImageClone = greyImage.clone();
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVChessboardPointDetector(corners));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::ChessboardPointDetector(corners));
       imagesForWarpingLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
-      dynamic_cast<niftk::OpenCVChessboardPointDetector*>(imagesForWarpingLeft.back().first.get())->SetImage(&(imagesForWarpingLeft.back().second));
+      dynamic_cast<niftk::ChessboardPointDetector*>(imagesForWarpingLeft.back().first.get())->SetImage(&(imagesForWarpingLeft.back().second));
 
       std::cout << " left." << std::endl;
     }
     else
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVChessboardPointDetector(corners));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::ChessboardPointDetector(corners));
       originalImagesRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
-      dynamic_cast<niftk::OpenCVChessboardPointDetector*>(originalImagesRight.back().first.get())->SetImage(&(originalImagesRight.back().second));
+      dynamic_cast<niftk::ChessboardPointDetector*>(originalImagesRight.back().first.get())->SetImage(&(originalImagesRight.back().second));
 
       cv::Mat greyImageClone = greyImage.clone();
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVChessboardPointDetector(corners));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::ChessboardPointDetector(corners));
       imagesForWarpingRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
-      dynamic_cast<niftk::OpenCVChessboardPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
+      dynamic_cast<niftk::ChessboardPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
 
       std::cout << " right." << std::endl;
     }
@@ -200,7 +200,7 @@ TEST_CASE( "Iterative Stereo Chessboard", "[StereoCalibration]" ) {
   cv::Mat imageLeft = cv::imread(niftk::argv[13]);
   cv::Mat greyImageLeft;
   cv::cvtColor(imageLeft, greyImageLeft, CV_BGR2GRAY);
-  niftk::OpenCVChessboardPointDetector detectorLeft(corners);
+  niftk::ChessboardPointDetector detectorLeft(corners);
   detectorLeft.SetImage(&greyImageLeft);
   niftk::PointSet pointSetLeft = detectorLeft.GetPoints();
 

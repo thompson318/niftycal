@@ -23,14 +23,7 @@ namespace niftk {
 //-----------------------------------------------------------------------------
 PointSet CopyPoints(const PointSet& p)
 {
-  PointSet result;
-
-  PointSet::const_iterator iter;
-  for (iter = p.begin(); iter != p.end(); ++iter)
-  {
-    result.insert(IdPoint2D((*iter).first, (*iter).second));
-  }
-
+  PointSet result(p);
   return result;
 }
 

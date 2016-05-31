@@ -16,7 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIPoint2DDetector.h>
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 #include <niftkIterativeMonoCameraCalibration.h>
 #include <niftkIOUtilities.h>
 
@@ -82,14 +82,14 @@ TEST_CASE( "Iterative Mono Chessboard", "[MonoCalibration]" ) {
     cv::Mat greyImage;
     cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVChessboardPointDetector(corners));
+    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::ChessboardPointDetector(corners));
     originalImages.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
-    dynamic_cast<niftk::OpenCVChessboardPointDetector*>(originalImages.back().first.get())->SetImage(&(originalImages.back().second));
+    dynamic_cast<niftk::ChessboardPointDetector*>(originalImages.back().first.get())->SetImage(&(originalImages.back().second));
 
     cv::Mat greyImageClone = greyImage.clone();
-    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVChessboardPointDetector(corners));
+    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::ChessboardPointDetector(corners));
     imagesForWarping.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
-    dynamic_cast<niftk::OpenCVChessboardPointDetector*>(imagesForWarping.back().first.get())->SetImage(&(imagesForWarping.back().second));
+    dynamic_cast<niftk::ChessboardPointDetector*>(imagesForWarping.back().first.get())->SetImage(&(imagesForWarping.back().second));
   }
 
   REQUIRE(originalImages.size() == niftk::argc-17);

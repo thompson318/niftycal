@@ -12,32 +12,28 @@
 
 =============================================================================*/
 
-#ifndef niftkAprilTagsPointDetector_h
-#define niftkAprilTagsPointDetector_h
+#ifndef niftkChessboardPointDetector_h
+#define niftkChessboardPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkPointDetector.h"
+#include <niftkPointDetector.h>
 
 namespace niftk
 {
 
 /**
-* \class AprilTagsPointDetector
-* \brief Detects AprilTags markers in a grey scale image.
+* \class ChessboardPointDetector
+* \brief Detects complete chessboards in a grey scale image using cv::findChessboardCorners.
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public PointDetector
+class NIFTYCAL_WINEXPORT ChessboardPointDetector : public PointDetector
 {
 
 public:
 
-  AprilTagsPointDetector(bool includeCorners,
-                         const std::string& name,
-                         float sigma,
-                         float segmentationSigma
-                        );
-  virtual ~AprilTagsPointDetector();
+  ChessboardPointDetector(cv::Size2i numberOfCorners);
+  virtual ~ChessboardPointDetector();
 
 protected:
 
@@ -48,10 +44,7 @@ protected:
 
 private:
 
-  bool        m_IncludeCorners;
-  std::string m_Name;
-  float       m_Sigma;
-  float       m_SegmentationSigma;
+  cv::Size2i m_NumberOfCorners;
 };
 
 } // end namespace
