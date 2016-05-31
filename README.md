@@ -37,9 +37,9 @@ Branching Workflow
 ------------------
 
  1. Raise issue in Gitlab Issue Tracker.
- 2. Create a feature branch called '<issue-number>-<some-short-description>'
-    replacing '<issue-number>' with the Gitlab issue number
-    and '<some-short-description>' with your description of the thing you are implementing.
+ 2. Create a feature branch called ```<issue-number>-<some-short-description>```
+    replacing ```<issue-number>``` with the Gitlab issue number
+    and ```<some-short-description>``` with your description of the thing you are implementing.
  3. Code on that branch.
  4. Push to remote when ready.
  5. Create merge request, and assign to Matt Clarkson.
