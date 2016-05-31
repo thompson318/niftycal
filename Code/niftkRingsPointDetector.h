@@ -16,7 +16,7 @@
 #define niftkRingsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkPointDetector.h"
+#include "niftkTemplateMatchingPointDetector.h"
 
 namespace niftk
 {
@@ -28,54 +28,27 @@ namespace niftk
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT RingsPointDetector : public PointDetector
+class NIFTYCAL_WINEXPORT RingsPointDetector : public TemplateMatchingPointDetector
 {
 
 public:
 
-  RingsPointDetector(cv::Size2i patternSize,      // i.e. how many rings in x,y.
-                           cv::Size2i offsetForTemplate // how many pixels to search in x,y.
-                           );
+  RingsPointDetector(cv::Size2i patternSize,      // how many rings in x,y.
+                     cv::Size2i offsetForTemplate // how many pixels to search in x,y.
+                    );
   virtual ~RingsPointDetector();
-
-  void SetReferenceImage(cv::Mat* image);
-  void SetTemplateImage(cv::Mat* image);
-  void SetReferencePoints(const niftk::PointSet& points);
-
-  void SetMaxAreaInPixels(unsigned long int& pixels);
-  void SetUseContours(bool useContours);
-  void SetUseInternalResampling(bool useResampling);
-  void SetUseTemplateMatching(bool useTemplateMatching);
 
 protected:
 
   /**
-  * \see niftk::PointDetector::InternalGetPoints()
+  * \see TemplateMatchingPointDetector::GetPointsUsingContours()
   */
-  virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
+  virtual PointSet GetPointsUsingContours(const cv::Mat& image);
 
 private:
 
-  void ExtractBlobs(const cv::Mat& image,
-                    cv::Mat& bigBlobs,
-                    cv::Mat& littleBlobs
-                   );
+  void ExtractBlobs(const cv::Mat& image, cv::Mat& bigBlobs, cv::Mat& littleBlobs);
 
-  PointSet GetPointsUsingContours(const cv::Mat& image);
-  PointSet GetPointsUsingTemplateMatching(const cv::Mat& image, const niftk::PointSet& startingGuess);
-  PointSet DoTemplateMatchingForAllPoints(const cv::Mat& image,
-                                          const cv::Mat& templateImage,
-                                          const niftk::PointSet& startingPoints
-                                          );
-  cv::Size2i        m_PatternSize;
-  cv::Size2i        m_OffsetForTemplate;
-  unsigned long int m_MaxAreaInPixels;
-  bool              m_UseContours;
-  bool              m_UseInternalResampling;
-  bool              m_UseTemplateMatching;
-  niftk::PointSet   m_ReferencePoints;
-  cv::Mat*          m_ReferenceImage;
-  cv::Mat*          m_TemplateImage;
 };
 
 } // end namespace
