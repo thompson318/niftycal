@@ -45,7 +45,7 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
 {
 
   cv::Mat thresholdedImage;
-  cv::threshold(image, thresholdedImage, 127.5, 255, cv::THRESH_BINARY);
+  cv::threshold(image, thresholdedImage, 50, 255, cv::THRESH_BINARY);
 
   // cv::RETR_CCOMP is important.
   //

@@ -498,12 +498,30 @@ add_test(CalibIterMonoCirclesSim1 niftkIterativeTemplateMatchingCameraCalibratio
   ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
   10 7                                                  # number rings
   0                                                     # zero distortion (1==true)
-  0.0171658                                             # RMS
-  1149.72 1149.72 359.545 239.527                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
-  -0.718669 0.204146 0.000387022 2.4678e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  0.0129552                                             # RMS
+  1150.11 1150.1 359.568 239.511                        # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718422 0.194674 0.000395073 1.73756e-05            # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_-15_0_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_-15_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_0_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_15_-5_.bmp
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_15_0_-5_.bmp
+)
+
+add_test(CalibIterMonoRingsReal1 niftkIterativeTemplateMatchingCameraCalibrationTest
+  0                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0658565                                             # RMS
+  841.847 841.146 511.589 362.415                       # intrinsic
+  -0.439364 0.325313 0.0012054 -0.000253661             # distortion
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img1.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img2.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img3.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img4.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img5.bmp
 )
