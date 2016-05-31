@@ -47,6 +47,7 @@ protected:
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 
 private:
+
   bool        m_IncludeCorners;
   std::string m_Name;
   float       m_Sigma;

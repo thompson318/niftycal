@@ -27,6 +27,7 @@ set(NIFTYCAL_SRCS
   niftkCirclesPointDetector.cxx
   niftkTemplateMatchingPointDetector.cxx
   niftkRingsPointDetector.cxx
+  niftkCirclesIterativePointDetector.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx

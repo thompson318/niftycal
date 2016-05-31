@@ -15,7 +15,6 @@
 #include "niftkCirclesPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <cv.h>
-#include <highgui.h>
 
 namespace niftk {
 
@@ -65,7 +64,6 @@ PointSet CirclesPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 
   if (found  && circles.size() == numberOfCircles)
   {
-
     for ( unsigned int k = 0; k < numberOfCircles; ++k)
     {
       Point2D tmp;

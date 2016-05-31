@@ -14,6 +14,7 @@
 
 #include "niftkChessboardPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include <cv.h>
 
 namespace niftk {
 

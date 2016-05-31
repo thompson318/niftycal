@@ -38,8 +38,8 @@ public:
                                );
   virtual ~TemplateMatchingPointDetector();
 
-  void SetReferenceImage(cv::Mat* image);
   void SetTemplateImage(cv::Mat* image);
+  void SetReferenceImage(cv::Mat* image);
   void SetReferencePoints(const niftk::PointSet& points);
 
   void SetMaxAreaInPixels(unsigned long int& pixels);

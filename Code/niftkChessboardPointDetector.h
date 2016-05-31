@@ -36,12 +36,14 @@ public:
   virtual ~ChessboardPointDetector();
 
 protected:
+
   /**
   * \see niftk::PointDetector::InternalGetPoints()
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 
 private:
+
   cv::Size2i m_NumberOfCorners;
 };
 
