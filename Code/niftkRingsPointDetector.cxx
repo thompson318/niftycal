@@ -12,18 +12,18 @@
 
 =============================================================================*/
 
-#include "niftkOpenCVRingsPointDetector.h"
+#include "niftkRingsPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkMatrixUtilities.h"
-#include "niftkOpenCVTemplateMatching.h"
+#include "niftkTemplateMatching.h"
 #include <cv.h>
 #include <highgui.h>
 
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize,
+RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
                                                    cv::Size2i offsetForTemplate
                                                    )
 : m_PatternSize(patternSize)
@@ -55,62 +55,62 @@ OpenCVRingsPointDetector::OpenCVRingsPointDetector(cv::Size2i patternSize,
 
 
 //-----------------------------------------------------------------------------
-OpenCVRingsPointDetector::~OpenCVRingsPointDetector()
+RingsPointDetector::~RingsPointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetMaxAreaInPixels(unsigned long int& pixels)
+void RingsPointDetector::SetMaxAreaInPixels(unsigned long int& pixels)
 {
   m_MaxAreaInPixels = pixels;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetUseContours(bool useContours)
+void RingsPointDetector::SetUseContours(bool useContours)
 {
   m_UseContours = useContours;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetUseTemplateMatching(bool useTemplateMatching)
+void RingsPointDetector::SetUseTemplateMatching(bool useTemplateMatching)
 {
   m_UseTemplateMatching = useTemplateMatching;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetUseInternalResampling(bool useResampling)
+void RingsPointDetector::SetUseInternalResampling(bool useResampling)
 {
   m_UseInternalResampling = useResampling;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetReferencePoints(const niftk::PointSet& points)
+void RingsPointDetector::SetReferencePoints(const niftk::PointSet& points)
 {
   m_ReferencePoints = points;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetReferenceImage(cv::Mat* image)
+void RingsPointDetector::SetReferenceImage(cv::Mat* image)
 {
   m_ReferenceImage = image;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::SetTemplateImage(cv::Mat* image)
+void RingsPointDetector::SetTemplateImage(cv::Mat* image)
 {
   m_TemplateImage = image;
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVRingsPointDetector::ExtractBlobs(const cv::Mat& image,
+void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
                                             cv::Mat& bigBlobs,
                                             cv::Mat& littleBlobs
                                            )
@@ -176,7 +176,7 @@ void OpenCVRingsPointDetector::ExtractBlobs(const cv::Mat& image,
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
+PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 {
   PointSet result;
   unsigned int numberOfRings= m_PatternSize.width * m_PatternSize.height;
@@ -228,7 +228,7 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVRingsPointDetector::GetPointsUsingTemplateMatching(const cv::Mat& image,
+PointSet RingsPointDetector::GetPointsUsingTemplateMatching(const cv::Mat& image,
                                                                   const niftk::PointSet& startingGuess
                                                                  )
 {
@@ -265,7 +265,7 @@ PointSet OpenCVRingsPointDetector::GetPointsUsingTemplateMatching(const cv::Mat&
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVRingsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
+PointSet RingsPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
   if (!m_UseContours && !m_UseTemplateMatching)
   {

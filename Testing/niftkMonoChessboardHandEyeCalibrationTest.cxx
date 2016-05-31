@@ -15,7 +15,7 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
@@ -95,7 +95,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
       imageSize.width = greyImage.cols;
       imageSize.height = greyImage.rows;
 
-      niftk::OpenCVChessboardPointDetector detector(corners);
+      niftk::ChessboardPointDetector detector(corners);
       detector.SetImage(&greyImage);
       detector.SetImageScaleFactor(scaleFactors);
       pointSet = detector.GetPoints();

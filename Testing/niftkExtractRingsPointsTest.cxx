@@ -15,7 +15,7 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkIOUtilities.h>
-#include <niftkOpenCVRingsPointDetector.h>
+#include <niftkRingsPointDetector.h>
 #include <niftkNiftyCalExceptionMacro.h>
 
 #include <cv.h>
@@ -65,7 +65,7 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::Size2i patternSize(ringsInY, ringsInX);
   cv::Size2i offsetSize(10, 10);
 
-  niftk::OpenCVRingsPointDetector detector(patternSize, offsetSize);
+  niftk::RingsPointDetector detector(patternSize, offsetSize);
   detector.SetImage(&greyImage);
   detector.SetTemplateImage(&greyTemplate);
   detector.SetReferenceImage(&greyReference);

@@ -12,13 +12,13 @@
 
 =============================================================================*/
 
-#include "niftkOpenCVChessboardPointDetector.h"
+#include "niftkChessboardPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(cv::Size2i numberOfCorners)
+ChessboardPointDetector::ChessboardPointDetector(cv::Size2i numberOfCorners)
 : m_NumberOfCorners(numberOfCorners)
 {
   if (m_NumberOfCorners.width < 2)
@@ -33,13 +33,13 @@ OpenCVChessboardPointDetector::OpenCVChessboardPointDetector(cv::Size2i numberOf
 
 
 //-----------------------------------------------------------------------------
-OpenCVChessboardPointDetector::~OpenCVChessboardPointDetector()
+ChessboardPointDetector::~ChessboardPointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVChessboardPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
+PointSet ChessboardPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
   PointSet result;
   std::vector<cv::Point2f> corners;
@@ -60,7 +60,6 @@ PointSet OpenCVChessboardPointDetector::InternalGetPoints(const cv::Mat& imageTo
 
   if (found  && corners.size() == numberOfCorners)
   {
-
     for ( unsigned int k = 0; k < numberOfCorners; ++k)
     {
       Point2D tmp;
@@ -70,7 +69,6 @@ PointSet OpenCVChessboardPointDetector::InternalGetPoints(const cv::Mat& imageTo
       result.insert(IdPoint2D(tmp.id, tmp));
     }
   }
-
   return result;
 }
 

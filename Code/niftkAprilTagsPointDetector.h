@@ -16,7 +16,7 @@
 #define niftkAprilTagsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkOpenCVPointDetector.h"
+#include "niftkPointDetector.h"
 
 namespace niftk
 {
@@ -27,7 +27,7 @@ namespace niftk
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public OpenCVPointDetector
+class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public PointDetector
 {
 
 public:
@@ -42,7 +42,7 @@ public:
 protected:
 
   /**
-  * \see niftk::OpenCVPointDetector::InternalGetPoints()
+  * \see niftk::PointDetector::InternalGetPoints()
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 

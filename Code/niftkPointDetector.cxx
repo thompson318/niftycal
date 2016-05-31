@@ -12,14 +12,14 @@
 
 =============================================================================*/
 
-#include "niftkOpenCVPointDetector.h"
+#include "niftkPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkPointUtilities.h"
 
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVPointDetector::OpenCVPointDetector()
+PointDetector::PointDetector()
 : m_Image(nullptr)
 {
   m_ScaleFactors.x = 1;
@@ -28,13 +28,13 @@ OpenCVPointDetector::OpenCVPointDetector()
 
 
 //-----------------------------------------------------------------------------
-OpenCVPointDetector::~OpenCVPointDetector()
+PointDetector::~PointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void OpenCVPointDetector::SetImage(cv::Mat* image)
+void PointDetector::SetImage(cv::Mat* image)
 {
   if (image == nullptr)
   {
@@ -45,7 +45,7 @@ void OpenCVPointDetector::SetImage(cv::Mat* image)
 
 
 //-----------------------------------------------------------------------------
-void OpenCVPointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
+void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
 {
   if (scaleFactor.x <= 0)
   {
@@ -60,14 +60,14 @@ void OpenCVPointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
 
 
 //-----------------------------------------------------------------------------
-void OpenCVPointDetector::SetInitialGuess(const PointSet& guess)
+void PointDetector::SetInitialGuess(const PointSet& guess)
 {
   m_InitialGuess = guess;
 }
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVPointDetector::GetPoints()
+PointSet PointDetector::GetPoints()
 {
   if (m_Image == nullptr)
   {

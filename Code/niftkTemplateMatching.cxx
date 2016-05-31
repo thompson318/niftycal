@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkOpenCVTemplateMatching.h"
+#include "niftkTemplateMatching.h"
 #include "niftkMatrixUtilities.h"
 
 namespace niftk {

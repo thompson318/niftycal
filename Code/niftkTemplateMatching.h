@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkOpenCVTemplateMatching_h
-#define niftkOpenCVTemplateMatching_h
+#ifndef niftkTemplateMatching_h
+#define niftkTemplateMatching_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"

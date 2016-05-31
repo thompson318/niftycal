@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkOpenCVCirclesPointDetector.h"
+#include "niftkCirclesPointDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <cv.h>
 #include <highgui.h>
@@ -20,7 +20,7 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-OpenCVCirclesPointDetector::OpenCVCirclesPointDetector(cv::Size2i patternSize)
+CirclesPointDetector::CirclesPointDetector(cv::Size2i patternSize)
 : m_PatternSize(patternSize)
 {
   if (m_PatternSize.width < 2)
@@ -35,19 +35,19 @@ OpenCVCirclesPointDetector::OpenCVCirclesPointDetector(cv::Size2i patternSize)
 
 
 //-----------------------------------------------------------------------------
-OpenCVCirclesPointDetector::~OpenCVCirclesPointDetector()
+CirclesPointDetector::~CirclesPointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-PointSet OpenCVCirclesPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
+PointSet CirclesPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
   PointSet result;
   std::vector<cv::Point2f> circles;
   unsigned int numberOfCircles = m_PatternSize.width * m_PatternSize.height;
 
-  /** http://answers.opencv.org/question/3471/findcirclesgrid-not-working/ */
+  /** http://answers..org/question/3471/findcirclesgrid-not-working/ */
   cv::SimpleBlobDetector::Params params;
   params.maxArea = 10e4;
   cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);

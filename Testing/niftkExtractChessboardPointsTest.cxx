@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include <niftkOpenCVChessboardPointDetector.h>
+#include <niftkChessboardPointDetector.h>
 #include <niftkIOUtilities.h>
 
 #include <cv.h>
@@ -49,13 +49,13 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
   cv::Size2i tooFewInternalCornersWidth(1, 2);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector1(tooFewInternalCornersWidth));
+  REQUIRE_THROWS(niftk::ChessboardPointDetector failingDetector1(tooFewInternalCornersWidth));
 
   cv::Size2i tooFewInternalCornersHeight(2, 1);
-  REQUIRE_THROWS(niftk::OpenCVChessboardPointDetector failingDetector2(tooFewInternalCornersHeight));
+  REQUIRE_THROWS(niftk::ChessboardPointDetector failingDetector2(tooFewInternalCornersHeight));
 
   cv::Size2i internalCorners(expectedInternalCornersX, expectedInternalCornersY);
-  niftk::OpenCVChessboardPointDetector detector(internalCorners);
+  niftk::ChessboardPointDetector detector(internalCorners);
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
 

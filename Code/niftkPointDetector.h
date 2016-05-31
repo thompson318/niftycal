@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkOpenCVPointDetector_h
-#define niftkOpenCVPointDetector_h
+#ifndef niftkPointDetector_h
+#define niftkPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
 #include <niftkIPoint2DDetector.h>
@@ -23,23 +23,23 @@ namespace niftk
 {
 
 /**
-* \class OpenCVPointDetector
-* \brief Base class for OpenCV based IPoint2DDetectors, mainly to handle image
+* \class PointDetector
+* \brief Base class for  based IPoint2DDetectors, mainly to handle image
 * rescaling, and the resultant scaling of the detected points.
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT OpenCVPointDetector : public IPoint2DDetector
+class NIFTYCAL_WINEXPORT PointDetector : public IPoint2DDetector
 {
 
 public:
 
-  OpenCVPointDetector();
-  virtual ~OpenCVPointDetector();
+  PointDetector();
+  virtual ~PointDetector();
 
   /**
   * \brief Gives this dector a pointer to an image,
-  * (remember to watch out for OpenCV reference counting).
+  * (remember to watch out for  reference counting).
   */
   void SetImage(cv::Mat* image);
 

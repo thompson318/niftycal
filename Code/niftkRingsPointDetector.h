@@ -12,31 +12,31 @@
 
 =============================================================================*/
 
-#ifndef niftkOpenCVRingsPointDetector_h
-#define niftkOpenCVRingsPointDetector_h
+#ifndef niftkRingsPointDetector_h
+#define niftkRingsPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include <niftkOpenCVPointDetector.h>
+#include "niftkPointDetector.h"
 
 namespace niftk
 {
 
 /**
-* \class OpenCVRingsPointDetector
+* \class RingsPointDetector
 * \brief Detects rings pattern, as seen in Dutta 2009
 * http://dx.doi.org/10.1109/ICCVW.2009.5457474
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT OpenCVRingsPointDetector : public OpenCVPointDetector
+class NIFTYCAL_WINEXPORT RingsPointDetector : public PointDetector
 {
 
 public:
 
-  OpenCVRingsPointDetector(cv::Size2i patternSize,      // i.e. how many rings in x,y.
+  RingsPointDetector(cv::Size2i patternSize,      // i.e. how many rings in x,y.
                            cv::Size2i offsetForTemplate // how many pixels to search in x,y.
                            );
-  virtual ~OpenCVRingsPointDetector();
+  virtual ~RingsPointDetector();
 
   void SetReferenceImage(cv::Mat* image);
   void SetTemplateImage(cv::Mat* image);
@@ -50,7 +50,7 @@ public:
 protected:
 
   /**
-  * \see niftk::OpenCVPointDetector::InternalGetPoints()
+  * \see niftk::PointDetector::InternalGetPoints()
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 

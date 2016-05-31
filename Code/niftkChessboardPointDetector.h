@@ -12,32 +12,32 @@
 
 =============================================================================*/
 
-#ifndef niftkOpenCVChessboardPointDetector_h
-#define niftkOpenCVChessboardPointDetector_h
+#ifndef niftkChessboardPointDetector_h
+#define niftkChessboardPointDetector_h
 
 #include "niftkWin32ExportHeader.h"
-#include <niftkOpenCVPointDetector.h>
+#include <niftkPointDetector.h>
 
 namespace niftk
 {
 
 /**
-* \class OpenCVChessboardPointDetector
-* \brief Detects complete OpenCV chessboards in a grey scale image using cv::findChessboardCorners.
+* \class ChessboardPointDetector
+* \brief Detects complete chessboards in a grey scale image using cv::findChessboardCorners.
 *
 * This detector is not thread safe.
 */
-class NIFTYCAL_WINEXPORT OpenCVChessboardPointDetector : public OpenCVPointDetector
+class NIFTYCAL_WINEXPORT ChessboardPointDetector : public PointDetector
 {
 
 public:
 
-  OpenCVChessboardPointDetector(cv::Size2i numberOfCorners);
-  virtual ~OpenCVChessboardPointDetector();
+  ChessboardPointDetector(cv::Size2i numberOfCorners);
+  virtual ~ChessboardPointDetector();
 
 protected:
   /**
-  * \see niftk::OpenCVPointDetector::InternalGetPoints()
+  * \see niftk::PointDetector::InternalGetPoints()
   */
   virtual PointSet InternalGetPoints(const cv::Mat& imageToUse);
 

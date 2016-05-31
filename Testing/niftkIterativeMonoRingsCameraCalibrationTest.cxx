@@ -16,7 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIPoint2DDetector.h>
-#include <niftkOpenCVRingsPointDetector.h>
+#include <niftkRingsPointDetector.h>
 #include <niftkIterativeMonoCameraCalibration.h>
 #include <niftkIOUtilities.h>
 
@@ -91,13 +91,13 @@ TEST_CASE( "Iterative Rings Chessboard", "[MonoCalibration]" ) {
     cv::Mat greyImage;
     cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::OpenCVRingsPointDetector(rings, offset));
+    std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::RingsPointDetector(rings, offset));
     originalImages.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
 
     unsigned long int maxArea = 10000;
 
-    niftk::OpenCVRingsPointDetector* opd =
-        dynamic_cast<niftk::OpenCVRingsPointDetector*>(originalImages.back().first.get());
+    niftk::RingsPointDetector* opd =
+        dynamic_cast<niftk::RingsPointDetector*>(originalImages.back().first.get());
 
     opd->SetImage(&(originalImages.back().second));
     opd->SetTemplateImage(&templateImageGreyScale);
@@ -112,11 +112,11 @@ TEST_CASE( "Iterative Rings Chessboard", "[MonoCalibration]" ) {
     REQUIRE(points.size() == ringsInX*ringsInY);
 
     cv::Mat greyImageClone = greyImage.clone();
-    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::OpenCVRingsPointDetector(rings, offset));
+    std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::RingsPointDetector(rings, offset));
     imagesForWarping.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
 
-    niftk::OpenCVRingsPointDetector* cpd =
-        dynamic_cast<niftk::OpenCVRingsPointDetector*>(imagesForWarping.back().first.get());
+    niftk::RingsPointDetector* cpd =
+        dynamic_cast<niftk::RingsPointDetector*>(imagesForWarping.back().first.get());
 
     cpd->SetImage(&(imagesForWarping.back().second));
     cpd->SetTemplateImage(&templateImageGreyScale);
