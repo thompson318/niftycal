@@ -86,6 +86,8 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarping;
   for (int i = 18; i < niftk::argc; i++)
   {
+    std::cerr << "Loading:" << niftk::argv[i] << std::endl;
+
     cv::Mat image = cv::imread(niftk::argv[i]);
     imageSize.width = image.cols;
     imageSize.height = image.rows;
