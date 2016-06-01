@@ -62,7 +62,4 @@ endif(BUILD_SHARED_LIBS)
 
 target_link_libraries(niftycal PRIVATE ${ALL_THIRD_PARTY_LIBRARIES})
 
-add_executable(niftkMonoCalibrationFromPoints niftkMonoCalibrationFromPoints.cxx)
-target_link_libraries(niftkMonoCalibrationFromPoints niftycal ${ALL_THIRD_PARTY_LIBRARIES})
-add_executable(niftkStereoCalibrationFromPoints niftkStereoCalibrationFromPoints.cxx)
-target_link_libraries(niftkStereoCalibrationFromPoints niftycal ${ALL_THIRD_PARTY_LIBRARIES})
+add_subdirectory(Apps)
