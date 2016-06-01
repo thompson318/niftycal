@@ -88,42 +88,59 @@ double IterativeStereoCameraCalibration(
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
 
-  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
-                                  pointsFromOriginalImagesLeft,
-                                  distortedPointsFromCanonicalImagesLeft
-                                  );
+  #pragma omp task
+  {
+    ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
+                                    pointsFromOriginalImagesLeft,
+                                    distortedPointsFromCanonicalImagesLeft
+                                    );
+  }
 
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
 
-  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
-                                  pointsFromOriginalImagesRight,
-                                  distortedPointsFromCanonicalImagesRight
-                                  );
+  #pragma omp task
+  {
+    ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
+                                    pointsFromOriginalImagesRight,
+                                    distortedPointsFromCanonicalImagesRight
+                                    );
+  }
+
+  #pragma omp taskwait
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
-  niftk::MonoCameraCalibration(
-        model,
-        pointsFromOriginalImagesLeft,
-        imageSize,
-        intrinsicLeft,
-        distortionLeft,
-        rvecsLeft,
-        tvecsLeft,
-        cvFlags
-        );
 
-  niftk::MonoCameraCalibration(
-        model,
-        pointsFromOriginalImagesRight,
-        imageSize,
-        intrinsicRight,
-        distortionRight,
-        rvecsRight,
-        tvecsRight,
-        cvFlags
-        );
+  #pragma omp task
+  {
+    niftk::MonoCameraCalibration(
+          model,
+          pointsFromOriginalImagesLeft,
+          imageSize,
+          intrinsicLeft,
+          distortionLeft,
+          rvecsLeft,
+          tvecsLeft,
+          cvFlags
+          );
+  }
+
+  #pragma omp task
+  {
+    niftk::MonoCameraCalibration(
+          model,
+          pointsFromOriginalImagesRight,
+          imageSize,
+          intrinsicRight,
+          distortionRight,
+          rvecsRight,
+          tvecsRight,
+          cvFlags
+          );
+  }
+
+  #pragma omp taskwait
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
@@ -188,6 +205,9 @@ double IterativeStereoCameraCalibration(
     std::list<PointSet>::iterator pointsIter;
 
     // Do all left.
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
+      infoLeft(new ExtractDistortedControlPointsInfo[detectorAndOriginalImagesLeft.size()]);
+    unsigned int counter = 0;
     for (originalIter = detectorAndOriginalImagesLeft.begin(),
          canonicalIter = detectorAndWarpedImagesLeft.begin(),
          pointsIter = distortedPointsFromCanonicalImagesLeft.begin();
@@ -199,17 +219,28 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
+      infoLeft[counter].m_OriginalImage = &((*originalIter).second);
+      infoLeft[counter].m_DetectorAndImage = &(*canonicalIter);
+      infoLeft[counter].m_OutputPoints = &(*pointsIter);
+      counter++;
+    }
+    #pragma omp for
+    for (counter = 0; counter < detectorAndOriginalImagesLeft.size(); counter++)
+    {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
         intrinsicLeft,
         distortionLeft,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
+        *(infoLeft[counter].m_OriginalImage),
+        *(infoLeft[counter].m_DetectorAndImage),
+        *(infoLeft[counter].m_OutputPoints)
       );
     }
 
     // Do all right.
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
+      infoRight(new ExtractDistortedControlPointsInfo[detectorAndOriginalImagesRight.size()]);
+    counter = 0;
     for (originalIter = detectorAndOriginalImagesRight.begin(),
          canonicalIter = detectorAndWarpedImagesRight.begin(),
          pointsIter = distortedPointsFromCanonicalImagesRight.begin();
@@ -221,13 +252,21 @@ double IterativeStereoCameraCalibration(
          ++pointsIter
          )
     {
+      infoRight[counter].m_OriginalImage = &((*originalIter).second);
+      infoRight[counter].m_DetectorAndImage = &(*canonicalIter);
+      infoRight[counter].m_OutputPoints = &(*pointsIter);
+      counter++;
+    }
+    #pragma omp for
+    for (counter = 0; counter < detectorAndOriginalImagesRight.size(); counter++)
+    {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
         intrinsicRight,
         distortionRight,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
+        *(infoLeft[counter].m_OriginalImage),
+        *(infoLeft[counter].m_DetectorAndImage),
+        *(infoLeft[counter].m_OutputPoints)
       );
     }
 

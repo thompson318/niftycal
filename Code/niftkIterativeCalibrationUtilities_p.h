@@ -43,6 +43,13 @@ void ExtractDistortedControlPoints(
     PointSet& outputPoints
     );
 
+struct ExtractDistortedControlPointsInfo
+{
+  const cv::Mat*                                         m_OriginalImage;
+  std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>* m_DetectorAndImage;
+  PointSet*                                              m_OutputPoints;
+};
+
 } // end namespace
 
 #endif

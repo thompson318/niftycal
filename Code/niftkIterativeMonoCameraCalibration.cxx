@@ -20,6 +20,7 @@
 #include "niftkPointUtilities.h"
 
 #include <highgui.h>
+#include <memory>
 
 namespace niftk
 {
@@ -106,6 +107,9 @@ double IterativeMonoCameraCalibration(
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
 
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
+      info(new ExtractDistortedControlPointsInfo[detectorAndOriginalImages.size()]);
+    unsigned int counter = 0;
     for (originalIter = detectorAndOriginalImages.begin(),
          canonicalIter = detectorAndWarpedImages.begin(),
          pointsIter = distortedPointsFromCanonicalImages.begin();
@@ -117,13 +121,21 @@ double IterativeMonoCameraCalibration(
          ++pointsIter
          )
     {
+      info[counter].m_OriginalImage = &((*originalIter).second);
+      info[counter].m_DetectorAndImage = &(*canonicalIter);
+      info[counter].m_OutputPoints = &(*pointsIter);
+      counter++;
+    }
+    #pragma omp for
+    for (counter = 0; counter < detectorAndOriginalImages.size(); counter++)
+    {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
         intrinsic,
         distortion,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
+        *(info[counter].m_OriginalImage),
+        *(info[counter].m_DetectorAndImage),
+        *(info[counter].m_OutputPoints)
       );
     }
 
