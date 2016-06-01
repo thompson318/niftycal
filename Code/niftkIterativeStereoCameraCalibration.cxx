@@ -114,7 +114,7 @@ double IterativeStereoCameraCalibration(
   // camera parameters using Levenberg-Marquardt.
 
   #pragma omp sections
-  { 
+  {
     #pragma omp section
     {
       niftk::MonoCameraCalibration(

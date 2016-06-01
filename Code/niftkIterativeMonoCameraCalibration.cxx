@@ -129,8 +129,8 @@ double IterativeMonoCameraCalibration(
     }
 
     #pragma omp parallel shared(referenceImageData), shared(intrinsic), shared(distortion), shared(info)
-    {    
-      #pragma omp for 
+    {
+      #pragma omp for
       for (counter = 0; counter < size; counter++)
       {
         niftk::ExtractDistortedControlPoints(
