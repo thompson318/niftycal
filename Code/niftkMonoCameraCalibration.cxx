@@ -119,8 +119,7 @@ double MonoCameraCalibration(const Model3D& model,
                               distortion,
                               rvecs,
                               tvecs,
-                              CV_CALIB_USE_INTRINSIC_GUESS,
-                              cvTermCriteria( CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1e-10)
+                              CV_CALIB_USE_INTRINSIC_GUESS
                               );
   }
   else
@@ -132,8 +131,7 @@ double MonoCameraCalibration(const Model3D& model,
                               distortion,
                               rvecs,
                               tvecs,
-                              cvFlags,
-                              cvTermCriteria( CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1e-10)
+                              cvFlags
                               );
   }
 
