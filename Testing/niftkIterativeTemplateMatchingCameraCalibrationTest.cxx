@@ -77,9 +77,19 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
   cv::Mat templateImageGreyScale;
   cv::cvtColor(templateImage, templateImageGreyScale, CV_BGR2GRAY);
 
-  cv::Size2i offset(10, 10);
-  cv::Size2i rings(ringsInY, ringsInX);
   cv::Size2i imageSize;
+  cv::Size2i offset(10, 10);
+
+  // This is passed through to cv::findCirclesGrid, for which the documentation
+  // says "patternSize = Size(points_per_row, points_per_colum)"
+  // which is the opposite way round to the normal cv::Size2i constructor.
+  cv::Size2i rings(ringsInY, ringsInX);
+
+  cv::Point2d scaleFactors;
+  scaleFactors.x = 1;
+  scaleFactors.y = 1;
+
+  std::cout << "Info: dots=" << rings << ", offset=" << offset << ", scaleFactors=" << scaleFactors << std::endl;
 
   // Loads all image data.
   std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImages;
@@ -123,6 +133,7 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
         dynamic_cast<niftk::TemplateMatchingPointDetector*>(originalImages.back().first.get());
 
     opd->SetImage(&(originalImages.back().second));
+    opd->SetImageScaleFactor(scaleFactors);
     opd->SetTemplateImage(&templateImageGreyScale);
     opd->SetReferenceImage(&referenceImageGreyScale);
     opd->SetReferencePoints(referenceImageData.second);
@@ -134,11 +145,11 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
     niftk::PointSet points = opd->GetPoints();
     REQUIRE(points.size() == ringsInX*ringsInY);
 
-
     niftk::TemplateMatchingPointDetector* cpd =
         dynamic_cast<niftk::TemplateMatchingPointDetector*>(imagesForWarping.back().first.get());
 
     cpd->SetImage(&(imagesForWarping.back().second));
+    cpd->SetImageScaleFactor(scaleFactors);
     cpd->SetTemplateImage(&templateImageGreyScale);
     cpd->SetReferenceImage(&referenceImageGreyScale);
     cpd->SetReferencePoints(referenceImageData.second);
@@ -146,7 +157,6 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
     cpd->SetUseContours(false);
     cpd->SetUseInternalResampling(false);
     cpd->SetUseTemplateMatching(true);
-    cpd->SetInitialGuess(referenceImageData.second);
   }
 
   REQUIRE(originalImages.size() == niftk::argc-18);
