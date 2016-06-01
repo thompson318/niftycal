@@ -128,20 +128,20 @@ double IterativeMonoCameraCalibration(
       counter++;
     }
 
-    #pragma omp for shared(referenceImageData) \\
-                    shared(intrinsic) \\
-                    shared(distortion)
-
-    for (counter = 0; counter < size; counter++)
-    {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsic,
-        distortion,
-        *(info[counter].m_OriginalImage),
-        *(info[counter].m_DetectorAndImage),
-        *(info[counter].m_OutputPoints)
-      );
+    #pragma omp parallel shared(referenceImageData), shared(intrinsic), shared(distortion), shared(info)
+    {    
+      #pragma omp for 
+      for (counter = 0; counter < size; counter++)
+      {
+        niftk::ExtractDistortedControlPoints(
+          referenceImageData,
+          intrinsic,
+          distortion,
+          *(info[counter].m_OriginalImage),
+          *(info[counter].m_DetectorAndImage),
+          *(info[counter].m_OutputPoints)
+        );
+      }
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine

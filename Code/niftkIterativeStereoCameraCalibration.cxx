@@ -88,77 +88,61 @@ double IterativeStereoCameraCalibration(
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
 
-  #pragma omp task shared(detectorAndOriginalImagesLeft) \\
-                   shared(pointsFromOriginalImagesLeft) \\
-                   shared(distortedPointsFromCanonicalImagesLeft)
-  {
-    ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
-                                    pointsFromOriginalImagesLeft,
-                                    distortedPointsFromCanonicalImagesLeft
-                                    );
-  }
-
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
 
-  #pragma omp task shared(detectorAndOriginalImagesRight) \\
-                   shared(pointsFromOriginalImagesRight) \\
-                   shared(distortedPointsFromCanonicalImagesRight)
+  #pragma omp sections
   {
-    ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
-                                    pointsFromOriginalImagesRight,
-                                    distortedPointsFromCanonicalImagesRight
-                                    );
-  }
+    #pragma omp section
+    {
+      ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
+                                      pointsFromOriginalImagesLeft,
+                                      distortedPointsFromCanonicalImagesLeft
+                                      );
+    }
 
-  #pragma omp taskwait
+    #pragma omp section
+    {
+      ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
+                                      pointsFromOriginalImagesRight,
+                                      distortedPointsFromCanonicalImagesRight
+                                      );
+    }
+  }
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
 
-  #pragma omp task shared(model) \\
-                   shared(pointsFromOriginalImagesLeft) \\
-                   shared(imageSize) \\
-                   shared(intrinsicLeft) \\
-                   shared(distortionLeft) \\
-                   shared(rvecsLeft) \\
-                   shared(tvecsLeft) \\
-                   shared(cvFlags)
-  {
-    niftk::MonoCameraCalibration(
-          model,
-          pointsFromOriginalImagesLeft,
-          imageSize,
-          intrinsicLeft,
-          distortionLeft,
-          rvecsLeft,
-          tvecsLeft,
-          cvFlags
-          );
+  #pragma omp sections
+  { 
+    #pragma omp section
+    {
+      niftk::MonoCameraCalibration(
+        model,
+        pointsFromOriginalImagesLeft,
+        imageSize,
+        intrinsicLeft,
+        distortionLeft,
+        rvecsLeft,
+        tvecsLeft,
+        cvFlags
+        );
+    }
+     
+    #pragma omp section
+    {
+      niftk::MonoCameraCalibration(
+        model,
+        pointsFromOriginalImagesRight,
+        imageSize,
+        intrinsicRight,
+        distortionRight,
+        rvecsRight,
+        tvecsRight,
+        cvFlags
+        );
+    }
   }
-
-  #pragma omp task shared(model) \\
-                   shared(pointsFromOriginalImagesRight) \\
-                   shared(imageSize) \\
-                   shared(intrinsicRight) \\
-                   shared(distortionRight) \\
-                   shared(rvecsRight) \\
-                   shared(tvecsRight) \\
-                   shared(cvFlags)
-  {
-    niftk::MonoCameraCalibration(
-          model,
-          pointsFromOriginalImagesRight,
-          imageSize,
-          intrinsicRight,
-          distortionRight,
-          rvecsRight,
-          tvecsRight,
-          cvFlags
-          );
-  }
-
-  #pragma omp taskwait
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
@@ -244,22 +228,22 @@ double IterativeStereoCameraCalibration(
       counter++;
     }
 
-    #pragma omp for shared(referenceImageData) \\
-                    shared(intrinsicLeft) \\
-                    shared(distortionLeft)
-
-    for (counter = 0; counter < size; counter++)
+    #pragma omp parallel shared(referenceImageData), shared(intrinsicLeft), shared(distortionLeft), shared(infoLeft)
     {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsicLeft,
-        distortionLeft,
-        *(infoLeft[counter].m_OriginalImage),
-        *(infoLeft[counter].m_DetectorAndImage),
-        *(infoLeft[counter].m_OutputPoints)
-      );
+      #pragma omp for
+      for (counter = 0; counter < size; counter++)
+      {
+        niftk::ExtractDistortedControlPoints(
+          referenceImageData,
+          intrinsicLeft,
+          distortionLeft,
+          *(infoLeft[counter].m_OriginalImage),
+          *(infoLeft[counter].m_DetectorAndImage),
+          *(infoLeft[counter].m_OutputPoints)
+        );
+      }
     }
-
+ 
     // Do all right.
     std::unique_ptr<ExtractDistortedControlPointsInfo[]> infoRight(new ExtractDistortedControlPointsInfo[size]);
     counter = 0;
@@ -280,20 +264,20 @@ double IterativeStereoCameraCalibration(
       counter++;
     }
 
-    #pragma omp for shared(referenceImageData) \\
-                    shared(intrinsicRight) \\
-                    shared(distortionRight)
-
-    for (counter = 0; counter < size; counter++)
+    #pragma omp parallel shared(referenceImageData), shared(intrinsicRight), shared(distortionRight), shared(infoRight)
     {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsicRight,
-        distortionRight,
-        *(infoLeft[counter].m_OriginalImage),
-        *(infoLeft[counter].m_DetectorAndImage),
-        *(infoLeft[counter].m_OutputPoints)
-      );
+      #pragma omp for
+      for (counter = 0; counter < size; counter++)
+      {
+        niftk::ExtractDistortedControlPoints(
+          referenceImageData,
+          intrinsicRight,
+          distortionRight,
+          *(infoRight[counter].m_OriginalImage),
+          *(infoRight[counter].m_DetectorAndImage),
+          *(infoRight[counter].m_OutputPoints)
+        );
+      }
     }
 
     // 4. Parameter Fitting: Use the projected control points to refine
