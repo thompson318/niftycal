@@ -12,16 +12,17 @@
 
 =============================================================================*/
 
-#include "niftkIOUtilities.h"
-#include "niftkMonoCameraCalibration.h"
+#include <niftkIOUtilities.h>
+#include <niftkMonoCameraCalibration.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
 
 /**
- * \brief Calibrate mono camera, using pre-extracted points,
- * using niftk::MonoCameraCalibration routine.
- */
+* \file niftkMonoCalibrationFromPoints.cxx
+* \brief Calibrate mono camera, using pre-extracted points,
+* using niftk::MonoCameraCalibration routine.
+*/
 int main(int argc, char ** argv)
 {
   if (argc < 6)
