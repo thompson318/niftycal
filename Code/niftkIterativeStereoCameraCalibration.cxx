@@ -176,8 +176,6 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial T3=" << rightToLeftTranslationVector.at<double>(0,2) << std::endl;
   std::cout << std::endl;
 
-  //return projectedRMS;
-
   unsigned int count = 0;
   double previousRMS = std::numeric_limits<double>::max();
 
@@ -246,8 +244,8 @@ double IterativeStereoCameraCalibration(
 
     projectedRMS = niftk::StereoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImagesLeft,  // or used trimmedPointsLeft?
-          distortedPointsFromCanonicalImagesRight, // or use trimmedPointsRight?
+          distortedPointsFromCanonicalImagesLeft,
+          distortedPointsFromCanonicalImagesRight,
           imageSize,
           tmpIntrinsicLeft,
           tmpDistortionLeft,

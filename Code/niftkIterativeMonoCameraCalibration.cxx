@@ -133,7 +133,7 @@ double IterativeMonoCameraCalibration(
     cv::Mat tmpDistortion = distortion.clone();
     projectedRMS = niftk::MonoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImages, // or used trimmedPoints?
+          distortedPointsFromCanonicalImages,
           imageSize,
           tmpIntrinsic,
           tmpDistortion,
