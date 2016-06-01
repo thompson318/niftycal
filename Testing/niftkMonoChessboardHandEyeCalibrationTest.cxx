@@ -24,6 +24,7 @@
 #include <highgui.h>
 #include <iostream>
 #include <list>
+#include <chrono>
 
 #ifdef NIFTYCAL_WITH_ITK
 #include <niftkNonLinearMalti12DOFHandEyeOptimiser.h>
@@ -33,6 +34,9 @@
 #endif
 
 TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
+
+  std::chrono::time_point<std::chrono::system_clock> start;
+  start = std::chrono::system_clock::now();
 
   int expectedMinimumNumberOfArguments =  11;
   if (niftk::argc < expectedMinimumNumberOfArguments)
@@ -79,12 +83,12 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   int snapshots = (niftk::argc -5)/2;
 
-  std::cerr << "Loaded model and expected result." << std::endl;
-  std::cerr << "argc=" << niftk::argc << ", snapshots=" << snapshots << std::endl;
+  std::cout << "Loaded model and expected result." << std::endl;
+  std::cout << "argc=" << niftk::argc << ", snapshots=" << snapshots << std::endl;
 
   for (int i = 5; i < snapshots+5; i++)
   {
-    std::cerr << "Loading i=" << i << ", file=" << niftk::argv[i] << std::endl;
+    std::cout << "Loading i=" << i << ", file=" << niftk::argv[i] << std::endl;
 
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
@@ -104,7 +108,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
       {
         listOfPoints.push_back(pointSet);
       }
-      std::cerr << "Loaded image in argument=" << i << ", total number of images=" << listOfPoints.size() << std::endl;
+      std::cout << "Loaded image in argument=" << i << ", total number of images=" << listOfPoints.size() << std::endl;
     }
   }
 
@@ -115,6 +119,10 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   std::vector<cv::Mat> rvecs;
   std::vector<cv::Mat> tvecs;
 
+  std::chrono::time_point<std::chrono::system_clock> endStartup = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = endStartup - start;
+  std::cout << "TIME:Startup=" << elapsed_seconds.count() << std::endl;
+
   double rms = niftk::MonoCameraCalibration(model,
                                             listOfPoints,
                                             imageSize,
@@ -124,7 +132,11 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
                                             tvecs
                                             );
 
-  std::cerr << "Mono intrinsic calibration RMS=" << rms << std::endl;
+  std::cout << "Mono intrinsic calibration RMS=" << rms << std::endl;
+
+  std::chrono::time_point<std::chrono::system_clock> endCalib = std::chrono::system_clock::now();
+  elapsed_seconds = endCalib - endStartup;
+  std::cout << "TIME:Calib=" << elapsed_seconds.count() << std::endl;
 
   std::list<cv::Matx44d> trackingMatrices;
 
@@ -149,7 +161,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   double residualRotation = 0;
   double residualTranslation = 0;
 
-  std::cerr << "Camera matrices=" << cameraMatrices.size() << ", tracking matrices=" << trackingMatrices.size() << std::endl;
+  std::cout << "Camera matrices=" << cameraMatrices.size() << ", tracking matrices=" << trackingMatrices.size() << std::endl;
 
   cv::Matx44d handEye = niftk::CalculateHandEyeUsingTsaisMethod(
         trackingMatrices,
@@ -158,7 +170,11 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         residualTranslation
         );
 
-  std::cerr << "Done hand-eye, rotation residual=" << residualRotation << ", translation residual=" << residualTranslation << std::endl;
+  std::cout << "Done hand-eye, rotation residual=" << residualRotation << ", translation residual=" << residualTranslation << std::endl;
+
+  std::chrono::time_point<std::chrono::system_clock> endTsai= std::chrono::system_clock::now();
+  elapsed_seconds = endTsai - endCalib;
+  std::cout << "TIME:Tsai=" << elapsed_seconds.count() << std::endl;
 
   cv::Matx44d eyeHand = handEye.inv(cv::DECOMP_SVD);
 
@@ -166,7 +182,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   {
     for (int c = 0; c < 4; c++)
     {
-      std::cerr << "Expected (" << r << ", " << c << ")="
+      std::cout << "Expected (" << r << ", " << c << ")="
                 << expectedEyeHand(r, c) << ", actual="
                 << eyeHand(r, c) << std::endl;
       REQUIRE(fabs(expectedEyeHand(r, c) - eyeHand(r, c)) < 0.001);
@@ -195,6 +211,10 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::cerr << "Doing non-linear optimisation - 12 DOF - DONE, rms=" << reprojectionRMS << std::endl;
 
+  std::chrono::time_point<std::chrono::system_clock> end12DOF= std::chrono::system_clock::now();
+  elapsed_seconds = end12DOF - endTsai;
+  std::cout << "TIME:12DOF=" << elapsed_seconds.count() << std::endl;
+
   std::cerr << "Doing non-linear optimisation - N DOF" << std::endl;
 
   niftk::NonLinearMaltiNDOFHandEyeOptimiser::Pointer optimiserNDOF = niftk::NonLinearMaltiNDOFHandEyeOptimiser::New();
@@ -210,6 +230,10 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         );
 
   std::cerr << "Doing non-linear optimisation - N DOF - DONE, rms=" << reprojectionRMS << std::endl;
+
+  std::chrono::time_point<std::chrono::system_clock> endNDOF= std::chrono::system_clock::now();
+  elapsed_seconds = endNDOF - end12DOF;
+  std::cout << "TIME:NDOF=" << elapsed_seconds.count() << std::endl;
 
   std::cerr << "Doing non-linear optimisation - stereo" << std::endl;
 
@@ -231,7 +255,11 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         stereoExtrinsics
         );
 
-  std::cerr << "Doing non-linear optimisation - stere - DONE, rms=" << reprojectionRMS << std::endl;
+  std::cerr << "Doing non-linear optimisation - stereo - DONE, rms=" << reprojectionRMS << std::endl;
+
+  std::chrono::time_point<std::chrono::system_clock> endStereo= std::chrono::system_clock::now();
+  elapsed_seconds = endStereo - endNDOF;
+  std::cout << "TIME:Stereo=" << elapsed_seconds.count() << std::endl;
 
   std::cerr << "Doing non-linear optimisation - Malti" << std::endl;
 
@@ -248,6 +276,10 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         );
 
   std::cerr << "Doing non-linear optimisation - Malti - DONE, rms=" << reprojectionRMS << std::endl;
+
+  std::chrono::time_point<std::chrono::system_clock> endMalti= std::chrono::system_clock::now();
+  elapsed_seconds = endMalti - endStereo;
+  std::cout << "TIME:Malti=" << elapsed_seconds.count() << std::endl;
 
 #endif
 }
