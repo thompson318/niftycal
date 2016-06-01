@@ -107,8 +107,9 @@ double IterativeMonoCameraCalibration(
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
 
-    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
-      info(new ExtractDistortedControlPointsInfo[detectorAndOriginalImages.size()]);
+    unsigned int size = detectorAndOriginalImages.size();
+
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]> info(new ExtractDistortedControlPointsInfo[size]);
     unsigned int counter = 0;
     for (originalIter = detectorAndOriginalImages.begin(),
          canonicalIter = detectorAndWarpedImages.begin(),
@@ -126,8 +127,12 @@ double IterativeMonoCameraCalibration(
       info[counter].m_OutputPoints = &(*pointsIter);
       counter++;
     }
-    #pragma omp for
-    for (counter = 0; counter < detectorAndOriginalImages.size(); counter++)
+
+    #pragma omp for shared(referenceImageData) \\
+                    shared(intrinsic) \\
+                    shared(distortion)
+
+    for (counter = 0; counter < size; counter++)
     {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,

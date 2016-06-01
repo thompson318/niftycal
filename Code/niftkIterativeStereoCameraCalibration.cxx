@@ -88,7 +88,9 @@ double IterativeStereoCameraCalibration(
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
 
-  #pragma omp task
+  #pragma omp task shared(detectorAndOriginalImagesLeft) \\
+                   shared(pointsFromOriginalImagesLeft) \\
+                   shared(distortedPointsFromCanonicalImagesLeft)
   {
     ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
                                     pointsFromOriginalImagesLeft,
@@ -99,7 +101,9 @@ double IterativeStereoCameraCalibration(
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
 
-  #pragma omp task
+  #pragma omp task shared(detectorAndOriginalImagesRight) \\
+                   shared(pointsFromOriginalImagesRight) \\
+                   shared(distortedPointsFromCanonicalImagesRight)
   {
     ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
                                     pointsFromOriginalImagesRight,
@@ -112,7 +116,14 @@ double IterativeStereoCameraCalibration(
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
 
-  #pragma omp task
+  #pragma omp task shared(model) \\
+                   shared(pointsFromOriginalImagesLeft) \\
+                   shared(imageSize) \\
+                   shared(intrinsicLeft) \\
+                   shared(distortionLeft) \\
+                   shared(rvecsLeft) \\
+                   shared(tvecsLeft) \\
+                   shared(cvFlags)
   {
     niftk::MonoCameraCalibration(
           model,
@@ -126,7 +137,14 @@ double IterativeStereoCameraCalibration(
           );
   }
 
-  #pragma omp task
+  #pragma omp task shared(model) \\
+                   shared(pointsFromOriginalImagesRight) \\
+                   shared(imageSize) \\
+                   shared(intrinsicRight) \\
+                   shared(distortionRight) \\
+                   shared(rvecsRight) \\
+                   shared(tvecsRight) \\
+                   shared(cvFlags)
   {
     niftk::MonoCameraCalibration(
           model,
@@ -204,9 +222,10 @@ double IterativeStereoCameraCalibration(
     std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
     std::list<PointSet>::iterator pointsIter;
 
+    unsigned int size = detectorAndOriginalImagesLeft.size();
+
     // Do all left.
-    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
-      infoLeft(new ExtractDistortedControlPointsInfo[detectorAndOriginalImagesLeft.size()]);
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]> infoLeft(new ExtractDistortedControlPointsInfo[size]);
     unsigned int counter = 0;
     for (originalIter = detectorAndOriginalImagesLeft.begin(),
          canonicalIter = detectorAndWarpedImagesLeft.begin(),
@@ -224,8 +243,12 @@ double IterativeStereoCameraCalibration(
       infoLeft[counter].m_OutputPoints = &(*pointsIter);
       counter++;
     }
-    #pragma omp for
-    for (counter = 0; counter < detectorAndOriginalImagesLeft.size(); counter++)
+
+    #pragma omp for shared(referenceImageData) \\
+                    shared(intrinsicLeft) \\
+                    shared(distortionLeft)
+
+    for (counter = 0; counter < size; counter++)
     {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
@@ -238,8 +261,7 @@ double IterativeStereoCameraCalibration(
     }
 
     // Do all right.
-    std::unique_ptr<ExtractDistortedControlPointsInfo[]>
-      infoRight(new ExtractDistortedControlPointsInfo[detectorAndOriginalImagesRight.size()]);
+    std::unique_ptr<ExtractDistortedControlPointsInfo[]> infoRight(new ExtractDistortedControlPointsInfo[size]);
     counter = 0;
     for (originalIter = detectorAndOriginalImagesRight.begin(),
          canonicalIter = detectorAndWarpedImagesRight.begin(),
@@ -257,8 +279,12 @@ double IterativeStereoCameraCalibration(
       infoRight[counter].m_OutputPoints = &(*pointsIter);
       counter++;
     }
-    #pragma omp for
-    for (counter = 0; counter < detectorAndOriginalImagesRight.size(); counter++)
+
+    #pragma omp for shared(referenceImageData) \\
+                    shared(intrinsicRight) \\
+                    shared(distortionRight)
+
+    for (counter = 0; counter < size; counter++)
     {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
