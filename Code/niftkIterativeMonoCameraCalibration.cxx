@@ -20,6 +20,7 @@
 #include "niftkPointUtilities.h"
 
 #include <highgui.h>
+#include <memory>
 
 namespace niftk
 {
@@ -29,7 +30,7 @@ double IterativeMonoCameraCalibration(
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImages,
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImages,
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndCanonicalImages,
     cv::Size2i& imageSize,
     cv::Mat& intrinsic,
     cv::Mat& distortion,
@@ -46,9 +47,9 @@ double IterativeMonoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Should have at least 2 views of calibration points.";
   }
-  if (detectorAndOriginalImages.size() != detectorAndWarpedImages.size())
+  if (detectorAndOriginalImages.size() != detectorAndCanonicalImages.size())
   {
-    niftkNiftyCalThrow() << "detectorAndOriginalImages must be the same size as detectorAndWarpedImages.";
+    niftkNiftyCalThrow() << "detectorAndOriginalImages must be the same size as detectorAndCanonicalImages.";
   }
   if (referenceImageData.first.cols == 0 || referenceImageData.first.rows == 0)
   {
@@ -102,30 +103,14 @@ double IterativeMonoCameraCalibration(
   {
     previousRMS = projectedRMS;
 
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
-    std::list<PointSet>::iterator pointsIter;
-
-    for (originalIter = detectorAndOriginalImages.begin(),
-         canonicalIter = detectorAndWarpedImages.begin(),
-         pointsIter = distortedPointsFromCanonicalImages.begin();
-         originalIter != detectorAndOriginalImages.end() &&
-         canonicalIter != detectorAndWarpedImages.end() &&
-         pointsIter != distortedPointsFromCanonicalImages.end();
-         ++originalIter,
-         ++canonicalIter,
-         ++pointsIter
-         )
-    {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsic,
-        distortion,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
-      );
-    }
+    niftk::ExtractAllDistortedControlPoints(
+          referenceImageData,
+          intrinsic,
+          distortion,
+          detectorAndOriginalImages,
+          detectorAndCanonicalImages,
+          distortedPointsFromCanonicalImages
+          );
 
     // 4. Parameter Fitting: Use the projected control points to refine
     // the camera parameters using Levenberg-Marquardt.
@@ -133,7 +118,7 @@ double IterativeMonoCameraCalibration(
     cv::Mat tmpDistortion = distortion.clone();
     projectedRMS = niftk::MonoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImages, // or used trimmedPoints?
+          distortedPointsFromCanonicalImages,
           imageSize,
           tmpIntrinsic,
           tmpDistortion,

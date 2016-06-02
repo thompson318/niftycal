@@ -29,19 +29,42 @@ namespace niftk
 * \brief Private (as in 'deliberately not exported') utility functions.
 */
 
+struct ExtractTwoCopiesInfo
+{
+  const std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>* m_DetectorAndImage;
+  PointSet                                                     m_ExtractedPoints;
+};
+
 void ExtractTwoCopiesOfControlPoints(
-    const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
-    std::list<PointSet>& a,
-    std::list<PointSet>& b);
+  const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& list,
+  std::list<PointSet>& a,
+  std::list<PointSet>& b
+  );
+
+struct ExtractDistortedControlPointsInfo
+{
+  const cv::Mat*                                         m_OriginalImage;
+  std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>* m_DetectorAndImage;
+  PointSet*                                              m_OutputPoints;
+};
+
+void ExtractAllDistortedControlPoints(
+  const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
+  const cv::Mat& intrinsic,
+  const cv::Mat& distortion,
+  const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& originalDetectorsAndImages,
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& canonicalDetectorsAndImages,
+  std::list<PointSet>& outputPoints
+  );
 
 void ExtractDistortedControlPoints(
-    const std::pair< cv::Mat, niftk::PointSet>& referenceData,
-    const cv::Mat& intrinsic,
-    const cv::Mat& distortion,
-    const cv::Mat& originalImage,
-    std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
-    PointSet& outputPoints
-    );
+  const std::pair< cv::Mat, niftk::PointSet>& referenceData,
+  const cv::Mat& intrinsic,
+  const cv::Mat& distortion,
+  const cv::Mat& originalImage,
+  std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
+  PointSet& outputPoints
+  );
 
 } // end namespace
 

@@ -137,10 +137,10 @@ double StereoCameraCalibration(const Model3D& model,
       objectPoints.push_back(objectVectors3D);
       leftImagePoints.push_back(leftVectors2D);
       rightImagePoints.push_back(rightVectors2D);
-      rvecsLeft.push_back(cv::Mat());
-      tvecsLeft.push_back(cv::Mat());
-      rvecsRight.push_back(cv::Mat());
-      tvecsRight.push_back(cv::Mat());
+      rvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
+      tvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
+      rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
+      tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
     }
   }
 
@@ -171,7 +171,7 @@ double StereoCameraCalibration(const Model3D& model,
                             rightToLeftTranslationVector,
                             essentialMatrix,
                             fundamentalMatrix,
-                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1e-10),
+                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
                             cvFlags
                             );
 
@@ -188,18 +188,7 @@ double StereoCameraCalibration(const Model3D& model,
                       cvFlags | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
                       );
 
-  // 2. Solve Right. (not really needed, but useful for debugging).
-  cv::calibrateCamera(objectPoints,
-                      rightImagePoints,
-                      imageSize,
-                      intrinsicRight,
-                      distortionRight,
-                      rvecsRight,
-                      tvecsRight,
-                      cvFlags | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
-                      );
-
-  // 3. Make consistent rvecs, tvecs, left and right,
+  // 2. Make consistent rvecs, tvecs, left and right,
   // by creating the right extrinsics, by composing
   // the left extrinsics, and the left-to-right transform.
   for (int i = 0; i < rvecsLeft.size(); i++)

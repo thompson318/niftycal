@@ -12,9 +12,9 @@
 
 =============================================================================*/
 
-#include "niftkIOUtilities.h"
-#include "niftkMonoCameraCalibration.h"
-#include "niftkStereoCameraCalibration.h"
+#include <niftkIOUtilities.h>
+#include <niftkMonoCameraCalibration.h>
+#include <niftkStereoCameraCalibration.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>

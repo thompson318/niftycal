@@ -17,6 +17,7 @@
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
 #include <highgui.h>
+#include <memory>
 
 namespace niftk
 {
@@ -31,21 +32,93 @@ void ExtractTwoCopiesOfControlPoints(
   a.clear();
   b.clear();
 
-  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
+  unsigned int size = list.size();
+  std::unique_ptr<ExtractTwoCopiesInfo[]> infos(new ExtractTwoCopiesInfo[size]);
 
+  // Populates a dynamically sized vector as opposed to stl::list, as OpenMP doesn't like stl::list.
   int counter = 0;
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
   for (iter = list.begin(); iter != list.end(); ++iter)
   {
-    PointSet points = (*iter).first->GetPoints();
-    if(points.empty())
-    {
-      niftkNiftyCalThrow() << "All input images should be valid calibration images containing "
-                           << "extractable points, and " << counter << " isn't.";
-    }
-
-    a.push_back(points);
-    b.push_back(points);
+    infos[counter].m_DetectorAndImage = &(*iter);
     counter++;
+  }
+
+  // Now use OpenMP on the dynamically sized vector.
+  #pragma omp parallel shared(infos)
+  {
+    #pragma omp for
+    for (int i = 0; i < size; i++)
+    {
+      infos[i].m_ExtractedPoints = (*(infos[i].m_DetectorAndImage)).first->GetPoints();
+      if(infos[i].m_ExtractedPoints.empty())
+      {
+        niftkNiftyCalThrow() << "All input images should be valid calibration images containing "
+                             << "extractable points, and " << counter << " isn't.";
+      }
+    }
+  }
+
+  // Extracts two copies. One is kept constant, and one gets iteratively updated.
+  for (int i = 0; i < size; i++)
+  {
+    a.push_back(infos[i].m_ExtractedPoints);
+    b.push_back(infos[i].m_ExtractedPoints);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ExtractAllDistortedControlPoints(
+  const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
+  const cv::Mat& intrinsic,
+  const cv::Mat& distortion,
+  const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& originalDetectorsAndImages,
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& canonicalDetectorsAndImages,
+  std::list<PointSet>& outputPoints
+  )
+{
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
+  std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
+  std::list<PointSet>::iterator pointsIter;
+
+  unsigned int size = originalDetectorsAndImages.size();
+  std::unique_ptr<ExtractDistortedControlPointsInfo[]> info(new ExtractDistortedControlPointsInfo[size]);
+
+  // Populates a dynamically sized vector as opposed to stl::list, as OpenMP doesn't like stl::list.
+  unsigned int counter = 0;
+  for (originalIter = originalDetectorsAndImages.begin(),
+       canonicalIter = canonicalDetectorsAndImages.begin(),
+       pointsIter = outputPoints.begin();
+       originalIter != originalDetectorsAndImages.end() &&
+       canonicalIter != canonicalDetectorsAndImages.end() &&
+       pointsIter != outputPoints.end();
+       ++originalIter,
+       ++canonicalIter,
+       ++pointsIter
+       )
+  {
+    info[counter].m_OriginalImage = &((*originalIter).second);
+    info[counter].m_DetectorAndImage = &(*canonicalIter);
+    info[counter].m_OutputPoints = &(*pointsIter);
+    counter++;
+  }
+
+  // Now use OpenMP on the dynamically sized vector.
+  #pragma omp parallel shared(referenceImageData), shared(intrinsic), shared(distortion), shared(info)
+  {
+    #pragma omp for
+    for (counter = 0; counter < size; counter++)
+    {
+      niftk::ExtractDistortedControlPoints(
+        referenceImageData,
+        intrinsic,
+        distortion,
+        *(info[counter].m_OriginalImage),
+        *(info[counter].m_DetectorAndImage),
+        *(info[counter].m_OutputPoints)
+      );
+    }
   }
 }
 

@@ -31,12 +31,12 @@ double IterativeStereoCameraCalibration(
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesRight,
     const cv::Size2i& imageSize,
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImagesLeft,
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndCanonicalImagesLeft,
     cv::Mat& intrinsicLeft,
     cv::Mat& distortionLeft,
     std::vector<cv::Mat>& rvecsLeft,
     std::vector<cv::Mat>& tvecsLeft,
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImagesRight,
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndCanonicalImagesRight,
     cv::Mat& intrinsicRight,
     cv::Mat& distortionRight,
     std::vector<cv::Mat>& rvecsRight,
@@ -61,12 +61,12 @@ double IterativeStereoCameraCalibration(
     niftkNiftyCalThrow() << "Should have at least 2 right-hand views of calibration points.";
   }
 
-  if (detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()
-      || detectorAndOriginalImagesLeft.size() != detectorAndWarpedImagesLeft.size()
-      || detectorAndOriginalImagesLeft.size() != detectorAndWarpedImagesRight.size()
-      || detectorAndOriginalImagesRight.size() != detectorAndWarpedImagesLeft.size()
-      || detectorAndOriginalImagesRight.size() != detectorAndWarpedImagesRight.size()
-      || detectorAndWarpedImagesLeft.size() != detectorAndWarpedImagesRight.size()
+  if (   detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()
+      || detectorAndOriginalImagesLeft.size() != detectorAndCanonicalImagesLeft.size()
+      || detectorAndOriginalImagesLeft.size() != detectorAndCanonicalImagesRight.size()
+      || detectorAndOriginalImagesRight.size() != detectorAndCanonicalImagesLeft.size()
+      || detectorAndOriginalImagesRight.size() != detectorAndCanonicalImagesRight.size()
+      || detectorAndCanonicalImagesLeft.size() != detectorAndCanonicalImagesRight.size()
       )
   {
     niftkNiftyCalThrow() << "Inconsistent number of images and detector pairs.";
@@ -103,7 +103,12 @@ double IterativeStereoCameraCalibration(
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
-  niftk::MonoCameraCalibration(
+
+  #pragma omp sections
+  {
+    #pragma omp section
+    {
+      niftk::MonoCameraCalibration(
         model,
         pointsFromOriginalImagesLeft,
         imageSize,
@@ -113,8 +118,11 @@ double IterativeStereoCameraCalibration(
         tvecsLeft,
         cvFlags
         );
-
-  niftk::MonoCameraCalibration(
+    }
+     
+    #pragma omp section
+    {
+      niftk::MonoCameraCalibration(
         model,
         pointsFromOriginalImagesRight,
         imageSize,
@@ -124,6 +132,8 @@ double IterativeStereoCameraCalibration(
         tvecsRight,
         cvFlags
         );
+    }
+  }
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
@@ -176,8 +186,6 @@ double IterativeStereoCameraCalibration(
   std::cout << "Initial T3=" << rightToLeftTranslationVector.at<double>(0,2) << std::endl;
   std::cout << std::endl;
 
-  //return projectedRMS;
-
   unsigned int count = 0;
   double previousRMS = std::numeric_limits<double>::max();
 
@@ -185,53 +193,23 @@ double IterativeStereoCameraCalibration(
   {
     previousRMS = projectedRMS;
 
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
-    std::list<PointSet>::iterator pointsIter;
+    niftk::ExtractAllDistortedControlPoints(
+          referenceImageData,
+          intrinsicLeft,
+          distortionLeft,
+          detectorAndOriginalImagesLeft,
+          detectorAndCanonicalImagesLeft,
+          distortedPointsFromCanonicalImagesLeft
+          );
 
-    // Do all left.
-    for (originalIter = detectorAndOriginalImagesLeft.begin(),
-         canonicalIter = detectorAndWarpedImagesLeft.begin(),
-         pointsIter = distortedPointsFromCanonicalImagesLeft.begin();
-         originalIter != detectorAndOriginalImagesLeft.end() &&
-         canonicalIter != detectorAndWarpedImagesLeft.end() &&
-         pointsIter != distortedPointsFromCanonicalImagesLeft.end();
-         ++originalIter,
-         ++canonicalIter,
-         ++pointsIter
-         )
-    {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsicLeft,
-        distortionLeft,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
-      );
-    }
-
-    // Do all right.
-    for (originalIter = detectorAndOriginalImagesRight.begin(),
-         canonicalIter = detectorAndWarpedImagesRight.begin(),
-         pointsIter = distortedPointsFromCanonicalImagesRight.begin();
-         originalIter != detectorAndOriginalImagesRight.end() &&
-         canonicalIter != detectorAndWarpedImagesRight.end() &&
-         pointsIter != distortedPointsFromCanonicalImagesRight.end();
-         ++originalIter,
-         ++canonicalIter,
-         ++pointsIter
-         )
-    {
-      niftk::ExtractDistortedControlPoints(
-        referenceImageData,
-        intrinsicRight,
-        distortionRight,
-        (*originalIter).second,
-        (*canonicalIter),
-        (*pointsIter)
-      );
-    }
+    niftk::ExtractAllDistortedControlPoints(
+          referenceImageData,
+          intrinsicRight,
+          distortionRight,
+          detectorAndOriginalImagesRight,
+          detectorAndCanonicalImagesRight,
+          distortedPointsFromCanonicalImagesRight
+          );
 
     // 4. Parameter Fitting: Use the projected control points to refine
     // the camera parameters using Levenberg-Marquardt.
@@ -246,8 +224,8 @@ double IterativeStereoCameraCalibration(
 
     projectedRMS = niftk::StereoCameraCalibration(
           model,
-          distortedPointsFromCanonicalImagesLeft,  // or used trimmedPointsLeft?
-          distortedPointsFromCanonicalImagesRight, // or use trimmedPointsRight?
+          distortedPointsFromCanonicalImagesLeft,
+          distortedPointsFromCanonicalImagesRight,
           imageSize,
           tmpIntrinsicLeft,
           tmpDistortionLeft,
