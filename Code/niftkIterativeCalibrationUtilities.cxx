@@ -45,7 +45,7 @@ void ExtractTwoCopiesOfControlPoints(
   }
 
   // Now use OpenMP on the dynamically sized vector.
-  #pragma omp parallel shared(info)
+  #pragma omp parallel shared(infos)
   {
     #pragma omp for
     for (int i = 0; i < size; i++)
