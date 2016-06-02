@@ -31,12 +31,12 @@ double IterativeStereoCameraCalibration(
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesRight,
     const cv::Size2i& imageSize,
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImagesLeft,
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndCanonicalImagesLeft,
     cv::Mat& intrinsicLeft,
     cv::Mat& distortionLeft,
     std::vector<cv::Mat>& rvecsLeft,
     std::vector<cv::Mat>& tvecsLeft,
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndWarpedImagesRight,
+    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndCanonicalImagesRight,
     cv::Mat& intrinsicRight,
     cv::Mat& distortionRight,
     std::vector<cv::Mat>& rvecsRight,
@@ -61,12 +61,12 @@ double IterativeStereoCameraCalibration(
     niftkNiftyCalThrow() << "Should have at least 2 right-hand views of calibration points.";
   }
 
-  if (detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()
-      || detectorAndOriginalImagesLeft.size() != detectorAndWarpedImagesLeft.size()
-      || detectorAndOriginalImagesLeft.size() != detectorAndWarpedImagesRight.size()
-      || detectorAndOriginalImagesRight.size() != detectorAndWarpedImagesLeft.size()
-      || detectorAndOriginalImagesRight.size() != detectorAndWarpedImagesRight.size()
-      || detectorAndWarpedImagesLeft.size() != detectorAndWarpedImagesRight.size()
+  if (   detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()
+      || detectorAndOriginalImagesLeft.size() != detectorAndCanonicalImagesLeft.size()
+      || detectorAndOriginalImagesLeft.size() != detectorAndCanonicalImagesRight.size()
+      || detectorAndOriginalImagesRight.size() != detectorAndCanonicalImagesLeft.size()
+      || detectorAndOriginalImagesRight.size() != detectorAndCanonicalImagesRight.size()
+      || detectorAndCanonicalImagesLeft.size() != detectorAndCanonicalImagesRight.size()
       )
   {
     niftkNiftyCalThrow() << "Inconsistent number of images and detector pairs.";
@@ -88,27 +88,18 @@ double IterativeStereoCameraCalibration(
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
 
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
+                                  pointsFromOriginalImagesLeft,
+                                  distortedPointsFromCanonicalImagesLeft
+                                  );
+
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
 
-  #pragma omp sections
-  {
-    #pragma omp section
-    {
-      ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
-                                      pointsFromOriginalImagesLeft,
-                                      distortedPointsFromCanonicalImagesLeft
-                                      );
-    }
-
-    #pragma omp section
-    {
-      ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
-                                      pointsFromOriginalImagesRight,
-                                      distortedPointsFromCanonicalImagesRight
-                                      );
-    }
-  }
+  ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
+                                  pointsFromOriginalImagesRight,
+                                  distortedPointsFromCanonicalImagesRight
+                                  );
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
@@ -202,83 +193,23 @@ double IterativeStereoCameraCalibration(
   {
     previousRMS = projectedRMS;
 
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator originalIter;
-    std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::iterator canonicalIter;
-    std::list<PointSet>::iterator pointsIter;
-
-    unsigned int size = detectorAndOriginalImagesLeft.size();
-
-    // Do all left.
-    std::unique_ptr<ExtractDistortedControlPointsInfo[]> infoLeft(new ExtractDistortedControlPointsInfo[size]);
-    unsigned int counter = 0;
-    for (originalIter = detectorAndOriginalImagesLeft.begin(),
-         canonicalIter = detectorAndWarpedImagesLeft.begin(),
-         pointsIter = distortedPointsFromCanonicalImagesLeft.begin();
-         originalIter != detectorAndOriginalImagesLeft.end() &&
-         canonicalIter != detectorAndWarpedImagesLeft.end() &&
-         pointsIter != distortedPointsFromCanonicalImagesLeft.end();
-         ++originalIter,
-         ++canonicalIter,
-         ++pointsIter
-         )
-    {
-      infoLeft[counter].m_OriginalImage = &((*originalIter).second);
-      infoLeft[counter].m_DetectorAndImage = &(*canonicalIter);
-      infoLeft[counter].m_OutputPoints = &(*pointsIter);
-      counter++;
-    }
-
-    #pragma omp parallel shared(referenceImageData), shared(intrinsicLeft), shared(distortionLeft), shared(infoLeft)
-    {
-      #pragma omp for
-      for (counter = 0; counter < size; counter++)
-      {
-        niftk::ExtractDistortedControlPoints(
+    niftk::ExtractAllDistortedControlPoints(
           referenceImageData,
           intrinsicLeft,
           distortionLeft,
-          *(infoLeft[counter].m_OriginalImage),
-          *(infoLeft[counter].m_DetectorAndImage),
-          *(infoLeft[counter].m_OutputPoints)
-        );
-      }
-    }
- 
-    // Do all right.
-    std::unique_ptr<ExtractDistortedControlPointsInfo[]> infoRight(new ExtractDistortedControlPointsInfo[size]);
-    counter = 0;
-    for (originalIter = detectorAndOriginalImagesRight.begin(),
-         canonicalIter = detectorAndWarpedImagesRight.begin(),
-         pointsIter = distortedPointsFromCanonicalImagesRight.begin();
-         originalIter != detectorAndOriginalImagesRight.end() &&
-         canonicalIter != detectorAndWarpedImagesRight.end() &&
-         pointsIter != distortedPointsFromCanonicalImagesRight.end();
-         ++originalIter,
-         ++canonicalIter,
-         ++pointsIter
-         )
-    {
-      infoRight[counter].m_OriginalImage = &((*originalIter).second);
-      infoRight[counter].m_DetectorAndImage = &(*canonicalIter);
-      infoRight[counter].m_OutputPoints = &(*pointsIter);
-      counter++;
-    }
+          detectorAndOriginalImagesLeft,
+          detectorAndCanonicalImagesLeft,
+          distortedPointsFromCanonicalImagesLeft
+          );
 
-    #pragma omp parallel shared(referenceImageData), shared(intrinsicRight), shared(distortionRight), shared(infoRight)
-    {
-      #pragma omp for
-      for (counter = 0; counter < size; counter++)
-      {
-        niftk::ExtractDistortedControlPoints(
+    niftk::ExtractAllDistortedControlPoints(
           referenceImageData,
           intrinsicRight,
           distortionRight,
-          *(infoRight[counter].m_OriginalImage),
-          *(infoRight[counter].m_DetectorAndImage),
-          *(infoRight[counter].m_OutputPoints)
-        );
-      }
-    }
+          detectorAndOriginalImagesRight,
+          detectorAndCanonicalImagesRight,
+          distortedPointsFromCanonicalImagesRight
+          );
 
     // 4. Parameter Fitting: Use the projected control points to refine
     // the camera parameters using Levenberg-Marquardt.

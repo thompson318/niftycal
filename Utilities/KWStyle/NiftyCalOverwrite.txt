@@ -1,4 +1,3 @@
 niftkNiftyCalException\.h MemberFunctions Disable
 niftkNiftyCalException\.cxx Functions Disable
-niftkIterativeMonoCameraCalibration\.cxx Functions Disable
-niftkIterativeStereoCameraCalibration\.cxx Functions Disable
+niftkIterativeCalibrationUtilities\.cxx Functions Disable
