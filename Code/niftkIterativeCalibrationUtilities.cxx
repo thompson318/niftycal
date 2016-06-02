@@ -36,7 +36,7 @@ void ExtractTwoCopiesOfControlPoints(
   std::unique_ptr<ExtractTwoCopiesInfo[]> infos(new ExtractTwoCopiesInfo[size]);
 
   // Populates a dynamically sized vector as opposed to stl::list, as OpenMP doesn't like stl::list.
-  int counter = 0;
+  unsigned int counter = 0;
   std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >::const_iterator iter;
   for (iter = list.begin(); iter != list.end(); ++iter)
   {
@@ -108,15 +108,15 @@ void ExtractAllDistortedControlPoints(
   #pragma omp parallel shared(referenceImageData), shared(intrinsic), shared(distortion), shared(info)
   {
     #pragma omp for
-    for (counter = 0; counter < size; counter++)
+    for (int i = 0; i < size; i++)
     {
       niftk::ExtractDistortedControlPoints(
         referenceImageData,
         intrinsic,
         distortion,
-        *(info[counter].m_OriginalImage),
-        *(info[counter].m_DetectorAndImage),
-        *(info[counter].m_OutputPoints)
+        *(info[i].m_OriginalImage),
+        *(info[i].m_DetectorAndImage),
+        *(info[i].m_OutputPoints)
       );
     }
   }
