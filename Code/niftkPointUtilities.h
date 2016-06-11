@@ -252,6 +252,20 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
   cv::Point3d& rmsForEachAxis
  );
 
+
+/**
+* \brief Used to project 3D model points, to 2D, but only for points that exist
+* in the given PointSet.
+*/
+NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
+                                                      const PointSet& points,
+                                                      const cv::Matx44d& extrinsic,
+                                                      const cv::Mat& intrinsic,
+                                                      const cv::Mat& distortion,
+                                                      std::vector<cv::Point2f>& observed,
+                                                      std::vector<cv::Point2f>& projected
+                                                     );
+
 } // end namespace
 
 #endif

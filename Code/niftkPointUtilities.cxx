@@ -944,4 +944,69 @@ double ComputeRMSReconstructionError(const Model3D& model,
   return rms;
 }
 
+
+//-----------------------------------------------------------------------------
+unsigned int ProjectMatchingPoints(const Model3D& model,
+                                   const PointSet& points,
+                                   const cv::Matx44d& extrinsic,
+                                   const cv::Mat& intrinsic,
+                                   const cv::Mat& distortion,
+                                   std::vector<cv::Point2f>& observed,
+                                   std::vector<cv::Point2f>& projected
+                                  )
+{
+  cv::Point3d modelPoint;
+  cv::Point3f m;
+  cv::Point2f p;
+  std::vector<cv::Point3f> modelPoints;
+  niftk::PointSet::const_iterator pointIter;
+  Model3D::const_iterator modelIter;
+  unsigned int pointPerViewCounter = 0;
+
+  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
+
+  observed.clear();
+  projected.clear();
+
+  modelPoints.resize(points.size());
+  projected.resize(points.size());
+  observed.resize(points.size());
+
+  for (pointIter = points.begin();
+       pointIter != points.end();
+       ++pointIter
+       )
+  {
+    NiftyCalIdType id = (*pointIter).first;
+    modelIter = model.find(id);
+    if (modelIter == model.end())
+    {
+      niftkNiftyCalThrow() << "Invalid point id:" << id;
+    }
+
+    modelPoint = (*modelIter).second.point;
+    m.x = modelPoint.x;
+    m.y = modelPoint.y;
+    m.z = modelPoint.z;
+    modelPoints[pointPerViewCounter] = m;
+
+    p.x = (*pointIter).second.point.x;
+    p.y = (*pointIter).second.point.y;
+    observed[pointPerViewCounter] = p;
+
+    pointPerViewCounter++;
+  }
+
+  cv::projectPoints(modelPoints,
+                    extrinsicRotationVector,
+                    extrinsicTranslationVector,
+                    intrinsic,
+                    distortion,
+                    projected);
+
+  return pointPerViewCounter;
+}
+
 } // end namespace

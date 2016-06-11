@@ -132,47 +132,18 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
                                                             unsigned int& totalPointCounter
                                                            ) const
 {
-  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
+  std::vector<cv::Point2f> observed(points.size());
+  std::vector<cv::Point2f> projected(points.size());
 
-  cv::Point3d    modelPoint;
-  cv::Point3f    m;
-  cv::Point2f    p;
-  std::vector<cv::Point3f> model;
-  std::vector<cv::Point2f> observed;
-  std::vector<cv::Point2f> projected;
-  niftk::PointSet::const_iterator pointIter;
+  niftk::ProjectMatchingPoints(*m_Model,
+                               points,
+                               extrinsic,
+                               intrinsic,
+                               distortion,
+                               observed,
+                               projected
+                              );
 
-  model.resize(points.size());
-  projected.resize(points.size());
-  observed.resize(points.size());
-
-  unsigned int pointPerViewCounter = 0;
-
-  for (pointIter = points.begin();
-       pointIter != points.end();
-       ++pointIter
-       )
-  {
-    NiftyCalIdType id = (*pointIter).first;
-    modelPoint = (*m_Model)[id].point;
-    m.x = modelPoint.x;
-    m.y = modelPoint.y;
-    m.z = modelPoint.z;
-    model[pointPerViewCounter] = m;
-
-    p.x = (*pointIter).second.point.x;
-    p.y = (*pointIter).second.point.y;
-    observed[pointPerViewCounter] = p;
-
-    pointPerViewCounter++;
-  }
-
-  // Project all points for that image.
-  cv::projectPoints(model, extrinsicRotationVector, extrinsicTranslationVector, intrinsic, distortion, projected);
-
-  // Now measure diff.
   for (unsigned int i = 0; i < observed.size(); i++)
   {
     values[totalPointCounter++] = (observed[i].x - projected[i].x);
@@ -236,7 +207,8 @@ NonLinearMaltiStereoHandEyeCostFunction::InternalGetValue(const ParametersType& 
 
   for (leftViewIter = m_Points->begin(),
        rightViewIter = m_RightHandPoints->begin();
-       leftViewIter != m_Points->end() && rightViewIter != m_RightHandPoints->end();
+       leftViewIter != m_Points->end()
+       && rightViewIter != m_RightHandPoints->end();
        ++leftViewIter,
        ++rightViewIter
        )
