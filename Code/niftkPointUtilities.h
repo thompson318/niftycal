@@ -254,7 +254,7 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
 
 
 /**
-* \brief Used to project 3D model points, to 2D, but only for points that exist
+* \brief Used to project 3D model points to 2D, but only for points that exist
 * in the given PointSet.
 */
 NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
@@ -263,7 +263,8 @@ NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
                                                       const cv::Mat& intrinsic,
                                                       const cv::Mat& distortion,
                                                       std::vector<cv::Point2f>& observed,
-                                                      std::vector<cv::Point2f>& projected
+                                                      std::vector<cv::Point2f>& projected,
+                                                      std::vector<niftk::NiftyCalIdType>& ids
                                                      );
 
 } // end namespace

@@ -110,6 +110,7 @@ NonLinearMalti12DOFHandEyeCostFunction::InternalGetValue(const ParametersType& p
 
     std::vector<cv::Point2f> observed((*viewIter).size());
     std::vector<cv::Point2f> projected((*viewIter).size());
+    std::vector<niftk::NiftyCalIdType> ids((*viewIter).size());
 
     niftk::ProjectMatchingPoints(*m_Model,
                                  *viewIter,
@@ -117,7 +118,8 @@ NonLinearMalti12DOFHandEyeCostFunction::InternalGetValue(const ParametersType& p
                                  *m_Intrinsic,
                                  *m_Distortion,
                                  observed,
-                                 projected
+                                 projected,
+                                 ids
                                 );
 
     for (unsigned int i = 0; i < observed.size(); i++)

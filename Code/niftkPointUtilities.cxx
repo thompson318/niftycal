@@ -952,7 +952,8 @@ unsigned int ProjectMatchingPoints(const Model3D& model,
                                    const cv::Mat& intrinsic,
                                    const cv::Mat& distortion,
                                    std::vector<cv::Point2f>& observed,
-                                   std::vector<cv::Point2f>& projected
+                                   std::vector<cv::Point2f>& projected,
+                                   std::vector<niftk::NiftyCalIdType>& ids
                                   )
 {
   cv::Point3d modelPoint;
@@ -969,10 +970,12 @@ unsigned int ProjectMatchingPoints(const Model3D& model,
 
   observed.clear();
   projected.clear();
+  ids.clear();
 
   modelPoints.resize(points.size());
   projected.resize(points.size());
   observed.resize(points.size());
+  ids.resize(points.size());
 
   for (pointIter = points.begin();
        pointIter != points.end();
@@ -995,6 +998,8 @@ unsigned int ProjectMatchingPoints(const Model3D& model,
     p.x = (*pointIter).second.point.x;
     p.y = (*pointIter).second.point.y;
     observed[pointPerViewCounter] = p;
+
+    ids.push_back(id);
 
     pointPerViewCounter++;
   }

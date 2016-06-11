@@ -134,6 +134,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
 {
   std::vector<cv::Point2f> observed(points.size());
   std::vector<cv::Point2f> projected(points.size());
+  std::vector<niftk::NiftyCalIdType> ids(points.size());
 
   niftk::ProjectMatchingPoints(*m_Model,
                                points,
@@ -141,7 +142,8 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
                                intrinsic,
                                distortion,
                                observed,
-                               projected
+                               projected,
+                               ids
                               );
 
   for (unsigned int i = 0; i < observed.size(); i++)
