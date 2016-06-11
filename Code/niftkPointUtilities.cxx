@@ -868,6 +868,14 @@ double ComputeRMSReconstructionError(const Model3D& model,
   {
     niftkNiftyCalThrow() << "Unequal number of left and right points.";
   }
+  if (listOfLeftHandPointSets.size() != rvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and rotation vectors.";
+  }
+  if (listOfLeftHandPointSets.size() != tvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and translation vectors.";
+  }
 
   std::list<PointSet>::const_iterator leftIter;
   std::list<PointSet>::const_iterator rightIter;
@@ -917,7 +925,7 @@ double ComputeRMSReconstructionError(const Model3D& model,
     rmsForEachAxis.y += cameraViewSSE.y;
     rmsForEachAxis.z += cameraViewSSE.z;
 
-    viewCounter ++;
+    viewCounter++;
   }
 
   if (pointCounter != 0)
