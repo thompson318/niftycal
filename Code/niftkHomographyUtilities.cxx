@@ -44,7 +44,8 @@ void FindHomography(const PointSet& src,
 {
   std::vector<cv::Point2f> srcPoint;
   std::vector<cv::Point2f> targetPoint;
-  niftk::ExtractCommonPoints(src , target, srcPoint, targetPoint);
+  std::vector<niftk::NiftyCalIdType> commonIds;
+  niftk::ExtractCommonPoints(src , target, srcPoint, targetPoint, commonIds);
 
   if (srcPoint.size() == 0)
   {
@@ -77,8 +78,9 @@ void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
   std::vector<cv::Point2f> distortedSource;
   std::vector<cv::Point2f> undistortedSource;
   std::vector<cv::Point2f> target;
+  std::vector<niftk::NiftyCalIdType> commonIds;
 
-  niftk::ExtractCommonPoints(distortedPoints, targetPoints, distortedSource, target);
+  niftk::ExtractCommonPoints(distortedPoints, targetPoints, distortedSource, target, commonIds);
 
   if (distortedSource.size() == 0)
   {

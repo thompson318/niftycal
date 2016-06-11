@@ -14,6 +14,7 @@
 
 #include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkMatrixUtilities.h"
 #include <queue>
 #include <vector>
 #include <functional>
@@ -66,11 +67,13 @@ PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
 void ExtractCommonPoints(const PointSet& inputA,
                          const PointSet& inputB,
                          std::vector<cv::Point2f>& outputA,
-                         std::vector<cv::Point2f>& outputB
+                         std::vector<cv::Point2f>& outputB,
+                         std::vector<niftk::NiftyCalIdType>& commonIds
                          )
 {
   outputA.clear();
   outputB.clear();
+  commonIds.clear();
 
   niftk::PointSet::const_iterator iterA;
   niftk::PointSet::const_iterator iterB;
@@ -89,6 +92,8 @@ void ExtractCommonPoints(const PointSet& inputA,
       b.x = (*iterB).second.point.x;
       b.y = (*iterB).second.point.y;
       outputB.push_back(b);
+
+      commonIds.push_back((*iterA).first);
     }
   }
 }
@@ -98,7 +103,8 @@ void ExtractCommonPoints(const PointSet& inputA,
 void ExtractCommonPoints(const Model3D& inputA,
                          const Model3D& inputB,
                          std::vector<cv::Point3d>& outputA,
-                         std::vector<cv::Point3d>& outputB
+                         std::vector<cv::Point3d>& outputB,
+                         std::vector<niftk::NiftyCalIdType>& commonIds
                         )
 {
   outputA.clear();
@@ -123,6 +129,8 @@ void ExtractCommonPoints(const Model3D& inputA,
       b.y = (*iterB).second.point.y;
       b.z = (*iterB).second.point.z;
       outputB.push_back(b);
+
+      commonIds.push_back((*iterA).first);
     }
   }
 }
@@ -177,13 +185,15 @@ void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
 //-----------------------------------------------------------------------------
 double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
                                                  const PointSet& inputB,
+                                                 cv::Point2d& sumSquaredError,
                                                  cv::Point2d& rmsForEachAxis
                                                  )
 {
   std::vector<cv::Point2f> a;
   std::vector<cv::Point2f> b;
+  std::vector<niftk::NiftyCalIdType> commonIds;
 
-  niftk::ExtractCommonPoints(inputA, inputB, a, b);
+  niftk::ExtractCommonPoints(inputA, inputB, a, b, commonIds);
   if (a.size() == 0 || b.size() == 0)
   {
     niftkNiftyCalThrow() << "No common points.";
@@ -194,20 +204,28 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
   }
 
   double rms = 0;
+  sumSquaredError.x = 0;
+  sumSquaredError.y = 0;
   rmsForEachAxis.x = 0;
   rmsForEachAxis.y = 0;
   cv::Point2d diff;
+  cv::Point2d squaredDiff;
 
   for (size_t i = 0; i < a.size(); i++)
   {
     diff.x = a[i].x - b[i].x;
     diff.y = a[i].y - b[i].y;
 
-    rms += ( (diff.x * diff.x)
-           + (diff.y * diff.y)
-           );
-    rmsForEachAxis.x += (diff.x * diff.x);
-    rmsForEachAxis.y += (diff.y * diff.y);
+    squaredDiff.x = diff.x * diff.x;
+    squaredDiff.y = diff.y * diff.y;
+
+    rms += squaredDiff.x + squaredDiff.y;
+
+    rmsForEachAxis.x += squaredDiff.x;
+    rmsForEachAxis.y += squaredDiff.y;
+
+    sumSquaredError.x += squaredDiff.x;
+    sumSquaredError.y += squaredDiff.y;
   }
 
   rms /= static_cast<double>(a.size());
@@ -226,13 +244,15 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
 //-----------------------------------------------------------------------------
 double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& inputA,
                                                  const Model3D& inputB,
+                                                 cv::Point3d& sumSquaredError,
                                                  cv::Point3d& rmsForEachAxis
                                                 )
 {
   std::vector<cv::Point3d> a;
   std::vector<cv::Point3d> b;
+  std::vector<niftk::NiftyCalIdType> commonIds;
 
-  niftk::ExtractCommonPoints(inputA, inputB, a, b);
+  niftk::ExtractCommonPoints(inputA, inputB, a, b, commonIds);
   if (a.size() == 0 || b.size() == 0)
   {
     niftkNiftyCalThrow() << "No common points.";
@@ -243,10 +263,14 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& inputA,
   }
 
   double rms = 0;
+  sumSquaredError.x = 0;
+  sumSquaredError.y = 0;
+  sumSquaredError.z = 0;
   rmsForEachAxis.x = 0;
   rmsForEachAxis.y = 0;
   rmsForEachAxis.z = 0;
   cv::Point3d diff;
+  cv::Point3d squaredDiff;
 
   for (size_t i = 0; i < a.size(); i++)
   {
@@ -254,16 +278,21 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& inputA,
     diff.y = (a[i].y - b[i].y);
     diff.z = (a[i].z - b[i].z);
 
-    rms += ( (diff.x * diff.x)
-           + (diff.y * diff.y)
-           + (diff.z * diff.z)
-           );
+    squaredDiff.x = diff.x * diff.x;
+    squaredDiff.y = diff.y * diff.y;
+    squaredDiff.z = diff.z * diff.z;
 
-    rmsForEachAxis.x += diff.x;
-    rmsForEachAxis.y += diff.y;
-    rmsForEachAxis.z += diff.z;
+    rms += squaredDiff.x + squaredDiff.y + squaredDiff.z;
 
+    rmsForEachAxis.x += squaredDiff.x;
+    rmsForEachAxis.y += squaredDiff.y;
+    rmsForEachAxis.z += squaredDiff.z;
+
+    sumSquaredError.x += squaredDiff.x;
+    sumSquaredError.y += squaredDiff.y;
+    sumSquaredError.z += squaredDiff.z;
   }
+
   rms /= static_cast<double>(a.size());
   rms = sqrt(rms);
 
@@ -702,6 +731,68 @@ void TriangulatePointPairs(
 
 
 //-----------------------------------------------------------------------------
+void TriangulatePointPairs(
+  const PointSet& leftDistortedPoints,
+  const PointSet& rightDistortedPoints,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
+  const cv::Mat& leftCameraRotationVector,
+  const cv::Mat& leftCameraTranslationVector,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
+  Model3D& outputTriangulatedPoints
+  )
+{
+  PointSet leftUndistortedPoints;
+  niftk::UndistortPoints(leftDistortedPoints, leftIntrinsics, leftDistortionParams, leftUndistortedPoints);
+
+  PointSet rightUndistortedPoints;
+  niftk::UndistortPoints(rightDistortedPoints, rightIntrinsics, rightDistortionParams, rightUndistortedPoints);
+
+  std::vector<cv::Point2f> leftPoints;
+  std::vector<cv::Point2f> rightPoints;
+  std::vector<niftk::NiftyCalIdType> commonIds;
+  niftk::ExtractCommonPoints(leftUndistortedPoints, rightUndistortedPoints, leftPoints, rightPoints, commonIds);
+
+  cv::Matx44d leftExtrinsic =
+      niftk::RodriguesToMatrix(leftCameraRotationVector, leftCameraTranslationVector);
+
+  cv::Matx44d leftToRight =
+      niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix, leftToRightTranslationVector);
+
+  cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
+
+  cv::Mat rightCameraRotationVector;
+  cv::Mat rightCameraTranslationVector;
+  niftk::MatrixToRodrigues(rightExtrinsic, rightCameraRotationVector, rightCameraTranslationVector);
+
+  std::vector<cv::Point3f> triangulatedPoints;
+
+  niftk::TriangulatePointPairs(leftPoints,
+                               rightPoints,
+                               leftIntrinsics,
+                               leftCameraRotationVector,
+                               leftCameraTranslationVector,
+                               rightIntrinsics,
+                               rightCameraRotationVector,
+                               rightCameraTranslationVector,
+                               triangulatedPoints
+                               );
+
+  outputTriangulatedPoints.clear();
+  for (int i = 0; i < triangulatedPoints.size(); i++)
+  {
+    Point3D p;
+    p.id = commonIds[i];
+    p.point = triangulatedPoints[i];
+    outputTriangulatedPoints.insert(niftk::IdPoint3D(commonIds[i], p));
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 Model3D TransformModel(const Model3D& inputModel, const cv::Matx44d& matrix)
 {
   Model3D output;
@@ -755,22 +846,94 @@ PointSet AddGaussianNoise(const PointSet& points,
 
 
 //-----------------------------------------------------------------------------
-double ComputeRMSReconstructionError(
-  const Model3D& model,
-  const std::list<PointSet>& listOfLeftHandPointSets,
-  const std::list<PointSet>& listOfRightHandPointSets,
-  const cv::Mat& intrinsicLeft,
-  const cv::Mat& distortionLeft,
-  const std::vector<cv::Mat>& rvecsLeft,
-  const std::vector<cv::Mat>& tvecsLeft,
-  const cv::Mat& intrinsicRight,
-  const cv::Mat& distortionRight,
-  const cv::Mat& leftToRightRotationMatrix,
-  const cv::Mat& leftToRightTranslationVector,
-  cv::Point3d& rmsForEachAxis
- )
+double ComputeRMSReconstructionError(const Model3D& model,
+                                     const std::list<PointSet>& listOfLeftHandPointSets,
+                                     const std::list<PointSet>& listOfRightHandPointSets,
+                                     const cv::Mat& leftIntrinsics,
+                                     const cv::Mat& leftDistortionParams,
+                                     const std::vector<cv::Mat>& rvecsLeft,
+                                     const std::vector<cv::Mat>& tvecsLeft,
+                                     const cv::Mat& rightIntrinsics,
+                                     const cv::Mat& rightDistortionParams,
+                                     const cv::Mat& leftToRightRotationMatrix,
+                                     const cv::Mat& leftToRightTranslationVector,
+                                     cv::Point3d& rmsForEachAxis
+                                    )
 {
-  return 0;
+  double rms = 0;
+  unsigned int pointCounter = 0;
+  unsigned int viewCounter = 0;
+
+  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left and right points.";
+  }
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+
+  for (leftIter = listOfLeftHandPointSets.begin(),
+       rightIter = listOfRightHandPointSets.begin();
+       leftIter != listOfLeftHandPointSets.end() &&
+       rightIter != listOfRightHandPointSets.end();
+       ++leftIter,
+       ++rightIter
+       )
+  {
+    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix(rvecsLeft[viewCounter], tvecsLeft[viewCounter]);
+    Model3D modelInLeftCameraCoordinates = niftk::TransformModel(model, modelToCamera);
+
+    Model3D triangulatedPoints;
+    rmsForEachAxis.x = 0;
+    rmsForEachAxis.y = 0;
+    rmsForEachAxis.z = 0;
+
+    niftk::TriangulatePointPairs(
+      *leftIter,
+      *rightIter,
+      leftIntrinsics,
+      leftDistortionParams,
+      rvecsLeft[viewCounter],
+      tvecsLeft[viewCounter],
+      leftToRightRotationMatrix,
+      leftToRightTranslationVector,
+      rightIntrinsics,
+      rightDistortionParams,
+      triangulatedPoints
+    );
+
+    cv::Point3d cameraViewRMS;
+    cv::Point3d cameraViewSSE;
+
+    double viewRMS = niftk::ComputeRMSDifferenceBetweenMatchingPoints(modelInLeftCameraCoordinates,
+                                                                      triangulatedPoints,
+                                                                      cameraViewSSE,
+                                                                      cameraViewRMS
+                                                                     );
+
+    pointCounter += (*leftIter).size();
+    rms += (viewRMS*viewRMS*static_cast<double>((*leftIter).size()));
+    rmsForEachAxis.x += cameraViewSSE.x;
+    rmsForEachAxis.y += cameraViewSSE.y;
+    rmsForEachAxis.z += cameraViewSSE.z;
+
+    viewCounter ++;
+  }
+
+  if (pointCounter != 0)
+  {
+    rms /= static_cast<double>(pointCounter);
+    rmsForEachAxis.x /= static_cast<double>(pointCounter);
+    rmsForEachAxis.y /= static_cast<double>(pointCounter);
+    rmsForEachAxis.z /= static_cast<double>(pointCounter);
+  }
+
+  rms = sqrt(rms);
+  rmsForEachAxis.x = sqrt(rmsForEachAxis.x);
+  rmsForEachAxis.y = sqrt(rmsForEachAxis.y);
+  rmsForEachAxis.z = sqrt(rmsForEachAxis.z);
+
+  return rms;
 }
 
 } // end namespace

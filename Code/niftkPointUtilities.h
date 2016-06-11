@@ -65,7 +65,8 @@ NIFTYCAL_WINEXPORT void ConvertPoints(const std::vector<cv::Point2f>& inputPoint
 NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
                                             const PointSet& inputB,
                                             std::vector<cv::Point2f>& outputA,
-                                            std::vector<cv::Point2f>& outputB
+                                            std::vector<cv::Point2f>& outputB,
+                                            std::vector<niftk::NiftyCalIdType>& commonIds
                                            );
 
 /**
@@ -75,7 +76,8 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
 NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
                                             const Model3D& inputB,
                                             std::vector<cv::Point3d>& outputA,
-                                            std::vector<cv::Point3d>& outputB
+                                            std::vector<cv::Point3d>& outputB,
+                                            std::vector<niftk::NiftyCalIdType>& commonIds
                                            );
 
 /**
@@ -84,6 +86,7 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
 */
 NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& a,
                                                                     const PointSet& b,
+                                                                    cv::Point2d& sumSquaredError,
                                                                     cv::Point2d& rmsForEachAxis
                                                                    );
 
@@ -93,6 +96,7 @@ NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointS
 */
 NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& a,
                                                                     const Model3D& b,
+                                                                    cv::Point3d& sumSquaredError,
                                                                     cv::Point3d& rmsForEachAxis
                                                                    );
 
@@ -237,12 +241,12 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
   const Model3D& model,
   const std::list<PointSet>& listOfLeftHandPointSets,
   const std::list<PointSet>& listOfRightHandPointSets,
-  const cv::Mat& intrinsicLeft,
-  const cv::Mat& distortionLeft,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
   const std::vector<cv::Mat>& rvecsLeft,
   const std::vector<cv::Mat>& tvecsLeft,
-  const cv::Mat& intrinsicRight,
-  const cv::Mat& distortionRight,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
   const cv::Mat& leftToRightRotationMatrix,
   const cv::Mat& leftToRightTranslationVector,
   cv::Point3d& rmsForEachAxis
