@@ -593,4 +593,54 @@ void TriangulatePointPairs(
   }
 }
 
+
+//-----------------------------------------------------------------------------
+std::list<PointSet> AddGaussianNoise(const std::list<PointSet>& points,
+                                     const double& mean,
+                                     const double stdDev
+                                    )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& a,
+                                                 const Model3D& b,
+                                                 cv::Point3d& rmsForEachAxis
+                                                )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+Model3D TransformModel(
+  const Model3D& inputModel,
+  const cv::Matx44d matrix
+  )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeRMSReconstructionError(
+  const Model3D& model,
+  const std::list<PointSet>& listOfLeftHandPointSets,
+  const std::list<PointSet>& listOfRightHandPointSets,
+  const cv::Mat& intrinsicLeft,
+  const cv::Mat& distortionLeft,
+  const std::vector<cv::Mat>& rvecsLeft,
+  const std::vector<cv::Mat>& tvecsLeft,
+  const cv::Mat& intrinsicRight,
+  const cv::Mat& distortionRight,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  cv::Point3d& rmsForEachAxis
+ )
+{
+
+}
+
 } // end namespace

@@ -17,6 +17,7 @@
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
+#include <list>
 
 /**
 * \file niftkPointUtilities.h
@@ -76,6 +77,15 @@ NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointS
                                                                    );
 
 /**
+* \brief Computes the RMS error between common (same identifier) points in a and b.
+* \throw if no common points.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& a,
+                                                                    const Model3D& b,
+                                                                    cv::Point3d& rmsForEachAxis
+                                                                   );
+
+/**
 * \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).
 */
 NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
@@ -83,7 +93,6 @@ NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
                                         const cv::Mat& distortionCoefficients,
                                         PointSet& undistortedPoints
                                        );
-
 
 /**
 * \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).
@@ -111,7 +120,6 @@ NIFTYCAL_WINEXPORT void DistortPoints(const std::vector<PointSet>& undistortedPo
                                       const cv::Mat& distortionCoefficients,
                                       std::vector<PointSet>& distortedPoints
                                      );
-
 
 /**
 * \brief Compares input with reference, and keeps the closest matching points,
@@ -164,7 +172,7 @@ NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
 * \param rightCameraIntrinsicParams [3x3] matrix for right camera.
 * \param rightCameraRotationVector [1x3] matrix for the right camera rotation vector.
 * \param rightCameraTranslationVector [1x3] matrix for right camera translation vector.
-* \param outputPoints reconstructed 3D points.
+* \param outputPoints reconstructed 3D points, w.r.t. left camera (ie. in left camera coordinates).
 */
 NIFTYCAL_WINEXPORT void TriangulatePointPairs(
   const std::vector<cv::Point2f>& leftCameraUndistortedPoints,
@@ -177,6 +185,57 @@ NIFTYCAL_WINEXPORT void TriangulatePointPairs(
   const cv::Mat& rightCameraTranslationVector,
   std::vector<cv::Point3f>& outputTriangulatedPoints
   );
+
+/**
+* \brief Overrides the above method.
+*/
+NIFTYCAL_WINEXPORT void TriangulatePointPairs(
+  const PointSet& leftDistortedPoints,
+  const PointSet& rightDistortedPoints,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
+  const cv::Mat& leftCameraRotationVector,
+  const cv::Mat& leftCameraTranslationVector,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
+  Model3D& outputTriangulatedPoints
+  );
+
+/**
+* \brief Transforms the inputModel by the given matrix.
+*/
+NIFTYCAL_WINEXPORT Model3D TransformModel(
+  const Model3D& inputModel,
+  const cv::Matx44d matrix
+  );
+
+/**
+* \brief Used to evaluate a stereo calibration's RMS reconstruction error.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
+  const Model3D& model,
+  const std::list<PointSet>& listOfLeftHandPointSets,
+  const std::list<PointSet>& listOfRightHandPointSets,
+  const cv::Mat& intrinsicLeft,
+  const cv::Mat& distortionLeft,
+  const std::vector<cv::Mat>& rvecsLeft,
+  const std::vector<cv::Mat>& tvecsLeft,
+  const cv::Mat& intrinsicRight,
+  const cv::Mat& distortionRight,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  cv::Point3d& rmsForEachAxis
+ );
+
+/**
+* \brief Adds Gaussian noise to pixel locations.
+*/
+NIFTYCAL_WINEXPORT std::list<PointSet> AddGaussianNoise(const std::list<PointSet>& points,
+                                                        const double& mean,
+                                                        const double& stdDev
+                                                       );
 
 } // end namespace
 
