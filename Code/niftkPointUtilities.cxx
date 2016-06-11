@@ -358,7 +358,7 @@ cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
 
 //-----------------------------------------------------------------------------
 /**
-* \brief Don't call this: Triangulates a 3D point using SVD.
+* \brief Triangulates a 3D point using SVD.
 *
 * Credit to <a href="http://www.morethantechnical.com/2012/01/04/
 * simple-triangulation-with-opencv-from-harley-zisserman-w-code/">these authors</a>.

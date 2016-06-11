@@ -45,8 +45,8 @@ NIFTYCAL_WINEXPORT double IterativeStereoCameraCalibration(
     cv::Mat& distortionRight,
     std::vector<cv::Mat>& rvecsRight,
     std::vector<cv::Mat>& tvecsRight,
-    cv::Mat& rightToLeftRotationMatrix,
-    cv::Mat& rightToLeftTranslationVector,
+    cv::Mat& leftToRightRotationMatrix,
+    cv::Mat& leftToRightTranslationVector,
     cv::Mat& essentialMatrix,
     cv::Mat& fundamentalMatrix,
     const int& cvFlags = 0

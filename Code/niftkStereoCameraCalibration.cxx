@@ -31,8 +31,8 @@ double StereoCameraCalibration(const Model3D& model,
                                cv::Mat& distortionRight,
                                std::vector<cv::Mat>& rvecsRight,
                                std::vector<cv::Mat>& tvecsRight,
-                               cv::Mat& rightToLeftRotationMatrix,
-                               cv::Mat& rightToLeftTranslationVector,
+                               cv::Mat& leftToRightRotationMatrix,
+                               cv::Mat& leftToRightTranslationVector,
                                cv::Mat& essentialMatrix,
                                cv::Mat& fundamentalMatrix,
                                const int& cvFlags
@@ -167,8 +167,8 @@ double StereoCameraCalibration(const Model3D& model,
                             intrinsicRight,
                             distortionRight,
                             imageSize,
-                            rightToLeftRotationMatrix,
-                            rightToLeftTranslationVector,
+                            leftToRightRotationMatrix,
+                            leftToRightTranslationVector,
                             essentialMatrix,
                             fundamentalMatrix,
                             cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
@@ -197,23 +197,23 @@ double StereoCameraCalibration(const Model3D& model,
     cv::Rodrigues(rvecsLeft[i], leftRot);
 
     cv::Matx44d leftExtrinsic;
-    cv::Matx44d rightToLeft;
+    cv::Matx44d leftToRight;
 
     leftExtrinsic = leftExtrinsic.eye();
-    rightToLeft = rightToLeft.eye();
+    leftToRight = leftToRight.eye();
 
     for (int r = 0; r < 3; r++)
     {
       for (int c = 0; c < 3; c++)
       {
         leftExtrinsic(r, c) = leftRot.at<double>(r,c);
-        rightToLeft(r, c) = rightToLeftRotationMatrix.at<double>(r, c);
+        leftToRight(r, c) = leftToRightRotationMatrix.at<double>(r, c);
       }
       leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
-      rightToLeft(r, 3) = rightToLeftTranslationVector.at<double>(0, r);
+      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(0, r);
     }
 
-    cv::Matx44d rightExtrinsic = rightToLeft * leftExtrinsic;
+    cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
     cv::Matx33d rightRotation;
 
     for (int r = 0; r < 3; r++)

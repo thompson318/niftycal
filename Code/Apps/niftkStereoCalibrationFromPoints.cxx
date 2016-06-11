@@ -80,8 +80,8 @@ int main(int argc, char ** argv)
 
   cv::Mat essentialMatrix;
   cv::Mat fundamentalMatrix;
-  cv::Mat rightToLeftRotation;
-  cv::Mat rightToLeftTranslation;
+  cv::Mat leftToRightRotation;
+  cv::Mat leftToRightTranslation;
 
   niftk::MonoCameraCalibration(model,
                                leftPoints,
@@ -113,8 +113,8 @@ int main(int argc, char ** argv)
                                               distortionRight,
                                               rvecsRight,
                                               tvecsRight,
-                                              rightToLeftRotation,
-                                              rightToLeftTranslation,
+                                              leftToRightRotation,
+                                              leftToRightTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS
@@ -138,12 +138,12 @@ int main(int argc, char ** argv)
             << distortionRight.at<double>(0,1) << " "
             << distortionRight.at<double>(0,2) << " "
             << distortionRight.at<double>(0,3) << " "
-            << rightToLeftRotation.at<double>(0,0) << " "
-            << rightToLeftRotation.at<double>(0,1) << " "
-            << rightToLeftRotation.at<double>(0,2) << " "
-            << rightToLeftTranslation.at<double>(0,0) << " "
-            << rightToLeftTranslation.at<double>(0,1) << " "
-            << rightToLeftTranslation.at<double>(0,2) << " "
+            << leftToRightRotation.at<double>(0,0) << " "
+            << leftToRightRotation.at<double>(0,1) << " "
+            << leftToRightRotation.at<double>(0,2) << " "
+            << leftToRightTranslation.at<double>(0,0) << " "
+            << leftToRightTranslation.at<double>(0,1) << " "
+            << leftToRightTranslation.at<double>(0,2) << " "
             << rms
             << std::endl;
 

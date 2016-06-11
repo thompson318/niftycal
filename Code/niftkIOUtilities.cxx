@@ -368,8 +368,8 @@ void SaveNifTKIntrinsics(const cv::Mat &intrinsics,
 
 
 //-----------------------------------------------------------------------------
-void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
-                               const cv::Mat& rightToLeftTranslationVector,
+void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
+                               const cv::Mat& leftToRightTranslationVector,
                                const std::string& fileName
                               )
 {
@@ -388,11 +388,11 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& rightToLeftRotationMatrix,
     niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for writing.";
   }
 
-  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
-                                                          rightToLeftTranslationVector);
+  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector);
 
-  // Beware: OpenCV and NiftyCalculate "right to left".
-  //         NifTK uses "left to right", so here we deliberately invert.
+  // Beware: OpenCV and NiftyCal calculate "left-to-right".
+  //         NifTK uses "right-to-left", so here we deliberately invert.
   cv::Matx44d matInv = mat.inv();
 
   // And here we deliberately output the inverted matrix.
@@ -456,13 +456,13 @@ void SaveRigidParams(const cv::Mat& rvec,
 
 
 //-----------------------------------------------------------------------------
-void Save4x4Matrix(const cv::Mat& rightToLeftRotationMatrix,
-                   const cv::Mat& rightToLeftTranslationVector,
+void Save4x4Matrix(const cv::Mat& leftToRightRotationMatrix,
+                   const cv::Mat& leftToRightTranslationVector,
                    const std::string& fileName
                   )
 {
-  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(rightToLeftRotationMatrix,
-                                                          rightToLeftTranslationVector);
+  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector);
 
   niftk::Save4x4Matrix(mat, fileName);
 }
