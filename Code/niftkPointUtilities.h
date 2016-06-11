@@ -143,7 +143,7 @@ NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
                                        );
 
 /**
-* \brief Triangulates a vector of un-distorted (i.e. already correction for distortion) 2D point pairs back into 3D.
+* \brief Triangulates a vector of undistorted (i.e. already correction for distortion) 2D point pairs back into 3D.
 *
 * From "Triangulation", Hartley, R.I. and Sturm, P., Computer vision and image understanding, 1997.
 *
@@ -156,6 +156,8 @@ NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
 *
 * Price 2012, Computer Vision: Models, Learning and Inference.
 *
+* \param leftCameraUndistortedPoints left camera undistorted points
+* \param leftCameraUndistortedPoints right camera undistorted points
 * \param leftCameraIntrinsicParams [3x3] matrix for left camera.
 * \param leftCameraRotationVector [1x3] matrix for the left camera rotation vector.
 * \param leftCameraTranslationVector [1x3] matrix for the left camera translation vector.

@@ -486,11 +486,6 @@ void TriangulatePointPairs(
   cv::Mat E1Inv = cv::Mat(4, 4, CV_64FC1);
   cv::Mat E2    = cv::Mat(4, 4, CV_64FC1);
   cv::Mat L2R   = cv::Mat(4, 4, CV_64FC1);
-  cv::Mat u1    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u1t   = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2t   = cv::Mat(3, 1, CV_64FC1);
-  cv::Matx34d P1d, P2d;
 
   // Convert OpenCV stylee rotation vector to a rotation matrix.
   cv::Rodrigues(leftCameraRotationVector, R1);
@@ -533,7 +528,8 @@ void TriangulatePointPairs(
 
   // Reading Prince 2012 Computer Vision, the projection matrix, is just the extrinsic parameters,
   // as our coordinates will be in a normalised camera space. P1 should be identity, so that
-  // reconstructed coordinates are in Left Camera Space, to P2 should reflect a right to left transform.
+  // reconstructed coordinates are in Left Camera Space, to P2 should reflect a left to right transform.
+  cv::Matx34d P1d, P2d;
   P1d(0,0) = 1;
   P1d(0,1) = 0;
   P1d(0,2) = 0;
@@ -555,36 +551,45 @@ void TriangulatePointPairs(
     }
   }
 
-  cv::Point3d u1p, u2p;            // Normalised image coordinates. (i.e. relative to a principal
-                                   // point of zero, and in millimetres not pixels).
-  cv::Point3d reconstructedPoint;  // the output 3D point, in reference frame of left camera.
+  cv::Mat u1    = cv::Mat(3, 1, CV_64FC1);
+  cv::Mat u2    = cv::Mat(3, 1, CV_64FC1);
+  cv::Mat u1t   = cv::Mat(3, 1, CV_64FC1);
+  cv::Mat u2t   = cv::Mat(3, 1, CV_64FC1);
 
-  for (int i = 0; i < numberOfPoints; i++)
+  cv::Point3d u1p, u2p;  // Normalised image coordinates. (i.e. relative to a principal
+                         // point of zero, and in millimetres not pixels).
+  cv::Point3d r;         // the output 3D point, in reference frame of left camera.
+
+  #pragma omp parallel private(u1), private(u2), private(u1t), private(u2t), private(u1p), private(u2p), private(r)
   {
-    u1.at<double>(0,0) = leftCameraUndistortedPoints[i].x;
-    u1.at<double>(1,0) = leftCameraUndistortedPoints[i].y;
-    u1.at<double>(2,0) = 1;
+    #pragma omp for
+    for (int i = 0; i < numberOfPoints; i++)
+    {
+      u1.at<double>(0,0) = leftCameraUndistortedPoints[i].x;
+      u1.at<double>(1,0) = leftCameraUndistortedPoints[i].y;
+      u1.at<double>(2,0) = 1;
 
-    u2.at<double>(0,0) = rightCameraUndistortedPoints[i].x;
-    u2.at<double>(1,0) = rightCameraUndistortedPoints[i].y;
-    u2.at<double>(2,0) = 1;
+      u2.at<double>(0,0) = rightCameraUndistortedPoints[i].x;
+      u2.at<double>(1,0) = rightCameraUndistortedPoints[i].y;
+      u2.at<double>(2,0) = 1;
 
-    // Converting to normalised image points
-    u1t = K1Inv * u1;
-    u2t = K2Inv * u2;
+      // Converting to normalised image points
+      u1t = K1Inv * u1;
+      u2t = K2Inv * u2;
 
-    u1p.x = u1t.at<double>(0,0);
-    u1p.y = u1t.at<double>(1,0);
-    u1p.z = u1t.at<double>(2,0);
+      u1p.x = u1t.at<double>(0,0);
+      u1p.y = u1t.at<double>(1,0);
+      u1p.z = u1t.at<double>(2,0);
 
-    u2p.x = u2t.at<double>(0,0);
-    u2p.y = u2t.at<double>(1,0);
-    u2p.z = u2t.at<double>(2,0);
+      u2p.x = u2t.at<double>(0,0);
+      u2p.y = u2t.at<double>(1,0);
+      u2p.z = u2t.at<double>(2,0);
 
-    reconstructedPoint = InternalIterativeTriangulatePointUsingSVD(P1d, P2d, u1p, u2p);
-    outputTriangulatedPoints[i].x = reconstructedPoint.x;
-    outputTriangulatedPoints[i].y = reconstructedPoint.y;
-    outputTriangulatedPoints[i].z = reconstructedPoint.z;
+      r = InternalIterativeTriangulatePointUsingSVD(P1d, P2d, u1p, u2p);
+      outputTriangulatedPoints[i].x = static_cast<float>(r.x);
+      outputTriangulatedPoints[i].y = static_cast<float>(r.y);
+      outputTriangulatedPoints[i].z = static_cast<float>(r.z);
+    }
   }
 }
 
