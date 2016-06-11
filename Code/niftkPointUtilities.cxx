@@ -17,6 +17,7 @@
 #include <queue>
 #include <vector>
 #include <functional>
+#include <random>
 
 namespace niftk {
 
@@ -94,6 +95,40 @@ void ExtractCommonPoints(const PointSet& inputA,
 
 
 //-----------------------------------------------------------------------------
+void ExtractCommonPoints(const Model3D& inputA,
+                         const Model3D& inputB,
+                         std::vector<cv::Point3d>& outputA,
+                         std::vector<cv::Point3d>& outputB
+                        )
+{
+  outputA.clear();
+  outputB.clear();
+
+  niftk::Model3D::const_iterator iterA;
+  niftk::Model3D::const_iterator iterB;
+
+  for(iterA = inputA.begin(); iterA != inputA.end(); ++iterA)
+  {
+    iterB = inputB.find((*iterA).first);
+    if (iterB != inputB.end())
+    {
+      cv::Point3d a;
+      a.x = (*iterA).second.point.x;
+      a.y = (*iterA).second.point.y;
+      a.z = (*iterA).second.point.z;
+      outputA.push_back(a);
+
+      cv::Point3d b;
+      b.x = (*iterB).second.point.x;
+      b.y = (*iterB).second.point.y;
+      b.z = (*iterB).second.point.z;
+      outputB.push_back(b);
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 void ConvertPoints(const PointSet& input,
                    std::vector<cv::Point2f>& outputPoint,
                    std::vector<niftk::NiftyCalIdType>& outputId
@@ -141,7 +176,9 @@ void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
 
 //-----------------------------------------------------------------------------
 double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
-                                                 const PointSet& inputB)
+                                                 const PointSet& inputB,
+                                                 cv::Point2d& rmsForEachAxis
+                                                 )
 {
   std::vector<cv::Point2f> a;
   std::vector<cv::Point2f> b;
@@ -157,17 +194,87 @@ double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& inputA,
   }
 
   double rms = 0;
+  rmsForEachAxis.x = 0;
+  rmsForEachAxis.y = 0;
+  cv::Point2d diff;
+
   for (size_t i = 0; i < a.size(); i++)
   {
-    rms += ((a[i].x - b[i].x) * (a[i].x - b[i].x)
-           +(a[i].y - b[i].y) * (a[i].y - b[i].y)
+    diff.x = a[i].x - b[i].x;
+    diff.y = a[i].y - b[i].y;
+
+    rms += ( (diff.x * diff.x)
+           + (diff.y * diff.y)
            );
+    rmsForEachAxis.x += (diff.x * diff.x);
+    rmsForEachAxis.y += (diff.y * diff.y);
   }
-  if (a.size() > 0)
-  {
-    rms /= static_cast<double>(a.size());
-  }
+
+  rms /= static_cast<double>(a.size());
   rms = sqrt(rms);
+
+  rmsForEachAxis.x /= static_cast<double>(a.size());
+  rmsForEachAxis.y /= static_cast<double>(a.size());
+
+  rmsForEachAxis.x = sqrt(rmsForEachAxis.x);
+  rmsForEachAxis.y = sqrt(rmsForEachAxis.y);
+
+  return rms;
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& inputA,
+                                                 const Model3D& inputB,
+                                                 cv::Point3d& rmsForEachAxis
+                                                )
+{
+  std::vector<cv::Point3d> a;
+  std::vector<cv::Point3d> b;
+
+  niftk::ExtractCommonPoints(inputA, inputB, a, b);
+  if (a.size() == 0 || b.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No common points.";
+  }
+  if (a.size() != b.size())
+  {
+    niftkNiftyCalThrow() << "Programming errors, invalid extraction of common points.";
+  }
+
+  double rms = 0;
+  rmsForEachAxis.x = 0;
+  rmsForEachAxis.y = 0;
+  rmsForEachAxis.z = 0;
+  cv::Point3d diff;
+
+  for (size_t i = 0; i < a.size(); i++)
+  {
+    diff.x = (a[i].x - b[i].x);
+    diff.y = (a[i].y - b[i].y);
+    diff.z = (a[i].z - b[i].z);
+
+    rms += ( (diff.x * diff.x)
+           + (diff.y * diff.y)
+           + (diff.z * diff.z)
+           );
+
+    rmsForEachAxis.x += diff.x;
+    rmsForEachAxis.y += diff.y;
+    rmsForEachAxis.z += diff.z;
+
+  }
+  rms /= static_cast<double>(a.size());
+  rms = sqrt(rms);
+
+  rmsForEachAxis.x /= static_cast<double>(a.size());
+  rmsForEachAxis.y /= static_cast<double>(a.size());
+  rmsForEachAxis.z /= static_cast<double>(a.size());
+
+  rmsForEachAxis.x = sqrt(rmsForEachAxis.x);
+  rmsForEachAxis.y = sqrt(rmsForEachAxis.y);
+  rmsForEachAxis.z = sqrt(rmsForEachAxis.z);
+
   return rms;
 }
 
@@ -595,32 +702,55 @@ void TriangulatePointPairs(
 
 
 //-----------------------------------------------------------------------------
-std::list<PointSet> AddGaussianNoise(const std::list<PointSet>& points,
-                                     const double& mean,
-                                     const double stdDev
-                                    )
+Model3D TransformModel(const Model3D& inputModel, const cv::Matx44d& matrix)
 {
+  Model3D output;
+  cv::Matx41d p;
+  cv::Matx41d q;
+  Point3D op;
 
+  Model3D::const_iterator iter;
+  for (iter = inputModel.begin(); iter != inputModel.end(); ++iter)
+  {
+    p(0,0) = (*iter).second.point.x;
+    p(1,0) = (*iter).second.point.y;
+    p(2,0) = (*iter).second.point.z;
+    p(3,0) = 1;
+
+    q = matrix * p;
+    op.point.x = q(0,0);
+    op.point.y = q(1,0);
+    op.point.z = q(2,0);
+    op.id = (*iter).first;
+
+    output.insert(IdPoint3D((*iter).first, op));
+  }
+  return output;
 }
 
 
 //-----------------------------------------------------------------------------
-double ComputeRMSDifferenceBetweenMatchingPoints(const Model3D& a,
-                                                 const Model3D& b,
-                                                 cv::Point3d& rmsForEachAxis
-                                                )
+PointSet AddGaussianNoise(const PointSet& points,
+                          const double& mean,
+                          const double& stdDev
+                         )
 {
+  std::default_random_engine generator;
+  std::normal_distribution<double> distribution(mean, stdDev);
 
-}
+  PointSet output;
+  Point2D op;
 
+  PointSet::const_iterator iter;
+  for (iter = points.begin(); iter != points.end(); ++iter)
+  {
+    op.id = (*iter).first;
+    op.point.x = (*iter).second.point.x + distribution(generator);
+    op.point.y = (*iter).second.point.y + distribution(generator);
+    output.insert(IdPoint2D((*iter).first, op));
+  }
 
-//-----------------------------------------------------------------------------
-Model3D TransformModel(
-  const Model3D& inputModel,
-  const cv::Matx44d matrix
-  )
-{
-
+  return output;
 }
 
 
@@ -640,7 +770,7 @@ double ComputeRMSReconstructionError(
   cv::Point3d& rmsForEachAxis
  )
 {
-
+  return 0;
 }
 
 } // end namespace

@@ -86,6 +86,9 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   REQUIRE(warpedPointSet.size() == sourcePointSet.size());
 
   // Transfer back, and check that RMS error is below a threshold.
-  double rms = niftk::ComputeRMSDifferenceBetweenMatchingPoints(warpedPointSet, targetPointSet);
+  cv::Point2d rmsForEachAxis;
+  double rms = niftk::ComputeRMSDifferenceBetweenMatchingPoints(warpedPointSet, targetPointSet, rmsForEachAxis);
   REQUIRE(fabs(rms - expectedRMS) < 0.01);
+
+  std::cout << "rms=" << rms << ", for each axis=" << rmsForEachAxis << std::endl;
 }

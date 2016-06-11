@@ -69,11 +69,22 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
                                            );
 
 /**
+* \brief Extracts the common (same identifier) points in A and B.
+* \return outputA and outputB are the same length and ordered.
+*/
+NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
+                                            const Model3D& inputB,
+                                            std::vector<cv::Point3d>& outputA,
+                                            std::vector<cv::Point3d>& outputB
+                                           );
+
+/**
 * \brief Computes the RMS error between common (same identifier) points in a and b.
 * \throw if no common points.
 */
 NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointSet& a,
-                                                                    const PointSet& b
+                                                                    const PointSet& b,
+                                                                    cv::Point2d& rmsForEachAxis
                                                                    );
 
 /**
@@ -208,8 +219,16 @@ NIFTYCAL_WINEXPORT void TriangulatePointPairs(
 */
 NIFTYCAL_WINEXPORT Model3D TransformModel(
   const Model3D& inputModel,
-  const cv::Matx44d matrix
+  const cv::Matx44d& matrix
   );
+
+/**
+* \brief Adds Gaussian noise to point locations.
+*/
+NIFTYCAL_WINEXPORT PointSet AddGaussianNoise(const PointSet& points,
+                                             const double& mean,
+                                             const double& stdDev
+                                            );
 
 /**
 * \brief Used to evaluate a stereo calibration's RMS reconstruction error.
@@ -228,14 +247,6 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
   const cv::Mat& leftToRightTranslationVector,
   cv::Point3d& rmsForEachAxis
  );
-
-/**
-* \brief Adds Gaussian noise to pixel locations.
-*/
-NIFTYCAL_WINEXPORT std::list<PointSet> AddGaussianNoise(const std::list<PointSet>& points,
-                                                        const double& mean,
-                                                        const double& stdDev
-                                                       );
 
 } // end namespace
 
