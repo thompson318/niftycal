@@ -37,10 +37,9 @@ NIFTYCAL_WINEXPORT void CopyPointsInto(const PointSet& a, PointSet& b);
 
 /**
 * \brief Rescales by multiplying each point by the scale factor.
-* \param scaleFactor contains a multiplier for x,y.
+* \param scaleFactor contains a multiplier for x and y.
 */
 NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor);
-
 
 /**
 * \brief Converts PointSet to vector for many OpenCV functions.
@@ -49,7 +48,6 @@ NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,
                                       std::vector<cv::Point2f>& outputPoint,
                                       std::vector<niftk::NiftyCalIdType>& outputId
                                      );
-
 
 /**
 * \brief Converts vector of points to our PointSet data type.
@@ -61,13 +59,13 @@ NIFTYCAL_WINEXPORT void ConvertPoints(const std::vector<cv::Point2f>& inputPoint
 
 /**
 * \brief Extracts the common (same identifier) points in A and B.
+* \return outputA and outputB are the same length and ordered.
 */
 NIFTYCAL_WINEXPORT void ExtractCommonPoints(const PointSet& inputA,
                                             const PointSet& inputB,
                                             std::vector<cv::Point2f>& outputA,
                                             std::vector<cv::Point2f>& outputB
                                            );
-
 
 /**
 * \brief Computes the RMS error between common (same identifier) points in a and b.
@@ -77,9 +75,8 @@ NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const PointS
                                                                     const PointSet& b
                                                                    );
 
-
 /**
-* \brief Maps all points in distortedPoints to undistortedPoints.
+* \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).
 */
 NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
                                         const cv::Mat& cameraIntrinsics,
@@ -89,7 +86,7 @@ NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
 
 
 /**
-* \brief Maps all points in distortedPoints to undistortedPoints.
+* \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).
 */
 NIFTYCAL_WINEXPORT void UndistortPoints(const std::vector<PointSet>& distortedPoints,
                                         const cv::Mat& cameraIntrinsics,
@@ -98,7 +95,7 @@ NIFTYCAL_WINEXPORT void UndistortPoints(const std::vector<PointSet>& distortedPo
                                        );
 
 /**
-* \brief Maps all points in undistortedPoints to distortedPoints.
+* \brief Maps all points in undistortedPoints (i.e. corrected) to distortedPoints (i.e. observed).
 */
 NIFTYCAL_WINEXPORT void DistortPoints(const PointSet& undistortedPoints,
                                       const cv::Mat& cameraIntrinsics,
@@ -107,7 +104,7 @@ NIFTYCAL_WINEXPORT void DistortPoints(const PointSet& undistortedPoints,
                                      );
 
 /**
-* \brief Maps all points in undistortedPoints to distortedPoints.
+* \brief Maps all points in undistortedPoints (i.e. corrected) to distortedPoints (i.e. observed).
 */
 NIFTYCAL_WINEXPORT void DistortPoints(const std::vector<PointSet>& undistortedPoints,
                                       const cv::Mat& cameraIntrinsics,
@@ -144,6 +141,40 @@ NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
                                         const cv::Mat& rightIntrinsics,
                                         const cv::Mat& rightDistortion
                                        );
+
+/**
+* \brief Triangulates a vector of un-distorted (i.e. already correction for distortion) 2D point pairs back into 3D.
+*
+* From "Triangulation", Hartley, R.I. and Sturm, P., Computer vision and image understanding, 1997.
+*
+* and
+*
+* <a href="http://www.morethantechnical.com/2012/01/04/
+* simple-triangulation-with-opencv-from-harley-zisserman-w-code/">here</a>.
+*
+* and
+*
+* Price 2012, Computer Vision: Models, Learning and Inference.
+*
+* \param leftCameraIntrinsicParams [3x3] matrix for left camera.
+* \param leftCameraRotationVector [1x3] matrix for the left camera rotation vector.
+* \param leftCameraTranslationVector [1x3] matrix for the left camera translation vector.
+* \param rightCameraIntrinsicParams [3x3] matrix for right camera.
+* \param rightCameraRotationVector [1x3] matrix for the right camera rotation vector.
+* \param rightCameraTranslationVector [1x3] matrix for right camera translation vector.
+* \param outputPoints reconstructed 3D points.
+*/
+NIFTYCAL_WINEXPORT void TriangulatePointPairs(
+  const std::vector<cv::Point2f>& leftCameraUndistortedPoints,
+  const std::vector<cv::Point2f>& rightCameraUndistortedPoints,
+  const cv::Mat& leftCameraIntrinsicParams,
+  const cv::Mat& leftCameraRotationVector,
+  const cv::Mat& leftCameraTranslationVector,
+  const cv::Mat& rightCameraIntrinsicParams,
+  const cv::Mat& rightCameraRotationVector,
+  const cv::Mat& rightCameraTranslationVector,
+  std::vector<cv::Point3f>& outputTriangulatedPoints
+  );
 
 } // end namespace
 
