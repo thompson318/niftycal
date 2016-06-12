@@ -27,16 +27,16 @@
  */
 int main(int argc, char ** argv)
 {
-  if (argc < 9)
+  if (argc < 10)
   {
-    std::cerr << "Usage: niftkStereoSimulationFromPoints sigma imageSizeX imageSizeY modelPoints.txt "
+    std::cerr << "Usage: niftkStereoSimulationFromPoints sigma iters imageSizeX imageSizeY modelPoints.txt "
               << "leftImagePoints1.txt leftImagePoints2.txt ... leftImagePointsN.txt "
               << "rightImagePoints1.txt rightImagePoints2.txt ... rightImagePointsN.txt " << std::endl;
 
     return EXIT_FAILURE;
   }
 
-  int numberOfArgumentsBeforeImages = 5;
+  int numberOfArgumentsBeforeImages = 6;
   int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
   if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
@@ -46,9 +46,10 @@ int main(int argc, char ** argv)
   }
 
   float sigma = atof(argv[1]);
-  int sizeX = atoi(argv[2]);
-  int sizeY = atoi(argv[3]);
-  std::string modelFile = argv[4];
+  int iterations = atoi(argv[2]);
+  int sizeX = atoi(argv[3]);
+  int sizeY = atoi(argv[4]);
+  std::string modelFile = argv[5];
 
   cv::Size2i imageSize(sizeX, sizeY);
   niftk::Model3D model = niftk::LoadModel3D(modelFile);
@@ -273,108 +274,112 @@ int main(int argc, char ** argv)
             << rms
             << std::endl;
 
-  // Now add noise to points.
-  std::list<niftk::PointSet> leftNoisyPoints;
-  for (leftIter = leftGoldStandardPoints.begin(); leftIter != leftGoldStandardPoints.end(); ++leftIter)
+  for (int i = 0; i < iterations; i++)
   {
-    niftk::PointSet noisyPoints = niftk::AddGaussianNoise(*leftIter, 0, sigma);
-    leftNoisyPoints.push_back(noisyPoints);
-  }
-  std::list<niftk::PointSet> rightNoisyPoints;
-  for (rightIter = leftGoldStandardPoints.begin(); rightIter != leftGoldStandardPoints.end(); ++rightIter)
-  {
-    niftk::PointSet noisyPoints = niftk::AddGaussianNoise(*rightIter, 0, sigma);
-    rightNoisyPoints.push_back(noisyPoints);
-  }
+    // Now add noise to points.
+    std::list<niftk::PointSet> leftNoisyPoints;
+    for (leftIter = leftGoldStandardPoints.begin(); leftIter != leftGoldStandardPoints.end(); ++leftIter)
+    {
+      niftk::PointSet noisyPoints = niftk::AddGaussianNoise(*leftIter, 0, sigma);
+      leftNoisyPoints.push_back(noisyPoints);
+    }
+    std::list<niftk::PointSet> rightNoisyPoints;
+    for (rightIter = leftGoldStandardPoints.begin(); rightIter != leftGoldStandardPoints.end(); ++rightIter)
+    {
+      niftk::PointSet noisyPoints = niftk::AddGaussianNoise(*rightIter, 0, sigma);
+      rightNoisyPoints.push_back(noisyPoints);
+    }
 
-  // Now re-run calibration.
-  niftk::MonoCameraCalibration(model,
-                               leftNoisyPoints,
-                               imageSize,
-                               intrinsicLeft,
-                               distortionLeft,
-                               rvecsLeft,
-                               tvecsLeft
-                              );
+    // Now re-run calibration.
+    niftk::MonoCameraCalibration(model,
+                                 leftNoisyPoints,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft,
+                                 tvecsLeft
+                                );
 
-  niftk::MonoCameraCalibration(model,
-                               rightNoisyPoints,
-                               imageSize,
-                               intrinsicRight,
-                               distortionRight,
-                               rvecsRight,
-                               tvecsRight
-                              );
+    niftk::MonoCameraCalibration(model,
+                                 rightNoisyPoints,
+                                 imageSize,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
 
-  rms = niftk::StereoCameraCalibration(model,
-                                       leftNoisyPoints,
-                                       rightNoisyPoints,
-                                       imageSize,
-                                       intrinsicLeft,
-                                       distortionLeft,
-                                       rvecsLeft,
-                                       tvecsLeft,
-                                       intrinsicRight,
-                                       distortionRight,
-                                       rvecsRight,
-                                       tvecsRight,
-                                       leftToRightRotation,
-                                       leftToRightTranslation,
-                                       essentialMatrix,
-                                       fundamentalMatrix,
-                                       CV_CALIB_USE_INTRINSIC_GUESS
-                                       );
+    rms = niftk::StereoCameraCalibration(model,
+                                         leftNoisyPoints,
+                                         rightNoisyPoints,
+                                         imageSize,
+                                         intrinsicLeft,
+                                         distortionLeft,
+                                         rvecsLeft,
+                                         tvecsLeft,
+                                         intrinsicRight,
+                                         distortionRight,
+                                         rvecsRight,
+                                         tvecsRight,
+                                         leftToRightRotation,
+                                         leftToRightTranslation,
+                                         essentialMatrix,
+                                         fundamentalMatrix,
+                                         CV_CALIB_USE_INTRINSIC_GUESS
+                                         );
 
-  std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-            << leftPoints.size() << " "
-            << intrinsicLeft.at<double>(0,0) << " "
-            << intrinsicLeft.at<double>(1,1) << " "
-            << intrinsicLeft.at<double>(0,2) << " "
-            << intrinsicLeft.at<double>(1,2) << " "
-            << distortionLeft.at<double>(0,0) << " "
-            << distortionLeft.at<double>(0,1) << " "
-            << distortionLeft.at<double>(0,2) << " "
-            << distortionLeft.at<double>(0,3) << " "
-            << distortionLeft.at<double>(0,4) << " "
-            << intrinsicRight.at<double>(0,0) << " "
-            << intrinsicRight.at<double>(1,1) << " "
-            << intrinsicRight.at<double>(0,2) << " "
-            << intrinsicRight.at<double>(1,2) << " "
-            << distortionRight.at<double>(0,0) << " "
-            << distortionRight.at<double>(0,1) << " "
-            << distortionRight.at<double>(0,2) << " "
-            << distortionRight.at<double>(0,3) << " "
-            << distortionRight.at<double>(0,4) << " "
-            << leftToRightRotation.at<double>(0,0) << " "
-            << leftToRightRotation.at<double>(0,1) << " "
-            << leftToRightRotation.at<double>(0,2) << " "
-            << leftToRightTranslation.at<double>(0,0) << " "
-            << leftToRightTranslation.at<double>(0,1) << " "
-            << leftToRightTranslation.at<double>(0,2) << " "
-            << rms
-            << std::endl;
+    std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << leftPoints.size() << " "
+              << intrinsicLeft.at<double>(0,0) << " "
+              << intrinsicLeft.at<double>(1,1) << " "
+              << intrinsicLeft.at<double>(0,2) << " "
+              << intrinsicLeft.at<double>(1,2) << " "
+              << distortionLeft.at<double>(0,0) << " "
+              << distortionLeft.at<double>(0,1) << " "
+              << distortionLeft.at<double>(0,2) << " "
+              << distortionLeft.at<double>(0,3) << " "
+              << distortionLeft.at<double>(0,4) << " "
+              << intrinsicRight.at<double>(0,0) << " "
+              << intrinsicRight.at<double>(1,1) << " "
+              << intrinsicRight.at<double>(0,2) << " "
+              << intrinsicRight.at<double>(1,2) << " "
+              << distortionRight.at<double>(0,0) << " "
+              << distortionRight.at<double>(0,1) << " "
+              << distortionRight.at<double>(0,2) << " "
+              << distortionRight.at<double>(0,3) << " "
+              << distortionRight.at<double>(0,4) << " "
+              << leftToRightRotation.at<double>(0,0) << " "
+              << leftToRightRotation.at<double>(0,1) << " "
+              << leftToRightRotation.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(0,0) << " "
+              << leftToRightTranslation.at<double>(0,1) << " "
+              << leftToRightTranslation.at<double>(0,2) << " "
+              << rms
+              << std::endl;
 
-  // Evaluate RMS
-  cv::Point3d rmsInEachAxis;
-  rms = niftk::ComputeRMSReconstructionError(model,
-                                             leftNoisyPoints,
-                                             rightNoisyPoints,
-                                             intrinsicLeft,
-                                             distortionLeft,
-                                             rvecsLeft,
-                                             tvecsLeft,
-                                             intrinsicRight,
-                                             distortionRight,
-                                             leftToRightRotation,
-                                             leftToRightTranslation,
-                                             rmsInEachAxis
-                                            );
+    // Evaluate RMS
+    cv::Point3d rmsInEachAxis;
+    rms = niftk::ComputeRMSReconstructionError(model,
+                                               leftNoisyPoints,
+                                               rightNoisyPoints,
+                                               intrinsicLeft,
+                                               distortionLeft,
+                                               rvecsLeft,
+                                               tvecsLeft,
+                                               intrinsicRight,
+                                               distortionRight,
+                                               leftToRightRotation,
+                                               leftToRightTranslation,
+                                               rmsInEachAxis
+                                              );
 
-  std::cout << "niftkStereoSimulationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-            << leftPoints.size() << " "
-            << rms << " "
-            << rmsInEachAxis
-            << std::endl;
+    std::cout << "niftkStereoSimulationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << leftPoints.size() << " "
+              << rms << " "
+              << rmsInEachAxis
+              << std::endl;
+
+  } // end for each iter
 
   return EXIT_SUCCESS;
 }
