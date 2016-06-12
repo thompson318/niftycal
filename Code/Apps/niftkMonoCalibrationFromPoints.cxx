@@ -72,6 +72,7 @@ int main(int argc, char ** argv)
             << distortion.at<double>(0,1) << " "
             << distortion.at<double>(0,2) << " "
             << distortion.at<double>(0,3) << " "
+            << distortion.at<double>(0,4) << " "
             << rms
             << std::endl;
 
