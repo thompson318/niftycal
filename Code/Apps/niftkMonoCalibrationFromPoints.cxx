@@ -20,8 +20,7 @@
 
 /**
 * \file niftkMonoCalibrationFromPoints.cxx
-* \brief Calibrate mono camera, using pre-extracted points,
-* using niftk::MonoCameraCalibration routine.
+* \brief Calibrate mono camera from pre-extracted points.
 */
 int main(int argc, char ** argv)
 {

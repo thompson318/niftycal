@@ -20,9 +20,9 @@
 #include <cstdlib>
 
 /**
- * \brief Calibrate stereo camera, using pre-extracted points,
- * using niftk::StereoCameraCalibration routine.
- */
+* \file niftkStereoCalibrationFromPoints.cxx
+* \brief Calibrate stereo camera from pre-extracted points.
+*/
 int main(int argc, char ** argv)
 {
   if (argc < 8)
@@ -130,6 +130,7 @@ int main(int argc, char ** argv)
             << distortionLeft.at<double>(0,1) << " "
             << distortionLeft.at<double>(0,2) << " "
             << distortionLeft.at<double>(0,3) << " "
+            << distortionLeft.at<double>(0,4) << " "
             << intrinsicRight.at<double>(0,0) << " "
             << intrinsicRight.at<double>(1,1) << " "
             << intrinsicRight.at<double>(0,2) << " "
@@ -138,6 +139,7 @@ int main(int argc, char ** argv)
             << distortionRight.at<double>(0,1) << " "
             << distortionRight.at<double>(0,2) << " "
             << distortionRight.at<double>(0,3) << " "
+            << distortionRight.at<double>(0,4) << " "
             << leftToRightRotation.at<double>(0,0) << " "
             << leftToRightRotation.at<double>(0,1) << " "
             << leftToRightRotation.at<double>(0,2) << " "
