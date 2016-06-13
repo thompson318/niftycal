@@ -67,6 +67,7 @@ add_test(ExtAprilTags2 niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationApr
 add_test(ExtAprilTags3 niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72)
 add_test(ExtRings1 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 8496 6372 10 7 ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt 260000 1 0.1)
 add_test(ExtRings2 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 720 480 10 7 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_test.txt 10000 0 2.0)
+add_test(ExtRings3 niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1400 1050 10 7 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt 260000 1 0.1)
 
 # For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera.
 add_test(CalibLapMonoLeft niftkMonoChessboardCameraCalibrationTest
