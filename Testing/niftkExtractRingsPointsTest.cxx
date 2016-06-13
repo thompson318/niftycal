@@ -24,11 +24,11 @@
 
 TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
-  int expectedNumberOfArguments =  13;
-  if (niftk::argc != expectedNumberOfArguments)
+  if (niftk::argc != 13 && niftk::argc != 14)
   {
-    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedPoints maxArea method tolerance" << std::endl;
-    REQUIRE( niftk::argc == expectedNumberOfArguments);
+    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedPoints maxArea method tolerance [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 13);
+    REQUIRE( niftk::argc <= 14);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -87,6 +87,12 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
   niftk::PointSet points = detector.GetPoints();
   REQUIRE( points.size() == ringsInX * ringsInY );
+
+  if (niftk::argc == 14 && points.size() > 0)
+  {
+    std::string outputFile = niftk::argv[13];
+    niftk::SavePointSet(points, outputFile);
+  }
 
   // check expected points
   niftk::PointSet::const_iterator iter;
