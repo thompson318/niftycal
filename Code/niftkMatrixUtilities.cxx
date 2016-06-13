@@ -71,6 +71,20 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
 
 
 //-----------------------------------------------------------------------------
+NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
+{
+  cv::Matx14d axisAngle = cv::Matx14d::zeros();
+  double norm = cv::norm(rotationVector1x3);
+  axisAngle(0, 0) = rotationVector1x3.at<double>(0, 0) / norm;
+  axisAngle(0, 1) = rotationVector1x3.at<double>(0, 1) / norm;
+  axisAngle(0, 2) = rotationVector1x3.at<double>(0, 2) / norm;
+  axisAngle(0, 3) = norm;
+
+  return axisAngle;
+}
+
+
+//-----------------------------------------------------------------------------
 std::vector<cv::Matx44d> MatrixListToVector(
     const std::list<cv::Matx44d>& list,
     const unsigned int& maximum

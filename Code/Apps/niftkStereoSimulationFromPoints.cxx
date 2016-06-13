@@ -131,6 +131,7 @@ int main(int argc, char ** argv)
                                                );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+    cv::Matx14d leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
     std::cout << "niftkStereoCalibrationFromPoints(initial):(" << imageSize.width << "," << imageSize.height <<  ") "
               << leftPoints.size() << " "
@@ -158,6 +159,10 @@ int main(int argc, char ** argv)
               << leftToRightTranslation.at<double>(0,0) << " "
               << leftToRightTranslation.at<double>(0,1) << " "
               << leftToRightTranslation.at<double>(0,2) << " "
+              << leftToRightAxisAngle(0, 0) << " "
+              << leftToRightAxisAngle(0, 1) << " "
+              << leftToRightAxisAngle(0, 2) << " "
+              << leftToRightAxisAngle(0, 3) << " "
               << rms
               << std::endl;
 
@@ -253,6 +258,7 @@ int main(int argc, char ** argv)
                                          );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+    leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
     std::cout << "niftkStereoCalibrationFromPoints(gold):(" << imageSize.width << "," << imageSize.height <<  ") "
               << leftPoints.size() << " "
@@ -280,6 +286,10 @@ int main(int argc, char ** argv)
               << leftToRightTranslation.at<double>(0,0) << " "
               << leftToRightTranslation.at<double>(0,1) << " "
               << leftToRightTranslation.at<double>(0,2) << " "
+              << leftToRightAxisAngle(0, 0) << " "
+              << leftToRightAxisAngle(0, 1) << " "
+              << leftToRightAxisAngle(0, 2) << " "
+              << leftToRightAxisAngle(0, 3) << " "
               << rms
               << std::endl;
 
@@ -341,6 +351,7 @@ int main(int argc, char ** argv)
                                            );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+      leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
       std::cout << "niftkStereoCalibrationFromPoints(noisy):(" << imageSize.width << "," << imageSize.height <<  ") "
                 << leftPoints.size() << " "
@@ -368,6 +379,10 @@ int main(int argc, char ** argv)
                 << leftToRightTranslation.at<double>(0,0) << " "
                 << leftToRightTranslation.at<double>(0,1) << " "
                 << leftToRightTranslation.at<double>(0,2) << " "
+                << leftToRightAxisAngle(0, 0) << " "
+                << leftToRightAxisAngle(0, 1) << " "
+                << leftToRightAxisAngle(0, 2) << " "
+                << leftToRightAxisAngle(0, 3) << " "
                 << rms
                 << std::endl;
 

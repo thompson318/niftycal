@@ -37,6 +37,8 @@ NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& rotationVector1x3,
                                           cv::Mat& translationVector1x3);
 
+NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3);
+
 /**
 * \brief Converts a list to a vector, in order, enabling you to set a limit to how many you convert.
 */
