@@ -133,7 +133,7 @@ int main(int argc, char ** argv)
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     cv::Matx14d leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
-    std::cout << "niftkStereoCalibrationFromPoints(initial):(" << imageSize.width << "," << imageSize.height <<  ") "
+    std::cout << "niftkStereoCalibrationFromPoints(initial) " << imageSize.width << " " << imageSize.height <<  " "
               << leftPoints.size() << " "
               << intrinsicLeft.at<double>(0,0) << " "
               << intrinsicLeft.at<double>(1,1) << " "
@@ -260,7 +260,7 @@ int main(int argc, char ** argv)
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
-    std::cout << "niftkStereoCalibrationFromPoints(gold):(" << imageSize.width << "," << imageSize.height <<  ") "
+    std::cout << "niftkStereoCalibrationFromPoints(gold) " << imageSize.width << " " << imageSize.height <<  " "
               << leftPoints.size() << " "
               << intrinsicLeft.at<double>(0,0) << " "
               << intrinsicLeft.at<double>(1,1) << " "
@@ -353,7 +353,7 @@ int main(int argc, char ** argv)
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
       leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
-      std::cout << "niftkStereoCalibrationFromPoints(noisy):(" << imageSize.width << "," << imageSize.height <<  ") "
+      std::cout << "niftkStereoCalibrationFromPoints(noisy) " << imageSize.width << " " << imageSize.height <<  " "
                 << leftPoints.size() << " "
                 << intrinsicLeft.at<double>(0,0) << " "
                 << intrinsicLeft.at<double>(1,1) << " "
@@ -402,10 +402,12 @@ int main(int argc, char ** argv)
                                                  rmsInEachAxis
                                                 );
 
-      std::cout << "niftkStereoSimulationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+      std::cout << "niftkStereoSimulationFromPoints " << imageSize.width << " " << imageSize.height <<  " "
                 << leftPoints.size() << " "
                 << rms << " "
-                << rmsInEachAxis
+                << rmsInEachAxis.x << " "
+                << rmsInEachAxis.y << " "
+                << rmsInEachAxis.z << " "
                 << std::endl;
 
     } // end for each iter
