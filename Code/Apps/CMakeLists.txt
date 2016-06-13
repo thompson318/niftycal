@@ -14,8 +14,9 @@
 set(NIFTYCAL_APPS
   niftkMonoCalibrationFromPoints
   niftkStereoCalibrationFromPoints
-  niftkMonoIterativeAprilTagsCalibration
-  niftkMonoIterativeRingsCalibration
+  niftkStereoSimulationFromPoints
+  niftkStereoIterativeAprilTagsCalibration
+  niftkStereoIterativeRingsCalibration
 )
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)

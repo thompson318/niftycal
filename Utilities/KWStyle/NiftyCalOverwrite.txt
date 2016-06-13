@@ -1,3 +1,4 @@
 niftkNiftyCalException\.h MemberFunctions Disable
 niftkNiftyCalException\.cxx Functions Disable
 niftkIterativeCalibrationUtilities\.cxx Functions Disable
+niftkPointUtilities\.cxx Functions Disable

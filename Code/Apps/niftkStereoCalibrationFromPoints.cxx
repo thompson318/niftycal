@@ -15,14 +15,15 @@
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
+#include <niftkNiftyCalException.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
 
 /**
- * \brief Calibrate stereo camera, using pre-extracted points,
- * using niftk::StereoCameraCalibration routine.
- */
+* \file niftkStereoCalibrationFromPoints.cxx
+* \brief Calibrate stereo camera from pre-extracted points.
+*/
 int main(int argc, char ** argv)
 {
   if (argc < 8)
@@ -34,118 +35,134 @@ int main(int argc, char ** argv)
     return EXIT_FAILURE;
   }
 
-  int numberOfArgumentsBeforeImages = 4;
-  int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
-
-  if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
+  try
   {
-    std::cerr << "Expected an even number of point files" << std::endl;
-    return EXIT_FAILURE;
-  }
+    int numberOfArgumentsBeforeImages = 4;
+    int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
-  int sizeX = atoi(argv[1]);
-  int sizeY = atoi(argv[2]);
-  std::string modelFile = argv[3];
-
-  cv::Size2i imageSize(sizeX, sizeY);
-  niftk::Model3D model = niftk::LoadModel3D(modelFile);
-  std::list<niftk::PointSet> leftPoints;
-  std::list<niftk::PointSet> rightPoints;
-
-  for (int i = numberOfArgumentsBeforeImages; i < argc; i++)
-  {
-    niftk::PointSet p = niftk::LoadPointSet(argv[i]);
-    if (p.size() >= 4) // Deep within OpenCV lies a check for at least 4 points.
+    if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
     {
-      if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
+      std::cerr << "Expected an even number of point files" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    int sizeX = atoi(argv[1]);
+    int sizeY = atoi(argv[2]);
+    std::string modelFile = argv[3];
+
+    cv::Size2i imageSize(sizeX, sizeY);
+    niftk::Model3D model = niftk::LoadModel3D(modelFile);
+    std::list<niftk::PointSet> leftPoints;
+    std::list<niftk::PointSet> rightPoints;
+
+    for (int i = numberOfArgumentsBeforeImages; i < argc; i++)
+    {
+      niftk::PointSet p = niftk::LoadPointSet(argv[i]);
+      if (p.size() >= 4) // Deep within OpenCV lies a check for at least 4 points.
       {
-        leftPoints.push_back(p);
-      }
-      else
-      {
-        rightPoints.push_back(p);
+        if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
+        {
+          leftPoints.push_back(p);
+        }
+        else
+        {
+          rightPoints.push_back(p);
+        }
       }
     }
+
+    cv::Mat intrinsicLeft;
+    cv::Mat distortionLeft;
+    std::vector<cv::Mat> rvecsLeft;
+    std::vector<cv::Mat> tvecsLeft;
+
+    cv::Mat intrinsicRight;
+    cv::Mat distortionRight;
+    std::vector<cv::Mat> rvecsRight;
+    std::vector<cv::Mat> tvecsRight;
+
+    cv::Mat essentialMatrix;
+    cv::Mat fundamentalMatrix;
+    cv::Mat leftToRightRotationMatrix;
+    cv::Mat leftToRightRotationVector;
+    cv::Mat leftToRightTranslation;
+
+    niftk::MonoCameraCalibration(model,
+                                 leftPoints,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft,
+                                 tvecsLeft
+                                );
+
+    niftk::MonoCameraCalibration(model,
+                                 rightPoints,
+                                 imageSize,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+    double rms = niftk::StereoCameraCalibration(model,
+                                                leftPoints,
+                                                rightPoints,
+                                                imageSize,
+                                                intrinsicLeft,
+                                                distortionLeft,
+                                                rvecsLeft,
+                                                tvecsLeft,
+                                                intrinsicRight,
+                                                distortionRight,
+                                                rvecsRight,
+                                                tvecsRight,
+                                                leftToRightRotationMatrix,
+                                                leftToRightTranslation,
+                                                essentialMatrix,
+                                                fundamentalMatrix,
+                                                CV_CALIB_USE_INTRINSIC_GUESS
+                                               );
+
+    cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+
+    std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << leftPoints.size() << " "
+              << intrinsicLeft.at<double>(0,0) << " "
+              << intrinsicLeft.at<double>(1,1) << " "
+              << intrinsicLeft.at<double>(0,2) << " "
+              << intrinsicLeft.at<double>(1,2) << " "
+              << distortionLeft.at<double>(0,0) << " "
+              << distortionLeft.at<double>(0,1) << " "
+              << distortionLeft.at<double>(0,2) << " "
+              << distortionLeft.at<double>(0,3) << " "
+              << distortionLeft.at<double>(0,4) << " "
+              << intrinsicRight.at<double>(0,0) << " "
+              << intrinsicRight.at<double>(1,1) << " "
+              << intrinsicRight.at<double>(0,2) << " "
+              << intrinsicRight.at<double>(1,2) << " "
+              << distortionRight.at<double>(0,0) << " "
+              << distortionRight.at<double>(0,1) << " "
+              << distortionRight.at<double>(0,2) << " "
+              << distortionRight.at<double>(0,3) << " "
+              << distortionRight.at<double>(0,4) << " "
+              << leftToRightRotationVector.at<double>(0,0) << " "
+              << leftToRightRotationVector.at<double>(0,1) << " "
+              << leftToRightRotationVector.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(0,0) << " "
+              << leftToRightTranslation.at<double>(0,1) << " "
+              << leftToRightTranslation.at<double>(0,2) << " "
+              << rms
+              << std::endl;
   }
-
-  cv::Mat intrinsicLeft;
-  cv::Mat distortionLeft;
-  std::vector<cv::Mat> rvecsLeft;
-  std::vector<cv::Mat> tvecsLeft;
-
-  cv::Mat intrinsicRight;
-  cv::Mat distortionRight;
-  std::vector<cv::Mat> rvecsRight;
-  std::vector<cv::Mat> tvecsRight;
-
-  cv::Mat essentialMatrix;
-  cv::Mat fundamentalMatrix;
-  cv::Mat rightToLeftRotation;
-  cv::Mat rightToLeftTranslation;
-
-  niftk::MonoCameraCalibration(model,
-                               leftPoints,
-                               imageSize,
-                               intrinsicLeft,
-                               distortionLeft,
-                               rvecsLeft,
-                               tvecsLeft
-                              );
-
-  niftk::MonoCameraCalibration(model,
-                               rightPoints,
-                               imageSize,
-                               intrinsicRight,
-                               distortionRight,
-                               rvecsRight,
-                               tvecsRight
-                              );
-
-  double rms = niftk::StereoCameraCalibration(model,
-                                              leftPoints,
-                                              rightPoints,
-                                              imageSize,
-                                              intrinsicLeft,
-                                              distortionLeft,
-                                              rvecsLeft,
-                                              tvecsLeft,
-                                              intrinsicRight,
-                                              distortionRight,
-                                              rvecsRight,
-                                              tvecsRight,
-                                              rightToLeftRotation,
-                                              rightToLeftTranslation,
-                                              essentialMatrix,
-                                              fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS
-                                             );
-
-  std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-            << leftPoints.size() << " "
-            << intrinsicLeft.at<double>(0,0) << " "
-            << intrinsicLeft.at<double>(1,1) << " "
-            << intrinsicLeft.at<double>(0,2) << " "
-            << intrinsicLeft.at<double>(1,2) << " "
-            << distortionLeft.at<double>(0,0) << " "
-            << distortionLeft.at<double>(0,1) << " "
-            << distortionLeft.at<double>(0,2) << " "
-            << distortionLeft.at<double>(0,3) << " "
-            << intrinsicRight.at<double>(0,0) << " "
-            << intrinsicRight.at<double>(1,1) << " "
-            << intrinsicRight.at<double>(0,2) << " "
-            << intrinsicRight.at<double>(1,2) << " "
-            << distortionRight.at<double>(0,0) << " "
-            << distortionRight.at<double>(0,1) << " "
-            << distortionRight.at<double>(0,2) << " "
-            << distortionRight.at<double>(0,3) << " "
-            << rightToLeftRotation.at<double>(0,0) << " "
-            << rightToLeftRotation.at<double>(0,1) << " "
-            << rightToLeftRotation.at<double>(0,2) << " "
-            << rightToLeftTranslation.at<double>(0,0) << " "
-            << rightToLeftTranslation.at<double>(0,1) << " "
-            << rightToLeftTranslation.at<double>(0,2) << " "
-            << rms
-            << std::endl;
+  catch (niftk::NiftyCalException& e)
+  {
+    std::cerr << "Caught exception:" << e.GetDescription() << std::endl
+              << "              in:" << e.GetFileName() << std::endl
+              << "         at line:" << e.GetLineNumber()
+              << std::endl;
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }

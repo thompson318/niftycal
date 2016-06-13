@@ -123,8 +123,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
   cv::Mat essentialMatrix;
   cv::Mat fundamentalMatrix;
-  cv::Mat rightToLeftRotationMatrix;
-  cv::Mat rightToLeftTranslationVector;
+  cv::Mat leftToRightRotationMatrix;
+  cv::Mat leftToRightTranslationVector;
 
   niftk::MonoCameraCalibration(model,
                                listOfPointsLeft,
@@ -156,8 +156,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                               distortionRight,
                                               rvecsRight,
                                               tvecsRight,
-                                              rightToLeftRotationMatrix,
-                                              rightToLeftTranslationVector,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslationVector,
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS
@@ -166,15 +166,15 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   double tolerance = 0.005;
 
   cv::Mat rvec;
-  cv::Rodrigues(rightToLeftRotationMatrix, rvec);
+  cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
   std::cout << "Stereo RMS=" << rms << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
-  std::cout << "Stereo T1=" << rightToLeftTranslationVector.at<double>(0,0) << std::endl;
-  std::cout << "Stereo T2=" << rightToLeftTranslationVector.at<double>(1,0) << std::endl;
-  std::cout << "Stereo T3=" << rightToLeftTranslationVector.at<double>(2,0) << std::endl;
+  std::cout << "Stereo T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "Stereo T2=" << leftToRightTranslationVector.at<double>(1,0) << std::endl;
+  std::cout << "Stereo T3=" << leftToRightTranslationVector.at<double>(2,0) << std::endl;
   std::cout << "Stereo Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Stereo Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Stereo Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
@@ -195,9 +195,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < tolerance );
   REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < tolerance );
   REQUIRE( fabs(rvec.at<double>(0,2) - eR3) < tolerance );
-  REQUIRE( fabs(rightToLeftTranslationVector.at<double>(0,0) - eT1) < tolerance );
-  REQUIRE( fabs(rightToLeftTranslationVector.at<double>(1,0) - eT2) < tolerance );
-  REQUIRE( fabs(rightToLeftTranslationVector.at<double>(2,0) - eT3) < tolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(0,0) - eT1) < tolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(1,0) - eT2) < tolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(2,0) - eT3) < tolerance );
 
   // Don't have a unit test yet.
   //niftk::SaveNifTKIntrinsics(intrinsicLeft, distortionLeft, "/tmp/calib.left.intrinsics.txt");

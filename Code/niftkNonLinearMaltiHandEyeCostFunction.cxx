@@ -71,27 +71,14 @@ NonLinearMaltiHandEyeCostFunction::InternalGetValue(const ParametersType& parame
     distortion.at<double>(0, i) = parameters[16+i];
   }
 
-  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-
   cv::Matx44d modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   cv::Matx44d handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 
-  NiftyCalIdType id;
-  cv::Point3d    modelPoint;
-  cv::Point3f    m;
-  cv::Point2f    p;
-  std::vector<cv::Point3f> model;
-  std::vector<cv::Point2f> observed;
-  std::vector<cv::Point2f> projected;
-
-  std::list<PointSet>::const_iterator viewIter;
-  niftk::PointSet::const_iterator pointIter;
-  std::list<cv::Matx44d>::const_iterator matrixIter;
-
   unsigned int totalPointCounter = 0;
 
-  // Iterating over each image.
+  std::list<PointSet>::const_iterator viewIter;
+  std::list<cv::Matx44d>::const_iterator matrixIter;
+
   for (viewIter = m_Points->begin(),
        matrixIter = m_HandMatrices->begin();
        viewIter != m_Points->end()
@@ -103,37 +90,21 @@ NonLinearMaltiHandEyeCostFunction::InternalGetValue(const ParametersType& parame
     cv::Matx44d handToWorld = (*matrixIter);
     cv::Matx44d worldToHand = handToWorld.inv();
     cv::Matx44d cameraMatrix = handEye * worldToHand * modelToWorld;
-    niftk::MatrixToRodrigues(cameraMatrix, extrinsicRotationVector, extrinsicTranslationVector);
 
-    model.resize((*viewIter).size());
-    projected.resize((*viewIter).size());
-    observed.resize((*viewIter).size());
-    unsigned int pointPerViewCounter = 0;
+    std::vector<cv::Point2f> observed((*viewIter).size());
+    std::vector<cv::Point2f> projected((*viewIter).size());
+    std::vector<niftk::NiftyCalIdType> ids((*viewIter).size());
 
-    // Iterating over each point in the current image.
-    for (pointIter = (*viewIter).begin();
-         pointIter != (*viewIter).end();
-         ++pointIter
-         )
-    {
-      id = (*pointIter).first;
-      modelPoint = (*m_Model)[id].point;
-      m.x = modelPoint.x;
-      m.y = modelPoint.y;
-      m.z = modelPoint.z;
-      model[pointPerViewCounter] = m;
+    niftk::ProjectMatchingPoints(*m_Model,
+                                 *viewIter,
+                                 cameraMatrix,
+                                 intrinsic,
+                                 distortion,
+                                 observed,
+                                 projected,
+                                 ids
+                                );
 
-      p.x = (*pointIter).second.point.x;
-      p.y = (*pointIter).second.point.y;
-      observed[pointPerViewCounter] = p;
-
-      pointPerViewCounter++;
-    }
-
-    // Project all points for that image.
-    cv::projectPoints(model, extrinsicRotationVector, extrinsicTranslationVector, intrinsic, distortion, projected);
-
-    // Now measure diff.
     for (unsigned int i = 0; i < observed.size(); i++)
     {
       result[totalPointCounter++] = (observed[i].x - projected[i].x);
