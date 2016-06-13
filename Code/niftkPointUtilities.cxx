@@ -18,7 +18,6 @@
 #include <queue>
 #include <vector>
 #include <functional>
-#include <random>
 
 namespace niftk {
 
@@ -167,7 +166,11 @@ void ConvertPoints(const std::vector<cv::Point2f>& inputPoint,
 
   if (inputPoint.size() != inputId.size())
   {
-    niftkNiftyCalThrow() << "Different number of points and ids.";
+    niftkNiftyCalThrow() << "Different number of points ("
+                         << inputPoint.size()
+                         << ") and ids ("
+                         << inputId.size()
+                         << ").";
   }
   for (size_t i = 0; i < inputPoint.size(); i++)
   {
@@ -764,8 +767,8 @@ void TriangulatePointPairs(
 
   cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
 
-  cv::Mat rightCameraRotationVector;
-  cv::Mat rightCameraTranslationVector;
+  cv::Mat rightCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rightCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(rightExtrinsic, rightCameraRotationVector, rightCameraTranslationVector);
 
   std::vector<cv::Point3f> triangulatedPoints;
@@ -821,14 +824,11 @@ Model3D TransformModel(const Model3D& inputModel, const cv::Matx44d& matrix)
 
 
 //-----------------------------------------------------------------------------
-PointSet AddGaussianNoise(const PointSet& points,
-                          const double& mean,
-                          const double& stdDev
+PointSet AddGaussianNoise(std::default_random_engine& engine,
+                          std::normal_distribution<double>& normalDistribution,
+                          const PointSet& points
                          )
 {
-  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(mean, stdDev);
-
   PointSet output;
   Point2D op;
 
@@ -836,8 +836,8 @@ PointSet AddGaussianNoise(const PointSet& points,
   for (iter = points.begin(); iter != points.end(); ++iter)
   {
     op.id = (*iter).first;
-    op.point.x = (*iter).second.point.x + distribution(generator);
-    op.point.y = (*iter).second.point.y + distribution(generator);
+    op.point.x = (*iter).second.point.x + normalDistribution(engine);
+    op.point.y = (*iter).second.point.y + normalDistribution(engine);
     output.insert(IdPoint2D((*iter).first, op));
   }
 
@@ -863,6 +863,9 @@ double ComputeRMSReconstructionError(const Model3D& model,
   double rms = 0;
   unsigned int pointCounter = 0;
   unsigned int viewCounter = 0;
+  rmsForEachAxis.x = 0;
+  rmsForEachAxis.y = 0;
+  rmsForEachAxis.z = 0;
 
   if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
   {
@@ -892,9 +895,6 @@ double ComputeRMSReconstructionError(const Model3D& model,
     Model3D modelInLeftCameraCoordinates = niftk::TransformModel(model, modelToCamera);
 
     Model3D triangulatedPoints;
-    rmsForEachAxis.x = 0;
-    rmsForEachAxis.y = 0;
-    rmsForEachAxis.z = 0;
 
     niftk::TriangulatePointPairs(
       *leftIter,
@@ -999,7 +999,7 @@ unsigned int ProjectMatchingPoints(const Model3D& model,
     p.y = (*pointIter).second.point.y;
     observed[pointPerViewCounter] = p;
 
-    ids.push_back(id);
+    ids[pointPerViewCounter] = id;
 
     pointPerViewCounter++;
   }

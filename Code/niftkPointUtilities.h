@@ -18,6 +18,7 @@
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
 #include <list>
+#include <random>
 
 /**
 * \file niftkPointUtilities.h
@@ -227,11 +228,11 @@ NIFTYCAL_WINEXPORT Model3D TransformModel(
   );
 
 /**
-* \brief Adds Gaussian noise to point locations.
+* \brief Adds noise to point locations.
 */
-NIFTYCAL_WINEXPORT PointSet AddGaussianNoise(const PointSet& points,
-                                             const double& mean,
-                                             const double& stdDev
+NIFTYCAL_WINEXPORT PointSet AddGaussianNoise(std::default_random_engine& engine,
+                                             std::normal_distribution<double>& normalDistribution,
+                                             const PointSet& points
                                             );
 
 /**

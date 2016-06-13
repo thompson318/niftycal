@@ -14,6 +14,7 @@
 
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
+#include <niftkNiftyCalException.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
@@ -31,50 +32,61 @@ int main(int argc, char ** argv)
     return EXIT_FAILURE;
   }
 
-  int sizeX = atoi(argv[1]);
-  int sizeY = atoi(argv[2]);
-  std::string modelFile = argv[3];
-
-  cv::Size2i imageSize(sizeX, sizeY);
-  niftk::Model3D model = niftk::LoadModel3D(modelFile);
-  std::list<niftk::PointSet> points;
-
-  for (int i = 4; i < argc; i++)
+  try
   {
-    niftk::PointSet p = niftk::LoadPointSet(argv[i]);
-    if (p.size() >= 4) // Deep within OpenCV lies a check for at least 4 points.
+    int sizeX = atoi(argv[1]);
+    int sizeY = atoi(argv[2]);
+    std::string modelFile = argv[3];
+
+    cv::Size2i imageSize(sizeX, sizeY);
+    niftk::Model3D model = niftk::LoadModel3D(modelFile);
+    std::list<niftk::PointSet> points;
+
+    for (int i = 4; i < argc; i++)
     {
-      points.push_back(p);
+      niftk::PointSet p = niftk::LoadPointSet(argv[i]);
+      if (p.size() >= 4) // Deep within OpenCV lies a check for at least 4 points.
+      {
+        points.push_back(p);
+      }
     }
+
+    cv::Mat intrinsic;
+    cv::Mat distortion;
+    std::vector<cv::Mat> rvecs;
+    std::vector<cv::Mat> tvecs;
+
+    double rms = niftk::MonoCameraCalibration(model,
+                                              points,
+                                              imageSize,
+                                              intrinsic,
+                                              distortion,
+                                              rvecs,
+                                              tvecs
+                                              );
+
+    std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << points.size() << " "
+              << intrinsic.at<double>(0,0) << " "
+              << intrinsic.at<double>(1,1) << " "
+              << intrinsic.at<double>(0,2) << " "
+              << intrinsic.at<double>(1,2) << " "
+              << distortion.at<double>(0,0) << " "
+              << distortion.at<double>(0,1) << " "
+              << distortion.at<double>(0,2) << " "
+              << distortion.at<double>(0,3) << " "
+              << distortion.at<double>(0,4) << " "
+              << rms
+              << std::endl;
   }
-
-  cv::Mat intrinsic;
-  cv::Mat distortion;
-  std::vector<cv::Mat> rvecs;
-  std::vector<cv::Mat> tvecs;
-
-  double rms = niftk::MonoCameraCalibration(model,
-                                            points,
-                                            imageSize,
-                                            intrinsic,
-                                            distortion,
-                                            rvecs,
-                                            tvecs
-                                            );
-
-  std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-            << points.size() << " "
-            << intrinsic.at<double>(0,0) << " "
-            << intrinsic.at<double>(1,1) << " "
-            << intrinsic.at<double>(0,2) << " "
-            << intrinsic.at<double>(1,2) << " "
-            << distortion.at<double>(0,0) << " "
-            << distortion.at<double>(0,1) << " "
-            << distortion.at<double>(0,2) << " "
-            << distortion.at<double>(0,3) << " "
-            << distortion.at<double>(0,4) << " "
-            << rms
-            << std::endl;
+  catch (niftk::NiftyCalException& e)
+  {
+    std::cerr << "Caught exception:" << e.GetDescription() << std::endl
+              << "              in:" << e.GetFileName() << std::endl
+              << "         at line:" << e.GetLineNumber()
+              << std::endl;
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }
