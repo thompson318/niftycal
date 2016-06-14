@@ -278,9 +278,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     std::cout << "Iterative calibration iter=" << count++
               << ", prms=" << previousRMS
-              << ", rms=" << projectedRMS
-              << ", recon=" << reconstructedRMS
-              << ", axis=" << rmsInEachAxis
+              << ", rms2D=" << projectedRMS
+              << ", rms3D=" << reconstructedRMS
+              << ", rms3DPerAxis=" << rmsInEachAxis
               << std::endl;
 
     if (projectedRMS < previousRMS)
@@ -328,6 +328,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << "Final T3=" << leftToRightTranslationVector.at<double>(0,2) << std::endl;
 
   result(0, 0) = projectedRMS;
+  result(1, 0) = reconstructedRMS;
+
   return result;
 }
 
