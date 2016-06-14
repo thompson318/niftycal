@@ -103,19 +103,15 @@ int main(int argc, char ** argv)
       detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 
-      std::cout << "i=" << i << ", file=" << argv[i] << ", points=" << pointSet.size();
-
       if (pointSet.size() > 0)
       {
         if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
         {
           listOfPointsLeft.push_back(pointSet);
-          std::cout << " left." << std::endl;
         }
         else
         {
           listOfPointsRight.push_back(pointSet);
-          std::cout << " right." << std::endl;
         }
       }
     }
