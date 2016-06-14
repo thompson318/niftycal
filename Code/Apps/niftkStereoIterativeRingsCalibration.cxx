@@ -198,7 +198,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslationVector;
 
-    double rms = niftk::IterativeStereoCameraCalibration(
+    cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
           model,
           referenceImageData,
           originalImagesLeft,
@@ -249,7 +249,8 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rms
+              << rms(0, 0) << " "
+              << rms(1, 0)
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)

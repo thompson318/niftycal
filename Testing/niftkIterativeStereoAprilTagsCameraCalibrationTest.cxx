@@ -152,7 +152,7 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   cv::Mat leftToRightRotationMatrix;
   cv::Mat leftToRightTranslationVector;
 
-  double rms = niftk::IterativeStereoCameraCalibration(
+  cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
         model,
         referenceImageData,
         originalImagesLeft,
@@ -218,7 +218,7 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   std::cout << "T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
   std::cout << "T2=" << leftToRightTranslationVector.at<double>(1,0) << std::endl;
   std::cout << "T3=" << leftToRightTranslationVector.at<double>(2,0) << std::endl;
-  std::cout << "RMS=" << rms << std::endl;
+  std::cout << "RMS=" << rms(0, 0) << std::endl;
 
   REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < tolerance );
   REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < tolerance );

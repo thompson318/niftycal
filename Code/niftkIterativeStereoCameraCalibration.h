@@ -27,9 +27,9 @@ namespace niftk
 /**
 * \brief Given a list of images, performs stereo camera calibration according to: Dutta ICCV 2009.
 * \see niftk::StereoCameraCalibration
-* \return rms re-projection error
+* \return rms re-projection and reconstruction error
 */
-NIFTYCAL_WINEXPORT double IterativeStereoCameraCalibration(
+NIFTYCAL_WINEXPORT cv::Matx21d IterativeStereoCameraCalibration(
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
