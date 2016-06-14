@@ -17,6 +17,7 @@ set(NIFTYCAL_APPS
   niftkStereoSimulationFromPoints
   niftkStereoIterativeAprilTagsCalibration
   niftkStereoIterativeRingsCalibration
+  niftkStereoChessboardCalibration
 )
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)

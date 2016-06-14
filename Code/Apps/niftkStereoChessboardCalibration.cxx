@@ -1,0 +1,225 @@
+/*=============================================================================
+
+  NiftyCal: A software package for camera calibration.
+
+  Copyright (c) University College London (UCL). All rights reserved.
+
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
+
+  See LICENSE.txt in the top level directory for details.
+
+=============================================================================*/
+
+#include <niftkIOUtilities.h>
+#include <niftkMonoCameraCalibration.h>
+#include <niftkStereoCameraCalibration.h>
+#include <niftkChessboardPointDetector.h>
+#include <niftkNiftyCalException.h>
+#include <niftkNiftyCalExceptionMacro.h>
+#include <cv.h>
+#include <highgui.h>
+#include <cstdlib>
+
+/**
+* \file niftkStereoChessboardCalibration.cxx
+* \brief Calibrate mono camera, using standard chessboard and OpenCV.
+*/
+int main(int argc, char ** argv)
+{
+  if (argc < 13)
+  {
+    std::cerr << "Usage: niftkStereChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion "
+              << "leftImage1.png leftImage2.png ... leftImageN.txt"
+              << "rightImage1.png rightImage2.png ... rightImageN.txt"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    int numberOfArgumentsBeforeImages = 7;
+    int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
+
+    if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
+    {
+      std::cerr << "Expected an even number of image files" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    std::string modelFileName = argv[1];
+    int numberInternalCornersInX = atoi(argv[2]);
+    int numberInternalCornersInY = atoi(argv[3]);
+    float rescaleX = atof(argv[4]);
+    float rescaleY = atof(argv[5]);
+    int   zeroDistortion = atoi(argv[6]);
+
+    if (numberInternalCornersInX < 2)
+    {
+      niftkNiftyCalThrow() << "numberInternalCornersInX < 2.";
+    }
+    if (numberInternalCornersInY < 2)
+    {
+      niftkNiftyCalThrow() << "numberInternalCornersInY < 2.";
+    }
+
+    cv::Point2d scaleFactors;
+    scaleFactors.x = rescaleX;
+    scaleFactors.y = rescaleY;
+
+    niftk::Model3D model = niftk::LoadModel3D(modelFileName);
+
+    cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
+
+    cv::Size2i imageSize;
+    niftk::PointSet pointSet;
+    std::list<niftk::PointSet> listOfPointsLeft;
+    std::list<niftk::PointSet> listOfPointsRight;
+
+    for (int i = numberOfArgumentsBeforeImages; i < argc; i++)
+    {
+      cv::Mat image = cv::imread(argv[i]);
+      if (i == numberOfArgumentsBeforeImages)
+      {
+        imageSize.width = image.cols;
+        imageSize.height = image.rows;
+      }
+      else
+      {
+        if (   image.cols != imageSize.width
+            || image.rows != imageSize.height
+            )
+        {
+          niftkNiftyCalThrow() << "Invalid image size:" << image.cols << "x" << image.rows << std::endl;
+        }
+      }
+
+      cv::Mat greyImage;
+      cv::cvtColor(image, greyImage, CV_BGR2GRAY);
+
+      niftk::ChessboardPointDetector detector(corners);
+      detector.SetImage(&greyImage);
+      pointSet = detector.GetPoints();
+
+      std::cout << "i=" << i << ", file=" << argv[i] << ", points=" << pointSet.size();
+
+      if (pointSet.size() > 0)
+      {
+        if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
+        {
+          listOfPointsLeft.push_back(pointSet);
+          std::cout << " left." << std::endl;
+        }
+        else
+        {
+          listOfPointsRight.push_back(pointSet);
+          std::cout << " right." << std::endl;
+        }
+      }
+    }
+
+    int flags = 0;
+    if (zeroDistortion != 0)
+    {
+      flags = cv::CALIB_ZERO_TANGENT_DIST
+          | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
+          | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
+          | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6;
+    }
+
+    cv::Mat intrinsicLeft;
+    cv::Mat distortionLeft;
+    std::vector<cv::Mat> rvecsLeft;
+    std::vector<cv::Mat> tvecsLeft;
+
+    cv::Mat intrinsicRight;
+    cv::Mat distortionRight;
+    std::vector<cv::Mat> rvecsRight;
+    std::vector<cv::Mat> tvecsRight;
+
+    cv::Mat essentialMatrix;
+    cv::Mat fundamentalMatrix;
+    cv::Mat leftToRightRotationMatrix;
+    cv::Mat leftToRightRotationVector;
+    cv::Mat leftToRightTranslationVector;
+
+    niftk::MonoCameraCalibration(model,
+                                 listOfPointsLeft,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft,
+                                 tvecsLeft
+                                );
+
+    niftk::MonoCameraCalibration(model,
+                                 listOfPointsRight,
+                                 imageSize,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+    double rms = niftk::StereoCameraCalibration(model,
+                                                listOfPointsLeft,
+                                                listOfPointsRight,
+                                                imageSize,
+                                                intrinsicLeft,
+                                                distortionLeft,
+                                                rvecsLeft,
+                                                tvecsLeft,
+                                                intrinsicRight,
+                                                distortionRight,
+                                                rvecsRight,
+                                                tvecsRight,
+                                                leftToRightRotationMatrix,
+                                                leftToRightTranslationVector,
+                                                essentialMatrix,
+                                                fundamentalMatrix,
+                                                CV_CALIB_USE_INTRINSIC_GUESS
+                                               );
+
+    cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+
+    std::cout << "niftkStereoChessboardCalibration:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << listOfPointsLeft.size() << " "
+              << intrinsicLeft.at<double>(0,0) << " "
+              << intrinsicLeft.at<double>(1,1) << " "
+              << intrinsicLeft.at<double>(0,2) << " "
+              << intrinsicLeft.at<double>(1,2) << " "
+              << distortionLeft.at<double>(0,0) << " "
+              << distortionLeft.at<double>(0,1) << " "
+              << distortionLeft.at<double>(0,2) << " "
+              << distortionLeft.at<double>(0,3) << " "
+              << distortionLeft.at<double>(0,4) << " "
+              << intrinsicRight.at<double>(0,0) << " "
+              << intrinsicRight.at<double>(1,1) << " "
+              << intrinsicRight.at<double>(0,2) << " "
+              << intrinsicRight.at<double>(1,2) << " "
+              << distortionRight.at<double>(0,0) << " "
+              << distortionRight.at<double>(0,1) << " "
+              << distortionRight.at<double>(0,2) << " "
+              << distortionRight.at<double>(0,3) << " "
+              << distortionRight.at<double>(0,4) << " "
+              << leftToRightRotationVector.at<double>(0,0) << " "
+              << leftToRightRotationVector.at<double>(0,1) << " "
+              << leftToRightRotationVector.at<double>(0,2) << " "
+              << leftToRightTranslationVector.at<double>(0,0) << " "
+              << leftToRightTranslationVector.at<double>(0,1) << " "
+              << leftToRightTranslationVector.at<double>(0,2) << " "
+              << rms
+              << std::endl;
+  }
+  catch (niftk::NiftyCalException& e)
+  {
+    std::cerr << "Caught exception:" << e.GetDescription() << std::endl
+              << "              in:" << e.GetFileName() << std::endl
+              << "         at line:" << e.GetLineNumber()
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
+}
