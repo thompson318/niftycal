@@ -262,26 +262,29 @@ cv::Matx21d IterativeStereoCameraCalibration(
           iterativeCvFlags
           );
 
+    reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                            distortedPointsFromCanonicalImagesLeft,
+                                                            distortedPointsFromCanonicalImagesRight,
+                                                            tmpIntrinsicLeft,
+                                                            tmpDistortionLeft,
+                                                            rvecsLeft,
+                                                            tvecsLeft,
+                                                            tmpIntrinsicRight,
+                                                            tmpDistortionRight,
+                                                            tmpLeftToRightRotationMatrix,
+                                                            tmpLeftToRightTranslationVector,
+                                                            rmsInEachAxis
+                                                           );
+
     std::cout << "Iterative calibration iter=" << count++
               << ", prms=" << previousRMS
               << ", rms=" << projectedRMS
+              << ", recon=" << reconstructedRMS
+              << ", axis=" << rmsInEachAxis
               << std::endl;
 
     if (projectedRMS < previousRMS)
     {
-      reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
-                                                              distortedPointsFromCanonicalImagesLeft,
-                                                              distortedPointsFromCanonicalImagesRight,
-                                                              tmpIntrinsicLeft,
-                                                              tmpDistortionLeft,
-                                                              rvecsLeft,
-                                                              tvecsLeft,
-                                                              tmpIntrinsicRight,
-                                                              tmpDistortionRight,
-                                                              tmpLeftToRightRotationMatrix,
-                                                              tmpLeftToRightTranslationVector,
-                                                              rmsInEachAxis
-                                                             );
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
