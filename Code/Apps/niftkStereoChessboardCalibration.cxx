@@ -18,6 +18,7 @@
 #include <niftkChessboardPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
+#include <niftkPointUtilities.h>
 #include <cv.h>
 #include <highgui.h>
 #include <cstdlib>
@@ -183,6 +184,22 @@ int main(int argc, char ** argv)
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
+    // Evaluate RMS reconstruction error.
+    cv::Point3d rmsInEachAxis;
+    double rmsReconstructionError = niftk::ComputeRMSReconstructionError(model,
+                                                                         listOfPointsLeft,
+                                                                         listOfPointsRight,
+                                                                         intrinsicLeft,
+                                                                         distortionLeft,
+                                                                         rvecsLeft,
+                                                                         tvecsLeft,
+                                                                         intrinsicRight,
+                                                                         distortionRight,
+                                                                         leftToRightRotationMatrix,
+                                                                         leftToRightTranslationVector,
+                                                                         rmsInEachAxis
+                                                                        );
+
     std::cout << "niftkStereoChessboardCalibration:(" << imageSize.width << "," << imageSize.height <<  ") "
               << listOfPointsLeft.size() << " "
               << intrinsicLeft.at<double>(0,0) << " "
@@ -209,7 +226,11 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rms
+              << rms << " "
+              << rmsReconstructionError << " "
+              << rmsInEachAxis.x << " "
+              << rmsInEachAxis.y << " "
+              << rmsInEachAxis.z << " "
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)
