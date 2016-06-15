@@ -174,7 +174,7 @@ int main(int argc, char ** argv)
     }
 
     int flags = 0;
-    if (zeroDistortion != 0)
+    if (zeroDistortion == 1)
     {
       flags = cv::CALIB_ZERO_TANGENT_DIST
           | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2

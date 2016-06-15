@@ -117,7 +117,7 @@ int main(int argc, char ** argv)
     }
 
     int flags = 0;
-    if (zeroDistortion != 0)
+    if (zeroDistortion == 1)
     {
       flags = cv::CALIB_ZERO_TANGENT_DIST
           | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
@@ -147,7 +147,8 @@ int main(int argc, char ** argv)
                                  intrinsicLeft,
                                  distortionLeft,
                                  rvecsLeft,
-                                 tvecsLeft
+                                 tvecsLeft,
+                                 flags
                                 );
 
     niftk::MonoCameraCalibration(model,
@@ -156,7 +157,8 @@ int main(int argc, char ** argv)
                                  intrinsicRight,
                                  distortionRight,
                                  rvecsRight,
-                                 tvecsRight
+                                 tvecsRight,
+                                 flags
                                 );
 
     double rms = niftk::StereoCameraCalibration(model,
@@ -175,7 +177,7 @@ int main(int argc, char ** argv)
                                                 leftToRightTranslationVector,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
-                                                CV_CALIB_USE_INTRINSIC_GUESS
+                                                flags | CV_CALIB_USE_INTRINSIC_GUESS
                                                );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);

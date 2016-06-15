@@ -100,10 +100,10 @@ int main(int argc, char ** argv)
       cv::cvtColor(image, greyImage, CV_BGR2GRAY);
       cv::Mat greyImageClone = greyImage.clone();
 
-      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
+      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(false, tagFamily, 0, 0.8);
       detector1->SetImageScaleFactor(scaleFactors);
 
-      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
+      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(false, tagFamily, 0, 0.8);
       detector2->SetImageScaleFactor(scaleFactors);
 
       if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
@@ -129,7 +129,7 @@ int main(int argc, char ** argv)
     }
 
     int flags = 0;
-    if (zeroDistortion != 0)
+    if (zeroDistortion == 1)
     {
       flags = cv::CALIB_ZERO_TANGENT_DIST
           | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2

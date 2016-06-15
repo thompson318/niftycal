@@ -172,6 +172,7 @@ void ExtractDistortedControlPoints(
   cp = outputDetectorAndImage.first->GetPoints();
   if(cp.empty())
   {
+    cv::imwrite("/tmp/matt.png", outputDetectorAndImage.second);
     niftkNiftyCalThrow() << "All warped images should still contain valid "
                          << "calibration images containing extractable points.";
   }
