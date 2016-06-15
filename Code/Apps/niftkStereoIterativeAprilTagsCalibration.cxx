@@ -31,9 +31,9 @@ int main(int argc, char ** argv)
   if (argc < 14)
   {
     std::cerr << "Usage: niftkStereoIterativeAprilTagsCalibration modelPoints.txt "
-              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion"
-              << "leftImage1.png leftImage2.png ... leftImageN.txt"
-              << "rightImage1.png rightImage2.png ... rightImageN.txt"
+              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion "
+              << "leftImage1.png leftImage2.png ... leftImageN.txt "
+              << "rightImage1.png rightImage2.png ... rightImageN.txt "
               << std::endl;
     return EXIT_FAILURE;
   }

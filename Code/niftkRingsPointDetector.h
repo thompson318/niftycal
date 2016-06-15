@@ -37,6 +37,7 @@ public:
                      cv::Size2i offsetForTemplate // how many pixels to search in x,y.
                     );
   virtual ~RingsPointDetector();
+  void SetUseOuterContour(const bool& useIt);     // Default to true.
 
 protected:
 
@@ -48,7 +49,7 @@ protected:
 private:
 
   void ExtractBlobs(const cv::Mat& image, cv::Mat& bigBlobs, cv::Mat& littleBlobs);
-
+  bool m_UseOuterContour;
 };
 
 } // end namespace
