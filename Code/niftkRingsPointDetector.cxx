@@ -27,6 +27,7 @@ RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
                                        cv::Size2i offsetForTemplate
                                       )
 : TemplateMatchingPointDetector(patternSize, offsetForTemplate)
+, m_UseOuterContour(true)
 {
 }
 
@@ -34,6 +35,13 @@ RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
 //-----------------------------------------------------------------------------
 RingsPointDetector::~RingsPointDetector()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+void RingsPointDetector::SetUseOuterContour(const bool& useIt)
+{
+  m_UseOuterContour = useIt;
 }
 
 
@@ -145,8 +153,16 @@ PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
     for ( unsigned int k = 0; k < numberOfRings; ++k)
     {
       Point2D tmp;
-      tmp.point.x = (littleCentres[k].x + bigCentres[k].x)/2.0;
-      tmp.point.y = (littleCentres[k].y + bigCentres[k].y)/2.0;
+      if (m_UseOuterContour)
+      {
+        tmp.point.x = (littleCentres[k].x + bigCentres[k].x)/2.0;
+        tmp.point.y = (littleCentres[k].y + bigCentres[k].y)/2.0;
+      }
+      else
+      {
+        tmp.point.x = (littleCentres[k].x);
+        tmp.point.y = (littleCentres[k].y);
+      }
       tmp.id = k;
       result.insert(IdPoint2D(tmp.id, tmp));
     }

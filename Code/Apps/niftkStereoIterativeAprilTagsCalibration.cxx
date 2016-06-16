@@ -23,7 +23,7 @@
 
 /**
 * \file niftkStereoIterativeAprilTagsCalibration.cxx
-* \brief Calibrate mono camera, using AprilTag features, and
+* \brief Calibrate stereo camera, using AprilTag features, and
 * the Dutta-2009 iterative optimisation algorithm.
 */
 int main(int argc, char ** argv)
@@ -31,9 +31,9 @@ int main(int argc, char ** argv)
   if (argc < 14)
   {
     std::cerr << "Usage: niftkStereoIterativeAprilTagsCalibration modelPoints.txt "
-              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion"
-              << "leftImage1.png leftImage2.png ... leftImageN.txt"
-              << "rightImage1.png rightImage2.png ... rightImageN.txt"
+              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion "
+              << "leftImage1.png leftImage2.png ... leftImageN.txt "
+              << "rightImage1.png rightImage2.png ... rightImageN.txt "
               << std::endl;
     return EXIT_FAILURE;
   }
@@ -100,10 +100,10 @@ int main(int argc, char ** argv)
       cv::cvtColor(image, greyImage, CV_BGR2GRAY);
       cv::Mat greyImageClone = greyImage.clone();
 
-      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
+      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(false, tagFamily, 0, 0.8);
       detector1->SetImageScaleFactor(scaleFactors);
 
-      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
+      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(false, tagFamily, 0, 0.8);
       detector2->SetImageScaleFactor(scaleFactors);
 
       if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
@@ -129,7 +129,7 @@ int main(int argc, char ** argv)
     }
 
     int flags = 0;
-    if (zeroDistortion != 0)
+    if (zeroDistortion == 1)
     {
       flags = cv::CALIB_ZERO_TANGENT_DIST
           | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
@@ -153,7 +153,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslationVector;
 
-    double rms = niftk::IterativeStereoCameraCalibration(
+    cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
           model,
           referenceImageData,
           originalImagesLeft,
@@ -204,7 +204,8 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rms
+              << rms(0, 0) << " "
+              << rms(1, 0)
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)

@@ -23,7 +23,7 @@
 
 /**
 * \file niftkStereoIterativeRingsCalibration.cxx
-* \brief Calibrate mono camera, using Ring features, and
+* \brief Calibrate stereo camera, using Ring features, and
 * the Dutta-2009 iterative optimisation algorithm.
 */
 int main(int argc, char ** argv)
@@ -31,9 +31,9 @@ int main(int argc, char ** argv)
   if (argc < 16)
   {
     std::cerr << "Usage: niftkStereoIterativeRingsCalibration modelPoints.txt "
-              << " referenceImage.png referencePoints templateImage dotsInX dotsInY rescaleX rescaleY zeroDistortion"
-              << "leftImage1.png leftImage2.png ... leftImageN.txt"
-              << "rightImage1.png rightImage2.png ... rightImageN.txt"
+              << " referenceImage.png referencePoints templateImage dotsInX dotsInY rescaleX rescaleY zeroDistortion "
+              << "leftImage1.png leftImage2.png ... leftImageN.txt "
+              << "rightImage1.png rightImage2.png ... rightImageN.txt "
               << std::endl;
     return EXIT_FAILURE;
   }
@@ -73,8 +73,6 @@ int main(int argc, char ** argv)
     cv::Point2d scaleFactors;
     scaleFactors.x = rescaleX;
     scaleFactors.y = rescaleY;
-
-    std::cout << "Info: dots=" << dots << ", offset=" << offset << ", scaleFactors=" << scaleFactors << std::endl;
 
     cv::Size2i imageSize;
     niftk::Model3D model = niftk::LoadModel3D(modelFile);
@@ -174,7 +172,7 @@ int main(int argc, char ** argv)
     }
 
     int flags = 0;
-    if (zeroDistortion != 0)
+    if (zeroDistortion == 1)
     {
       flags = cv::CALIB_ZERO_TANGENT_DIST
           | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
@@ -198,7 +196,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslationVector;
 
-    double rms = niftk::IterativeStereoCameraCalibration(
+    cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
           model,
           referenceImageData,
           originalImagesLeft,
@@ -249,7 +247,8 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rms
+              << rms(0, 0) << " "
+              << rms(1, 0)
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)

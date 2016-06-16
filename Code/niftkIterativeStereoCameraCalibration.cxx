@@ -25,7 +25,7 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double IterativeStereoCameraCalibration(
+cv::Matx21d IterativeStereoCameraCalibration(
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
@@ -48,6 +48,10 @@ double IterativeStereoCameraCalibration(
     const int& cvFlags
     )
 {
+  cv::Matx21d result;
+  result(0, 0) = 0;
+  result(1, 0) = 0;
+
   if (model.empty())
   {
     niftkNiftyCalThrow() << "Model is empty.";
@@ -81,6 +85,7 @@ double IterativeStereoCameraCalibration(
   }
 
   double projectedRMS = 0;
+  double reconstructedRMS = 0;
 
   // 1. Detect control points: Detect calibration pattern control
   // points (corners, circle or ring centers) in the input images.
@@ -157,7 +162,22 @@ double IterativeStereoCameraCalibration(
         iterativeCvFlags
         );
 
-  std::cout << "Initial stereo calibration, rms=" << projectedRMS << std::endl;
+  cv::Point3d rmsInEachAxis;
+  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                          pointsFromOriginalImagesLeft,
+                                                          pointsFromOriginalImagesRight,
+                                                          intrinsicLeft,
+                                                          distortionLeft,
+                                                          rvecsLeft,
+                                                          tvecsLeft,
+                                                          intrinsicRight,
+                                                          distortionRight,
+                                                          leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector,
+                                                          rmsInEachAxis
+                                                         );
+
+  std::cout << "Initial stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
   std::cout << "Initial Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Initial Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Initial Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
@@ -244,11 +264,24 @@ double IterativeStereoCameraCalibration(
 
     std::cout << "Iterative calibration iter=" << count++
               << ", prms=" << previousRMS
-              << ", rms=" << projectedRMS
+              << ", rms2D=" << projectedRMS
               << std::endl;
 
     if (projectedRMS < previousRMS)
     {
+      reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                              distortedPointsFromCanonicalImagesLeft,
+                                                              distortedPointsFromCanonicalImagesRight,
+                                                              tmpIntrinsicLeft,
+                                                              tmpDistortionLeft,
+                                                              rvecsLeft,
+                                                              tvecsLeft,
+                                                              tmpIntrinsicRight,
+                                                              tmpDistortionRight,
+                                                              tmpLeftToRightRotationMatrix,
+                                                              tmpLeftToRightTranslationVector,
+                                                              rmsInEachAxis
+                                                             );
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
@@ -264,7 +297,7 @@ double IterativeStereoCameraCalibration(
     }
   } // end while
 
-  std::cout << "Final stereo calibration, rms=" << projectedRMS << std::endl;
+  std::cout << "Final stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Final Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Final Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
@@ -291,7 +324,10 @@ double IterativeStereoCameraCalibration(
   std::cout << "Final T2=" << leftToRightTranslationVector.at<double>(0,1) << std::endl;
   std::cout << "Final T3=" << leftToRightTranslationVector.at<double>(0,2) << std::endl;
 
-  return projectedRMS;
+  result(0, 0) = projectedRMS;
+  result(1, 0) = reconstructedRMS;
+
+  return result;
 }
 
 } // end namespace
