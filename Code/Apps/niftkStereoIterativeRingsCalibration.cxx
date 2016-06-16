@@ -74,8 +74,6 @@ int main(int argc, char ** argv)
     scaleFactors.x = rescaleX;
     scaleFactors.y = rescaleY;
 
-    std::cout << "Info: dots=" << dots << ", offset=" << offset << ", scaleFactors=" << scaleFactors << std::endl;
-
     cv::Size2i imageSize;
     niftk::Model3D model = niftk::LoadModel3D(modelFile);
 
