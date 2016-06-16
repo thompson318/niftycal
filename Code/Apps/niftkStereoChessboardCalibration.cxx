@@ -224,11 +224,11 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rms << " "
-              << rmsReconstructionError << " "
               << rmsInEachAxis.x << " "
               << rmsInEachAxis.y << " "
               << rmsInEachAxis.z << " "
+              << rms << " "
+              << rmsReconstructionError << " "
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)
