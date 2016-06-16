@@ -25,7 +25,7 @@
 
 /**
 * \file niftkStereoChessboardCalibration.cxx
-* \brief Calibrate mono camera, using standard chessboard and OpenCV.
+* \brief Calibrate stereo camera, using standard chessboard and OpenCV.
 */
 int main(int argc, char ** argv)
 {

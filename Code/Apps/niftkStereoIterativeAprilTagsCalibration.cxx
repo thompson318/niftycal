@@ -23,7 +23,7 @@
 
 /**
 * \file niftkStereoIterativeAprilTagsCalibration.cxx
-* \brief Calibrate mono camera, using AprilTag features, and
+* \brief Calibrate stereo camera, using AprilTag features, and
 * the Dutta-2009 iterative optimisation algorithm.
 */
 int main(int argc, char ** argv)

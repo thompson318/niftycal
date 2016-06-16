@@ -23,7 +23,7 @@
 
 /**
 * \file niftkStereoIterativeRingsCalibration.cxx
-* \brief Calibrate mono camera, using Ring features, and
+* \brief Calibrate stereo camera, using Ring features, and
 * the Dutta-2009 iterative optimisation algorithm.
 */
 int main(int argc, char ** argv)
