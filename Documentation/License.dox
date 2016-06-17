@@ -1,0 +1,29 @@
+/**
+\page NiftyCalLicense NiftyCal Licenses
+
+\li \ref LicenseNiftyCal
+\li \ref LicenseOpenCV
+\li \ref LicenseEigen
+\li \ref LicenseAprilTags
+\li \ref LicenseITK
+
+\section LicenseNiftyCal The NiftyCal License
+
+\include LICENSE.txt
+
+\section LicenseOpenCV The OpenCV License
+
+\include LICENSE_OpenCV.txt
+
+\section LicenseEigen The Eigen License
+
+\include LICENSE_Eigen.txt
+
+\section LicenseAprilTags The AprilTags License
+
+\include LICENSE_AprilTags.txt
+
+\section LicenseITK The ITK License
+
+\include LICENSE_ITK.txt
+*/

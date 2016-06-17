@@ -4,8 +4,32 @@
 
 Copyright (C) 2016 University College London (UCL). All rights reserved.
 
-\section MainPageIntroduction Introduction
+\subpage NiftyCalLicense
 
-\section MainPageAcknowledgements Acknowledgements
+\section MainPageIntro Introduction
+
+NiftyCal is a software library to perform
+video camera calibration, and is largely based on OpenCV.
+
+NiftyCal provides:
+\li 2D and 3D structures that store each point along with its identifier.
+\li A simple IPoint2DDetector interface that all point detectors implement.
+\li A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids,
+<a href="http://github.com/NifTK/apriltags">AprilTags</a>, and template matching of dots and rings.
+\li Camera calibration using iterative refinement of control points, as in
+<a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>.
+\li Hand-eye calibration using a direct matrix multiplication method as in
+<a href="http://dx.doi.org/10.1109/TMI.2002.806597">Shahidi 2002</a>.
+\li Hand-eye calibration using linear least-squares as in
+<a href="http://dx.doi.org/10.1109/70.34770">Tsai 1989</a>.
+\li Hand-eye calibration using non-linear minimisation as in
+<a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
+\li Performance enhancements using OpenMP.
+\li Performance enhancements using CUDA for NVIDIA GPUs (coming soon).
+
+Further information can be obtained via
+
+\li <a href="https://www.mailinglists.ucl.ac.uk/mailman/listinfo/niftk-users">The users' mailing list</a>
+\li \subpage TechnicalManual
 
 */

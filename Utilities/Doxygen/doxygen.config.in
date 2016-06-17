@@ -286,8 +286,11 @@ EXCLUDE_PATTERNS      = *_p.h
 # directories that contain example code fragments that are included (see 
 # the \include command). 
 
-EXAMPLE_PATH     = 
-
+EXAMPLE_PATH     = @CMAKE_BINARY_DIR@/LICENSE.txt \
+                   @CMAKE_BINARY_DIR@/LICENSE_OpenCV.txt \
+                   @CMAKE_BINARY_DIR@/LICENSE_Eigen.txt \
+                   @CMAKE_BINARY_DIR@/LICENSE_AprilTags.txt \
+                   @CMAKE_BINARY_DIR@/LICENSE_ITK.txt \
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cxx 
