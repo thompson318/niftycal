@@ -21,7 +21,7 @@
 
 /**
 * \file niftkMatrixUtilities.h
-* \brief Various matrix related functions.
+* \brief Utilities for various matrix based functions.
 */
 namespace niftk
 {

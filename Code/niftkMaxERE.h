@@ -20,10 +20,10 @@
 
 /**
 * \file niftkMaxERE.h
-* \brief Functions to calculate MaxERE
+* \brief Functions to calculate MaxERE.
 *
-* See Algorithm 1, Richardson et al. IROS 2013,
-* http://dx.doi.org/10.1109/IROS.2013.6696595
+* See Algorithm 1, <a href="http://dx.doi.org/10.1109/IROS.2013.6696595">Richardson et al. IROS 2013</a>.
+*
 */
 namespace niftk
 {

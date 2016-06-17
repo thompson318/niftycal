@@ -22,7 +22,7 @@
 
 /**
 * \file niftkPointUtilities.h
-* \brief Defines various simple functions to process points.
+* \brief Utilities to process points.
 */
 namespace niftk
 {
