@@ -22,7 +22,9 @@ namespace niftk
 {
 
 /**
-* \brief RMS re-projection error for intrinsic, extrinsic, hand-eye and model-to-world optimisation.
+* \brief Computes cost as RMS re-projection error for extrinsic,
+* hand-eye and model-to-world optimisation, as an extension of
+* Malti 2013 http://dx.doi.org/10.1002/rcs.1478.
 *
 * \see niftk::NonLinearMaltiNDOFHandEyeOptimiser
 */

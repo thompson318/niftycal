@@ -1,0 +1,19 @@
+/**
+
+\page TechnicalManual The Technical Manual
+
+\section TechnicalManualIntro Introduction
+
+Welcome to the NiftyCal technical manual. This manual provides the detailed technical information
+for the platform and any further information can be obtained be joining:
+
+\li <a href="https://www.mailinglists.ucl.ac.uk/mailman/listinfo/niftk-users">the users' mailing list</a>
+
+The aim of providing this manual is to enable developers to understand the architecture, the code design, 
+layout and conventions, and to start coding and contributing to NiftyCal. Where necessary or informative 
+the design decisions will be explained in detail. It is however assumed that the reader is a good C++ developer.
+
+\section TechnicalManualTable Table Of Contents
+
+(coming soon).
+*/

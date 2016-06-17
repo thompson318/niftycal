@@ -25,11 +25,7 @@ namespace niftk
 
 /**
 * \brief Optimises camera intrinsic, hand-eye and model-to-world
-* as per Malti 2013 paper.
-*
-* Does non-linear (Levenberg-Marquart) optimisation as per Malti 2013
-* paper <a href="http://dx.doi.org/10.1002/rcs.1478">
-* Hand-eye and radial distortion calibration for rigid endoscopes</a>.
+* as per Malti 2013 http://dx.doi.org/10.1002/rcs.1478.
 *
 * \see niftk::NonLinearMaltiHandEyeCostFunction
 */

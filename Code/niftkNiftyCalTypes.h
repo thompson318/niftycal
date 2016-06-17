@@ -20,7 +20,7 @@
 #include <map>
 
 /**
-* \file niftkTypes.h
+* \file niftkNiftyCalTypes.h
 * \brief Defines types used in this library.
 */
 namespace niftk

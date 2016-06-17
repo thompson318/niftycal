@@ -2,7 +2,19 @@ NiftyCal
 ---------
 
 NiftyCal is a software library to perform
-video camera calibration, largely based on OpenCV.
+video camera calibration, and is largely based on OpenCV.
+
+NiftyCal provides:
+ - 2D and 3D structures that store each point along with its identifier.
+ - A simple IPoint2DDetector interface that all point detectors implement.
+ - A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids, AprilTags,
+   and template matching of [dots and rings][Dutta].
+ - Camera calibration using iterative refinement of control points, as in [Dutta 2009][Dutta].
+ - Hand-eye calibration using a direct matrix multiplication method as in [Shahidi 2002][Shahidi].
+ - Hand-eye calibration using linear least-squares as in [Tsai 1989][Tsai].
+ - Hand-eye calibration using non-linear minimisation as in [Malti 2013][Malti].
+ - Performance enhancements using OpenMP.
+ - Performance enhancements using CUDA for NVIDIA GPUs (coming soon).
 
 NiftyCal was developed by the [Centre for Medical Image Computing][cmic] at [University College London (UCL)][ucl].
 
@@ -33,6 +45,29 @@ NiftyCal is a cross-platform C++ library and officially supports:
  - Linux
 
 
+Build Instructions
+-----------------------------
+
+For developers:
+
+```
+git clone https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal.git
+mkdir NiftyCal-build
+cd NiftyCal-build
+cmake -DOpenCV_DIR:PATH=${OpenCV_DIR} -DEigen_DIR:PATH=${Eigen_DIR} -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
+```
+In addition, AprilTags is optional and can be specified with
+```
+-DAprilTags_DIRECTORY:PATH=${AprilTags_DIR}
+```
+and similarly, ITK is optional and can be specified with
+```
+-DITK_DIR:PATH=${ITK_DIR}
+```
+
+where these variable substitutions point to your installed version of these libraries.
+
+
 Branching Workflow
 ------------------
 
@@ -43,7 +78,7 @@ Branching Workflow
  3. Code on that branch.
  4. Push to remote when ready.
  5. Create merge request, and assign to Matt Clarkson.
- 6. Matt will merge to master and remove the feature branch when it looks ready.
+ 6. Matt will code review, merge to master and remove the feature branch when it looks ready.
 
 [cmic]: http://cmic.cs.ucl.ac.uk
 [ucl]: http://www.ucl.ac.uk
@@ -53,4 +88,8 @@ Branching Workflow
 [niftk]: http://www.niftk.org
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
 [matt]: http://www.mattclarkson.co.uk
-
+[April]: http://github.com/NifTK/apriltags
+[Dutta]: http://dx.doi.org/10.1109/ICCVW.2009.5457474
+[Shahidi]: http://dx.doi.org/10.1109/TMI.2002.806597
+[Tsai]: http://dx.doi.org/10.1109/70.34770
+[Malti]: http://dx.doi.org/10.1002/rcs.1478

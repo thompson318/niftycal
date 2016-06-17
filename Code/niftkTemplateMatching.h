@@ -22,6 +22,7 @@ namespace niftk
 {
 
 /**
+* \file niftkTemplateMatching.h
 * \brief Matches the template to the image around each starting point,
 * shifting the template window in a region given by the specified offset.
 */

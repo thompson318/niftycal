@@ -22,12 +22,8 @@ namespace niftk
 {
 
 /**
-* \brief RMS re-projection error for intrinsic, hand-eye and model-to-world
-* optimisation as per Malti 2013 paper.
-*
-* Cost function for non-linear optimisation as per Malti 2013
-* paper <a href="http://dx.doi.org/10.1002/rcs.1478">
-* Hand-eye and radial distortion calibration for rigid endoscopes</a>.
+* \brief Computes cost as RMS re-projection error for intrinsic, hand-eye and model-to-world
+* optimisation as per Malti 2013 http://dx.doi.org/10.1002/rcs.1478.
 *
 * \see niftk::NonLinearMaltiHandEyeOptimiser
 */
