@@ -23,8 +23,8 @@ namespace niftk
 
 /**
 * \class TemplateMatchingPointDetector
-* \brief Base class for template matching, as seen in Dutta 2009
-* http://dx.doi.org/10.1109/ICCVW.2009.5457474
+* \brief Base class for template matching, as seen in
+* <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>.
 *
 * This detector is not thread safe.
 */

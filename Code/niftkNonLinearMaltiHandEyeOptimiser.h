@@ -25,7 +25,7 @@ namespace niftk
 
 /**
 * \brief Optimises camera intrinsic, hand-eye and model-to-world
-* as per Malti 2013 http://dx.doi.org/10.1002/rcs.1478.
+* as per <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 *
 * \see niftk::NonLinearMaltiHandEyeCostFunction
 */

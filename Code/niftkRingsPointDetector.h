@@ -23,8 +23,8 @@ namespace niftk
 
 /**
 * \class RingsPointDetector
-* \brief Detects rings pattern, as seen in Dutta 2009
-* http://dx.doi.org/10.1109/ICCVW.2009.5457474
+* \brief Detects rings pattern, as seen in
+* <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>.
 *
 * This detector is not thread safe.
 */

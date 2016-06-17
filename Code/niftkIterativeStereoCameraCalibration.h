@@ -26,7 +26,7 @@ namespace niftk
 
 /**
 * \brief Given a list of images, performs iterative stereo camera calibration,
-* as an extension of Dutta 2009 http://dx.doi.org/10.1109/ICCVW.2009.5457474.
+* as an extension of <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474>Dutta 2009</a>.
 * \see niftk::StereoCameraCalibration
 * \return rms re-projection and 3D reconstruction error
 */
