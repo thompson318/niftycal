@@ -33,6 +33,29 @@ NiftyCal is a cross-platform C++ library and officially supports:
  - Linux
 
 
+Build Instructions
+-----------------------------
+
+For developers:
+
+```
+git clone https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal.git
+mkdir NiftyCal-build
+cd NiftyCal-build
+cmake -DOpenCV_DIR:PATH=${OpenCV_DIR} -DEigen_DIR:PATH=${Eigen_DIR} -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
+```
+In addition, AprilTags is optional and can be specified with
+```
+-DAprilTags_DIRECTORY:PATH=${AprilTags_DIR}
+```
+and similarly, ITK is optional and can be specified with
+```
+-DITK_DIR:PATH=${ITK_DIR}
+```
+
+where these variable substitutions point to your installed version of these libraries.
+
+
 Branching Workflow
 ------------------
 
@@ -43,7 +66,7 @@ Branching Workflow
  3. Code on that branch.
  4. Push to remote when ready.
  5. Create merge request, and assign to Matt Clarkson.
- 6. Matt will merge to master and remove the feature branch when it looks ready.
+ 6. Matt will code review, merge to master and remove the feature branch when it looks ready.
 
 [cmic]: http://cmic.cs.ucl.ac.uk
 [ucl]: http://www.ucl.ac.uk
@@ -53,4 +76,4 @@ Branching Workflow
 [niftk]: http://www.niftk.org
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
 [matt]: http://www.mattclarkson.co.uk
-
+[CMake]
