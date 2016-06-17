@@ -21,7 +21,7 @@
 
 /**
 * \file niftkIOUtilities.h
-* \brief Defines various simple functions to read/write points/models/matrices as plain text files.
+* \brief Utilities to read/write points/models/matrices as plain text files.
 *
 * If PointSet/Model3D has zero points, we read/write an empty file. Its not an error.
 */
