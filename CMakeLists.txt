@@ -120,6 +120,7 @@ configure_file(${CMAKE_SOURCE_DIR}/Documentation/Licenses/OpenCV.txt ${CMAKE_BIN
 configure_file(${CMAKE_SOURCE_DIR}/Documentation/Licenses/AprilTags.txt ${CMAKE_BINARY_DIR}/LICENSE_AprilTags.txt)
 configure_file(${CMAKE_SOURCE_DIR}/Documentation/Licenses/Eigen.txt ${CMAKE_BINARY_DIR}/LICENSE_Eigen.txt)
 configure_file(${CMAKE_SOURCE_DIR}/Documentation/Licenses/ITK.txt ${CMAKE_BINARY_DIR}/LICENSE_ITK.txt)
+configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/GenerateTestingReports.sh.in ${CMAKE_BINARY_DIR}/GenerateTestingReports.sh @ONLY )
 
 find_package(Eigen)
 if(Eigen_FOUND)

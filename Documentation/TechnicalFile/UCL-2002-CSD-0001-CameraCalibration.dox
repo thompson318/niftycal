@@ -55,10 +55,6 @@ REQ-2002-CSD-0001-002-01: The code shall pass static analysis checks.
 
 These functional requirements shall be expressed, each on a single line, for automatic parsing.
 
-REQ-2002-CSD-0001-003-01: If number of fixed points < 3, throw mitk::Exception.
-
-REQ-2002-CSD-0001-004-01: If number of moving points < 3, throw mitk::Exception.
-
 \section NiftyCalCSDDesign Design
 
 \subsection NiftyCalCSDArchitecture Architecture
