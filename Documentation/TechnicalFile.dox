@@ -1,0 +1,29 @@
+/**
+
+\page TechnicalFile The Technical File
+
+\tableofcontents
+
+\section TOCUsefulDocs General Documents
+
+\li \ref UCLCopyrightStatement
+\li \ref UCLDefinitionsAcronyms
+\li \ref UCLRequirementsTraceability
+\li \ref UCLReferences
+
+\section TOCProject Project Identifiers
+
+A four digit, with leading zeros, monotonically increasing identifier for
+each project, unique over all NifTK projects.
+
+\li 2002: Nifty Cal project
+
+\section TOCComponent Document Identifiers
+
+A four digit, with leading zeros, monotonically increasing identifier for
+each document, unique over all documents within this project.
+
+\li 0001: \ref NiftyCalCSD
+\li 0002: \ref NiftyCalSDP
+\li 0003: \ref NiftyCal62304
+*/

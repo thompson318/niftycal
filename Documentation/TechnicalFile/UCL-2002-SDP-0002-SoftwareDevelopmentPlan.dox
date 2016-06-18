@@ -1,0 +1,33 @@
+/**
+\page NiftyCalSDP Software Development Plan (SDP)
+\tableofcontents
+
+\section NiftyCalSDP Software Development Plan (SDP)
+
+<table>
+<tr><td>Document ID:</td><td>UCL-2002-CSD-0002-SoftwareDevelopmentPlan.dox</td></tr>
+<tr><td>Prepared By:</td><td>Matt Clarkson</td></tr>
+<tr><td>Authorised By:</td><td></td></tr>
+<tr><td>Last Modified:</td><td>18 Jun 2016</td></tr>
+</table>
+
+\subsection NiftyCalSDPPreamble Preamble
+
+\li \ref UCLCopyrightStatement
+\li \ref UCLDefinitionsAcronyms
+\li \ref UCLRequirementsTraceability
+\li \ref UCLReferences
+
+\subsection NiftyCalSDPHistory Revision History
+
+A brief summary of changes between authorised releases of this document is recorded here.
+This section only describes the changes between authorised published versions.
+
+<table>
+<tr><th>Version</th><th>Date</th><th>Author(s)</th><th>Change(s)</th><th>Sections Affected</th></tr>
+<tr><td>0.1</td><td>18 June 2015</td><td>Matt Clarkson</td><td>Initial Version</td><td>All</td></tr>
+</table>
+
+\section NiftyCalSDPIntro Introduction
+
+*/

@@ -74,11 +74,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
 * points to tracker points. So, for example, the user has a stationary
 * chessboard, and uses point based registration to register model coordinates
 * to the tracker coordinates.
-*
-* \param modelToTrackerTransform transform to convert model coordinates into tracker coordinates.
-* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
-* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
-* \return cv::Matx44d hand-eye matrix
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
     const cv::Matx44d&            modelToTrackerTransform,
@@ -92,10 +87,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
 * in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
-*
-* \param handMatrices matrices, synchronised with eyeMatrices, describing how the hand (tracker) moves.
-* \param eyeMatrices matrices, synchronised with handMatrices, describing how the eye (camera) moves.
-* \return cv::Matx44d hand-eye matrix
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d>& handMatrices,
