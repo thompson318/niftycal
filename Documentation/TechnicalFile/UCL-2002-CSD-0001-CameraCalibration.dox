@@ -42,23 +42,25 @@ This document defines the requirements, design and implementation.
 \subsection NiftyCalCSDGeneral General Description
 
 \section NiftyCalCSDRequirements Requirements
-\subsection NiftyCalCSDFuncReq Functional Requirements
-
-These functional requirements shall be expressed, each on a single line, for automatic parsing.
-
-REQ-3001-CSD-0001-001-01: If number of fixed points < 3, throw mitk::Exception.
-
-REQ-2001-CSD-0001-002-01: If number of moving points < 3, throw mitk::Exception.
 
 \subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
 
 These non-functional requirements shall be expressed, each on a single line, for automatic parsing.
 
-REQ-2001-CSD-0001-006-01: Point sets of 100,000 corresponding points must register in < 0.001 seconds.
+REQ-2002-CSD-0001-001-01: The code shall pass coding style checks.
 
-REQ-2001-CSD-0001-008-01: The PBRS shall be available as a Micro Service.
+REQ-2002-CSD-0001-002-01: The code shall pass static analysis checks.
+
+\subsection NiftyCalCSDFuncReq Functional Requirements
+
+These functional requirements shall be expressed, each on a single line, for automatic parsing.
+
+REQ-2002-CSD-0001-003-01: If number of fixed points < 3, throw mitk::Exception.
+
+REQ-2002-CSD-0001-004-01: If number of moving points < 3, throw mitk::Exception.
 
 \section NiftyCalCSDDesign Design
+
 \subsection NiftyCalCSDArchitecture Architecture
 
 \subsection NiftyCalCSDError Error Handling

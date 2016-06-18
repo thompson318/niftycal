@@ -16,7 +16,7 @@
 A four digit, with leading zeros, monotonically increasing identifier for
 each project, unique over all NifTK projects.
 
-\li 2002: Nifty Cal project
+\li 2002: NiftyCal project
 
 \section TOCComponent Document Identifiers
 
