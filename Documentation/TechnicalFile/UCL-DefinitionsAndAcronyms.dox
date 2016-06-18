@@ -1,0 +1,20 @@
+/**
+\page UCLDefinitionsAcronyms Definitions, Acronyms and Abbreviations
+
+<table>
+<tr><th>Term</th><th>Description</th></tr>
+<tr><td>shall</td><td>Wording used to indicate a requirement that must be fulfilled.</td></tr>
+<tr><td>should</td><td>Wording used to suggest a course of action that would be expected.
+It is never used to indicate a requirement that must be fulfilled.
+</td></tr>
+<tr><td>may</td><td>Wording used to suggest an optional course of action.
+It is never used to indicate a requirement that must be fulfilled.
+</td></tr>
+<tr><td>can</td><td>Wording used to indicate a possibility of, or ability to do something.
+It is never used to indicate a requirement that must be fulfilled.
+</td></tr>
+<tr><td>2D</td><td>two dimensional</td></tr>
+<tr><td>3D</td><td>three dimensional</td></tr>
+</table>
+
+*/

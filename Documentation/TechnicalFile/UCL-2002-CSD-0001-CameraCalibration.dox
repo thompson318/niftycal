@@ -1,0 +1,70 @@
+/**
+\page NiftyCalCSD Component Specificication Document (CSD)
+\tableofcontents
+
+\section NiftyCalCSD Component Specificication Document (CSD)
+
+<table>
+<tr><td>Document ID:</td><td>UCL-2002-CSD-0001-CameraCalibration.dox</td></tr>
+<tr><td>Prepared By:</td><td>Matt Clarkson</td></tr>
+<tr><td>Authorised By:</td><td></td></tr>
+<tr><td>Last Modified:</td><td>18 Jun 2016</td></tr>
+</table>
+
+\subsection NiftyCalCSDPreamble Preamble
+
+\li \ref UCLCopyrightStatement
+\li \ref UCLDefinitionsAcronyms
+\li \ref UCLRequirementsTraceability
+\li \ref UCLReferences
+
+\subsection NiftyCalCSDHistory Revision History
+
+A brief summary of changes between authorised releases of this document is recorded here.
+This section only describes the changes between authorised published versions.
+
+<table>
+<tr><th>Version</th><th>Date</th><th>Author(s)</th><th>Change(s)</th><th>Sections Affected</th></tr>
+<tr><td>0.1</td><td>18 June 2015</td><td>Matt Clarkson</td><td>Initial Version</td><td>All</td></tr>
+</table>
+
+\section NiftyCalCSDIntro Introduction
+
+The purpose of this Component Specification Document (CSD) is to describe the
+NiftyCal Camera Calibration Library.  It is intended to be read by those wanting
+to gain a technical understanding as to the fundamental requirements, design and
+implementation.  This document is not intended for end-users.
+
+\subsection NiftyCalCSDScope Scope
+
+This document defines the requirements, design and implementation.
+
+\subsection NiftyCalCSDGeneral General Description
+
+\section NiftyCalCSDRequirements Requirements
+
+\subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
+
+These non-functional requirements shall be expressed, each on a single line, for automatic parsing.
+
+REQ-2002-CSD-0001-001-01: The code shall pass coding style checks.
+
+REQ-2002-CSD-0001-002-01: The code shall pass static analysis checks.
+
+\subsection NiftyCalCSDFuncReq Functional Requirements
+
+These functional requirements shall be expressed, each on a single line, for automatic parsing.
+
+\section NiftyCalCSDDesign Design
+
+\subsection NiftyCalCSDArchitecture Architecture
+
+\subsection NiftyCalCSDError Error Handling
+
+\section NiftyCalCSDImpl Implementation
+
+\subsection NiftyCalCSDLogging Logging
+
+\subsection NiftyCalCSDClassesFunctions Classes and Functions
+
+*/

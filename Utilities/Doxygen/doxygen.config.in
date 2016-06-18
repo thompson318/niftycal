@@ -255,7 +255,7 @@ WARN_FORMAT           = "$file:$line: $text"
 # or directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT    = @CMAKE_SOURCE_DIR@/Code @CMAKE_BINARY_DIR@/Doxygen
+INPUT    = @CMAKE_SOURCE_DIR@/Documentation @CMAKE_SOURCE_DIR@/Code @CMAKE_BINARY_DIR@/Doxygen
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cxx 

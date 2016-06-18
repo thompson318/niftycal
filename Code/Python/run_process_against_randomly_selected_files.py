@@ -1,36 +1,25 @@
 #!/usr/bin/env python
 
-import os
 import sys
 import subprocess
+import niftk_file_utils as niftk
 from random import sample
 
-if len(sys.argv) < 5:
-    print 'Usage: launch_point_calibration_test.py dirName numberOfSamples endsWith [command]'
+if len(sys.argv) < 6:
+    print 'Usage: run_process_against_randomly_selected_files.py dirName endsWith minimumNumberLinesInFile numberOfSamples command'
     exit()
 
-def file_len(fname):
-    p = subprocess.Popen(['wc', '-l', fname], stdout=subprocess.PIPE, 
-                                              stderr=subprocess.PIPE)
-    result, err = p.communicate()
-    if p.returncode != 0:
-        raise IOError(err)
-    return int(result.strip().split()[0])
-
-# Get all bmp files in the specified path.
-fileNames = []
-for f in os.listdir(sys.argv[1]):
-    if f.endswith(sys.argv[3]) and file_len(f) > 50:
-        fileNames.append(f)
+# Get all files in the specified path.
+file_names = niftk.get_files_by_name_and_line_count(sys.argv[1], sys.argv[2], sys.argv[3])
 
 # Get a sample of file indexes.
-fileSamples = sample(range(0, len(fileNames)), int(sys.argv[2]))
-fileSamples.sort()
+file_samples = sample(range(0, len(file_names)), int(sys.argv[4]))
+file_samples.sort()
 
 # Now select the file names.
-selectedFileNames = []
-for f in fileSamples:
-    selectedFileNames.append(fileNames[f])
+selected_file_names = []
+for f in file_samples:
+    selected_file_names.append(file_names[f])
 
 # Sort out command
 command = sys.argv
@@ -38,7 +27,8 @@ command.pop(0)
 command.pop(0)
 command.pop(0)
 command.pop(0)
-command.extend(selectedFileNames)
+command.pop(0)
+command.extend(selected_file_names)
 
 # Now run process.
-returnCode = subprocess.call(command)
+return_code = subprocess.call(command)
