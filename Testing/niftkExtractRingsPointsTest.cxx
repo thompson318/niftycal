@@ -32,10 +32,6 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     REQUIRE( niftk::argc <= 17);
   }
 
-  for (int i = 0; i < niftk::argc; i++)
-  {
-    std::cerr << "Args are: i=" << i << ":" << niftk::argv[i] << std::endl;
-  }
   cv::Mat image = cv::imread(niftk::argv[1]);
   cv::Mat referenceImage = cv::imread(niftk::argv[2]);
   std::string referencePointsFileName = niftk::argv[3];
