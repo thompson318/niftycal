@@ -115,29 +115,6 @@ add_test(REQ-2002-CSD-0001-002-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardC
   ${DATA_DIR}/Laparoscope/Left/left-798.png
 )
 
-# For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for right camera,
-# but there is no gold standard, so we just use this test as a regression test.
-add_test(CalibLapMonoRight ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
-  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
-  14 10                                          # internal corners
-  0.610067                                       # RMS
-  2030.46 2046.25 1046.24 552.077                # intrinsic
-  -0.20807 -0.497051 -0.00654118 0.000343286     # distortion
-  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
-  0.01                                           # fxTol, so we expect OpenCV to work out fx,fy accurate to 0.01 as this is a regression test, and we have specified the result.
-  0.01                                           # fyTol, so we expect OpenCV to work out cx,cy accurate to 0.01 as this is a regression test, and we have specified the result.
-  0.01                                           # distTol, so we expect OpenCV to work out distortion, accurate to 0.01 as this is a regression test, and we have specified the result.
-  ${DATA_DIR}/Laparoscope/Right/right-1095.png
-  ${DATA_DIR}/Laparoscope/Right/right-1338.png
-  ${DATA_DIR}/Laparoscope/Right/right-1884.png
-  ${DATA_DIR}/Laparoscope/Right/right-2520.png
-  ${DATA_DIR}/Laparoscope/Right/right-3083.png
-  ${DATA_DIR}/Laparoscope/Right/right-3335.png
-  ${DATA_DIR}/Laparoscope/Right/right-3685.png
-  ${DATA_DIR}/Laparoscope/Right/right-4848.png
-  ${DATA_DIR}/Laparoscope/Right/right-798.png
-)
-
 
 add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
