@@ -69,13 +69,17 @@ repeated here.
 
 These functional requirements shall be expressed, each on a single line, for automatic parsing.
 
-REQ-2002-CSD-0001-001-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's mono calibration with fixed, zero distortion parameters, and OpenCV shall return intrinsic fx,fy accurate to 1.0, cx,cy accurate to 1.5 and distortion params accurate to 0.001.
+REQ-2002-CSD-0001-001-01: Failure to extract a chessboard from a non chessboard image shall not throw an exception.
 
-REQ-2002-CSD-0001-002-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's mono calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+REQ-2002-CSD-0001-013-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's mono calibration with fixed, zero distortion parameters, and OpenCV shall return intrinsic fx,fy accurate to 1.0, cx,cy accurate to 1.5 and distortion params accurate to 0.001.
 
-REQ-2002-CSD-0001-003-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's stereo calibration with fixed, zero distortion parameters, and OpenCV shall return rotation parameters accurate to 0.1, and translation parameters accurate to 0.8.
+REQ-2002-CSD-0001-014-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's mono calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
 
-REQ-2002-CSD-0001-004-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+REQ-2002-CSD-0001-015-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's stereo calibration with fixed, zero distortion parameters, and OpenCV shall return rotation parameters accurate to 0.1, and translation parameters accurate to 0.8.
+
+REQ-2002-CSD-0001-016-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+
+
 
 \subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
 
