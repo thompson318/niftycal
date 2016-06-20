@@ -110,6 +110,7 @@ int main(int argc, char ** argv)
 
       niftk::ChessboardPointDetector detector(corners);
       detector.SetImage(&greyImage);
+      detector.SetImageScaleFactor(scaleFactors);
       pointSet = detector.GetPoints();
 
       if (pointSet.size() > 0)
