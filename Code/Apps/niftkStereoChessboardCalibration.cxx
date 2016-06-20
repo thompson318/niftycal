@@ -66,7 +66,15 @@ int main(int argc, char ** argv)
     cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
 
     float rescaleX = atof(argv[4]);
+    if (rescaleX < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
     float rescaleY = atof(argv[5]);
+    if (rescaleY < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
 
     cv::Point2d scaleFactors;
     scaleFactors.x = rescaleX;

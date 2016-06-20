@@ -49,12 +49,31 @@ int main(int argc, char ** argv)
       return EXIT_FAILURE;
     }
 
-    std::string modelFile = argv[1];
+    std::string modelFileName = argv[1];
+    niftk::Model3D model = niftk::LoadModel3D(modelFileName);
+
     std::string referenceImageFile = argv[2];
+    cv::Mat referenceImage = cv::imread(referenceImageFile);
+    cv::Mat referenceImageGreyScale;
+    cv::cvtColor(referenceImage, referenceImageGreyScale, CV_BGR2GRAY);
+
     std::string referencePointsFile = argv[3];
+    std::pair< cv::Mat, niftk::PointSet> referenceImageData;
+    referenceImageData.first = referenceImageGreyScale;
+    referenceImageData.second = niftk::LoadPointSet(referencePointsFile);
+
     std::string tagFamily = argv[4];
     float rescaleX = atof(argv[5]);
+    if (rescaleX < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
     float rescaleY = atof(argv[6]);
+    if (rescaleY < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
+
     int   zeroDistortion = atoi(argv[7]);
 
     cv::Point2d scaleFactors;
@@ -62,15 +81,6 @@ int main(int argc, char ** argv)
     scaleFactors.y = rescaleY;
 
     cv::Size2i imageSize;
-    niftk::Model3D model = niftk::LoadModel3D(modelFile);
-
-    cv::Mat referenceImage = cv::imread(referenceImageFile);
-    cv::Mat referenceImageGreyScale;
-    cv::cvtColor(referenceImage, referenceImageGreyScale, CV_BGR2GRAY);
-
-    std::pair< cv::Mat, niftk::PointSet> referenceImageData;
-    referenceImageData.first = referenceImageGreyScale;
-    referenceImageData.second = niftk::LoadPointSet(referencePointsFile);
 
     std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImagesLeft;
     std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarpingLeft;
@@ -126,6 +136,19 @@ int main(int argc, char ** argv)
         imagesForWarpingRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
         dynamic_cast<niftk::AprilTagsPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
       }
+    }
+
+    if (originalImagesLeft.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No left hand camera images available.";
+    }
+    if (originalImagesRight.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No right hand camera points available.";
+    }
+    if (originalImagesLeft.size() != originalImagesRight.size())
+    {
+      niftkNiftyCalThrow() << "Different number of views for left and right camera.";
     }
 
     int flags = 0;
