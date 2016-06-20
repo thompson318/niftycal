@@ -214,17 +214,17 @@ void TriangulatePointPairs(
     }
   }
 
-  cv::Mat u1    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u1t   = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2t   = cv::Mat(3, 1, CV_64FC1);
-
-  cv::Point3d u1p, u2p;  // Normalised image coordinates. (i.e. relative to a principal
-                         // point of zero, and in millimetres not pixels).
-  cv::Point3d r;         // the output 3D point, in reference frame of left camera.
-
-  #pragma omp parallel private(u1), private(u2), private(u1t), private(u2t), private(u1p), private(u2p), private(r), shared(leftCameraUndistortedPoints), shared(rightCameraUndistortedPoints), shared(P1d), shared(P2d)
+  #pragma omp parallel shared(leftCameraUndistortedPoints), shared(rightCameraUndistortedPoints), shared(P1d), shared(P2d)
   {
+    cv::Mat u1    = cv::Mat(3, 1, CV_64FC1);
+    cv::Mat u2    = cv::Mat(3, 1, CV_64FC1);
+    cv::Mat u1t   = cv::Mat(3, 1, CV_64FC1);
+    cv::Mat u2t   = cv::Mat(3, 1, CV_64FC1);
+
+    cv::Point3d u1p, u2p;  // Normalised image coordinates. (i.e. relative to a principal
+                           // point of zero, and in millimetres not pixels).
+    cv::Point3d r;         // the output 3D point, in reference frame of left camera.
+
     #pragma omp for
     for (int i = 0; i < numberOfPoints; i++)
     {
