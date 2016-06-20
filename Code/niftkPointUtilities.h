@@ -27,6 +27,10 @@
 namespace niftk
 {
 
+NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b);
+
+NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point2d& a, const cv::Point2d& b);
+
 /**
 * \brief Creates a new copy of the input list.
 */
@@ -42,11 +46,6 @@ NIFTYCAL_WINEXPORT void CopyPointsInto(const PointSet& a, PointSet& b);
 * \param scaleFactor contains a multiplier for x and y.
 */
 NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor);
-
-/**
-* \brief Method to check if a point detector is outputting sub-pixel coordinates.
-*/
-NIFTYCAL_WINEXPORT bool PointSetContainsNonIntegerPositions(const PointSet& p);
 
 /**
 * \brief Converts PointSet to vector for many OpenCV functions.
@@ -105,6 +104,17 @@ NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const Model3
                                                                     cv::Point3d& sumSquaredError,
                                                                     cv::Point3d& rmsForEachAxis
                                                                    );
+
+/**
+* \brief Method to check if a PointSet contains sub-pixel coordinates.
+*/
+NIFTYCAL_WINEXPORT bool PointSetContainsNonIntegerPositions(const PointSet& p);
+
+/**
+* \brief Checks that a and b contain the same number of points, with matching
+* identifiers, and the 3D location of these points is within some tolerance (i.e Eucliden distance).
+*/
+NIFTYCAL_WINEXPORT bool MatchesToWithinTolerance(const PointSet& a, const PointSet& b, const double& tolerance);
 
 /**
 * \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).

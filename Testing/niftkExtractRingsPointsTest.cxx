@@ -15,6 +15,7 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 #include <niftkRingsPointDetector.h>
 #include <niftkNiftyCalExceptionMacro.h>
 
@@ -24,11 +25,11 @@
 
 TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
-  if (niftk::argc != 12 && niftk::argc != 13 && niftk::argc != 14)
+  if (niftk::argc != 13 && niftk::argc != 14 && niftk::argc != 15)
   {
-    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn maxArea method tolerance [expectedPoints] [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 12);
-    REQUIRE( niftk::argc <= 14);
+    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberPoints maxArea method tolerance [expectedPoints] [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 13);
+    REQUIRE( niftk::argc <= 15);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -39,9 +40,10 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   int expectedHeight = atoi(niftk::argv[6]);
   int ringsInX = atoi(niftk::argv[7]);
   int ringsInY = atoi(niftk::argv[8]);
-  unsigned long int maxArea = atoi(niftk::argv[9]);
-  int method = atoi(niftk::argv[10]);
-  double tolerance = atof(niftk::argv[11]);
+  int expectedNumberOfRings = atoi(niftk::argv[9]);
+  unsigned long int maxArea = atoi(niftk::argv[10]);
+  int method = atoi(niftk::argv[11]);
+  double tolerance = atof(niftk::argv[12]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -81,45 +83,34 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     detector.SetUseTemplateMatching(true);
   }
 
-  niftk::PointSet points = detector.GetPoints();
-  REQUIRE( points.size() == ringsInX * ringsInY );
+  niftk::PointSet points;
 
-  if (niftk::argc >= 13 && points.size() > 0)
+  if (expectedNumberOfRings == 0)
   {
-    std::string expectedPointsFileName = niftk::argv[12];
+    REQUIRE_NOTHROW(points = detector.GetPoints());
+  }
+  else
+  {
+    points = detector.GetPoints();
+    REQUIRE( points.size() == ringsInX * ringsInY );
+  }
+  REQUIRE( points.size() == expectedNumberOfRings );
+
+  if (niftk::argc >= 14 && points.size() > 0)
+  {
+    std::string expectedPointsFileName = niftk::argv[13];
 
     if (expectedPointsFileName != "dummy")
     {
       niftk::PointSet expectedPoints = niftk::LoadPointSet(expectedPointsFileName);
       REQUIRE( expectedPoints.size() == ringsInX * ringsInY );
-
-      // check expected points
-      niftk::PointSet::const_iterator iter;
-      niftk::PointSet::const_iterator actualIter;
-
-      for (iter = expectedPoints.begin();
-           iter != expectedPoints.end();
-           ++iter
-           )
-      {
-        niftk::Point2D exp = (*iter).second;
-        actualIter = points.find((*iter).first);
-
-        if (actualIter == points.end())
-        {
-          niftkNiftyCalThrow() << "Failed to find point:" << (*iter).first;
-        }
-
-        niftk::Point2D actual = (*actualIter).second;
-        REQUIRE(fabs((*iter).second.point.x - (*actualIter).second.point.x) < tolerance);
-        REQUIRE(fabs((*iter).second.point.y - (*actualIter).second.point.y) < tolerance);
-      }
+      REQUIRE(niftk::MatchesToWithinTolerance(points, expectedPoints, tolerance));
     }
   }
 
-  if (niftk::argc >= 14 && points.size() > 0)
+  if (niftk::argc >= 15 && points.size() > 0)
   {
-    std::string outputFile = niftk::argv[13];
+    std::string outputFile = niftk::argv[14];
     niftk::SavePointSet(points, outputFile);
   }
 }

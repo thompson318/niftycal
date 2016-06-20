@@ -76,12 +76,12 @@ add_test(REQ-2002-CSD-0001-005-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTag
 add_test(REQ-2002-CSD-0001-006-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8-500border-smaller.png 25h7 1 1 1079 973 72 0)
 
 # Rings
-add_test(ExtRings1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 8496 6372 10 7 260000 1 0.1 ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt )
-add_test(ExtRings2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 720 480 10 7 10000 0 2.0 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_test.txt)
-add_test(ExtRings3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1400 1050 10 7 260000 1 0.1 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt)
+add_test(REQ-2002-CSD-0001-007-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1280 1024 10 7 0 10000  0 2.0)
+add_test(REQ-2002-CSD-0001-008-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1280 1024 10 7 0 260000 1 0.1)
+add_test(REQ-2002-CSD-0001-009-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1400 1050 10 7 70 260000 1 0.1 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt)
 
 # Test the performance of the underlying OpenCV mono calibration.
-add_test(REQ-2002-CSD-0001-009-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
+add_test(REQ-2002-CSD-0001-010-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt
   14 10
   0.298669                                       # expected RMS, for regression testing purposes.
@@ -104,7 +104,7 @@ add_test(REQ-2002-CSD-0001-009-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardC
 
 # For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera,
 # but there is no gold standard, so we just use this test as a regression test.
-add_test(REQ-2002-CSD-0001-010-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
+add_test(REQ-2002-CSD-0001-011-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   0.577703                                       # RMS
@@ -125,8 +125,7 @@ add_test(REQ-2002-CSD-0001-010-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardC
   ${DATA_DIR}/Laparoscope/Left/left-798.png
 )
 
-
-add_test(REQ-2002-CSD-0001-011-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+add_test(REQ-2002-CSD-0001-012-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   0 0 0                                          # rvec
@@ -152,8 +151,7 @@ add_test(REQ-2002-CSD-0001-011-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
   ${DATA_DIR}/Simulation2/Right8.png
 )
 
-
-add_test(REQ-2002-CSD-0001-012-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   -0.0198931 0.0402461 0.000409826               # rvec
@@ -337,6 +335,37 @@ add_test(CalibIterMonoCMU2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboar
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img5.bmp
 )
 
+add_test(CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoAprilTagsCameraCalibrationTest
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
+  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
+  0                                                         # zero distortion (1==true)
+  1 2                                                       # Simulation has proper scale factors
+  0.642218                                                  # RMS
+  1747.17 870.803 894.99 236.136                            # intrinsic
+  -0.331478 0.316505 0.00741399 -0.00205115                 # distortion
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252090016800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252154020400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252458038000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230253498097400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230256554272200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257324316200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257658335200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257722339000_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230260762512800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230271146106800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230274842318200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230280181623600_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230284714882800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296106534400_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296330547200_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296794573800_left.bmp
+  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230320793946400_left.bmp
+)
+
 # Now try iterative on AprilTags.
 add_test(CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
@@ -417,36 +446,61 @@ add_test(CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStere
   ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230320793946400_right.bmp
 )
 
-add_test(CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoAprilTagsCameraCalibrationTest
-  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
-  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
-  ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
-  0                                                         # zero distortion (1==true)
-  1 2                                                       # Simulation has proper scale factors
-  0.642218                                                  # RMS
-  1747.17 870.803 894.99 236.136                            # intrinsic
-  -0.331478 0.316505 0.00741399 -0.00205115                 # distortion
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252090016800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252154020400_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252458038000_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230253498097400_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230256554272200_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257324316200_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257658335200_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230257722339000_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230260762512800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230271146106800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230274842318200_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230280181623600_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230284714882800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296106534400_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296330547200_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230296794573800_left.bmp
-  ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230320793946400_left.bmp
+add_test(CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+  1                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/circles_10_7.png                      # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gcircleFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0171658                                             # RMS
+  1149.72 1149.72 359.545 239.527                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718669 0.204146 0.000387022 2.4678e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_-15_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_-15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_15_0_-5_.bmp
 )
+
+add_test(CalibIterMonoRingsSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+  0                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0129552                                             # RMS
+  1150.11 1150.1 359.568 239.511                        # intrinsic (should be 1150, 1150, 360.5, 240.5)
+  -0.718422 0.194674 0.000395073 1.73756e-05            # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_15_-5_.bmp
+  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_15_0_-5_.bmp
+)
+
+
+add_test(CalibIterMonoRingsReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+  0                                                     # Method (0==rings, 1==circles)
+  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
+  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
+  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
+  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
+  10 7                                                  # number rings
+  0                                                     # zero distortion (1==true)
+  0.0658565                                             # RMS
+  841.847 841.146 511.589 362.415                       # intrinsic
+  -0.439364 0.325313 0.0012054 -0.000253661             # distortion
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img1.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img2.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img3.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img4.bmp
+  ${DATA_DIR}/CMU/TestRealImage/ring/1/img5.bmp
+)
+
 
 add_test(CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandEyeCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
@@ -518,58 +572,4 @@ add_test(CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandEyeCa
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/30.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
-)
-
-add_test(CalibIterMonoRingsSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
-  0                                                     # Method (0==rings, 1==circles)
-  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
-  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
-  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
-  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
-  10 7                                                  # number rings
-  0                                                     # zero distortion (1==true)
-  0.0129552                                             # RMS
-  1150.11 1150.1 359.568 239.511                        # intrinsic (should be 1150, 1150, 360.5, 240.5)
-  -0.718422 0.194674 0.000395073 1.73756e-05            # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
-  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_-15_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_0_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_0_15_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_15_0_-5_.bmp
-)
-
-add_test(CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
-  1                                                     # Method (0==rings, 1==circles)
-  ${DATA_DIR}/CMU/circles_10_7.png                      # Model image
-  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
-  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
-  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gcircleFilter.bmp # Template
-  10 7                                                  # number rings
-  0                                                     # zero distortion (1==true)
-  0.0171658                                             # RMS
-  1149.72 1149.72 359.545 239.527                       # intrinsic (should be 1150, 1150, 360.5, 240.5)
-  -0.718669 0.204146 0.000387022 2.4678e-05             # distortion (should be -0.7, -0.3, 0.0004, 0.00005)
-  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_-15_0_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_-15_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_0_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_0_15_-5_.bmp
-  ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_15_0_-5_.bmp
-)
-
-add_test(CalibIterMonoRingsReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
-  0                                                     # Method (0==rings, 1==circles)
-  ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
-  ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
-  ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt              # 2D points for reference image
-  ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp # Template
-  10 7                                                  # number rings
-  0                                                     # zero distortion (1==true)
-  0.0658565                                             # RMS
-  841.847 841.146 511.589 362.415                       # intrinsic
-  -0.439364 0.325313 0.0012054 -0.000253661             # distortion
-  ${DATA_DIR}/CMU/TestRealImage/ring/1/img1.bmp
-  ${DATA_DIR}/CMU/TestRealImage/ring/1/img2.bmp
-  ${DATA_DIR}/CMU/TestRealImage/ring/1/img3.bmp
-  ${DATA_DIR}/CMU/TestRealImage/ring/1/img4.bmp
-  ${DATA_DIR}/CMU/TestRealImage/ring/1/img5.bmp
 )

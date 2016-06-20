@@ -16,11 +16,31 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include <Internal/niftkTriangulationUtilities_p.h>
+#include "niftkNiftyCalTypes.h"
 #include <queue>
 #include <vector>
 #include <functional>
 
 namespace niftk {
+
+//-----------------------------------------------------------------------------
+double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b)
+{
+  return sqrt(  (a.x - b.x) * (a.x - b.x)
+              + (a.y - b.y) * (a.y - b.y)
+              + (a.z - b.z) * (a.z - b.z)
+             );
+}
+
+
+//-----------------------------------------------------------------------------
+double DistanceBetween(const cv::Point2d& a, const cv::Point2d& b)
+{
+  return sqrt(  (a.x - b.x) * (a.x - b.x)
+              + (a.y - b.y) * (a.y - b.y)
+             );
+}
+
 
 //-----------------------------------------------------------------------------
 PointSet CopyPoints(const PointSet& p)
@@ -86,6 +106,37 @@ bool PointSetContainsNonIntegerPositions(const PointSet& points)
     }
   }
   return containsNonIntegerPoints;
+}
+
+
+//-----------------------------------------------------------------------------
+bool MatchesToWithinTolerance(const PointSet& a, const PointSet& b, const double& tolerance)
+{
+  if (a.size() != b.size())
+  {
+    return false;
+  }
+  else
+  {
+    niftk::PointSet::const_iterator iter;
+    for (iter = a.begin(); iter != a.end(); ++iter)
+    {
+      niftk::NiftyCalIdType id = (*iter).first;
+      niftk::PointSet::const_iterator bIter = b.find(id);
+      if (bIter == b.end())
+      {
+        return false;
+      }
+      cv::Point2d ap = (*iter).second.point;
+      cv::Point2d bp = (*bIter).second.point;
+      double distance = niftk::DistanceBetween(ap, bp);
+      if (distance > tolerance)
+      {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 

@@ -56,12 +56,12 @@ repeated here.
 
 \subsection NiftyCalCSDReferences References
 
-\li [1] <a href="link">Zhang</a>
-\li [2] <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>
-\li [3] <a href="link">OpenCV camera calibration book</a>
-\li [4] <a href="http://dx.doi.org/10.1109/TMI.2002.806597">Shahidi 2002</a>
-\li [5] <a href="http://dx.doi.org/10.1109/70.34770">Tsai 1989</a>
-\li [6] <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>
+\li [1] <a href="http://dx.doi.org/10.1109/34.888718">Zhang 2000: A flexible new technique for camera calibration</a>.
+\li [2] <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009: Accurate camera calibration by iterative refinement of control points</a>.
+\li [3] <a href="http://opencv.org/books.html">Bradski 2008: Learning OpenCV</a>
+\li [4] <a href="http://dx.doi.org/10.1109/TMI.2002.806597">Shahidi 2002: Implementation, calibration and accuracy testing of an image-enhanced endoscopy system</a>.
+\li [5] <a href="http://dx.doi.org/10.1109/70.34770">Tsai 1989: A new technique for fully autonomous and efficient 3D robotics hand/eye calibration</a>.
+\li [6] <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013: Hand–eye and radial distortion calibration for rigid endoscopes</a>.
 
 \section NiftyCalCSDRequirements Requirements
 
@@ -81,13 +81,19 @@ REQ-2002-CSD-0001-005-01: Failure to extract an AprilTags pattern from an image 
 
 REQ-2002-CSD-0001-006-01: AprilTags detection shall return sub-pixel corner locations.
 
-REQ-2002-CSD-0001-009-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's mono calibration with fixed, zero distortion parameters, and OpenCV shall return intrinsic fx,fy accurate to 1.0, cx,cy accurate to 1.5 and distortion params accurate to 0.001.
+REQ-2002-CSD-0001-007-01: Failure to extract the Rings pattern (see Dutta 2009 [2]), using contours, from an image that does not contain one shall not throw an exception.
 
-REQ-2002-CSD-0001-010-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's mono calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+REQ-2002-CSD-0001-008-01: Failure to extract the Rings pattern (see Dutta 2009 [2]), using contours and template matching, from an image that does not contain one shall not throw an exception.
 
-REQ-2002-CSD-0001-011-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's stereo calibration with fixed, zero distortion parameters, and OpenCV shall return rotation parameters accurate to 0.1, and translation parameters accurate to 0.8.
+REQ-2002-CSD-0001-009-01: The detection of the Rings pattern (see Dutta 2009 [2]) shall return sub-pixel corner locations.
 
-REQ-2002-CSD-0001-012-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+REQ-2002-CSD-0001-010-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's mono calibration with fixed, zero distortion parameters, and OpenCV shall return intrinsic fx,fy accurate to 1.0, cx,cy accurate to 1.5 and distortion params accurate to 0.001.
+
+REQ-2002-CSD-0001-011-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's mono calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+
+REQ-2002-CSD-0001-012-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's stereo calibration with fixed, zero distortion parameters, and OpenCV shall return rotation parameters accurate to 0.1, and translation parameters accurate to 0.8.
+
+REQ-2002-CSD-0001-013-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
 
 \subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
 
