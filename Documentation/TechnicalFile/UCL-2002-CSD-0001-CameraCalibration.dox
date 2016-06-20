@@ -81,9 +81,9 @@ REQ-2002-CSD-0001-004-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm mo
 
 These non-functional requirements shall be expressed, each on a single line, for automatic parsing.
 
-REQ-2002-CSD-0001-101-01: The code shall pass coding style checks.
+REQ-2002-CSD-0001-101-01: The code shall pass coding style checks, as defined in ```NiftyCal/Utilities/KWStyle/NiftyCalKWS.xml.in```
 
-REQ-2002-CSD-0001-102-01: The code shall pass static analysis checks.
+REQ-2002-CSD-0001-102-01: The code shall pass static analysis checks, as defined by CppCheck.
 
 \section NiftyCalCSDDesign Design
 
