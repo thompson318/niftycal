@@ -26,10 +26,10 @@
 
 TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  15;
+  int expectedMinimumNumberOfArguments =  19;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest modelFileName cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkMonoChessboardCameraCalibrationTest modelFileName cornersInX cornersInY eRMS eFx eFy eCx eCy eK1 eK2 eP1 eP2 zeroDist fxTolerance cxTolerance distortionTolerance image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
@@ -45,6 +45,10 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   float eK2 = atof(niftk::argv[10]);
   float eP1 = atof(niftk::argv[11]);
   float eP2 = atof(niftk::argv[12]);
+  int zeroDistortion = atoi(niftk::argv[13]);
+  float fxTol = atof(niftk::argv[14]);
+  float cxTol = atof(niftk::argv[15]);
+  float distTol = atof(niftk::argv[16]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -66,7 +70,7 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::list<niftk::PointSet> listOfPoints;
   cv::Size2i imageSize;
 
-  for (int i = 13; i < niftk::argc; i++)
+  for (int i = 17; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
@@ -90,6 +94,15 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
   REQUIRE( listOfPoints.size() >= 2 );
 
+  int flags = 0;
+  if (zeroDistortion == 1)
+  {
+    flags = cv::CALIB_ZERO_TANGENT_DIST
+        | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
+        | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
+        | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6;
+  }
+
   cv::Mat intrinsic;
   cv::Mat distortion;
   std::vector<cv::Mat> rvecs;
@@ -101,7 +114,8 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
                                             intrinsic,
                                             distortion,
                                             rvecs,
-                                            tvecs
+                                            tvecs,
+                                            flags
                                             );
 
   std::cout << "RMS=" << rms << std::endl;
@@ -114,14 +128,13 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
 
-  double tolerance = 0.005;
   REQUIRE( fabs(rms - eRMS) < 0.001 );
-  REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(1,1) - eFy) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(0,2) - eCx) < tolerance );
-  REQUIRE( fabs(intrinsic.at<double>(1,2) - eCy) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,0) - eK1) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < tolerance );
-  REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < tolerance );
+  REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < fxTol );
+  REQUIRE( fabs(intrinsic.at<double>(1,1) - eFy) < fxTol );
+  REQUIRE( fabs(intrinsic.at<double>(0,2) - eCx) < cxTol );
+  REQUIRE( fabs(intrinsic.at<double>(1,2) - eCy) < cxTol );
+  REQUIRE( fabs(distortion.at<double>(0,0) - eK1) < distTol );
+  REQUIRE( fabs(distortion.at<double>(0,1) - eK2) < distTol );
+  REQUIRE( fabs(distortion.at<double>(0,2) - eP1) < distTol );
+  REQUIRE( fabs(distortion.at<double>(0,3) - eP2) < distTol );
 }

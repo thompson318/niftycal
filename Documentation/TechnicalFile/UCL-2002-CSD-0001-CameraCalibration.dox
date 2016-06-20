@@ -2,7 +2,7 @@
 \page NiftyCalCSD Component Specification Document (CSD)
 \tableofcontents
 
-\section NiftyCalCSD Component Specification Document (CSD)
+\section NiftyCalCSDDoc Component Specification Document (CSD)
 
 <table>
 <tr><td>Document ID:</td><td>UCL-2002-CSD-0001-CameraCalibration.dox</td></tr>
@@ -41,19 +41,49 @@ This document defines the requirements, design and implementation.
 
 \subsection NiftyCalCSDGeneral General Description
 
+The aim of this software library is to establish a geometric model of a camera,
+as is common in the computer vision literature[1, 2]. We use the model described by OpenCV [3].
+The general procedure is to take several pictures of a stationary calibration
+pattern, extract 2D features from each image, and fit a 3D-2D camera model
+to match the 3D model points to the observed 2D feature points.
+
+OpenCV [3] provides an implementation of Zhang's [1] popular method. This library
+additionally implements Dutta's iterative control point optimisation [2] and various
+hand-eye calibration methods [4, 5, 6].
+
+We assume the reader has read all the referenced papers as the information is not
+repeated here.
+
+\subsection NiftyCalCSDReferences References
+
+\li [1] <a href="link">Zhang</a>
+\li [2] <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>
+\li [3] <a href="link">OpenCV camera calibration book</a>
+\li [4] <a href="http://dx.doi.org/10.1109/TMI.2002.806597">Shahidi 2002</a>
+\li [5] <a href="http://dx.doi.org/10.1109/70.34770">Tsai 1989</a>
+\li [6] <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>
+
 \section NiftyCalCSDRequirements Requirements
+
+\subsection NiftyCalCSDFuncReq Functional Requirements
+
+These functional requirements shall be expressed, each on a single line, for automatic parsing.
+
+REQ-2002-CSD-0001-001-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's mono calibration with fixed, zero distortion parameters, and OpenCV shall return intrinsic fx,fy accurate to 1.0, cx,cy accurate to 1.5 and distortion params accurate to 0.001.
+
+REQ-2002-CSD-0001-002-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's mono calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
+
+REQ-2002-CSD-0001-003-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and simulated (rendered data), we test OpenCV's stereo calibration with fixed, zero distortion parameters, and OpenCV shall return rotation parameters accurate to 0.1, and translation parameters accurate to 0.8.
+
+REQ-2002-CSD-0001-004-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
 
 \subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
 
 These non-functional requirements shall be expressed, each on a single line, for automatic parsing.
 
-REQ-2002-CSD-0001-001-01: The code shall pass coding style checks.
+REQ-2002-CSD-0001-101-01: The code shall pass coding style checks.
 
-REQ-2002-CSD-0001-002-01: The code shall pass static analysis checks.
-
-\subsection NiftyCalCSDFuncReq Functional Requirements
-
-These functional requirements shall be expressed, each on a single line, for automatic parsing.
+REQ-2002-CSD-0001-102-01: The code shall pass static analysis checks.
 
 \section NiftyCalCSDDesign Design
 

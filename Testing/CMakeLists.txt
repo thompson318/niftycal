@@ -70,13 +70,40 @@ add_test(ExtRings1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_
 add_test(ExtRings2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_.bmp ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 720 480 10 7 10000 0 2.0 ${DATA_DIR}/CMU/TestSyntheticData/ring1/15_rz-5/0/ring_-15_0_-5_test.txt)
 add_test(ExtRings3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1400 1050 10 7 260000 1 0.1 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt)
 
-# For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera.
-add_test(CalibLapMonoLeft ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
+# Test the performance of the underlying OpenCV mono calibration.
+add_test(REQ-2002-CSD-0001-001-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt
+  14 10
+  0.298669                                       # expected RMS, for regression testing purposes.
+  1750 1750 639.5 511.5                          # intrinsic, specified during rendering.
+  0 0 0 0                                        # distortion, specified during rendering
+  1                                              # zeroDistortion==1 meaning 'yes, we expect zeroDistortion'.
+  1                                              # fxTol, so we expect OpenCV to work out fx,fy accurate to 1.
+  2                                              # fyTol, so we expect OpenCV to work out cx,cy accurate to 0.5.
+  0.01                                           # distTol, so we expect OpenCV to work out distortion, accurate to 0.01, as there is no distortion, and we explicitly told OpenCV so.
+  ${DATA_DIR}/Simulation2/Left1.png
+  ${DATA_DIR}/Simulation2/Left2.png
+  ${DATA_DIR}/Simulation2/Left3.png
+  ${DATA_DIR}/Simulation2/Left4.png
+  ${DATA_DIR}/Simulation2/Left5.png
+  ${DATA_DIR}/Simulation2/Left6.png
+  ${DATA_DIR}/Simulation2/Left7.png
+  ${DATA_DIR}/Simulation2/Left8.png
+  ${DATA_DIR}/Simulation2/Left9.png
+)
+
+# For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for left camera,
+# but there is no gold standard, so we just use this test as a regression test.
+add_test(REQ-2002-CSD-0001-002-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   0.577703                                       # RMS
   2007.33 2013.72 945.486 619.07                 # intrinsic
   -0.237351 -0.244029 0.00299158 -0.00141141     # distortion
+  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
+  0.01                                           # fxTol, so we expect OpenCV to work out fx,fy accurate to 0.01 as this is a regression test, and we have specified the result.
+  0.01                                           # fyTol, so we expect OpenCV to work out cx,cy accurate to 0.01 as this is a regression test, and we have specified the result.
+  0.01                                           # distTol, so we expect OpenCV to work out distortion, accurate to 0.01 as this is a regression test, and we have specified the result.
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png
@@ -88,13 +115,18 @@ add_test(CalibLapMonoLeft ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCal
   ${DATA_DIR}/Laparoscope/Left/left-798.png
 )
 
-# For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for right camera.
+# For Laparoscope dataset, gives the benchmark for standard OpenCV mono calibration for right camera,
+# but there is no gold standard, so we just use this test as a regression test.
 add_test(CalibLapMonoRight ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   0.610067                                       # RMS
   2030.46 2046.25 1046.24 552.077                # intrinsic
   -0.20807 -0.497051 -0.00654118 0.000343286     # distortion
+  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
+  0.01                                           # fxTol, so we expect OpenCV to work out fx,fy accurate to 0.01 as this is a regression test, and we have specified the result.
+  0.01                                           # fyTol, so we expect OpenCV to work out cx,cy accurate to 0.01 as this is a regression test, and we have specified the result.
+  0.01                                           # distTol, so we expect OpenCV to work out distortion, accurate to 0.01 as this is a regression test, and we have specified the result.
   ${DATA_DIR}/Laparoscope/Right/right-1095.png
   ${DATA_DIR}/Laparoscope/Right/right-1338.png
   ${DATA_DIR}/Laparoscope/Right/right-1884.png
@@ -106,15 +138,42 @@ add_test(CalibLapMonoRight ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCa
   ${DATA_DIR}/Laparoscope/Right/right-798.png
 )
 
-# For Laparoscope dataset, the stereo should give very close
-# results for both left and right channels, as it did for the mono.
-# This can be checked in the log file, rather than have too many program parameters.
-# Here, we just check the stereo transform.
-add_test(CalibLapStereo ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+
+add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
+  14 10                                          # internal corners
+  0 0 0                                          # rvec
+  6 0 0                                          # tvec
+  1                                              # zeroDistortion==1 meaning 'yes, we expect zeroDistortion'.
+  0.1                                            # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.1
+  0.8                                            # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.8
+  ${DATA_DIR}/Simulation2/Left1.png
+  ${DATA_DIR}/Simulation2/Left2.png
+  ${DATA_DIR}/Simulation2/Left3.png
+  ${DATA_DIR}/Simulation2/Left4.png
+  ${DATA_DIR}/Simulation2/Left5.png
+  ${DATA_DIR}/Simulation2/Left6.png
+  ${DATA_DIR}/Simulation2/Left7.png
+  ${DATA_DIR}/Simulation2/Left8.png
+  ${DATA_DIR}/Simulation2/Right1.png
+  ${DATA_DIR}/Simulation2/Right2.png
+  ${DATA_DIR}/Simulation2/Right3.png
+  ${DATA_DIR}/Simulation2/Right4.png
+  ${DATA_DIR}/Simulation2/Right5.png
+  ${DATA_DIR}/Simulation2/Right6.png
+  ${DATA_DIR}/Simulation2/Right7.png
+  ${DATA_DIR}/Simulation2/Right8.png
+)
+
+
+add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   -0.0198931 0.0402461 0.000409826               # rvec
   -4.64005 0.26403 0.297868                      # tvec
+  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
+  0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
+  0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png

@@ -28,10 +28,10 @@
 
 TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
-  int expectedMinimumNumberOfArguments =  13;
+  int expectedMinimumNumberOfArguments =  16;
   if (niftk::argc < expectedMinimumNumberOfArguments)
   {
-    std::cerr << "Usage: niftkStereChessboardCameraCalibrationTest modelFileName cornersInX cornersInY eRMSLeft eRMSRight eR1 eR2 eR3 eT1 eT2 eT3 image1.png image2.png etc." << std::endl;
+    std::cerr << "Usage: niftkStereoChessboardCameraCalibrationTest modelFileName cornersInX cornersInY eR1 eR2 eR3 eT1 eT2 eT3 zeroDist rotTol transTol image1.png image2.png etc." << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
   }
 
@@ -44,6 +44,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   float eT1 = atof(niftk::argv[7]);
   float eT2 = atof(niftk::argv[8]);
   float eT3 = atof(niftk::argv[9]);
+  int zeroDistortion = atoi(niftk::argv[10]);
+  float rotationTolerance = atof(niftk::argv[11]);
+  float translationTolerance = atof(niftk::argv[12]);
 
   if (numberInternalCornersInX < 2)
   {
@@ -55,7 +58,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   }
 
   // Should have an even number of images left.
-  if ((niftk::argc - 10) % 2 != 0)
+  if ((niftk::argc - 13) % 2 != 0)
   {
     niftkNiftyCalThrow() << "Should have an even number of images.";
   }
@@ -72,7 +75,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::list<niftk::PointSet> listOfPointsLeft;
   std::list<niftk::PointSet> listOfPointsRight;
 
-  for (int i = 10; i < niftk::argc; i++)
+  for (int i = 13; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
@@ -91,7 +94,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
       if (pointSet.size() > 0)
       {
-        if (i-10 < (niftk::argc-10)/2)
+        if (i-13 < (niftk::argc-13)/2)
         {
           listOfPointsLeft.push_back(pointSet);
           std::cout << " left." << std::endl;
@@ -110,6 +113,15 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "listOfPointsRight.size()=" << listOfPointsRight.size() << std::endl;
   REQUIRE( listOfPointsRight.size() >= 1 );
   REQUIRE( listOfPointsLeft.size()  == listOfPointsRight.size());
+
+  int flags = 0;
+  if (zeroDistortion == 1)
+  {
+    flags = cv::CALIB_ZERO_TANGENT_DIST
+        | cv::CALIB_FIX_K1 | cv::CALIB_FIX_K2
+        | cv::CALIB_FIX_K3 | cv::CALIB_FIX_K4
+        | cv::CALIB_FIX_K5 | cv::CALIB_FIX_K6;
+  }
 
   cv::Mat intrinsicLeft;
   cv::Mat distortionLeft;
@@ -132,7 +144,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                intrinsicLeft,
                                distortionLeft,
                                rvecsLeft,
-                               tvecsLeft
+                               tvecsLeft,
+                               flags
                               );
 
   niftk::MonoCameraCalibration(model,
@@ -141,7 +154,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                intrinsicRight,
                                distortionRight,
                                rvecsRight,
-                               tvecsRight
+                               tvecsRight,
+                               flags
                               );
 
   double rms = niftk::StereoCameraCalibration(model,
@@ -160,10 +174,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                               leftToRightTranslationVector,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS
+                                              flags | CV_CALIB_USE_INTRINSIC_GUESS
                                              );
-
-  double tolerance = 0.005;
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
@@ -192,12 +204,12 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Stereo P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
-  REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < tolerance );
-  REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < tolerance );
-  REQUIRE( fabs(rvec.at<double>(0,2) - eR3) < tolerance );
-  REQUIRE( fabs(leftToRightTranslationVector.at<double>(0,0) - eT1) < tolerance );
-  REQUIRE( fabs(leftToRightTranslationVector.at<double>(1,0) - eT2) < tolerance );
-  REQUIRE( fabs(leftToRightTranslationVector.at<double>(2,0) - eT3) < tolerance );
+  REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < rotationTolerance );
+  REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < rotationTolerance );
+  REQUIRE( fabs(rvec.at<double>(0,2) - eR3) < rotationTolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(0,0) - eT1) < translationTolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(1,0) - eT2) < translationTolerance );
+  REQUIRE( fabs(leftToRightTranslationVector.at<double>(2,0) - eT3) < translationTolerance );
 
   // Don't have a unit test yet.
   //niftk::SaveNifTKIntrinsics(intrinsicLeft, distortionLeft, "/tmp/calib.left.intrinsics.txt");
