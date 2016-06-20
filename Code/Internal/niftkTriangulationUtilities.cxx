@@ -12,9 +12,10 @@
 
 =============================================================================*/
 
-#include "niftkPointUtilities.h"
-#include "niftkNiftyCalExceptionMacro.h"
-#include "niftkMatrixUtilities.h"
+#include "niftkTriangulationUtilities_p.h"
+#include <niftkPointUtilities.h>
+#include <niftkNiftyCalExceptionMacro.h>
+#include <niftkMatrixUtilities.h>
 
 namespace niftk {
 
@@ -222,7 +223,7 @@ void TriangulatePointPairs(
                          // point of zero, and in millimetres not pixels).
   cv::Point3d r;         // the output 3D point, in reference frame of left camera.
 
-  #pragma omp parallel private(u1), private(u2), private(u1t), private(u2t), private(u1p), private(u2p), private(r)
+  #pragma omp parallel private(u1), private(u2), private(u1t), private(u2t), private(u1p), private(u2p), private(r), shared(leftCameraUndistortedPoints), shared(rightCameraUndistortedPoints), shared(P1d), shared(P2d)
   {
     #pragma omp for
     for (int i = 0; i < numberOfPoints; i++)
@@ -253,168 +254,6 @@ void TriangulatePointPairs(
       outputTriangulatedPoints[i].z = static_cast<float>(r.z);
     }
   }
-}
-
-
-//-----------------------------------------------------------------------------
-void TriangulatePointPairs(
-  const PointSet& leftDistortedPoints,
-  const PointSet& rightDistortedPoints,
-  const cv::Mat& leftIntrinsics,
-  const cv::Mat& leftDistortionParams,
-  const cv::Mat& leftCameraRotationVector,
-  const cv::Mat& leftCameraTranslationVector,
-  const cv::Mat& leftToRightRotationMatrix,
-  const cv::Mat& leftToRightTranslationVector,
-  const cv::Mat& rightIntrinsics,
-  const cv::Mat& rightDistortionParams,
-  Model3D& outputTriangulatedPoints
-  )
-{
-  PointSet leftUndistortedPoints;
-  niftk::UndistortPoints(leftDistortedPoints, leftIntrinsics, leftDistortionParams, leftUndistortedPoints);
-
-  PointSet rightUndistortedPoints;
-  niftk::UndistortPoints(rightDistortedPoints, rightIntrinsics, rightDistortionParams, rightUndistortedPoints);
-
-  std::vector<cv::Point2f> leftPoints;
-  std::vector<cv::Point2f> rightPoints;
-  std::vector<niftk::NiftyCalIdType> commonIds;
-  niftk::ExtractCommonPoints(leftUndistortedPoints, rightUndistortedPoints, leftPoints, rightPoints, commonIds);
-
-  cv::Matx44d leftExtrinsic =
-      niftk::RodriguesToMatrix(leftCameraRotationVector, leftCameraTranslationVector);
-
-  cv::Matx44d leftToRight =
-      niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix, leftToRightTranslationVector);
-
-  cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
-
-  cv::Mat rightCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat rightCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  niftk::MatrixToRodrigues(rightExtrinsic, rightCameraRotationVector, rightCameraTranslationVector);
-
-  std::vector<cv::Point3f> triangulatedPoints;
-
-  niftk::TriangulatePointPairs(leftPoints,
-                               rightPoints,
-                               leftIntrinsics,
-                               leftCameraRotationVector,
-                               leftCameraTranslationVector,
-                               rightIntrinsics,
-                               rightCameraRotationVector,
-                               rightCameraTranslationVector,
-                               triangulatedPoints
-                               );
-
-  outputTriangulatedPoints.clear();
-  for (int i = 0; i < triangulatedPoints.size(); i++)
-  {
-    Point3D p;
-    p.id = commonIds[i];
-    p.point = triangulatedPoints[i];
-    outputTriangulatedPoints.insert(niftk::IdPoint3D(commonIds[i], p));
-  }
-}
-
-
-//-----------------------------------------------------------------------------
-double ComputeRMSReconstructionError(const Model3D& model,
-                                     const std::list<PointSet>& listOfLeftHandPointSets,
-                                     const std::list<PointSet>& listOfRightHandPointSets,
-                                     const cv::Mat& leftIntrinsics,
-                                     const cv::Mat& leftDistortionParams,
-                                     const std::vector<cv::Mat>& rvecsLeft,
-                                     const std::vector<cv::Mat>& tvecsLeft,
-                                     const cv::Mat& rightIntrinsics,
-                                     const cv::Mat& rightDistortionParams,
-                                     const cv::Mat& leftToRightRotationMatrix,
-                                     const cv::Mat& leftToRightTranslationVector,
-                                     cv::Point3d& rmsForEachAxis
-                                    )
-{
-  double rms = 0;
-  unsigned int pointCounter = 0;
-  unsigned int viewCounter = 0;
-  rmsForEachAxis.x = 0;
-  rmsForEachAxis.y = 0;
-  rmsForEachAxis.z = 0;
-
-  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
-  {
-    niftkNiftyCalThrow() << "Unequal number of left and right points.";
-  }
-  if (listOfLeftHandPointSets.size() != rvecsLeft.size())
-  {
-    niftkNiftyCalThrow() << "Unequal number of left points and rotation vectors.";
-  }
-  if (listOfLeftHandPointSets.size() != tvecsLeft.size())
-  {
-    niftkNiftyCalThrow() << "Unequal number of left points and translation vectors.";
-  }
-
-  std::list<PointSet>::const_iterator leftIter;
-  std::list<PointSet>::const_iterator rightIter;
-
-  for (leftIter = listOfLeftHandPointSets.begin(),
-       rightIter = listOfRightHandPointSets.begin();
-       leftIter != listOfLeftHandPointSets.end() &&
-       rightIter != listOfRightHandPointSets.end();
-       ++leftIter,
-       ++rightIter
-       )
-  {
-    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix(rvecsLeft[viewCounter], tvecsLeft[viewCounter]);
-    Model3D modelInLeftCameraCoordinates = niftk::TransformModel(model, modelToCamera);
-
-    Model3D triangulatedPoints;
-
-    niftk::TriangulatePointPairs(
-      *leftIter,
-      *rightIter,
-      leftIntrinsics,
-      leftDistortionParams,
-      rvecsLeft[viewCounter],
-      tvecsLeft[viewCounter],
-      leftToRightRotationMatrix,
-      leftToRightTranslationVector,
-      rightIntrinsics,
-      rightDistortionParams,
-      triangulatedPoints
-    );
-
-    cv::Point3d cameraViewRMS;
-    cv::Point3d cameraViewSSE;
-
-    double viewRMS = niftk::ComputeRMSDifferenceBetweenMatchingPoints(modelInLeftCameraCoordinates,
-                                                                      triangulatedPoints,
-                                                                      cameraViewSSE,
-                                                                      cameraViewRMS
-                                                                     );
-
-    pointCounter += (*leftIter).size();
-    rms += (viewRMS*viewRMS*static_cast<double>((*leftIter).size()));
-    rmsForEachAxis.x += cameraViewSSE.x;
-    rmsForEachAxis.y += cameraViewSSE.y;
-    rmsForEachAxis.z += cameraViewSSE.z;
-
-    viewCounter++;
-  }
-
-  if (pointCounter != 0)
-  {
-    rms /= static_cast<double>(pointCounter);
-    rmsForEachAxis.x /= static_cast<double>(pointCounter);
-    rmsForEachAxis.y /= static_cast<double>(pointCounter);
-    rmsForEachAxis.z /= static_cast<double>(pointCounter);
-  }
-
-  rms = sqrt(rms);
-  rmsForEachAxis.x = sqrt(rmsForEachAxis.x);
-  rmsForEachAxis.y = sqrt(rmsForEachAxis.y);
-  rmsForEachAxis.z = sqrt(rmsForEachAxis.z);
-
-  return rms;
 }
 
 } // end namespace

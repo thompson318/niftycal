@@ -196,6 +196,43 @@ NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
                                                       std::vector<niftk::NiftyCalIdType>& ids
                                                      );
 
+
+/**
+* \brief Triangulates common (same identifier) points in left and right views.
+*/
+NIFTYCAL_WINEXPORT void TriangulatePointPairs(
+  const PointSet& leftDistortedPoints,
+  const PointSet& rightDistortedPoints,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
+  const cv::Mat& leftCameraRotationVector,
+  const cv::Mat& leftCameraTranslationVector,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
+  Model3D& outputTriangulatedPoints
+  );
+
+
+/**
+* \brief Used to evaluate a stereo calibration's RMS reconstruction error, using triangulation.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
+  const Model3D& model,
+  const std::list<PointSet>& listOfLeftHandPointSets,
+  const std::list<PointSet>& listOfRightHandPointSets,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
+  const std::vector<cv::Mat>& rvecsLeft,
+  const std::vector<cv::Mat>& tvecsLeft,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  cv::Point3d& rmsForEachAxis
+ );
+
 } // end namespace
 
 #endif

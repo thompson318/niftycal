@@ -16,10 +16,10 @@
 #include "niftkMonoCameraCalibration.h"
 #include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
-#include "niftkIterativeCalibrationUtilities_p.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
-#include "niftkTriangulationUtilities.h"
+#include <Internal/niftkTriangulationUtilities_p.h>
+#include <Internal/niftkIterativeCalibrationUtilities_p.h>
 #include <highgui.h>
 
 namespace niftk

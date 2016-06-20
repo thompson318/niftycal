@@ -13,14 +13,14 @@
 #============================================================================*/
 
 set(NIFTYCAL_SRCS
+  Internal/niftkIterativeCalibrationUtilities.cxx
+  Internal/niftkTriangulationUtilities.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
-  niftkTriangulationUtilities.cxx
   niftkHomographyUtilities.cxx
   niftkMatrixUtilities.cxx
   niftkIOUtilities.cxx
-  niftkIterativeCalibrationUtilities.cxx
   niftkTemplateMatching.cxx
   niftkIPoint2DDetector.cxx
   niftkPointDetector.cxx

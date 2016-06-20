@@ -13,9 +13,9 @@
 =============================================================================*/
 
 #include "niftkIterativeCalibrationUtilities_p.h"
-#include "niftkNiftyCalExceptionMacro.h"
-#include "niftkHomographyUtilities.h"
-#include "niftkPointUtilities.h"
+#include <niftkNiftyCalExceptionMacro.h>
+#include <niftkHomographyUtilities.h>
+#include <niftkPointUtilities.h>
 #include <highgui.h>
 #include <memory>
 

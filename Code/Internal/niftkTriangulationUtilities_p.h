@@ -15,7 +15,6 @@
 #ifndef niftkTriangulationUtilities_h
 #define niftkTriangulationUtilities_h
 
-#include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
 #include <list>
 #include <vector>
@@ -51,7 +50,7 @@ namespace niftk
 * \param rightCameraTranslationVector [1x3] matrix for right camera translation vector.
 * \param outputPoints reconstructed 3D points, w.r.t. left camera (ie. in left camera coordinates).
 */
-NIFTYCAL_WINEXPORT void TriangulatePointPairs(
+void TriangulatePointPairs(
   const std::vector<cv::Point2f>& leftCameraUndistortedPoints,
   const std::vector<cv::Point2f>& rightCameraUndistortedPoints,
   const cv::Mat& leftCameraIntrinsicParams,
@@ -62,43 +61,6 @@ NIFTYCAL_WINEXPORT void TriangulatePointPairs(
   const cv::Mat& rightCameraTranslationVector,
   std::vector<cv::Point3f>& outputTriangulatedPoints
   );
-
-
-/**
-* \brief Overrides the above method.
-*/
-NIFTYCAL_WINEXPORT void TriangulatePointPairs(
-  const PointSet& leftDistortedPoints,
-  const PointSet& rightDistortedPoints,
-  const cv::Mat& leftIntrinsics,
-  const cv::Mat& leftDistortionParams,
-  const cv::Mat& leftCameraRotationVector,
-  const cv::Mat& leftCameraTranslationVector,
-  const cv::Mat& leftToRightRotationMatrix,
-  const cv::Mat& leftToRightTranslationVector,
-  const cv::Mat& rightIntrinsics,
-  const cv::Mat& rightDistortionParams,
-  Model3D& outputTriangulatedPoints
-  );
-
-
-/**
-* \brief Used to evaluate a stereo calibration's RMS reconstruction error, using triangulation.
-*/
-NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
-  const Model3D& model,
-  const std::list<PointSet>& listOfLeftHandPointSets,
-  const std::list<PointSet>& listOfRightHandPointSets,
-  const cv::Mat& leftIntrinsics,
-  const cv::Mat& leftDistortionParams,
-  const std::vector<cv::Mat>& rvecsLeft,
-  const std::vector<cv::Mat>& tvecsLeft,
-  const cv::Mat& rightIntrinsics,
-  const cv::Mat& rightDistortionParams,
-  const cv::Mat& leftToRightRotationMatrix,
-  const cv::Mat& leftToRightTranslationVector,
-  cv::Point3d& rmsForEachAxis
- );
 
 } // end namespace
 
