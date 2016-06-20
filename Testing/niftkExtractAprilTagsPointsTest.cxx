@@ -69,7 +69,10 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   {
     points = detector.GetPoints();
   }
-  REQUIRE( points.size() == expectedNumberOfTags );
+  if (expectedNumberOfTags >= 0)
+  {
+    REQUIRE( points.size() == expectedNumberOfTags );
+  }
 
   if (points.size() > 0)
   {
