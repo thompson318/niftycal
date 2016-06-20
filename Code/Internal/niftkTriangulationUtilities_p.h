@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkTriangulationUtilities_h
-#define niftkTriangulationUtilities_h
+#ifndef niftkTriangulationUtilities_p_h
+#define niftkTriangulationUtilities_p_h
 
 #include "niftkNiftyCalTypes.h"
 #include <list>
