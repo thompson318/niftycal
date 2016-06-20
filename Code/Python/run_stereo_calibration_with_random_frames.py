@@ -10,8 +10,8 @@ if len(sys.argv) < 8:
     exit()
 
 # Get all files in the specified path.
-left_file_names =  niftk.get_files_by_name_and_line_count(sys.argv[1], sys.argv[3], sys.argv[5])
-right_file_names = niftk.get_files_by_name_and_line_count(sys.argv[1], sys.argv[4], sys.argv[5])
+left_file_names =  niftk.get_files_by_ending_and_line_count(sys.argv[1], sys.argv[3], sys.argv[5])
+right_file_names = niftk.get_files_by_ending_and_line_count(sys.argv[1], sys.argv[4], sys.argv[5])
 
 # Get a random ordering of indexes, then try to find files where we have both left and right.
 file_indexes = sample(range(0, len(left_file_names)), len(left_file_names))
