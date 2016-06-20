@@ -19,6 +19,7 @@
 #include "niftkIterativeCalibrationUtilities_p.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
+#include "niftkTriangulationUtilities.h"
 #include <highgui.h>
 
 namespace niftk

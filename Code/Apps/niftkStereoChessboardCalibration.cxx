@@ -19,6 +19,7 @@
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkPointUtilities.h>
+#include <niftkTriangulationUtilities.h>
 #include <cv.h>
 #include <highgui.h>
 #include <cstdlib>

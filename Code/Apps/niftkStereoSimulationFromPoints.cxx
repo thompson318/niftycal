@@ -16,6 +16,7 @@
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
 #include <niftkPointUtilities.h>
+#include <niftkTriangulationUtilities.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalException.h>
 #include <cv.h>
