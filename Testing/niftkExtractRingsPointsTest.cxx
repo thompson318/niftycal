@@ -25,9 +25,9 @@
 
 TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
-  if (niftk::argc != 13 && niftk::argc != 14 && niftk::argc != 15)
+  if (niftk::argc != 15 && niftk::argc != 16 && niftk::argc != 17)
   {
-    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberPoints maxArea method tolerance [expectedPoints] [outputFile]" << std::endl;
+    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberPoints maxArea method tolerance [expectedPoints] [outputFile]" << std::endl;
     REQUIRE( niftk::argc >= 13);
     REQUIRE( niftk::argc <= 15);
   }
@@ -36,17 +36,23 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::Mat referenceImage = cv::imread(niftk::argv[2]);
   std::string referencePointsFileName = niftk::argv[3];
   cv::Mat templateImage = cv::imread(niftk::argv[4]);
-  int expectedWidth = atoi(niftk::argv[5]);
-  int expectedHeight = atoi(niftk::argv[6]);
-  int ringsInX = atoi(niftk::argv[7]);
-  int ringsInY = atoi(niftk::argv[8]);
-  int expectedNumberOfRings = atoi(niftk::argv[9]);
-  unsigned long int maxArea = atoi(niftk::argv[10]);
-  int method = atoi(niftk::argv[11]);
-  double tolerance = atof(niftk::argv[12]);
+  int scaleX = atoi(niftk::argv[5]);
+  int scaleY = atoi(niftk::argv[6]);
+  int expectedWidth = atoi(niftk::argv[7]);
+  int expectedHeight = atoi(niftk::argv[8]);
+  int ringsInX = atoi(niftk::argv[9]);
+  int ringsInY = atoi(niftk::argv[10]);
+  int expectedNumberOfRings = atoi(niftk::argv[11]);
+  unsigned long int maxArea = atoi(niftk::argv[12]);
+  int method = atoi(niftk::argv[13]);
+  double tolerance = atof(niftk::argv[14]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
+
+  cv::Point2d scaleFactors;
+  scaleFactors.x = scaleX;
+  scaleFactors.y = scaleY;
 
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
@@ -65,6 +71,7 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
   niftk::RingsPointDetector detector(patternSize, offsetSize);
   detector.SetImage(&greyImage);
+  detector.SetImageScaleFactor(scaleFactors);
   detector.SetTemplateImage(&greyTemplate);
   detector.SetReferenceImage(&greyReference);
   detector.SetReferencePoints(referencePoints);
@@ -96,9 +103,9 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   }
   REQUIRE( points.size() == expectedNumberOfRings );
 
-  if (niftk::argc >= 14 && points.size() > 0)
+  if (niftk::argc >= 16 && points.size() > 0)
   {
-    std::string expectedPointsFileName = niftk::argv[13];
+    std::string expectedPointsFileName = niftk::argv[15];
 
     if (expectedPointsFileName != "dummy")
     {
@@ -108,9 +115,9 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     }
   }
 
-  if (niftk::argc >= 15 && points.size() > 0)
+  if (niftk::argc >= 17 && points.size() > 0)
   {
-    std::string outputFile = niftk::argv[14];
+    std::string outputFile = niftk::argv[16];
     niftk::SavePointSet(points, outputFile);
   }
 }
