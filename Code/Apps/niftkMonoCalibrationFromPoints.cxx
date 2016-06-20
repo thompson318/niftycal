@@ -15,6 +15,7 @@
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkNiftyCalException.h>
+#include <niftkNiftyCalExceptionMacro.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
@@ -35,11 +36,20 @@ int main(int argc, char ** argv)
   try
   {
     int sizeX = atoi(argv[1]);
+    if (sizeX < 1)
+    {
+      niftkNiftyCalThrow() << "Invalid imageSizeX which should be >= 1";
+    }
     int sizeY = atoi(argv[2]);
-    std::string modelFile = argv[3];
-
+    if (sizeY < 1)
+    {
+      niftkNiftyCalThrow() << "Invalid sizeY which should be >= 1";
+    }
     cv::Size2i imageSize(sizeX, sizeY);
+
+    std::string modelFile = argv[3];
     niftk::Model3D model = niftk::LoadModel3D(modelFile);
+
     std::list<niftk::PointSet> points;
 
     for (int i = 4; i < argc; i++)

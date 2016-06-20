@@ -50,28 +50,29 @@ int main(int argc, char ** argv)
     }
 
     std::string modelFileName = argv[1];
-    int numberInternalCornersInX = atoi(argv[2]);
-    int numberInternalCornersInY = atoi(argv[3]);
-    float rescaleX = atof(argv[4]);
-    float rescaleY = atof(argv[5]);
-    int   zeroDistortion = atoi(argv[6]);
+    niftk::Model3D model = niftk::LoadModel3D(modelFileName);
 
+    int numberInternalCornersInX = atoi(argv[2]);
     if (numberInternalCornersInX < 2)
     {
       niftkNiftyCalThrow() << "numberInternalCornersInX < 2.";
     }
+
+    int numberInternalCornersInY = atoi(argv[3]);
     if (numberInternalCornersInY < 2)
     {
       niftkNiftyCalThrow() << "numberInternalCornersInY < 2.";
     }
+    cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
+
+    float rescaleX = atof(argv[4]);
+    float rescaleY = atof(argv[5]);
 
     cv::Point2d scaleFactors;
     scaleFactors.x = rescaleX;
     scaleFactors.y = rescaleY;
 
-    niftk::Model3D model = niftk::LoadModel3D(modelFileName);
-
-    cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
+    int   zeroDistortion = atoi(argv[6]);
 
     cv::Size2i imageSize;
     niftk::PointSet pointSet;
@@ -114,6 +115,19 @@ int main(int argc, char ** argv)
           listOfPointsRight.push_back(pointSet);
         }
       }
+    }
+
+    if (listOfPointsLeft.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No left hand camera points available.";
+    }
+    if (listOfPointsRight.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No right hand camera points available.";
+    }
+    if (listOfPointsLeft.size() != listOfPointsRight.size())
+    {
+      niftkNiftyCalThrow() << "Different number of views for left and right camera.";
     }
 
     int flags = 0;
