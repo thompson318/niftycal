@@ -91,7 +91,7 @@ REQ-2002-CSD-0001-102-01: The code shall pass static analysis checks, as defined
 
 All errors should be reported as subclasses of niftk::NiftyCalException.
 
-\subsection NiftyCalCSDLogging Thread Safety
+\subsection NiftyCalCSDThreading Thread Safety
 
 There is currently no provision for thread safety. It is assumed that client code will manage threads correctly.
 Within the calling context of one thread, this library may call OpenMP, as needed.
@@ -99,8 +99,9 @@ Within the calling context of one thread, this library may call OpenMP, as neede
 \subsection NiftyCalCSDLogging Logging
 
 There is currently no provision for logging. It is assumed that client code will monitor how it calls
-this library, and log requests accordingly. Furthermore, if all errors are thrown as exceptions, then
-it is further assumed that client code will catch these and client code will log the occurance of exceptions.
+this library, and log requests accordingly. Furthermore, as all errors are thrown as exceptions, then
+it is further assumed that client code will catch these and client code will log the occurance of exceptions
+and act accordingly.
 
 \subsection NiftyCalCSDArchitecture Architecture
 
