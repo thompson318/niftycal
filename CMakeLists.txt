@@ -157,6 +157,8 @@ configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/doxygen.config.in ${CMAKE_B
 ######################################################################
 # Add code folders.
 ######################################################################
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(${CMAKE_SOURCE_DIR}/Code/)
 add_subdirectory(Code)
 add_subdirectory(Documentation)
