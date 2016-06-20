@@ -16,6 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkChessboardPointDetector.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 
 #include <cv.h>
@@ -77,26 +78,12 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
   if (points.size() > 0)
   {
-    bool foundOneNonIntegerCoordinate = false;
-    niftk::PointSet::const_iterator iter;
-    for (iter = points.begin(); iter != points.end(); ++iter)
-    {
-      niftk::Point2D p = (*iter).second;
-      if (p.point.x - static_cast<int>(p.point.x) != 0)
-      {
-        foundOneNonIntegerCoordinate = true;
-      }
-      if (p.point.y - static_cast<int>(p.point.y) != 0)
-      {
-        foundOneNonIntegerCoordinate = true;
-      }
-      std::cerr << "Matt, p=" << p.point << std::endl;
-    }
-    if (expectIntegerLocations == 1 && foundOneNonIntegerCoordinate)
+    bool containsNonIntegerPoints = niftk::PointSetContainsNonIntegerPositions(points);
+    if (expectIntegerLocations == 1 && containsNonIntegerPoints)
     {
       niftkNiftyCalThrow() << "Found non-integer coordinates.";
     }
-    else if (expectIntegerLocations != 1 && !foundOneNonIntegerCoordinate)
+    else if (expectIntegerLocations != 1 && !containsNonIntegerPoints)
     {
       niftkNiftyCalThrow() << "Did not find non-integer coordinates.";
     }

@@ -16,6 +16,8 @@
 #include "niftkCatchMain.h"
 #include <niftkAprilTagsPointDetector.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
+#include <niftkNiftyCalExceptionMacro.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -23,11 +25,11 @@
 
 TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
-  if (niftk::argc != 7 && niftk::argc != 8 && niftk::argc != 9)
+  if (niftk::argc != 9 && niftk::argc != 10)
   {
-    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight [expectedNumberTags] [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 7);
-    REQUIRE( niftk::argc <= 9);
+    std::cerr << "Usage: niftkExtractAprilTagsPointsTest image tagFamily scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberTags expectIntegerLocations [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 9);
+    REQUIRE( niftk::argc <= 10);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -36,6 +38,8 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   int scaleY = atoi(niftk::argv[4]);
   int expectedWidth = atoi(niftk::argv[5]);
   int expectedHeight = atoi(niftk::argv[6]);
+  int expectedNumberOfTags = atoi(niftk::argv[7]);
+  int expectIntegerLocations = atoi(niftk::argv[8]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -47,7 +51,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  niftk::AprilTagsPointDetector detector(true, // do include corners
+  niftk::AprilTagsPointDetector detector(false, // don't output corners.
                                          tagFamily,
                                          0,
                                          0.8
@@ -55,23 +59,36 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
 
-  niftk::PointSet points = detector.GetPoints();
+  niftk::PointSet points;
 
-  int expectedNumberTags = 0;
-  if (niftk::argc >= 8)
+  if (expectedNumberOfTags == 0)
   {
-    expectedNumberTags = atoi(niftk::argv[7]);
-    if (expectedNumberTags > 0)
+    REQUIRE_NOTHROW(points = detector.GetPoints());
+  }
+  else
+  {
+    points = detector.GetPoints();
+  }
+  REQUIRE( points.size() == expectedNumberOfTags );
+
+  if (points.size() > 0)
+  {
+    bool containsNonIntegerPoints = niftk::PointSetContainsNonIntegerPositions(points);
+    if (expectIntegerLocations == 1 && containsNonIntegerPoints)
     {
-      REQUIRE( points.size() == expectedNumberTags*5);
+      niftkNiftyCalThrow() << "Found non-integer coordinates.";
+    }
+    else if (expectIntegerLocations != 1 && !containsNonIntegerPoints)
+    {
+      niftkNiftyCalThrow() << "Did not find non-integer coordinates.";
     }
   }
 
   std::cout << "niftkExtractAprilTagsPointsTest: " << points.size() << std::endl;
 
-  if (niftk::argc >= 9 && points.size() > 0)
+  if (niftk::argc >= 10 && points.size() > 0)
   {
-    std::string outputFile = niftk::argv[8];
+    std::string outputFile = niftk::argv[9];
     niftk::SavePointSet(points, outputFile);
   }
 }

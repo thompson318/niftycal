@@ -44,6 +44,11 @@ NIFTYCAL_WINEXPORT void CopyPointsInto(const PointSet& a, PointSet& b);
 NIFTYCAL_WINEXPORT PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor);
 
 /**
+* \brief Method to check if a point detector is outputting sub-pixel coordinates.
+*/
+NIFTYCAL_WINEXPORT bool PointSetContainsNonIntegerPositions(const PointSet& p);
+
+/**
 * \brief Converts PointSet to vector for many OpenCV functions.
 */
 NIFTYCAL_WINEXPORT void ConvertPoints(const PointSet& input,

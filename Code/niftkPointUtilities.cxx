@@ -64,6 +64,32 @@ PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
 
 
 //-----------------------------------------------------------------------------
+bool PointSetContainsNonIntegerPositions(const PointSet& points)
+{
+  bool containsNonIntegerPoints = false;
+  if (points.empty())
+  {
+    return containsNonIntegerPoints;
+  }
+
+  niftk::PointSet::const_iterator iter;
+  for (iter = points.begin(); iter != points.end(); ++iter)
+  {
+    niftk::Point2D p = (*iter).second;
+    if (p.point.x - static_cast<int>(p.point.x) != 0)
+    {
+      containsNonIntegerPoints = true;
+    }
+    if (p.point.y - static_cast<int>(p.point.y) != 0)
+    {
+      containsNonIntegerPoints = true;
+    }
+  }
+  return containsNonIntegerPoints;
+}
+
+
+//-----------------------------------------------------------------------------
 void ExtractCommonPoints(const PointSet& inputA,
                          const PointSet& inputB,
                          std::vector<cv::Point2f>& outputA,

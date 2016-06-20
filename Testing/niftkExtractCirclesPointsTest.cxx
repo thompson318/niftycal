@@ -15,6 +15,8 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkCirclesPointDetector.h>
+#include <niftkNiftyCalExceptionMacro.h>
+#include <niftkPointUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -22,10 +24,10 @@
 
 TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
 
-  int expectedNumberOfArguments =  6;
+  int expectedNumberOfArguments =  8;
   if (niftk::argc != expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkExtractCirclesPointsTest image expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn " << std::endl;
+    std::cerr << "Usage: niftkExtractCirclesPointsTest image expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberOfCircles expectIntegerLocations" << std::endl;
     REQUIRE( niftk::argc == expectedNumberOfArguments);
   }
 
@@ -34,6 +36,8 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   int expectedHeight = atoi(niftk::argv[3]);
   int expectedColumns = atoi(niftk::argv[4]);
   int expectedCirclesPerColumn = atoi(niftk::argv[5]);
+  int expectedNumberOfCircles = atoi(niftk::argv[6]);
+  int expectIntegerLocations = atoi(niftk::argv[7]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -44,7 +48,29 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
   niftk::CirclesPointDetector detector(patternSize);
   detector.SetImage(&greyImage);
-  niftk::PointSet points = detector.GetPoints();
 
-  REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
+  niftk::PointSet points;
+  if (expectedNumberOfCircles == 0)
+  {
+    REQUIRE_NOTHROW(points = detector.GetPoints());
+  }
+  else
+  {
+    points = detector.GetPoints();
+    REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
+  }
+  REQUIRE( points.size() == expectedNumberOfCircles );
+
+  if (points.size() > 0)
+  {
+    bool containsNonIntegerPoints = niftk::PointSetContainsNonIntegerPositions(points);
+    if (expectIntegerLocations == 1 && containsNonIntegerPoints)
+    {
+      niftkNiftyCalThrow() << "Found non-integer coordinates.";
+    }
+    else if (expectIntegerLocations != 1 && !containsNonIntegerPoints)
+    {
+      niftkNiftyCalThrow() << "Did not find non-integer coordinates.";
+    }
+  }
 }
