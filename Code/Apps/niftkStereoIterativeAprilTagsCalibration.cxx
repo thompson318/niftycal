@@ -17,6 +17,7 @@
 #include <niftkAprilTagsPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
+#include <niftkPointUtilities.h>
 #include <cv.h>
 #include <highgui.h>
 #include <cstdlib>
@@ -150,6 +151,39 @@ int main(int argc, char ** argv)
     {
       niftkNiftyCalThrow() << "Different number of views for left and right camera.";
     }
+
+    // Prune pairings with < 4 common points.
+    std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> >::iterator iterA;
+    std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> >::iterator iterB;
+    std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> >::iterator iterC;
+    std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> >::iterator iterD;
+    for (iterA = originalImagesLeft.begin(),
+         iterB = originalImagesRight.begin(),
+         iterC = imagesForWarpingLeft.begin(),
+         iterD = imagesForWarpingRight.begin();
+         iterA != originalImagesLeft.end();
+         ++iterA,
+         ++iterB,
+         ++iterC,
+         ++iterD
+         )
+    {
+      niftk::PointSet a = (*iterA).first->GetPoints();
+      niftk::PointSet b = (*iterB).first->GetPoints();
+      std::vector<cv::Point2f> av;
+      std::vector<cv::Point2f> bv;
+      std::vector<niftk::NiftyCalIdType> ids;
+      niftk::ExtractCommonPoints(a, b, av, bv, ids);
+
+      if (ids.size() <= 4)
+      {
+        originalImagesLeft.erase(iterA);
+        originalImagesRight.erase(iterB);
+        imagesForWarpingLeft.erase(iterC);
+        imagesForWarpingRight.erase(iterD);
+      }
+    }
+    std::cout << "After pruning, list size=" << originalImagesLeft.size() << std::endl;
 
     int flags = 0;
     if (zeroDistortion == 1)

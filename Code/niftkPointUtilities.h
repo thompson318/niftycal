@@ -27,8 +27,14 @@
 namespace niftk
 {
 
+/**
+* \brief Computes the Euclidean distance between two points a and b.
+*/
 NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b);
 
+/**
+* \brief Computes the Euclidean distance between two points a and b.
+*/
 NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point2d& a, const cv::Point2d& b);
 
 /**
@@ -211,7 +217,6 @@ NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
                                                       std::vector<niftk::NiftyCalIdType>& ids
                                                      );
 
-
 /**
 * \brief Triangulates common (same identifier) points in left and right views.
 */
@@ -228,7 +233,6 @@ NIFTYCAL_WINEXPORT void TriangulatePointPairs(
   const cv::Mat& rightDistortionParams,
   Model3D& outputTriangulatedPoints
   );
-
 
 /**
 * \brief Used to evaluate a stereo calibration's RMS reconstruction error, using triangulation.
