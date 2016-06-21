@@ -146,7 +146,7 @@ double StereoCameraCalibration(const Model3D& model,
     }
     else
     {
-      std::cout << "Warning: Dropping view " << viewCounter << ", as there were < 4 common points." << std::endl;
+      std::cout << "Warning: Dropping view " << viewCounter << ", as there were < 4 common points across both views." << std::endl;
     }
     viewCounter++;
   }
