@@ -51,17 +51,17 @@ endforeach()
 
 # Put unit-tests at the top. There is no point trying to assess the correctness of functional
 # requirements, if the internal and most lowest level unit tests themselves do not work.
-add_test(NiftyCalExcept ${EXECUTABLE_OUTPUT_PATH}/niftkNiftyCalExceptionTest)
-add_test(InterpSurf1 ${EXECUTABLE_OUTPUT_PATH}/niftkInterpolateQuadraticSurfaceTest)
-add_test(PointDist ${EXECUTABLE_OUTPUT_PATH}/niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
-add_test(WarpHomog1 ${EXECUTABLE_OUTPUT_PATH}/niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
-add_test(AveMatrix1 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
-add_test(AveMatrix2 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
-add_test(AveMatrix3 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
-add_test(ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10 140 0)
-add_test(ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35 0)
-add_test(ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35 0)
-add_test(ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72 0)
+add_test(UNIT-NiftyCalExcept ${EXECUTABLE_OUTPUT_PATH}/niftkNiftyCalExceptionTest)
+add_test(UNIT-InterpSurf1 ${EXECUTABLE_OUTPUT_PATH}/niftkInterpolateQuadraticSurfaceTest)
+add_test(UNIT-PointDist ${EXECUTABLE_OUTPUT_PATH}/niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
+add_test(UNIT-WarpHomog1 ${EXECUTABLE_OUTPUT_PATH}/niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
+add_test(UNIT-AveMatrix1 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
+add_test(UNIT-AveMatrix2 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(UNIT-AveMatrix3 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10 140 0)
+add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 35 0)
+add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 35 0)
+add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 72 0)
 
 # Chess
 add_test(REQ-2002-CSD-0001-001-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612 14 10   0 0)
@@ -180,7 +180,7 @@ add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
 )
 
 # Now try iterative. Using simulation 2. No distortion.
-add_test(CalibIterMonoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(REG-CalibIterMonoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model points
   14 10                                                 # internal corners
@@ -200,7 +200,7 @@ add_test(CalibIterMonoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboar
 )
 
 # Now try iterative. Using simulation 2. With distortion modelling, but should have no distortion.
-add_test(CalibIterMonoSim2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(REG-CalibIterMonoSim2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model points
   14 10                                                 # internal corners
@@ -220,7 +220,7 @@ add_test(CalibIterMonoSim2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboar
 )
 
 # Now try iterative on stereo, using simulation 2.
-add_test(CalibIterStereoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChessboardCameraCalibrationTest
+add_test(REG-CalibIterStereoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model points
   14 10                                                 # internal corners
@@ -247,7 +247,7 @@ add_test(CalibIterStereoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChess
 )
 
 # Check iterative does something on mono laparoscope.
-add_test(CalibIterLapLeft ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(REG-CalibIterLapLeft ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_750_550_14_10.png   # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
   14 10                                                 # internal corners
@@ -268,7 +268,7 @@ add_test(CalibIterLapLeft ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboard
 )
 
 # Check iterative does something on stereo laparoscope.
-add_test(CalibIterLapStereo ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChessboardCameraCalibrationTest
+add_test(REG-CalibIterLapStereo ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_750_550_14_10.png   # Model image
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt        # Model description (chessboard points)
   14 10                                                 # internal corners
@@ -297,7 +297,7 @@ add_test(CalibIterLapStereo ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoChessb
 )
 
 # Now try iterative, mono, using CMU synthetic dataset.
-add_test(CalibIterMonoCMU1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(REG-CalibIterMonoCMU1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp # Model image
   ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt                # Model description (chessboard points)
   10 7                                                                   # internal corners
@@ -319,7 +319,7 @@ add_test(CalibIterMonoCMU1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboar
 )
 
 # Now try iterative, mono, using CMU real dataset.
-add_test(CalibIterMonoCMU2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
+add_test(REG-CalibIterMonoCMU2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/CMU/TestSyntheticData/checker1/45_rz0/0/checker_0_0_0_.bmp # Model image
   ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt                # Model description (chessboard points)
   10 7                                                                   # internal corners
@@ -335,7 +335,7 @@ add_test(CalibIterMonoCMU2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboar
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img5.bmp
 )
 
-add_test(CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoAprilTagsCameraCalibrationTest
+add_test(REG-CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
@@ -367,7 +367,7 @@ add_test(CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoApr
 )
 
 # Now try iterative on AprilTags.
-add_test(CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoAprilTagsCameraCalibrationTest
+add_test(REG-CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
@@ -396,7 +396,7 @@ add_test(CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoA
 )
 
 # Now try iterative AprilTags on real data.
-add_test(CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoAprilTagsCameraCalibrationTest
+add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
@@ -446,7 +446,7 @@ add_test(CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStere
   ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230320793946400_right.bmp
 )
 
-add_test(CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+add_test(REG-CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
   1                                                     # Method (0==rings, 1==circles)
   ${DATA_DIR}/CMU/circles_10_7.png                      # Model image
   ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
@@ -464,7 +464,7 @@ add_test(CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTempla
   ${DATA_DIR}/CMU/TestSyntheticData/circle1/15_rz-5/0/circle_15_0_-5_.bmp
 )
 
-add_test(CalibIterMonoRingsSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+add_test(REG-CalibIterMonoRingsSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
   0                                                     # Method (0==rings, 1==circles)
   ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
   ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
@@ -483,7 +483,7 @@ add_test(CalibIterMonoRingsSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplate
 )
 
 
-add_test(CalibIterMonoRingsReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
+add_test(REG-CalibIterMonoRingsReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
   0                                                     # Method (0==rings, 1==circles)
   ${DATA_DIR}/CMU/rings_10_7.png                        # Model image
   ${DATA_DIR}/CMU/centres_10_7_7mm.txt                  # Model points
@@ -502,7 +502,7 @@ add_test(CalibIterMonoRingsReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplat
 )
 
 
-add_test(CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandEyeCalibrationTest
+add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandEyeCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
   ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/calib.left.handeye.txt

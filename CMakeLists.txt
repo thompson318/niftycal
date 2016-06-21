@@ -93,16 +93,6 @@ if(BUILD_TESTING)
 endif(BUILD_TESTING)
 
 ######################################################################
-# NiftyCal uses KWStyle for checking the coding style
-######################################################################
-include(${CMAKE_SOURCE_DIR}/Utilities/KWStyle/NiftyCalKWStyle.cmake)
-
-######################################################################
-# NiftyCal uses CppCheck for static analysis
-######################################################################
-include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
-
-######################################################################
 # Add Mandatory Requirements
 ######################################################################
 set(ALL_THIRD_PARTY_LIBRARIES)
@@ -153,6 +143,16 @@ endif()
 ######################################################################
 configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/niftkdoxygen.pl.in ${CMAKE_BINARY_DIR}/niftkdoxygen.pl)
 configure_file(${CMAKE_SOURCE_DIR}/Utilities/Doxygen/doxygen.config.in ${CMAKE_BINARY_DIR}/doxygen.config)
+
+######################################################################
+# NiftyCal uses KWStyle for checking the coding style
+######################################################################
+include(${CMAKE_SOURCE_DIR}/Utilities/KWStyle/NiftyCalKWStyle.cmake)
+
+######################################################################
+# NiftyCal uses CppCheck for static analysis
+######################################################################
+include(${CMAKE_SOURCE_DIR}/Utilities/CppCheck/NiftyCalCppCheck.cmake)
 
 ######################################################################
 # Add code folders.
