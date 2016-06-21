@@ -77,9 +77,13 @@ int main(int argc, char ** argv)
 
     int   zeroDistortion = atoi(argv[7]);
 
-    cv::Point2d scaleFactors;
-    scaleFactors.x = rescaleX;
-    scaleFactors.y = rescaleY;
+    cv::Point2d originalScaleFactors;
+    originalScaleFactors.x = rescaleX;
+    originalScaleFactors.y = rescaleY;
+
+    cv::Point2d warpedImageScaleFactors;
+    warpedImageScaleFactors.x = 1;
+    warpedImageScaleFactors.y = 1;
 
     cv::Size2i imageSize;
 
@@ -111,11 +115,11 @@ int main(int argc, char ** argv)
       cv::cvtColor(image, greyImage, CV_BGR2GRAY);
       cv::Mat greyImageClone = greyImage.clone();
 
-      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
-      detector1->SetImageScaleFactor(scaleFactors);
+      niftk::AprilTagsPointDetector* detector1 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0);
+      detector1->SetImageScaleFactor(originalScaleFactors);
 
-      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0.8);
-      detector2->SetImageScaleFactor(scaleFactors);
+      niftk::AprilTagsPointDetector* detector2 = new niftk::AprilTagsPointDetector(true, tagFamily, 0, 0);
+      detector2->SetImageScaleFactor(warpedImageScaleFactors);
 
       if (i-numberOfArgumentsBeforeImages < numberOfImagesPerSide)
       {

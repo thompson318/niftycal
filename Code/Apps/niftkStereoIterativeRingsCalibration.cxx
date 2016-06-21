@@ -103,9 +103,13 @@ int main(int argc, char ** argv)
     offset.width = 5;
     offset.height = 5;
 
-    cv::Point2d scaleFactors;
-    scaleFactors.x = rescaleX;
-    scaleFactors.y = rescaleY;
+    cv::Point2d originalScaleFactors;
+    originalScaleFactors.x = rescaleX;
+    originalScaleFactors.y = rescaleY;
+
+    cv::Point2d warpedImageScaleFactors;
+    warpedImageScaleFactors.x = 1;
+    warpedImageScaleFactors.y = 1;
 
     cv::Size2i imageSize;
 
@@ -142,7 +146,7 @@ int main(int argc, char ** argv)
 
       niftk::RingsPointDetector* detector1 = new niftk::RingsPointDetector(dots, offset);
       detector1->SetImage(&greyImage);
-      detector1->SetImageScaleFactor(scaleFactors);
+      detector1->SetImageScaleFactor(originalScaleFactors);
       detector1->SetTemplateImage(&templateImageGreyScale);
       detector1->SetReferenceImage(&referenceImageGreyScale);
       detector1->SetReferencePoints(referenceImageData.second);
@@ -160,7 +164,7 @@ int main(int argc, char ** argv)
       maxArea = templateImageGreyScale.cols * templateImageGreyScale.rows;
 
       niftk::RingsPointDetector* detector2 = new niftk::RingsPointDetector(dots, offset);
-      detector2->SetImageScaleFactor(scaleFactors);
+      detector2->SetImageScaleFactor(warpedImageScaleFactors);
       detector2->SetTemplateImage(&templateImageGreyScale);
       detector2->SetReferenceImage(&referenceImageGreyScale);
       detector2->SetReferencePoints(referenceImageData.second);
