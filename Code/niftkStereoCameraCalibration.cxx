@@ -77,7 +77,7 @@ double StereoCameraCalibration(const Model3D& model,
   {
     if ((*iter).size() < 4)
     {
-      niftkNiftyCalThrow() << "Should have 1 or more points in the " << viewCounter << "th right camera view.";
+      niftkNiftyCalThrow() << "Should have 4 or more points in the " << viewCounter << "th right camera view.";
     }
     viewCounter++;
   }
