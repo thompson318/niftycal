@@ -10,10 +10,11 @@ if len(sys.argv) < 8:
     exit()
 
 # Get all files in the specified path.
-left_file_names =  niftk.get_files_by_ending_and_line_count(sys.argv[1], sys.argv[3], sys.argv[5])
-right_file_names = niftk.get_files_by_ending_and_line_count(sys.argv[1], sys.argv[4], sys.argv[5])
+left_file_names =  niftk.get_files_by_ending(sys.argv[1], sys.argv[3])
+right_file_names = niftk.get_files_by_ending(sys.argv[1], sys.argv[4])
 
-# Get a random ordering of indexes, then try to find files where we have both left and right.
+# Get a random ordering of indexes, then try to find files where we have both left and right,
+# and both have the correct line count.
 file_indexes = sample(range(0, len(left_file_names)), len(left_file_names))
 selected_left_file_names = []
 selected_right_file_names = []
@@ -23,8 +24,9 @@ for i in file_indexes:
         chopped_left_name = left_name[0:int(sys.argv[2])]
         matching = [m for m in right_file_names if chopped_left_name in m]
         if len(matching) == 1:
-            selected_left_file_names.append(left_name)
-            selected_right_file_names.append(matching[0])
+            if number_of_lines(left_name) >= int(sys.argv[5]) and number_of_lines(matching[0]) >= int(sys.argv[5]):
+                selected_left_file_names.append(left_name)
+                selected_right_file_names.append(matching[0])
 
 # Sort out command
 command = sys.argv
