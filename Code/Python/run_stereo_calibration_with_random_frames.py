@@ -24,7 +24,7 @@ for i in file_indexes:
         chopped_left_name = left_name[0:int(sys.argv[2])]
         matching = [m for m in right_file_names if chopped_left_name in m]
         if len(matching) == 1:
-            if number_of_lines(left_name) >= int(sys.argv[5]) and number_of_lines(matching[0]) >= int(sys.argv[5]):
+            if niftk.number_of_lines(left_name) >= int(sys.argv[5]) and niftk.number_of_lines(matching[0]) >= int(sys.argv[5]):
                 selected_left_file_names.append(left_name)
                 selected_right_file_names.append(matching[0])
 
