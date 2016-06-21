@@ -61,24 +61,25 @@ double StereoCameraCalibration(const Model3D& model,
     niftkNiftyCalThrow() << "Should have the same number of views in left and right channel.";
   }
 
+  unsigned int viewCounter = 0;
   std::list<PointSet>::const_iterator iter;
-  int counter = 0;
+
   for (iter = listOfLeftHandPointSets.begin(); iter != listOfLeftHandPointSets.end(); ++iter)
   {
-    counter++;
-    if ((*iter).size() == 0)
+    if ((*iter).size() < 4)
     {
-      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th left camera view.";
+      niftkNiftyCalThrow() << "Should have 4 or more points in the " << viewCounter << "th left camera view.";
     }
+    viewCounter++;
   }
-  counter = 0;
+  viewCounter = 0;
   for (iter = listOfRightHandPointSets.begin(); iter != listOfRightHandPointSets.end(); ++iter)
   {
-    counter++;
-    if ((*iter).size() == 0)
+    if ((*iter).size() < 4)
     {
-      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th right camera view.";
+      niftkNiftyCalThrow() << "Should have 1 or more points in the " << viewCounter << "th right camera view.";
     }
+    viewCounter++;
   }
 
   std::vector<std::vector<cv::Vec3f> > objectPoints;
@@ -93,6 +94,7 @@ double StereoCameraCalibration(const Model3D& model,
   PointSet::const_iterator rightPointsIter;
 
   // Loop through each point set.
+  viewCounter = 0;
   for (leftListIter = listOfLeftHandPointSets.begin(),
        rightListIter = listOfRightHandPointSets.begin();
        leftListIter != listOfLeftHandPointSets.end() &&
@@ -129,7 +131,7 @@ double StereoCameraCalibration(const Model3D& model,
       }
     }
 
-    if (objectVectors3D.size() > 0 && leftVectors2D.size() > 0 && rightVectors2D.size() > 0
+    if (objectVectors3D.size() >= 4 && leftVectors2D.size() >= 4 && rightVectors2D.size() >= 4
         && objectVectors3D.size() == leftVectors2D.size()
         && objectVectors3D.size() == rightVectors2D.size()
         )
@@ -142,6 +144,11 @@ double StereoCameraCalibration(const Model3D& model,
       rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
       tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
     }
+    else
+    {
+      std::cout << "Warning: Dropping view " << viewCounter << ", as there were < 4 common points." << std::endl;
+    }
+    viewCounter++;
   }
 
   // Sanity check
