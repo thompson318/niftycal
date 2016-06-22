@@ -163,7 +163,7 @@ PointSet TemplateMatchingPointDetector::InternalGetPoints(const cv::Mat& imageTo
 
   if (m_UseTemplateMatching)
   {
-    if (m_InitialGuess.size() > 0)
+    if (!m_InitialGuess.empty())
     {
       if (m_InitialGuess.size() != m_PatternSize.width * m_PatternSize.height)
       {
@@ -173,7 +173,10 @@ PointSet TemplateMatchingPointDetector::InternalGetPoints(const cv::Mat& imageTo
     }
     else
     {
-      result = this->GetPointsUsingTemplateMatching(imageToUse, result);
+      if (!result.empty())
+      {
+        result = this->GetPointsUsingTemplateMatching(imageToUse, result);
+      }
     }
   }
   return result;

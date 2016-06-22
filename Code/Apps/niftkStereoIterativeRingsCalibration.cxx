@@ -49,14 +49,47 @@ int main(int argc, char ** argv)
       return EXIT_FAILURE;
     }
 
-    std::string modelFile = argv[1];
+    std::string modelFileName = argv[1];
+    niftk::Model3D model = niftk::LoadModel3D(modelFileName);
+
     std::string referenceImageFile = argv[2];
+    cv::Mat referenceImage = cv::imread(referenceImageFile);
+    cv::Mat referenceImageGreyScale;
+    cv::cvtColor(referenceImage, referenceImageGreyScale, CV_BGR2GRAY);
+
     std::string referencePointsFile = argv[3];
+    std::pair< cv::Mat, niftk::PointSet> referenceImageData;
+    referenceImageData.first = referenceImageGreyScale;
+    referenceImageData.second = niftk::LoadPointSet(referencePointsFile);
+
     std::string templateImageFile = argv[4];
+    cv::Mat templateImage = cv::imread(templateImageFile);
+    cv::Mat templateImageGreyScale;
+    cv::cvtColor(templateImage, templateImageGreyScale, CV_BGR2GRAY);
+
     int dotsInX = atoi(argv[5]);
+    if (dotsInX < 2)
+    {
+      niftkNiftyCalThrow() << "dotsInX < 2.";
+    }
     int dotsInY = atoi(argv[6]);
+    if (dotsInY < 2)
+    {
+      niftkNiftyCalThrow() << "dotsInY < 2.";
+    }
+
     float rescaleX = atof(argv[7]);
+    if (rescaleX < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
+
     float rescaleY = atof(argv[8]);
+    if (rescaleY < 0)
+    {
+      niftkNiftyCalThrow() << "Negative scale factors are not allowed.";
+    }
+
     int   zeroDistortion = atoi(argv[9]);
 
     // This is passed through to cv::findCirclesGrid, for which the documentation
@@ -70,24 +103,15 @@ int main(int argc, char ** argv)
     offset.width = 5;
     offset.height = 5;
 
-    cv::Point2d scaleFactors;
-    scaleFactors.x = rescaleX;
-    scaleFactors.y = rescaleY;
+    cv::Point2d originalScaleFactors;
+    originalScaleFactors.x = rescaleX;
+    originalScaleFactors.y = rescaleY;
+
+    cv::Point2d warpedImageScaleFactors;
+    warpedImageScaleFactors.x = 1;
+    warpedImageScaleFactors.y = 1;
 
     cv::Size2i imageSize;
-    niftk::Model3D model = niftk::LoadModel3D(modelFile);
-
-    cv::Mat referenceImage = cv::imread(referenceImageFile);
-    cv::Mat referenceImageGreyScale;
-    cv::cvtColor(referenceImage, referenceImageGreyScale, CV_BGR2GRAY);
-
-    cv::Mat templateImage = cv::imread(templateImageFile);
-    cv::Mat templateImageGreyScale;
-    cv::cvtColor(templateImage, templateImageGreyScale, CV_BGR2GRAY);
-
-    std::pair< cv::Mat, niftk::PointSet> referenceImageData;
-    referenceImageData.first = referenceImageGreyScale;
-    referenceImageData.second = niftk::LoadPointSet(referencePointsFile);
 
     std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > originalImagesLeft;
     std::list< std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat> > imagesForWarpingLeft;
@@ -122,7 +146,7 @@ int main(int argc, char ** argv)
 
       niftk::RingsPointDetector* detector1 = new niftk::RingsPointDetector(dots, offset);
       detector1->SetImage(&greyImage);
-      detector1->SetImageScaleFactor(scaleFactors);
+      detector1->SetImageScaleFactor(originalScaleFactors);
       detector1->SetTemplateImage(&templateImageGreyScale);
       detector1->SetReferenceImage(&referenceImageGreyScale);
       detector1->SetReferencePoints(referenceImageData.second);
@@ -140,7 +164,7 @@ int main(int argc, char ** argv)
       maxArea = templateImageGreyScale.cols * templateImageGreyScale.rows;
 
       niftk::RingsPointDetector* detector2 = new niftk::RingsPointDetector(dots, offset);
-      detector2->SetImageScaleFactor(scaleFactors);
+      detector2->SetImageScaleFactor(warpedImageScaleFactors);
       detector2->SetTemplateImage(&templateImageGreyScale);
       detector2->SetReferenceImage(&referenceImageGreyScale);
       detector2->SetReferencePoints(referenceImageData.second);
@@ -169,6 +193,19 @@ int main(int argc, char ** argv)
         imagesForWarpingRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
         dynamic_cast<niftk::RingsPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
       }
+    }
+
+    if (originalImagesLeft.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No left hand camera images available.";
+    }
+    if (originalImagesRight.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No right hand camera points available.";
+    }
+    if (originalImagesLeft.size() != originalImagesRight.size())
+    {
+      niftkNiftyCalThrow() << "Different number of views for left and right camera.";
     }
 
     int flags = 0;

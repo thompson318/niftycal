@@ -10,7 +10,7 @@ if len(sys.argv) < 6:
     exit()
 
 # Get all files in the specified path.
-file_names = niftk.get_files_by_name_and_line_count(sys.argv[1], sys.argv[2], sys.argv[3])
+file_names = niftk.get_files_by_ending_and_line_count(sys.argv[1], sys.argv[2], sys.argv[3])
 
 # Get a sample of file indexes.
 file_samples = sample(range(0, len(file_names)), int(sys.argv[4]))

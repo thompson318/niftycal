@@ -15,9 +15,9 @@
 #include "niftkIterativeMonoCameraCalibration.h"
 #include "niftkMonoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
-#include "niftkIterativeCalibrationUtilities_p.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
+#include <Internal/niftkIterativeCalibrationUtilities_p.h>
 
 #include <highgui.h>
 #include <memory>

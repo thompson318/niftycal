@@ -44,17 +44,32 @@ NIFTYCAL_WINEXPORT double StereoCameraCalibration(const Model3D& model,
                                                   const cv::Size2i& imageSize,
                                                   cv::Mat& intrinsicLeft,
                                                   cv::Mat& distortionLeft,
-                                                  std::vector<cv::Mat>& rvecsLeft,
-                                                  std::vector<cv::Mat>& tvecsLeft,
                                                   cv::Mat& intrinsicRight,
                                                   cv::Mat& distortionRight,
-                                                  std::vector<cv::Mat>& rvecsRight,
-                                                  std::vector<cv::Mat>& tvecsRight,
                                                   cv::Mat& leftToRightRotationMatrix,
                                                   cv::Mat& leftToRightTranslationVector,
                                                   cv::Mat& essentialMatrix,
                                                   cv::Mat& fundamentalMatrix,
                                                   const int& cvFlags = 0
+                                                 );
+
+/**
+* \brief Computes a consistent set of left and right extrinsics.
+*
+* Basically, you call this after a successful stereo calibration.
+* \return rms re-projection error for left camera as internally we run another mono calibration
+*/
+NIFTYCAL_WINEXPORT double ComputeStereoExtrinsics(const Model3D& model,
+                                                  const std::list<PointSet>& listOfLeftHandPointSets,
+                                                  const cv::Size2i& imageSize,
+                                                  const cv::Mat& intrinsicLeft,
+                                                  const cv::Mat& distortionLeft,
+                                                  const cv::Mat& leftToRightRotationMatrix,
+                                                  const cv::Mat& leftToRightTranslationVector,
+                                                  std::vector<cv::Mat>& rvecsLeft,
+                                                  std::vector<cv::Mat>& tvecsLeft,
+                                                  std::vector<cv::Mat>& rvecsRight,
+                                                  std::vector<cv::Mat>& tvecsRight
                                                  );
 
 } // end namespace

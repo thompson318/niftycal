@@ -14,183 +14,51 @@
 
 #include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkMonoCameraCalibration.h"
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double StereoCameraCalibration(const Model3D& model,
+double ComputeStereoExtrinsics(const Model3D& model,
                                const std::list<PointSet>& listOfLeftHandPointSets,
-                               const std::list<PointSet>& listOfRightHandPointSets,
                                const cv::Size2i& imageSize,
-                               cv::Mat& intrinsicLeft,
-                               cv::Mat& distortionLeft,
+                               const cv::Mat& intrinsicLeft,
+                               const cv::Mat& distortionLeft,
+                               const cv::Mat& leftToRightRotationMatrix,
+                               const cv::Mat& leftToRightTranslationVector,
                                std::vector<cv::Mat>& rvecsLeft,
                                std::vector<cv::Mat>& tvecsLeft,
-                               cv::Mat& intrinsicRight,
-                               cv::Mat& distortionRight,
                                std::vector<cv::Mat>& rvecsRight,
-                               std::vector<cv::Mat>& tvecsRight,
-                               cv::Mat& leftToRightRotationMatrix,
-                               cv::Mat& leftToRightTranslationVector,
-                               cv::Mat& essentialMatrix,
-                               cv::Mat& fundamentalMatrix,
-                               const int& cvFlags
+                               std::vector<cv::Mat>& tvecsRight
                               )
 {
-  double rms = 0;
-  rvecsLeft.clear();
-  tvecsLeft.clear();
+  // We do mono calib, but turn off intrinsic optimisation,
+  // which internally falls back to basically calling solvePnP.
+
+  cv::Mat tmpIntrinsicLeft = intrinsicLeft.clone(); // to get round const issues.
+  cv::Mat tmpDistortionLeft = distortionLeft.clone(); // to get round const issues.
+
+  double rms = niftk::MonoCameraCalibration(model,
+                                            listOfLeftHandPointSets,
+                                            imageSize,
+                                            tmpIntrinsicLeft,
+                                            tmpDistortionLeft,
+                                            rvecsLeft,
+                                            tvecsLeft,
+                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
+                                            );
+
+  // First make sure we have the right number of rvecsRight and rvecsLeft allocated.
   rvecsRight.clear();
   tvecsRight.clear();
-
-  if (model.empty())
+  for (int i = 0; i < rvecsLeft.size(); i++)
   {
-    niftkNiftyCalThrow() << "Model is empty.";
+    rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
+    tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
   }
-  if (listOfLeftHandPointSets.size() < 2)
-  {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for left camera.";
-  }
-  if (listOfRightHandPointSets.size() < 2)
-  {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for right camera.";
-  }
-  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
-  {
-    niftkNiftyCalThrow() << "Should have the same number of views in left and right channel.";
-  }
-
-  std::list<PointSet>::const_iterator iter;
-  int counter = 0;
-  for (iter = listOfLeftHandPointSets.begin(); iter != listOfLeftHandPointSets.end(); ++iter)
-  {
-    counter++;
-    if ((*iter).size() == 0)
-    {
-      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th left camera view.";
-    }
-  }
-  counter = 0;
-  for (iter = listOfRightHandPointSets.begin(); iter != listOfRightHandPointSets.end(); ++iter)
-  {
-    counter++;
-    if ((*iter).size() == 0)
-    {
-      niftkNiftyCalThrow() << "Should have 1 or more points in the " << counter << "th right camera view.";
-    }
-  }
-
-  std::vector<std::vector<cv::Vec3f> > objectPoints;
-  std::vector<std::vector<cv::Vec2f> > leftImagePoints;
-  std::vector<std::vector<cv::Vec2f> > rightImagePoints;
-
-  // Remember at this point, the number of PointSets in left and right is the same.
-
-  std::list<PointSet>::const_iterator leftListIter;
-  std::list<PointSet>::const_iterator rightListIter;
-  PointSet::const_iterator leftPointsIter;
-  PointSet::const_iterator rightPointsIter;
-
-  // Loop through each point set.
-  for (leftListIter = listOfLeftHandPointSets.begin(),
-       rightListIter = listOfRightHandPointSets.begin();
-       leftListIter != listOfLeftHandPointSets.end() &&
-       rightListIter != listOfRightHandPointSets.end();
-       ++leftListIter,
-       ++rightListIter
-       )
-  {
-    std::vector<cv::Vec3f> objectVectors3D;
-    std::vector<cv::Vec2f> leftVectors2D;
-    std::vector<cv::Vec2f> rightVectors2D;
-
-    // A point must be visible in both left and right view for it to be added.
-    for (leftPointsIter = (*leftListIter).begin(); leftPointsIter != (*leftListIter).end(); ++leftPointsIter)
-    {
-      niftk::NiftyCalIdType id = (*leftPointsIter).first;
-      rightPointsIter = (*rightListIter).find(id);
-
-      if (rightPointsIter != (*rightListIter).end())
-      {
-        // Found matching right hand point
-        cv::Point3d p3 = (model.at((*leftPointsIter).first)).point;
-        cv::Vec3f v3(p3.x, p3.y, p3.z);
-
-        cv::Point2d p2l = ((*leftPointsIter).second).point;
-        cv::Vec2f v2l(p2l.x, p2l.y);
-
-        cv::Point2d p2r = ((*rightPointsIter).second).point;
-        cv::Vec2f v2r(p2r.x, p2r.y);
-
-        objectVectors3D.push_back(v3);
-        leftVectors2D.push_back(v2l);
-        rightVectors2D.push_back(v2r);
-      }
-    }
-
-    if (objectVectors3D.size() > 0 && leftVectors2D.size() > 0 && rightVectors2D.size() > 0
-        && objectVectors3D.size() == leftVectors2D.size()
-        && objectVectors3D.size() == rightVectors2D.size()
-        )
-    {
-      objectPoints.push_back(objectVectors3D);
-      leftImagePoints.push_back(leftVectors2D);
-      rightImagePoints.push_back(rightVectors2D);
-      rvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
-      tvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
-      rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-      tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-    }
-  }
-
-  // Sanity check
-  if (objectPoints.size() == 0)
-  {
-    niftkNiftyCalThrow() << "No object points extracted.";
-  }
-  if (leftImagePoints.size() == 0)
-  {
-    niftkNiftyCalThrow() << "No left image points extracted.";
-  }
-  if (rightImagePoints.size() == 0)
-  {
-    niftkNiftyCalThrow() << "No right image points extracted.";
-  }
-
-  // Do calibration
-  rms = cv::stereoCalibrate(objectPoints,
-                            leftImagePoints,
-                            rightImagePoints,
-                            intrinsicLeft,
-                            distortionLeft,
-                            intrinsicRight,
-                            distortionRight,
-                            imageSize,
-                            leftToRightRotationMatrix,
-                            leftToRightTranslationVector,
-                            essentialMatrix,
-                            fundamentalMatrix,
-                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
-                            cvFlags
-                            );
 
   // Additionally make sure rvecs and tvecs are consistent left and right.
-
-  // 1. Solve left.
-  cv::calibrateCamera(objectPoints,
-                      leftImagePoints,
-                      imageSize,
-                      intrinsicLeft,
-                      distortionLeft,
-                      rvecsLeft,
-                      tvecsLeft,
-                      cvFlags | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
-                      );
-
-  // 2. Make consistent rvecs, tvecs, left and right,
-  // by creating the right extrinsics, by composing
-  // the left extrinsics, and the left-to-right transform.
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
     cv::Mat leftRot;
@@ -236,6 +104,162 @@ double StereoCameraCalibration(const Model3D& model,
     tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
   }
 
+  return rms;
+}
+
+
+//-----------------------------------------------------------------------------
+double StereoCameraCalibration(const Model3D& model,
+                               const std::list<PointSet>& listOfLeftHandPointSets,
+                               const std::list<PointSet>& listOfRightHandPointSets,
+                               const cv::Size2i& imageSize,
+                               cv::Mat& intrinsicLeft,
+                               cv::Mat& distortionLeft,
+                               cv::Mat& intrinsicRight,
+                               cv::Mat& distortionRight,
+                               cv::Mat& leftToRightRotationMatrix,
+                               cv::Mat& leftToRightTranslationVector,
+                               cv::Mat& essentialMatrix,
+                               cv::Mat& fundamentalMatrix,
+                               const int& cvFlags
+                              )
+{
+  double rms = 0;
+
+  if (model.empty())
+  {
+    niftkNiftyCalThrow() << "Model is empty.";
+  }
+  if (listOfLeftHandPointSets.size() < 2)
+  {
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for left camera.";
+  }
+  if (listOfRightHandPointSets.size() < 2)
+  {
+    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for right camera.";
+  }
+  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
+  {
+    niftkNiftyCalThrow() << "Should have the same number of views in left and right channel.";
+  }
+
+  unsigned int viewCounter = 0;
+  std::list<PointSet>::const_iterator iter;
+
+  for (iter = listOfLeftHandPointSets.begin(); iter != listOfLeftHandPointSets.end(); ++iter)
+  {
+    if ((*iter).size() < 4)
+    {
+      niftkNiftyCalThrow() << "Should have 4 or more points in the " << viewCounter << "th left camera view.";
+    }
+    viewCounter++;
+  }
+  viewCounter = 0;
+  for (iter = listOfRightHandPointSets.begin(); iter != listOfRightHandPointSets.end(); ++iter)
+  {
+    if ((*iter).size() < 4)
+    {
+      niftkNiftyCalThrow() << "Should have 4 or more points in the " << viewCounter << "th right camera view.";
+    }
+    viewCounter++;
+  }
+
+  std::vector<std::vector<cv::Vec3f> > objectPoints;
+  std::vector<std::vector<cv::Vec2f> > leftImagePoints;
+  std::vector<std::vector<cv::Vec2f> > rightImagePoints;
+
+  // Remember at this point, the number of PointSets in left and right is the same.
+
+  std::list<PointSet>::const_iterator leftListIter;
+  std::list<PointSet>::const_iterator rightListIter;
+  PointSet::const_iterator leftPointsIter;
+  PointSet::const_iterator rightPointsIter;
+
+  // Loop through each point set.
+  viewCounter = 0;
+  for (leftListIter = listOfLeftHandPointSets.begin(),
+       rightListIter = listOfRightHandPointSets.begin();
+       leftListIter != listOfLeftHandPointSets.end() &&
+       rightListIter != listOfRightHandPointSets.end();
+       ++leftListIter,
+       ++rightListIter
+       )
+  {
+    std::vector<cv::Vec3f> objectVectors3D;
+    std::vector<cv::Vec2f> leftVectors2D;
+    std::vector<cv::Vec2f> rightVectors2D;
+
+    // A point must be visible in both left and right view for it to be added.
+    for (leftPointsIter = (*leftListIter).begin(); leftPointsIter != (*leftListIter).end(); ++leftPointsIter)
+    {
+      niftk::NiftyCalIdType id = (*leftPointsIter).first;
+      rightPointsIter = (*rightListIter).find(id);
+
+      if (rightPointsIter != (*rightListIter).end())
+      {
+        // Found matching right hand point
+        cv::Point3d p3 = (model.at((*leftPointsIter).first)).point;
+        cv::Vec3f v3(p3.x, p3.y, p3.z);
+
+        cv::Point2d p2l = ((*leftPointsIter).second).point;
+        cv::Vec2f v2l(p2l.x, p2l.y);
+
+        cv::Point2d p2r = ((*rightPointsIter).second).point;
+        cv::Vec2f v2r(p2r.x, p2r.y);
+
+        objectVectors3D.push_back(v3);
+        leftVectors2D.push_back(v2l);
+        rightVectors2D.push_back(v2r);
+      }
+    }
+
+    if (objectVectors3D.size() >= 4 && leftVectors2D.size() >= 4 && rightVectors2D.size() >= 4
+        && objectVectors3D.size() == leftVectors2D.size()
+        && objectVectors3D.size() == rightVectors2D.size()
+        )
+    {
+      objectPoints.push_back(objectVectors3D);
+      leftImagePoints.push_back(leftVectors2D);
+      rightImagePoints.push_back(rightVectors2D);
+    }
+    else
+    {
+      std::cout << "Warning: Dropping view " << viewCounter
+                << ", as there were < 4 common points across both views." << std::endl;
+    }
+    viewCounter++;
+  }
+
+  // Sanity check
+  if (objectPoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No object points extracted.";
+  }
+  if (leftImagePoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No left image points extracted.";
+  }
+  if (rightImagePoints.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No right image points extracted.";
+  }
+
+  // Do calibration
+  rms = cv::stereoCalibrate(objectPoints,
+                            leftImagePoints,
+                            rightImagePoints,
+                            intrinsicLeft,
+                            distortionLeft,
+                            intrinsicRight,
+                            distortionRight,
+                            imageSize,
+                            leftToRightRotationMatrix,
+                            leftToRightTranslationVector,
+                            essentialMatrix,
+                            fundamentalMatrix,
+                            cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
+                            cvFlags
+                            );
   return rms;
 }
 

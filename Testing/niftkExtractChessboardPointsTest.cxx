@@ -16,6 +16,8 @@
 #include "niftkCatchMain.h"
 #include <niftkChessboardPointDetector.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
+#include <niftkNiftyCalExceptionMacro.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -23,11 +25,11 @@
 
 TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
-  if (niftk::argc != 8 && niftk::argc != 9)
+  if (niftk::argc != 10 && niftk::argc != 11)
   {
-    std::cerr << "Usage: niftkExtractChessboardPointsTest image scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberInternalCornersX expectedNumberInternalCornersY [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 8);
-    REQUIRE( niftk::argc <= 9);
+    std::cerr << "Usage: niftkExtractChessboardPointsTest image scaleX scaleY expectedImageWidth expectedImageHeight expectedNumberInternalCornersX expectedNumberInternalCornersY expectedNumberOfCorners expectIntegerLocations [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 10);
+    REQUIRE( niftk::argc <= 11);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -37,6 +39,8 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   int expectedHeight = atoi(niftk::argv[5]);
   int expectedInternalCornersX = atoi(niftk::argv[6]);
   int expectedInternalCornersY = atoi(niftk::argv[7]);
+  int expectedNumberOfCorners = atoi(niftk::argv[8]);
+  int expectIntegerLocations = atoi(niftk::argv[9]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -59,14 +63,35 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
 
-  niftk::PointSet points = detector.GetPoints();
-  REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
+  niftk::PointSet points;
 
-  std::cout << "niftkExtractChessboardPointsTest: " << points.size() << std::endl;
-
-  if (niftk::argc == 9 && points.size() > 0)
+  if (expectedNumberOfCorners == 0)
   {
-    std::string outputFile = niftk::argv[8];
+    REQUIRE_NOTHROW(points = detector.GetPoints());
+  }
+  else
+  {
+    points = detector.GetPoints();
+    REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
+  }
+  REQUIRE( points.size() == expectedNumberOfCorners );
+
+  if (points.size() > 0)
+  {
+    bool containsNonIntegerPoints = niftk::PointSetContainsNonIntegerPositions(points);
+    if (expectIntegerLocations == 1 && containsNonIntegerPoints)
+    {
+      niftkNiftyCalThrow() << "Found non-integer coordinates.";
+    }
+    else if (expectIntegerLocations != 1 && !containsNonIntegerPoints)
+    {
+      niftkNiftyCalThrow() << "Did not find non-integer coordinates.";
+    }
+  }
+
+  if (niftk::argc == 11 && points.size() > 0)
+  {
+    std::string outputFile = niftk::argv[10];
     niftk::SavePointSet(points, outputFile);
   }
 }

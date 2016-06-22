@@ -15,11 +15,32 @@
 #include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
+#include <Internal/niftkTriangulationUtilities_p.h>
+#include "niftkNiftyCalTypes.h"
 #include <queue>
 #include <vector>
 #include <functional>
 
 namespace niftk {
+
+//-----------------------------------------------------------------------------
+double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b)
+{
+  return sqrt(  (a.x - b.x) * (a.x - b.x)
+              + (a.y - b.y) * (a.y - b.y)
+              + (a.z - b.z) * (a.z - b.z)
+             );
+}
+
+
+//-----------------------------------------------------------------------------
+double DistanceBetween(const cv::Point2d& a, const cv::Point2d& b)
+{
+  return sqrt(  (a.x - b.x) * (a.x - b.x)
+              + (a.y - b.y) * (a.y - b.y)
+             );
+}
+
 
 //-----------------------------------------------------------------------------
 PointSet CopyPoints(const PointSet& p)
@@ -59,6 +80,63 @@ PointSet RescalePoints(const PointSet& p, const cv::Point2d& scaleFactor)
   }
 
   return result;
+}
+
+
+//-----------------------------------------------------------------------------
+bool PointSetContainsNonIntegerPositions(const PointSet& points)
+{
+  bool containsNonIntegerPoints = false;
+  if (points.empty())
+  {
+    return containsNonIntegerPoints;
+  }
+
+  niftk::PointSet::const_iterator iter;
+  for (iter = points.begin(); iter != points.end(); ++iter)
+  {
+    niftk::Point2D p = (*iter).second;
+    if (p.point.x - static_cast<int>(p.point.x) != 0)
+    {
+      containsNonIntegerPoints = true;
+    }
+    if (p.point.y - static_cast<int>(p.point.y) != 0)
+    {
+      containsNonIntegerPoints = true;
+    }
+  }
+  return containsNonIntegerPoints;
+}
+
+
+//-----------------------------------------------------------------------------
+bool MatchesToWithinTolerance(const PointSet& a, const PointSet& b, const double& tolerance)
+{
+  if (a.size() != b.size())
+  {
+    return false;
+  }
+  else
+  {
+    niftk::PointSet::const_iterator iter;
+    for (iter = a.begin(); iter != a.end(); ++iter)
+    {
+      niftk::NiftyCalIdType id = (*iter).first;
+      niftk::PointSet::const_iterator bIter = b.find(id);
+      if (bIter == b.end())
+      {
+        return false;
+      }
+      cv::Point2d ap = (*iter).second.point;
+      cv::Point2d bp = (*bIter).second.point;
+      double distance = niftk::DistanceBetween(ap, bp);
+      if (distance > tolerance)
+      {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 
@@ -496,240 +574,122 @@ cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
 
 
 //-----------------------------------------------------------------------------
-/**
-* \brief Triangulates a 3D point using SVD.
-*
-* Credit to <a href="http://www.morethantechnical.com/2012/01/04/
-* simple-triangulation-with-opencv-from-harley-zisserman-w-code/">these authors</a>.
-*
-*
-* \param P1 left camera matrix, meaning a full perspective projection, including extrinsic and intrinsic.
-* \param P2 right camera matrix, meaning a full perspective projection, including extrinsic and intrinsic.
-* \param u1 normalised left camera image coordinate in pixels.
-* \param u2 normalised right camera image coordinate in pixels.
-*/
-cv::Mat_<double> InternalTriangulatePointUsingSVD(
-    const cv::Matx34d& P1,
-    const cv::Matx34d& P2,
-    const cv::Point3d& u1,
-    const cv::Point3d& u2,
-    const double& w1,
-    const double& w2
-    )
+Model3D TransformModel(const Model3D& inputModel, const cv::Matx44d& matrix)
 {
-  // Build matrix A for homogenous equation system Ax = 0
-  // Assume X = (x,y,z,1), for Linear-LS method
-  // Which turns it into a AX = B system, where A is 4x3, X is 3x1 and B is 4x1
-  cv::Matx43d A((u1.x*P1(2,0)-P1(0,0))/w1, (u1.x*P1(2,1)-P1(0,1))/w1, (u1.x*P1(2,2)-P1(0,2))/w1,
-                (u1.y*P1(2,0)-P1(1,0))/w1, (u1.y*P1(2,1)-P1(1,1))/w1, (u1.y*P1(2,2)-P1(1,2))/w1,
-                (u2.x*P2(2,0)-P2(0,0))/w2, (u2.x*P2(2,1)-P2(0,1))/w2, (u2.x*P2(2,2)-P2(0,2))/w2,
-                (u2.y*P2(2,0)-P2(1,0))/w2, (u2.y*P2(2,1)-P2(1,1))/w2, (u2.y*P2(2,2)-P2(1,2))/w2
-               );
+  Model3D output;
+  cv::Matx41d p;
+  cv::Matx41d q;
+  Point3D op;
 
+  Model3D::const_iterator iter;
+  for (iter = inputModel.begin(); iter != inputModel.end(); ++iter)
+  {
+    p(0,0) = (*iter).second.point.x;
+    p(1,0) = (*iter).second.point.y;
+    p(2,0) = (*iter).second.point.z;
+    p(3,0) = 1;
 
-  cv::Matx41d B(-(u1.x*P1(2,3) -P1(0,3))/w1,
-                -(u1.y*P1(2,3) -P1(1,3))/w1,
-                -(u2.x*P2(2,3) -P2(0,3))/w2,
-                -(u2.y*P2(2,3) -P2(1,3))/w2
-               );
+    q = matrix * p;
+    op.point.x = q(0,0);
+    op.point.y = q(1,0);
+    op.point.z = q(2,0);
+    op.id = (*iter).first;
 
-  cv::Mat_<double> X;
-  cv::solve(A,B,X,cv::DECOMP_SVD);
-
-  return X;
+    output.insert(IdPoint3D((*iter).first, op));
+  }
+  return output;
 }
 
 
 //-----------------------------------------------------------------------------
-/**
-* \brief Triangulates a 3D point using SVD by calling
-* InternalTriangulatePointUsingSVD (above) with different weighting factors.
-*
-* Credit to <a href="http://www.morethantechnical.com/2012/01/04/
-* simple-triangulation-with-opencv-from-harley-zisserman-w-code/">these authors</a>.
-*
-* \param P1 left camera matrix, meaning a full perspective projection, including extrinsic and intrinsic.
-* \param P2 right camera matrix, meaning a full perspective projection, including extrinsic and intrinsic.
-* \param u1 normalised left camera image coordinate in pixels.
-* \param u2 normalised right camera image coordinate in pixels.
- */
-cv::Point3d InternalIterativeTriangulatePointUsingSVD(
-    const cv::Matx34d& P1,
-    const cv::Matx34d& P2,
-    const cv::Point3d& u1,
-    const cv::Point3d& u2
-    )
+PointSet AddGaussianNoise(std::default_random_engine& engine,
+                          std::normal_distribution<double>& normalDistribution,
+                          const PointSet& points
+                         )
 {
-  double epsilon = 0.00000000001;
-  double w1 = 1;
-  double w2 = 1;
-  cv::Mat_<double> X(4,1);
+  PointSet output;
+  Point2D op;
 
-  for (int i = 0; i < 10; i++) // Hartley suggests 10 iterations at most
+  PointSet::const_iterator iter;
+  for (iter = points.begin(); iter != points.end(); ++iter)
   {
-    cv::Mat_<double> X_ = InternalTriangulatePointUsingSVD(P1,P2,u1,u2,w1,w2);
-    X(0) = X_(0);
-    X(1) = X_(1);
-    X(2) = X_(2);
-    X(3) = 1.0;
-
-    double p2x1 = cv::Mat_<double>(cv::Mat_<double>(P1).row(2)*X)(0);
-    double p2x2 = cv::Mat_<double>(cv::Mat_<double>(P2).row(2)*X)(0);
-
-    if(fabs(w1 - p2x1) <= epsilon && fabs(w2 - p2x2) <= epsilon)
-      break;
-
-    w1 = p2x1;
-    w2 = p2x2;
+    op.id = (*iter).first;
+    op.point.x = (*iter).second.point.x + normalDistribution(engine);
+    op.point.y = (*iter).second.point.y + normalDistribution(engine);
+    output.insert(IdPoint2D((*iter).first, op));
   }
 
-  cv::Point3d result;
-  result.x = X(0);
-  result.y = X(1);
-  result.z = X(2);
-
-  return result;
+  return output;
 }
 
 
 //-----------------------------------------------------------------------------
-void TriangulatePointPairs(
-  const std::vector<cv::Point2f>& leftCameraUndistortedPoints,
-  const std::vector<cv::Point2f>& rightCameraUndistortedPoints,
-  const cv::Mat& leftCameraIntrinsicParams,
-  const cv::Mat& leftCameraRotationVector,
-  const cv::Mat& leftCameraTranslationVector,
-  const cv::Mat& rightCameraIntrinsicParams,
-  const cv::Mat& rightCameraRotationVector,
-  const cv::Mat& rightCameraTranslationVector,
-  std::vector<cv::Point3f>& outputTriangulatedPoints
-  )
+unsigned int ProjectMatchingPoints(const Model3D& model,
+                                   const PointSet& points,
+                                   const cv::Matx44d& extrinsic,
+                                   const cv::Mat& intrinsic,
+                                   const cv::Mat& distortion,
+                                   std::vector<cv::Point2f>& observed,
+                                   std::vector<cv::Point2f>& projected,
+                                   std::vector<niftk::NiftyCalIdType>& ids
+                                  )
 {
+  cv::Point3d modelPoint;
+  cv::Point3f m;
+  cv::Point2f p;
+  std::vector<cv::Point3f> modelPoints;
+  niftk::PointSet::const_iterator pointIter;
+  Model3D::const_iterator modelIter;
+  unsigned int pointPerViewCounter = 0;
 
-  if (leftCameraUndistortedPoints.size() != rightCameraUndistortedPoints.size())
+  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
+
+  observed.clear();
+  projected.clear();
+  ids.clear();
+
+  modelPoints.resize(points.size());
+  projected.resize(points.size());
+  observed.resize(points.size());
+  ids.resize(points.size());
+
+  for (pointIter = points.begin();
+       pointIter != points.end();
+       ++pointIter
+       )
   {
-    niftkNiftyCalThrow() << "Unequal number of left and right points.";
-  }
-
-  int numberOfPoints = leftCameraUndistortedPoints.size();
-  outputTriangulatedPoints.clear();
-  outputTriangulatedPoints.resize(numberOfPoints);
-
-  cv::Mat K1    = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat K2    = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat K1Inv = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat K2Inv = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat R1    = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat R2    = cv::Mat(3, 3, CV_64FC1);
-  cv::Mat E1    = cv::Mat(4, 4, CV_64FC1);
-  cv::Mat E1Inv = cv::Mat(4, 4, CV_64FC1);
-  cv::Mat E2    = cv::Mat(4, 4, CV_64FC1);
-  cv::Mat L2R   = cv::Mat(4, 4, CV_64FC1);
-
-  // Convert OpenCV stylee rotation vector to a rotation matrix.
-  cv::Rodrigues(leftCameraRotationVector, R1);
-  cv::Rodrigues(rightCameraRotationVector, R2);
-
-  // Construct:
-  // E1 = Object to Left Camera = Left Camera Extrinsics.
-  // E2 = Object to Right Camera = Right Camera Extrinsics.
-  // K1 = Copy of Left Camera intrinsics.
-  // K2 = Copy of Right Camera intrinsics.
-  // Copy data into cv::Mat data types.
-  for (int i = 0; i < 3; i++)
-  {
-    for (int j = 0; j < 3; j++)
+    NiftyCalIdType id = (*pointIter).first;
+    modelIter = model.find(id);
+    if (modelIter == model.end())
     {
-      K1.at<double>(i,j) = leftCameraIntrinsicParams.at<double>(i,j);
-      K2.at<double>(i,j) = rightCameraIntrinsicParams.at<double>(i,j);
-      E1.at<double>(i,j) = R1.at<double>(i,j);
-      E2.at<double>(i,j) = R2.at<double>(i,j);
+      niftkNiftyCalThrow() << "Invalid point id:" << id;
     }
-    E1.at<double>(i,3) = leftCameraTranslationVector.at<double>(0,i);
-    E2.at<double>(i,3) = rightCameraTranslationVector.at<double>(0,i);
-  }
-  E1.at<double>(3,0) = 0;
-  E1.at<double>(3,1) = 0;
-  E1.at<double>(3,2) = 0;
-  E1.at<double>(3,3) = 1;
-  E2.at<double>(3,0) = 0;
-  E2.at<double>(3,1) = 0;
-  E2.at<double>(3,2) = 0;
-  E2.at<double>(3,3) = 1;
 
-  // We invert the intrinsic params, so we can convert from pixels to normalised image coordinates.
-  K1Inv = K1.inv();
-  K2Inv = K2.inv();
+    modelPoint = (*modelIter).second.point;
+    m.x = modelPoint.x;
+    m.y = modelPoint.y;
+    m.z = modelPoint.z;
+    modelPoints[pointPerViewCounter] = m;
 
-  // We want output coordinates relative to left camera.
-  E1Inv = E1.inv();
-  L2R = E2 * E1Inv;
+    p.x = (*pointIter).second.point.x;
+    p.y = (*pointIter).second.point.y;
+    observed[pointPerViewCounter] = p;
 
-  // Reading Prince 2012 Computer Vision, the projection matrix, is just the extrinsic parameters,
-  // as our coordinates will be in a normalised camera space. P1 should be identity, so that
-  // reconstructed coordinates are in Left Camera Space, to P2 should reflect a left to right transform.
-  cv::Matx34d P1d, P2d;
-  P1d(0,0) = 1;
-  P1d(0,1) = 0;
-  P1d(0,2) = 0;
-  P1d(0,3) = 0;
-  P1d(1,0) = 0;
-  P1d(1,1) = 1;
-  P1d(1,2) = 0;
-  P1d(1,3) = 0;
-  P1d(2,0) = 0;
-  P1d(2,1) = 0;
-  P1d(2,2) = 1;
-  P1d(2,3) = 0;
+    ids[pointPerViewCounter] = id;
 
-  for (int i = 0; i < 3; i++)
-  {
-    for (int j = 0; j < 4; j++)
-    {
-      P2d(i,j) = L2R.at<double>(i,j);
-    }
+    pointPerViewCounter++;
   }
 
-  cv::Mat u1    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2    = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u1t   = cv::Mat(3, 1, CV_64FC1);
-  cv::Mat u2t   = cv::Mat(3, 1, CV_64FC1);
+  cv::projectPoints(modelPoints,
+                    extrinsicRotationVector,
+                    extrinsicTranslationVector,
+                    intrinsic,
+                    distortion,
+                    projected);
 
-  cv::Point3d u1p, u2p;  // Normalised image coordinates. (i.e. relative to a principal
-                         // point of zero, and in millimetres not pixels).
-  cv::Point3d r;         // the output 3D point, in reference frame of left camera.
-
-  #pragma omp parallel private(u1), private(u2), private(u1t), private(u2t), private(u1p), private(u2p), private(r)
-  {
-    #pragma omp for
-    for (int i = 0; i < numberOfPoints; i++)
-    {
-      u1.at<double>(0,0) = leftCameraUndistortedPoints[i].x;
-      u1.at<double>(1,0) = leftCameraUndistortedPoints[i].y;
-      u1.at<double>(2,0) = 1;
-
-      u2.at<double>(0,0) = rightCameraUndistortedPoints[i].x;
-      u2.at<double>(1,0) = rightCameraUndistortedPoints[i].y;
-      u2.at<double>(2,0) = 1;
-
-      // Converting to normalised image points
-      u1t = K1Inv * u1;
-      u2t = K2Inv * u2;
-
-      u1p.x = u1t.at<double>(0,0);
-      u1p.y = u1t.at<double>(1,0);
-      u1p.z = u1t.at<double>(2,0);
-
-      u2p.x = u2t.at<double>(0,0);
-      u2p.y = u2t.at<double>(1,0);
-      u2p.z = u2t.at<double>(2,0);
-
-      r = InternalIterativeTriangulatePointUsingSVD(P1d, P2d, u1p, u2p);
-      outputTriangulatedPoints[i].x = static_cast<float>(r.x);
-      outputTriangulatedPoints[i].y = static_cast<float>(r.y);
-      outputTriangulatedPoints[i].z = static_cast<float>(r.z);
-    }
-  }
+  return pointPerViewCounter;
 }
 
 
@@ -792,56 +752,6 @@ void TriangulatePointPairs(
     p.point = triangulatedPoints[i];
     outputTriangulatedPoints.insert(niftk::IdPoint3D(commonIds[i], p));
   }
-}
-
-
-//-----------------------------------------------------------------------------
-Model3D TransformModel(const Model3D& inputModel, const cv::Matx44d& matrix)
-{
-  Model3D output;
-  cv::Matx41d p;
-  cv::Matx41d q;
-  Point3D op;
-
-  Model3D::const_iterator iter;
-  for (iter = inputModel.begin(); iter != inputModel.end(); ++iter)
-  {
-    p(0,0) = (*iter).second.point.x;
-    p(1,0) = (*iter).second.point.y;
-    p(2,0) = (*iter).second.point.z;
-    p(3,0) = 1;
-
-    q = matrix * p;
-    op.point.x = q(0,0);
-    op.point.y = q(1,0);
-    op.point.z = q(2,0);
-    op.id = (*iter).first;
-
-    output.insert(IdPoint3D((*iter).first, op));
-  }
-  return output;
-}
-
-
-//-----------------------------------------------------------------------------
-PointSet AddGaussianNoise(std::default_random_engine& engine,
-                          std::normal_distribution<double>& normalDistribution,
-                          const PointSet& points
-                         )
-{
-  PointSet output;
-  Point2D op;
-
-  PointSet::const_iterator iter;
-  for (iter = points.begin(); iter != points.end(); ++iter)
-  {
-    op.id = (*iter).first;
-    op.point.x = (*iter).second.point.x + normalDistribution(engine);
-    op.point.y = (*iter).second.point.y + normalDistribution(engine);
-    output.insert(IdPoint2D((*iter).first, op));
-  }
-
-  return output;
 }
 
 
@@ -942,76 +852,6 @@ double ComputeRMSReconstructionError(const Model3D& model,
   rmsForEachAxis.z = sqrt(rmsForEachAxis.z);
 
   return rms;
-}
-
-
-//-----------------------------------------------------------------------------
-unsigned int ProjectMatchingPoints(const Model3D& model,
-                                   const PointSet& points,
-                                   const cv::Matx44d& extrinsic,
-                                   const cv::Mat& intrinsic,
-                                   const cv::Mat& distortion,
-                                   std::vector<cv::Point2f>& observed,
-                                   std::vector<cv::Point2f>& projected,
-                                   std::vector<niftk::NiftyCalIdType>& ids
-                                  )
-{
-  cv::Point3d modelPoint;
-  cv::Point3f m;
-  cv::Point2f p;
-  std::vector<cv::Point3f> modelPoints;
-  niftk::PointSet::const_iterator pointIter;
-  Model3D::const_iterator modelIter;
-  unsigned int pointPerViewCounter = 0;
-
-  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
-
-  observed.clear();
-  projected.clear();
-  ids.clear();
-
-  modelPoints.resize(points.size());
-  projected.resize(points.size());
-  observed.resize(points.size());
-  ids.resize(points.size());
-
-  for (pointIter = points.begin();
-       pointIter != points.end();
-       ++pointIter
-       )
-  {
-    NiftyCalIdType id = (*pointIter).first;
-    modelIter = model.find(id);
-    if (modelIter == model.end())
-    {
-      niftkNiftyCalThrow() << "Invalid point id:" << id;
-    }
-
-    modelPoint = (*modelIter).second.point;
-    m.x = modelPoint.x;
-    m.y = modelPoint.y;
-    m.z = modelPoint.z;
-    modelPoints[pointPerViewCounter] = m;
-
-    p.x = (*pointIter).second.point.x;
-    p.y = (*pointIter).second.point.y;
-    observed[pointPerViewCounter] = p;
-
-    ids[pointPerViewCounter] = id;
-
-    pointPerViewCounter++;
-  }
-
-  cv::projectPoints(modelPoints,
-                    extrinsicRotationVector,
-                    extrinsicTranslationVector,
-                    intrinsic,
-                    distortion,
-                    projected);
-
-  return pointPerViewCounter;
 }
 
 } // end namespace

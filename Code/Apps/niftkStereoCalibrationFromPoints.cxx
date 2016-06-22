@@ -15,7 +15,9 @@
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
+#include <niftkPointUtilities.h>
 #include <niftkNiftyCalException.h>
+#include <niftkNiftyCalExceptionMacro.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
@@ -47,11 +49,20 @@ int main(int argc, char ** argv)
     }
 
     int sizeX = atoi(argv[1]);
+    if (sizeX < 1)
+    {
+      niftkNiftyCalThrow() << "Invalid imageSizeX which should be >= 1";
+    }
     int sizeY = atoi(argv[2]);
-    std::string modelFile = argv[3];
-
+    if (sizeY < 1)
+    {
+      niftkNiftyCalThrow() << "Invalid sizeY which should be >= 1";
+    }
     cv::Size2i imageSize(sizeX, sizeY);
+
+    std::string modelFile = argv[3];
     niftk::Model3D model = niftk::LoadModel3D(modelFile);
+
     std::list<niftk::PointSet> leftPoints;
     std::list<niftk::PointSet> rightPoints;
 
@@ -111,18 +122,42 @@ int main(int argc, char ** argv)
                                                 imageSize,
                                                 intrinsicLeft,
                                                 distortionLeft,
-                                                rvecsLeft,
-                                                tvecsLeft,
                                                 intrinsicRight,
                                                 distortionRight,
-                                                rvecsRight,
-                                                tvecsRight,
                                                 leftToRightRotationMatrix,
                                                 leftToRightTranslation,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
                                                 CV_CALIB_USE_INTRINSIC_GUESS
                                                );
+
+    niftk::ComputeStereoExtrinsics(model,
+                                   leftPoints,
+                                   imageSize,
+                                   intrinsicLeft,
+                                   distortionLeft,
+                                   leftToRightRotationMatrix,
+                                   leftToRightTranslation,
+                                   rvecsLeft,
+                                   tvecsLeft,
+                                   rvecsRight,
+                                   tvecsRight
+                                  );
+
+    cv::Point3d rmsInEachAxis;
+    double reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                                   leftPoints,
+                                                                   rightPoints,
+                                                                   intrinsicLeft,
+                                                                   distortionLeft,
+                                                                   rvecsLeft,
+                                                                   tvecsLeft,
+                                                                   intrinsicRight,
+                                                                   distortionRight,
+                                                                   leftToRightRotationMatrix,
+                                                                   leftToRightTranslation,
+                                                                   rmsInEachAxis
+                                                                  );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
@@ -152,7 +187,9 @@ int main(int argc, char ** argv)
               << leftToRightTranslation.at<double>(0,0) << " "
               << leftToRightTranslation.at<double>(0,1) << " "
               << leftToRightTranslation.at<double>(0,2) << " "
-              << rms
+              << rmsInEachAxis << " "
+              << rms << " "
+              << reconstructedRMS
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)

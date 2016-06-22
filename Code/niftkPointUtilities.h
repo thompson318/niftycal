@@ -28,6 +28,16 @@ namespace niftk
 {
 
 /**
+* \brief Computes the Euclidean distance between two points a and b.
+*/
+NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b);
+
+/**
+* \brief Computes the Euclidean distance between two points a and b.
+*/
+NIFTYCAL_WINEXPORT double DistanceBetween(const cv::Point2d& a, const cv::Point2d& b);
+
+/**
 * \brief Creates a new copy of the input list.
 */
 NIFTYCAL_WINEXPORT PointSet CopyPoints(const PointSet& p);
@@ -102,6 +112,17 @@ NIFTYCAL_WINEXPORT double ComputeRMSDifferenceBetweenMatchingPoints(const Model3
                                                                    );
 
 /**
+* \brief Method to check if a PointSet contains sub-pixel coordinates.
+*/
+NIFTYCAL_WINEXPORT bool PointSetContainsNonIntegerPositions(const PointSet& p);
+
+/**
+* \brief Checks that a and b contain the same number of points, with matching
+* identifiers, and the 3D location of these points is within some tolerance (i.e Eucliden distance).
+*/
+NIFTYCAL_WINEXPORT bool MatchesToWithinTolerance(const PointSet& a, const PointSet& b, const double& tolerance);
+
+/**
 * \brief Maps all points in distortedPoints (i.e. observed) to undistortedPoints (i.e. corrected).
 */
 NIFTYCAL_WINEXPORT void UndistortPoints(const PointSet& distortedPoints,
@@ -167,59 +188,6 @@ NIFTYCAL_WINEXPORT cv::Mat DrawEpiLines(const PointSet& leftDistortedPoints,
                                        );
 
 /**
-* \brief Triangulates a vector of undistorted (i.e. already correction for distortion) 2D point pairs back into 3D.
-*
-* From "Triangulation", Hartley, R.I. and Sturm, P., Computer vision and image understanding, 1997.
-*
-* and
-*
-* <a href="http://www.morethantechnical.com/2012/01/04/
-* simple-triangulation-with-opencv-from-harley-zisserman-w-code/">here</a>.
-*
-* and
-*
-* Price 2012, Computer Vision: Models, Learning and Inference.
-*
-* \param leftCameraUndistortedPoints left camera undistorted points
-* \param leftCameraUndistortedPoints right camera undistorted points
-* \param leftCameraIntrinsicParams [3x3] matrix for left camera.
-* \param leftCameraRotationVector [1x3] matrix for the left camera rotation vector.
-* \param leftCameraTranslationVector [1x3] matrix for the left camera translation vector.
-* \param rightCameraIntrinsicParams [3x3] matrix for right camera.
-* \param rightCameraRotationVector [1x3] matrix for the right camera rotation vector.
-* \param rightCameraTranslationVector [1x3] matrix for right camera translation vector.
-* \param outputPoints reconstructed 3D points, w.r.t. left camera (ie. in left camera coordinates).
-*/
-NIFTYCAL_WINEXPORT void TriangulatePointPairs(
-  const std::vector<cv::Point2f>& leftCameraUndistortedPoints,
-  const std::vector<cv::Point2f>& rightCameraUndistortedPoints,
-  const cv::Mat& leftCameraIntrinsicParams,
-  const cv::Mat& leftCameraRotationVector,
-  const cv::Mat& leftCameraTranslationVector,
-  const cv::Mat& rightCameraIntrinsicParams,
-  const cv::Mat& rightCameraRotationVector,
-  const cv::Mat& rightCameraTranslationVector,
-  std::vector<cv::Point3f>& outputTriangulatedPoints
-  );
-
-/**
-* \brief Overrides the above method.
-*/
-NIFTYCAL_WINEXPORT void TriangulatePointPairs(
-  const PointSet& leftDistortedPoints,
-  const PointSet& rightDistortedPoints,
-  const cv::Mat& leftIntrinsics,
-  const cv::Mat& leftDistortionParams,
-  const cv::Mat& leftCameraRotationVector,
-  const cv::Mat& leftCameraTranslationVector,
-  const cv::Mat& leftToRightRotationMatrix,
-  const cv::Mat& leftToRightTranslationVector,
-  const cv::Mat& rightIntrinsics,
-  const cv::Mat& rightDistortionParams,
-  Model3D& outputTriangulatedPoints
-  );
-
-/**
 * \brief Transforms the inputModel by the given matrix.
 */
 NIFTYCAL_WINEXPORT Model3D TransformModel(
@@ -236,7 +204,38 @@ NIFTYCAL_WINEXPORT PointSet AddGaussianNoise(std::default_random_engine& engine,
                                             );
 
 /**
-* \brief Used to evaluate a stereo calibration's RMS reconstruction error.
+* \brief Used to project 3D model points to 2D, but only for points that exist
+* in the given PointSet.
+*/
+NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
+                                                      const PointSet& points,
+                                                      const cv::Matx44d& extrinsic,
+                                                      const cv::Mat& intrinsic,
+                                                      const cv::Mat& distortion,
+                                                      std::vector<cv::Point2f>& observed,
+                                                      std::vector<cv::Point2f>& projected,
+                                                      std::vector<niftk::NiftyCalIdType>& ids
+                                                     );
+
+/**
+* \brief Triangulates common (same identifier) points in left and right views.
+*/
+NIFTYCAL_WINEXPORT void TriangulatePointPairs(
+  const PointSet& leftDistortedPoints,
+  const PointSet& rightDistortedPoints,
+  const cv::Mat& leftIntrinsics,
+  const cv::Mat& leftDistortionParams,
+  const cv::Mat& leftCameraRotationVector,
+  const cv::Mat& leftCameraTranslationVector,
+  const cv::Mat& leftToRightRotationMatrix,
+  const cv::Mat& leftToRightTranslationVector,
+  const cv::Mat& rightIntrinsics,
+  const cv::Mat& rightDistortionParams,
+  Model3D& outputTriangulatedPoints
+  );
+
+/**
+* \brief Used to evaluate a stereo calibration's RMS reconstruction error, using triangulation.
 */
 NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
   const Model3D& model,
@@ -252,21 +251,6 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(
   const cv::Mat& leftToRightTranslationVector,
   cv::Point3d& rmsForEachAxis
  );
-
-
-/**
-* \brief Used to project 3D model points to 2D, but only for points that exist
-* in the given PointSet.
-*/
-NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
-                                                      const PointSet& points,
-                                                      const cv::Matx44d& extrinsic,
-                                                      const cv::Mat& intrinsic,
-                                                      const cv::Mat& distortion,
-                                                      std::vector<cv::Point2f>& observed,
-                                                      std::vector<cv::Point2f>& projected,
-                                                      std::vector<niftk::NiftyCalIdType>& ids
-                                                     );
 
 } // end namespace
 

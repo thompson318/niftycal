@@ -117,18 +117,27 @@ int main(int argc, char ** argv)
                                                 imageSize,
                                                 intrinsicLeft,
                                                 distortionLeft,
-                                                rvecsLeft,
-                                                tvecsLeft,
                                                 intrinsicRight,
                                                 distortionRight,
-                                                rvecsRight,
-                                                tvecsRight,
                                                 leftToRightRotationMatrix,
                                                 leftToRightTranslation,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
                                                 CV_CALIB_USE_INTRINSIC_GUESS
                                                );
+
+    niftk::ComputeStereoExtrinsics(model,
+                                   leftPoints,
+                                   imageSize,
+                                   intrinsicLeft,
+                                   distortionLeft,
+                                   leftToRightRotationMatrix,
+                                   leftToRightTranslation,
+                                   rvecsLeft,
+                                   tvecsLeft,
+                                   rvecsRight,
+                                   tvecsRight
+                                  );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     cv::Matx14d leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -244,18 +253,27 @@ int main(int argc, char ** argv)
                                          imageSize,
                                          intrinsicLeft,
                                          distortionLeft,
-                                         rvecsLeft,
-                                         tvecsLeft,
                                          intrinsicRight,
                                          distortionRight,
-                                         rvecsRight,
-                                         tvecsRight,
                                          leftToRightRotationMatrix,
                                          leftToRightTranslation,
                                          essentialMatrix,
                                          fundamentalMatrix,
                                          CV_CALIB_USE_INTRINSIC_GUESS
                                          );
+
+    niftk::ComputeStereoExtrinsics(model,
+                                   leftGoldStandardPoints,
+                                   imageSize,
+                                   intrinsicLeft,
+                                   distortionLeft,
+                                   leftToRightRotationMatrix,
+                                   leftToRightTranslation,
+                                   rvecsLeft,
+                                   tvecsLeft,
+                                   rvecsRight,
+                                   tvecsRight
+                                  );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -337,18 +355,27 @@ int main(int argc, char ** argv)
                                            imageSize,
                                            intrinsicLeft,
                                            distortionLeft,
-                                           rvecsLeft,
-                                           tvecsLeft,
                                            intrinsicRight,
                                            distortionRight,
-                                           rvecsRight,
-                                           tvecsRight,
                                            leftToRightRotationMatrix,
                                            leftToRightTranslation,
                                            essentialMatrix,
                                            fundamentalMatrix,
                                            CV_CALIB_USE_INTRINSIC_GUESS
                                            );
+
+      niftk::ComputeStereoExtrinsics(model,
+                                     leftNoisyPoints,
+                                     imageSize,
+                                     intrinsicLeft,
+                                     distortionLeft,
+                                     leftToRightRotationMatrix,
+                                     leftToRightTranslation,
+                                     rvecsLeft,
+                                     tvecsLeft,
+                                     rvecsRight,
+                                     tvecsRight
+                                    );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
       leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);

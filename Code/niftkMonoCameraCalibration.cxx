@@ -42,6 +42,8 @@ double MonoCameraCalibration(const Model3D& model,
   rvecs.clear();
   tvecs.clear();
 
+  unsigned int viewCounter = 0;
+
   std::vector<std::vector<cv::Vec3f> > objectPoints;
   std::vector<std::vector<cv::Vec2f> > imagePoints;
 
@@ -69,13 +71,18 @@ double MonoCameraCalibration(const Model3D& model,
       }
     }
 
-    if (vectors3D.size() > 0 && vectors2D.size() > 0 && vectors3D.size() == vectors2D.size())
+    if (vectors3D.size() >= 4 && vectors2D.size() >= 4 && vectors3D.size() == vectors2D.size())
     {
       objectPoints.push_back(vectors3D);
       imagePoints.push_back(vectors2D);
       rvecs.push_back(cv::Mat());
       tvecs.push_back(cv::Mat());
     }
+    else
+    {
+      std::cout << "Warning: Dropping view " << viewCounter << ", as there were < 4 points." << std::endl;
+    }
+    viewCounter++;
   }
 
   // Sanity check

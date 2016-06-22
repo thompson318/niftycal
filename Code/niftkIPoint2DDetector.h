@@ -17,6 +17,7 @@
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
+#include "niftkNiftyCalException.h"
 
 namespace niftk
 {
@@ -40,7 +41,12 @@ public:
 
   /**
   * \brief Retrieves points, each one identified by a Point2D.
-  * \return PointSet of Point2D.
+  * \return PointSet of Point2D, which may have zero points, i.e. empty.
+  * \throw All errors of the underlying detection mechanism must be
+  * thrown as subclasses of niftk::NiftyCalException.
+  *
+  * Note: If the current image contains zero points, this is not
+  * an exceptional scenario, so the detector should return an empty point set.
   */
   virtual PointSet GetPoints() = 0;
 
