@@ -164,18 +164,27 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                               imageSize,
                                               intrinsicLeft,
                                               distortionLeft,
-                                              rvecsLeft,
-                                              tvecsLeft,
                                               intrinsicRight,
                                               distortionRight,
-                                              rvecsRight,
-                                              tvecsRight,
                                               leftToRightRotationMatrix,
                                               leftToRightTranslationVector,
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               flags | CV_CALIB_USE_INTRINSIC_GUESS
                                              );
+
+  niftk::ComputeStereoExtrinsics(model,
+                                 listOfPointsLeft,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsLeft,
+                                 tvecsLeft,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);

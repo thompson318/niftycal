@@ -14,9 +14,99 @@
 
 #include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include "niftkMonoCameraCalibration.h"
 
 namespace niftk
 {
+
+//-----------------------------------------------------------------------------
+double ComputeStereoExtrinsics(const Model3D& model,
+                               const std::list<PointSet>& listOfLeftHandPointSets,
+                               const cv::Size2i& imageSize,
+                               const cv::Mat& intrinsicLeft,
+                               const cv::Mat& distortionLeft,
+                               const cv::Mat& leftToRightRotationMatrix,
+                               const cv::Mat& leftToRightTranslationVector,
+                               std::vector<cv::Mat>& rvecsLeft,
+                               std::vector<cv::Mat>& tvecsLeft,
+                               std::vector<cv::Mat>& rvecsRight,
+                               std::vector<cv::Mat>& tvecsRight
+                              )
+{
+  // We do mono calib, but turn off intrinsic optimisation,
+  // which internally falls back to basically calling solvePnP.
+
+  cv::Mat tmpIntrinsicLeft = intrinsicLeft.clone(); // to get round const issues.
+  cv::Mat tmpDistortionLeft = distortionLeft.clone(); // to get round const issues.
+
+  double rms = niftk::MonoCameraCalibration(model,
+                                            listOfLeftHandPointSets,
+                                            imageSize,
+                                            tmpIntrinsicLeft,
+                                            tmpDistortionLeft,
+                                            rvecsLeft,
+                                            tvecsLeft,
+                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
+                                            );
+
+  // First make sure we have the right number of rvecsRight and rvecsLeft allocated.
+  rvecsRight.clear();
+  tvecsRight.clear();
+  for (int i = 0; i < rvecsLeft.size(); i++)
+  {
+    rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
+    tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
+  }
+
+  // Additionally make sure rvecs and tvecs are consistent left and right.
+  for (int i = 0; i < rvecsLeft.size(); i++)
+  {
+    cv::Mat leftRot;
+    cv::Rodrigues(rvecsLeft[i], leftRot);
+
+    cv::Matx44d leftExtrinsic;
+    cv::Matx44d leftToRight;
+
+    leftExtrinsic = leftExtrinsic.eye();
+    leftToRight = leftToRight.eye();
+
+    for (int r = 0; r < 3; r++)
+    {
+      for (int c = 0; c < 3; c++)
+      {
+        leftExtrinsic(r, c) = leftRot.at<double>(r,c);
+        leftToRight(r, c) = leftToRightRotationMatrix.at<double>(r, c);
+      }
+      leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
+      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(0, r);
+    }
+
+    cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
+    cv::Matx33d rightRotation;
+
+    for (int r = 0; r < 3; r++)
+    {
+      for (int c = 0; c < 3; c++)
+      {
+        rightRotation(r, c) = rightExtrinsic(r,c);
+      }
+    }
+
+    cv::Mat rightRotationVec;
+    cv::Rodrigues(rightRotation, rightRotationVec);
+
+    rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);
+    rvecsRight[i].at<double>(0, 1) = rightRotationVec.at<double>(0,1);
+    rvecsRight[i].at<double>(0, 2) = rightRotationVec.at<double>(0,2);
+
+    tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3);
+    tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
+    tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
+  }
+
+  return rms;
+}
+
 
 //-----------------------------------------------------------------------------
 double StereoCameraCalibration(const Model3D& model,
@@ -25,12 +115,8 @@ double StereoCameraCalibration(const Model3D& model,
                                const cv::Size2i& imageSize,
                                cv::Mat& intrinsicLeft,
                                cv::Mat& distortionLeft,
-                               std::vector<cv::Mat>& rvecsLeft,
-                               std::vector<cv::Mat>& tvecsLeft,
                                cv::Mat& intrinsicRight,
                                cv::Mat& distortionRight,
-                               std::vector<cv::Mat>& rvecsRight,
-                               std::vector<cv::Mat>& tvecsRight,
                                cv::Mat& leftToRightRotationMatrix,
                                cv::Mat& leftToRightTranslationVector,
                                cv::Mat& essentialMatrix,
@@ -39,10 +125,6 @@ double StereoCameraCalibration(const Model3D& model,
                               )
 {
   double rms = 0;
-  rvecsLeft.clear();
-  tvecsLeft.clear();
-  rvecsRight.clear();
-  tvecsRight.clear();
 
   if (model.empty())
   {
@@ -139,10 +221,6 @@ double StereoCameraCalibration(const Model3D& model,
       objectPoints.push_back(objectVectors3D);
       leftImagePoints.push_back(leftVectors2D);
       rightImagePoints.push_back(rightVectors2D);
-      rvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
-      tvecsLeft.push_back(cvCreateMat(1, 3, CV_64FC1));
-      rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-      tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
     }
     else
     {
@@ -182,68 +260,6 @@ double StereoCameraCalibration(const Model3D& model,
                             cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
                             cvFlags
                             );
-
-  // Additionally make sure rvecs and tvecs are consistent left and right.
-
-  // 1. Solve left.
-  cv::calibrateCamera(objectPoints,
-                      leftImagePoints,
-                      imageSize,
-                      intrinsicLeft,
-                      distortionLeft,
-                      rvecsLeft,
-                      tvecsLeft,
-                      cvFlags | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
-                      );
-
-  // 2. Make consistent rvecs, tvecs, left and right,
-  // by creating the right extrinsics, by composing
-  // the left extrinsics, and the left-to-right transform.
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    cv::Mat leftRot;
-    cv::Rodrigues(rvecsLeft[i], leftRot);
-
-    cv::Matx44d leftExtrinsic;
-    cv::Matx44d leftToRight;
-
-    leftExtrinsic = leftExtrinsic.eye();
-    leftToRight = leftToRight.eye();
-
-    for (int r = 0; r < 3; r++)
-    {
-      for (int c = 0; c < 3; c++)
-      {
-        leftExtrinsic(r, c) = leftRot.at<double>(r,c);
-        leftToRight(r, c) = leftToRightRotationMatrix.at<double>(r, c);
-      }
-      leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
-      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(0, r);
-    }
-
-    cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
-    cv::Matx33d rightRotation;
-
-    for (int r = 0; r < 3; r++)
-    {
-      for (int c = 0; c < 3; c++)
-      {
-        rightRotation(r, c) = rightExtrinsic(r,c);
-      }
-    }
-
-    cv::Mat rightRotationVec;
-    cv::Rodrigues(rightRotation, rightRotationVec);
-
-    rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);
-    rvecsRight[i].at<double>(0, 1) = rightRotationVec.at<double>(0,1);
-    rvecsRight[i].at<double>(0, 2) = rightRotationVec.at<double>(0,2);
-
-    tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3);
-    tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
-    tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
-  }
-
   return rms;
 }
 

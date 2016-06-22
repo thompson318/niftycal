@@ -150,18 +150,27 @@ cv::Matx21d IterativeStereoCameraCalibration(
         imageSize,
         intrinsicLeft,
         distortionLeft,
-        rvecsLeft,
-        tvecsLeft,
         intrinsicRight,
         distortionRight,
-        rvecsRight,
-        tvecsRight,
         leftToRightRotationMatrix,
         leftToRightTranslationVector,
         essentialMatrix,
         fundamentalMatrix,
         iterativeCvFlags
         );
+
+  niftk::ComputeStereoExtrinsics(model,
+                                 pointsFromOriginalImagesLeft,
+                                 imageSize,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsLeft,
+                                 tvecsLeft,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
 
   cv::Point3d rmsInEachAxis;
   reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
@@ -250,12 +259,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
           imageSize,
           tmpIntrinsicLeft,
           tmpDistortionLeft,
-          rvecsLeft,
-          tvecsLeft,
           tmpIntrinsicRight,
           tmpDistortionRight,
-          rvecsRight,
-          tvecsRight,
           tmpLeftToRightRotationMatrix,
           tmpLeftToRightTranslationVector,
           tmpEssentialMatrix,
@@ -270,6 +275,19 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     if (projectedRMS < previousRMS)
     {
+      niftk::ComputeStereoExtrinsics(model,
+                                     distortedPointsFromCanonicalImagesLeft,
+                                     imageSize,
+                                     tmpIntrinsicLeft,
+                                     tmpDistortionLeft,
+                                     leftToRightRotationMatrix,
+                                     leftToRightTranslationVector,
+                                     rvecsLeft,
+                                     tvecsLeft,
+                                     rvecsRight,
+                                     tvecsRight
+                                    );
+
       reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
                                                               distortedPointsFromCanonicalImagesLeft,
                                                               distortedPointsFromCanonicalImagesRight,
