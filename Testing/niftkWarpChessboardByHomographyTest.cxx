@@ -89,7 +89,7 @@ TEST_CASE( "Warp chessboard to match another", "[chessboard]" ) {
   cv::Point2d sseForEachAxis;
   cv::Point2d rmsForEachAxis;
   double rms = niftk::ComputeRMSDifferenceBetweenMatchingPoints(warpedPointSet, targetPointSet, sseForEachAxis, rmsForEachAxis);
-  REQUIRE(fabs(rms - expectedRMS) < 0.01);
-
   std::cout << "rms=" << rms << ", for each axis=" << rmsForEachAxis << std::endl;
+
+  REQUIRE(fabs(rms - expectedRMS) < 0.01);
 }
