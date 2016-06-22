@@ -133,7 +133,7 @@ void WarpImageByHomography(const cv::Mat& inputImage,
                            cv::Mat& outputImage
                           )
 {
-  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize, cv::INTER_CUBIC);
+  cv::warpPerspective(inputImage, outputImage, homography, outputImageSize, cv::INTER_LINEAR);
 }
 
 } // end namespace
