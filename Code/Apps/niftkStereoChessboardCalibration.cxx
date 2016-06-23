@@ -15,6 +15,7 @@
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
+#include <niftkNonLinearStereoCalibrationOptimiser.h>
 #include <niftkChessboardPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -230,6 +231,20 @@ int main(int argc, char ** argv)
                                                                          rmsInEachAxis
                                                                         );
 
+    niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
+        niftk::NonLinearStereoCalibrationOptimiser::New();
+    optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
+
+    double optimisedRMS = optimiser->Optimise(intrinsicLeft,
+                                              distortionLeft,
+                                              intrinsicRight,
+                                              distortionRight,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslationVector
+                                             );
+
     std::cout << "niftkStereoChessboardCalibration:(" << imageSize.width << "," << imageSize.height <<  ") "
               << listOfPointsLeft.size() << " "
               << intrinsicLeft.at<double>(0,0) << " "
@@ -261,6 +276,7 @@ int main(int argc, char ** argv)
               << rmsInEachAxis.z << " "
               << rms << " "
               << rmsReconstructionError << " "
+              << optimisedRMS << " "
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)
