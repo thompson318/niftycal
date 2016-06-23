@@ -43,10 +43,17 @@ public:
   void SetPoints(std::list<PointSet>* const points);
   void SetRightHandPoints(std::list<PointSet>* const points);
 
+  /**
+  * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.
+  *
+  * Note: You probably need a very good calibration before calling this.
+  */
   double Optimise(cv::Mat& leftIntrinsic,
                   cv::Mat& leftDistortion,
                   cv::Mat& rightIntrinsic,
                   cv::Mat& rightDistortion,
+                  std::vector<cv::Mat>& rvecsLeft,
+                  std::vector<cv::Mat>& tvecsLeft,
                   cv::Mat& leftToRightRotationMatrix,
                   cv::Mat& leftToRightTranslationVector
                  );
@@ -60,7 +67,9 @@ protected:
   NonLinearStereoCalibrationOptimiser& operator=(const NonLinearStereoCalibrationOptimiser&);
 
 private:
+
   niftk::NonLinearStereoCalibrationCostFunction::Pointer m_CostFunction;
+
 };
 
 } // end namespace
