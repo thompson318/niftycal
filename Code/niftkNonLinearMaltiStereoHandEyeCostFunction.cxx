@@ -110,7 +110,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetRightHandPoints(std::list<Point
     num += (*iter).size();
   }
 
-  m_NumberOfRightHandValues = num * 2; // For each point, we have deltaX and deltaY.
+  m_NumberOfRightHandValues = num;
   m_RightHandPoints = points;
   this->Modified();
 }
@@ -119,7 +119,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetRightHandPoints(std::list<Point
 //-----------------------------------------------------------------------------
 unsigned int NonLinearMaltiStereoHandEyeCostFunction::GetNumberOfValues(void) const
 {
-  return m_NumberOfValues + m_NumberOfRightHandValues;
+  return (this->m_NumberOfValues + m_NumberOfRightHandValues) * 2;
 }
 
 

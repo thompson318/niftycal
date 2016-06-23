@@ -45,7 +45,7 @@ void NonLinearMaltiNDOFHandEyeOptimiser::SetModel(Model3D* const model)
 //-----------------------------------------------------------------------------
 void NonLinearMaltiNDOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
 {
-  m_CostFunction->SetPoints(points, 2);
+  m_CostFunction->SetPoints(points);
   this->Modified();
 }
 

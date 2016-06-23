@@ -39,9 +39,10 @@ public:
   typedef  itk::SmartPointer<Self>             Pointer;
   itkNewMacro(Self);
 
-  void SetModel(Model3D* const model);
-  void SetPoints(std::list<PointSet>* const points);
-  void SetRightHandPoints(std::list<PointSet>* const points);
+  void SetModelAndPoints(Model3D* const model,
+                         std::list<PointSet>* const leftPoints,
+                         std::list<PointSet>* const rightPoints
+                         );
 
   /**
   * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.

@@ -43,7 +43,7 @@ public:
   typedef Superclass::MeasureType         MeasureType;
 
   void SetModel(Model3D* const model);
-  void SetPoints(std::list<PointSet>* const points, const int& numDimensions);
+  void SetPoints(std::list<PointSet>* const points);
   itkSetMacro(NumberOfParameters, unsigned int);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;

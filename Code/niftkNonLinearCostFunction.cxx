@@ -50,7 +50,7 @@ void NonLinearCostFunction::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points, const int& numDimensions)
+void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {
@@ -67,8 +67,7 @@ void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points, const i
   {
     num += (*iter).size();
   }
-
-  m_NumberOfValues = num * numDimensions;
+  m_NumberOfValues = num;
   m_Points = points;
   this->Modified();
 }
@@ -77,7 +76,7 @@ void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points, const i
 //-----------------------------------------------------------------------------
 unsigned int NonLinearCostFunction::GetNumberOfValues(void) const
 {
-  return m_NumberOfValues;
+  return m_NumberOfValues * 2; // multiply by 2 for dx, dy.
 }
 
 

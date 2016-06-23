@@ -40,12 +40,14 @@ public:
   typedef itk::SmartPointer<const Self>          ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType            ParametersType;
-  typedef Superclass::DerivativeType            DerivativeType;
-  typedef Superclass::MeasureType               MeasureType;
+  typedef Superclass::ParametersType             ParametersType;
+  typedef Superclass::DerivativeType             DerivativeType;
+  typedef Superclass::MeasureType                MeasureType;
 
-  void SetRightHandPoints(std::list<PointSet>* const points, const int& numDimensions);
+  void SetRightHandPoints(std::list<PointSet>* const points);
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
+  itkSetMacro(NumberOfValues, unsigned int);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -58,7 +60,7 @@ protected:
 
 private:
   std::list<PointSet> *m_RightHandPoints;
-  unsigned int         m_NumberOfRightHandValues;
+  unsigned int         m_NumberOfValues;
 };
 
 } // end namespace
