@@ -114,10 +114,10 @@ double NonLinearStereoCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
                          << leftToRightRotationMatrix.cols << ", " << leftToRightRotationMatrix.rows << ")";
   }
 
-  if (leftToRightTranslationVector.rows != 1 || leftToRightTranslationVector.cols != 3)
+  if (leftToRightTranslationVector.rows != 3 || leftToRightTranslationVector.cols != 1)
   {
-    niftkNiftyCalThrow() << "Left to Right translation vector matrix should be 1x3, and its ("
-                         << leftToRightTranslationVector.cols << ", " << leftToRightTranslationVector.rows << ")";
+    niftkNiftyCalThrow() << "Left to Right translation vector matrix should be 3x1, and its ("
+                         << leftToRightTranslationVector.rows << ", " << leftToRightTranslationVector.cols << ")";
   }
 
   if (rvecsLeft.size() != tvecsLeft.size())
@@ -189,73 +189,85 @@ double NonLinearStereoCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
     m_CostFunction->GetValue(initialParameters);
 
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-  int numberOfParamsNotToPrint = 4 + leftDistortion.cols + 4 + rightDistortion.cols + 6;
-
-  for (int i = numberOfParamsNotToPrint; i < initialParameters.GetSize(); i++)
+  int startingPointOfExtrinsics = 4 + leftDistortion.cols + 4 + rightDistortion.cols + 6;
+/*
+  for (int i = 0; i < startingPointOfExtrinsics; i++)
+  {
+    std::cout << "NonLinearStereoCalibrationOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;;
+  }
+  for (int i = startingPointOfExtrinsics; i < initialParameters.GetSize(); i++)
   {
     std::cout << "NonLinearStereoCalibrationOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
-    if ((i - numberOfParamsNotToPrint) % 6 == 5)
+    if ((i - startingPointOfExtrinsics) % 6 == 5)
     {
       std::cout << std::endl;
     }
   }
-  std::cout << ", rms=" << initialRMS << std::endl;
+*/
+  std::cout << "NonLinearStereoCalibrationOptimiser: initial rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
 
   // Get final parameters.
   niftk::NonLinearStereoCalibrationCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-
   niftk::NonLinearStereoCalibrationCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  for (int i = numberOfParamsNotToPrint; i < finalParameters.GetSize(); i++)
+  for (int i = startingPointOfExtrinsics; i < finalParameters.GetSize(); i++)
   {
     std::cout << "NonLinearStereoCalibrationOptimiser: final(" << i << ")=" << finalParameters[i]
                  << ", initial=" << initialParameters[i]
                  << ", diff=" << finalParameters[i] - initialParameters[i]
                  << std::endl;
-    if ((i - numberOfParamsNotToPrint) % 6 == 5)
+    if ((i - startingPointOfExtrinsics) % 6 == 5)
     {
       std::cout << std::endl;
     }
   }
 
   counter = 0;
-  leftIntrinsic.at<double>(0, 0) = initialParameters[counter++];
-  leftIntrinsic.at<double>(1, 1) = initialParameters[counter++];
-  leftIntrinsic.at<double>(0, 2) = initialParameters[counter++];
-  leftIntrinsic.at<double>(1, 2) = initialParameters[counter++];
+  leftIntrinsic.at<double>(0, 0) = finalParameters[counter++];
+  leftIntrinsic.at<double>(1, 1) = finalParameters[counter++];
+  leftIntrinsic.at<double>(0, 2) = finalParameters[counter++];
+  leftIntrinsic.at<double>(1, 2) = finalParameters[counter++];
   for (int i = 0; i < leftDistortion.cols; i++)
   {
-    leftDistortion.at<double>(0, i) = initialParameters[counter++];
+    leftDistortion.at<double>(0, i) = finalParameters[counter++];
   }
-  rightIntrinsic.at<double>(0, 0) = initialParameters[counter++];
-  rightIntrinsic.at<double>(1, 1) = initialParameters[counter++];
-  rightIntrinsic.at<double>(0, 2) = initialParameters[counter++];
-  rightIntrinsic.at<double>(1, 2) = initialParameters[counter++];
+  rightIntrinsic.at<double>(0, 0) = finalParameters[counter++];
+  rightIntrinsic.at<double>(1, 1) = finalParameters[counter++];
+  rightIntrinsic.at<double>(0, 2) = finalParameters[counter++];
+  rightIntrinsic.at<double>(1, 2) = finalParameters[counter++];
   for (int i = 0; i < rightDistortion.cols; i++)
   {
-    rightDistortion.at<double>(0, i) = initialParameters[counter++];
+    rightDistortion.at<double>(0, i) = finalParameters[counter++];
   }
-  leftToRightRotationVector.at<double>(0, 0) = initialParameters[counter++];
-  leftToRightRotationVector.at<double>(0, 1) = initialParameters[counter++];
-  leftToRightRotationVector.at<double>(0, 2) = initialParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 0) = initialParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 1) = initialParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 2) = initialParameters[counter++];
+  leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
+  leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
+  leftToRightRotationVector.at<double>(0, 2) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 2) = finalParameters[counter++];
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
-    rvecsLeft[i].at<double>(0, 0) = initialParameters[counter++];
-    rvecsLeft[i].at<double>(0, 1) = initialParameters[counter++];
-    rvecsLeft[i].at<double>(0, 2) = initialParameters[counter++];
-    tvecsLeft[i].at<double>(0, 0) = initialParameters[counter++];
-    tvecsLeft[i].at<double>(0, 1) = initialParameters[counter++];
-    tvecsLeft[i].at<double>(0, 2) = initialParameters[counter++];
+    rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+    rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+    rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
   }
 
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+
+  for (int i = 0; i < startingPointOfExtrinsics; i++)
+  {
+    std::cout << "NonLinearStereoCalibrationOptimiser: final(" << i << ")=" << finalParameters[i]
+                 << ", initial=" << initialParameters[i]
+                 << ", diff=" << finalParameters[i] - initialParameters[i]
+                 << std::endl;
+  }
 
   std::cout << "NonLinearStereoCalibrationOptimiser: stereo="
             << leftToRightRotationVector.at<double>(0, 0) << ", "
@@ -271,7 +283,7 @@ double NonLinearStereoCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
             << leftIntrinsic.at<double>(1, 2) << ", ";
   for (int i = 0; i < leftDistortion.cols; i++)
   {
-    std::cout << leftDistortion.at<double>(0, i);
+    std::cout << leftDistortion.at<double>(0, i) << ", ";
     if (i == leftDistortion.cols - 1)
     {
       std::cout << std::endl;
@@ -284,7 +296,7 @@ double NonLinearStereoCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
             << rightIntrinsic.at<double>(1, 2) << ", ";
   for (int i = 0; i < leftDistortion.cols; i++)
   {
-    std::cout << rightDistortion.at<double>(0, i);
+    std::cout << rightDistortion.at<double>(0, i) << ", ";
     if (i == rightDistortion.cols - 1)
     {
       std::cout << std::endl;

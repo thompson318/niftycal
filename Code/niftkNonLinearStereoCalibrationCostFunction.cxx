@@ -67,34 +67,39 @@ NonLinearStereoCalibrationCostFunction::InternalGetValue(const ParametersType& p
   result.SetSize(this->GetNumberOfValues());
 
   int counter = 0;
-  cv::Mat leftIntrinsic = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat leftIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
   leftIntrinsic.at<double>(0, 0) = parameters[counter++];
   leftIntrinsic.at<double>(1, 1) = parameters[counter++];
   leftIntrinsic.at<double>(0, 2) = parameters[counter++];
   leftIntrinsic.at<double>(1, 2) = parameters[counter++];
+  leftIntrinsic.at<double>(2, 2) = 1;
 
-  cv::Mat leftDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat leftDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   for (int i = 0; i < 5; i++)
   {
     leftDistortion.at<double>(0, i) = parameters[counter++];
   }
 
-  cv::Mat rightIntrinsic = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat rightIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
   rightIntrinsic.at<double>(0, 0) = parameters[counter++];
   rightIntrinsic.at<double>(1, 1) = parameters[counter++];
   rightIntrinsic.at<double>(0, 2) = parameters[counter++];
   rightIntrinsic.at<double>(1, 2) = parameters[counter++];
+  rightIntrinsic.at<double>(2, 2) = 1;
 
-  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat rightDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   for (int i = 0; i < 5; i++)
   {
     rightDistortion.at<double>(0, i) = parameters[counter++];
   }
 
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   leftToRightRotationVector.at<double>(0, 0) = parameters[counter++];
   leftToRightRotationVector.at<double>(0, 1) = parameters[counter++];
   leftToRightRotationVector.at<double>(0, 2) = parameters[counter++];
+
+  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
+  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
 
   cv::Mat leftToRightTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   leftToRightTranslationVector.at<double>(0, 0) = parameters[counter++];
@@ -133,7 +138,7 @@ NonLinearStereoCalibrationCostFunction::InternalGetValue(const ParametersType& p
       leftDistortion,
       leftCameraRotationVector,
       leftCameraTranslationVector,
-      leftToRightRotationVector,
+      leftToRightRotationMatrix,
       leftToRightTranslationVector,
       rightIntrinsic,
       rightDistortion,
