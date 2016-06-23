@@ -69,7 +69,7 @@ NonLinearHandEyeCostFunction::GetValue(const ParametersType& parameters ) const
   {
     niftkNiftyCalThrow() << "Different number of point sets and hand matrices.";
   }
-  return NonLinearHandEyeCostFunction::GetValue(parameters);
+  return NonLinearCostFunction::GetValue(parameters);
 }
 
 } // end namespace
