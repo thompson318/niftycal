@@ -24,6 +24,7 @@ namespace niftk
 {
 
 /**
+* \class NonLinearMalti12DOFHandEyeOptimiser
 * \brief Optimises only hand-eye and model-to-world.
 *
 * \see niftk::NonLinearMalti12DOFHandEyeCostFunction

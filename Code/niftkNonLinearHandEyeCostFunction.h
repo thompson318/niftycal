@@ -24,6 +24,7 @@ namespace niftk
 {
 
 /**
+* \class NonLinearHandEyeCostFunction
 * \brief Base class for non-linear hand-eye cost functions.
 */
 class NIFTYCAL_WINEXPORT NonLinearHandEyeCostFunction :

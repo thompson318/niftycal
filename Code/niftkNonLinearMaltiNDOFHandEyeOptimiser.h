@@ -24,6 +24,7 @@ namespace niftk
 {
 
 /**
+* \class NonLinearMaltiNDOFHandEyeOptimiser
 * \brief Optimises camera extrinsic, hand-eye and model-to-world,
 * as an extension of <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 *
