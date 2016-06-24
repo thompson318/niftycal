@@ -15,6 +15,7 @@
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
 set(TEST_CASES
   niftkNiftyCalExceptionTest
+  niftkPointUtilitiesTest
   niftkPointDistortionTest
   niftkMatrixAverageTest
   niftkWarpChessboardByHomographyTest
@@ -52,8 +53,9 @@ endforeach()
 # Put unit-tests at the top. There is no point trying to assess the correctness of functional
 # requirements, if the internal and most lowest level unit tests themselves do not work.
 add_test(UNIT-NiftyCalExcept ${EXECUTABLE_OUTPUT_PATH}/niftkNiftyCalExceptionTest)
-add_test(UNIT-InterpSurf1 ${EXECUTABLE_OUTPUT_PATH}/niftkInterpolateQuadraticSurfaceTest)
+add_test(UNIT-PointUtils ${EXECUTABLE_OUTPUT_PATH}/niftkPointUtilitiesTest)
 add_test(UNIT-PointDist ${EXECUTABLE_OUTPUT_PATH}/niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
+add_test(UNIT-InterpSurf1 ${EXECUTABLE_OUTPUT_PATH}/niftkInterpolateQuadraticSurfaceTest)
 add_test(UNIT-WarpHomog1 ${EXECUTABLE_OUTPUT_PATH}/niftkWarpChessboardByHomographyTest ${DATA_DIR}/Laparoscope/Left/left-1095.png ${DATA_DIR}/Laparoscope/Left/left-1338.png 14 10 1.0880866642) #RMS error of difference in points.
 add_test(UNIT-AveMatrix1 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
 add_test(UNIT-AveMatrix2 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)

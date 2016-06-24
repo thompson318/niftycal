@@ -26,7 +26,7 @@ namespace niftk
 {
 
 /**
-* \brief Maps all points in src to target via homography.
+* \brief Maps all points in src to target using homography.
 */
 NIFTYCAL_WINEXPORT void WarpPointsByHomography(const PointSet& src,
                                                const cv::Mat& homography,
@@ -48,7 +48,8 @@ NIFTYCAL_WINEXPORT void FindHomography(const PointSet& src,
 * \brief Warps inputImage to outputImage, depending on
 * homography that maps between distortedPoints and targetPoints.
 * \param distortedPoints points detected in the original video image
-* \param targetPoints reference points in the canonical/reference image
+* \param targetPoints reference points in the reference image
+* \param outputImage output image, computed using linear interpolation
 * \param outputPoints warped points, that should be very close to the reference points
 */
 NIFTYCAL_WINEXPORT void WarpImageByCorrespondingPoints(const cv::Mat& inputImage,
@@ -64,7 +65,7 @@ NIFTYCAL_WINEXPORT void WarpImageByCorrespondingPoints(const cv::Mat& inputImage
 
 
 /**
-* \brief Warps inputImage to outputImage according on homography.
+* \brief Warps inputImage to outputImage using linear interpolation and homography.
 */
 NIFTYCAL_WINEXPORT void WarpImageByHomography(const cv::Mat& inputImage,
                                               const cv::Mat& homography,

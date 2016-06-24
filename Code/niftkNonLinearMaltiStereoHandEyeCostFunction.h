@@ -22,6 +22,7 @@ namespace niftk
 {
 
 /**
+* \class NonLinearMaltiStereoHandEyeCostFunction
 * \brief Computes cost as RMS re-projection error for stereo, extrinsic,
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.

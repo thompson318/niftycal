@@ -22,11 +22,16 @@
 #include <Internal/niftkIterativeCalibrationUtilities_p.h>
 #include <highgui.h>
 
+#ifdef NIFTYCAL_WITH_ITK
+#include <niftkNonLinearStereoCalibrationOptimiser.h>
+#endif
+
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
 cv::Matx21d IterativeStereoCameraCalibration(
+    const bool& optimise3D,
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
@@ -309,6 +314,29 @@ cv::Matx21d IterativeStereoCameraCalibration(
       tmpLeftToRightTranslationVector.copyTo(leftToRightTranslationVector);
       tmpEssentialMatrix.copyTo(essentialMatrix);
       tmpFundamentalMatrix.copyTo(fundamentalMatrix);
+
+#ifdef NIFTYCAL_WITH_ITK
+      if (optimise3D)
+      {
+        // Now optimise RMS reconstruction error.
+        niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
+            niftk::NonLinearStereoCalibrationOptimiser::New();
+        Model3D* tmpModel = const_cast<Model3D*>(&model);
+        optimiser->SetModelAndPoints(tmpModel,
+                                     &distortedPointsFromCanonicalImagesLeft,
+                                     &distortedPointsFromCanonicalImagesRight);
+
+        reconstructedRMS = optimiser->Optimise(intrinsicLeft,
+                                               distortionLeft,
+                                               intrinsicRight,
+                                               distortionRight,
+                                               rvecsLeft,
+                                               tvecsLeft,
+                                               leftToRightRotationMatrix,
+                                               leftToRightTranslationVector
+                                              );
+      }
+#endif
     }
     else
     {

@@ -28,10 +28,10 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 16)
+  if (argc < 17)
   {
     std::cerr << "Usage: niftkStereoIterativeRingsCalibration modelPoints.txt "
-              << " referenceImage.png referencePoints templateImage dotsInX dotsInY rescaleX rescaleY zeroDistortion "
+              << " referenceImage.png referencePoints templateImage dotsInX dotsInY rescaleX rescaleY zeroDistortion optimise3D "
               << "leftImage1.png leftImage2.png ... leftImageN.txt "
               << "rightImage1.png rightImage2.png ... rightImageN.txt "
               << std::endl;
@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
 
   try
   {
-    int numberOfArgumentsBeforeImages = 10;
+    int numberOfArgumentsBeforeImages = 11;
     int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
     if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
@@ -91,6 +91,7 @@ int main(int argc, char ** argv)
     }
 
     int   zeroDistortion = atoi(argv[9]);
+    int   optimise3D = atoi(argv[8]);
 
     // This is passed through to cv::findCirclesGrid, for which the documentation
     // says "patternSize = Size(points_per_row, points_per_colum)"
@@ -234,6 +235,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslationVector;
 
     cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
+          optimise3D,
           model,
           referenceImageData,
           originalImagesLeft,

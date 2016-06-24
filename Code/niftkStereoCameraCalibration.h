@@ -30,7 +30,7 @@ namespace niftk
 * \return rms re-projection error over both views
 *
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
-* and that each corresponding point set has at least 1 corresponding points, meaning
+* and that each corresponding pair of point set has at least 4 corresponding points, meaning
 * the same point ID is visible in both left and right view.
 *
 * This method, ONLY does the stereo calibration. Also, OpenCV notes that this

@@ -22,6 +22,7 @@ namespace niftk
 {
 
 /**
+* \class NonLinearMaltiHandEyeCostFunction
 * \brief Computes cost as RMS re-projection error for intrinsic, hand-eye and model-to-world
 * optimisation as per <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 *

@@ -153,6 +153,7 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   cv::Mat leftToRightTranslationVector;
 
   cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
+        false,
         model,
         referenceImageData,
         originalImagesLeft,

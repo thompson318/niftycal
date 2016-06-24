@@ -32,8 +32,18 @@ class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public PointDetector
 
 public:
 
+  /**
+  * \brief Constructor.
+  * \param includeCorners if true will output the 4 corners as well as
+  * the centre point. Preliminary testing suggests that the central point
+  * is most accurate, as there is an averaging effect of computing the
+  * centre from the 4 corners. So, if you want really accurate points,
+  * just use the centre one. If you want lots of additional points,
+  * use all the corners aswell. The corners are ordered, and given a
+  * point ID, are output as 1000+ID, 2000+ID, 3000+ID and 4000+ID.
+  */
   AprilTagsPointDetector(bool includeCorners,
-                         const std::string& name,
+                         const std::string& tagFamilyName,
                          float sigma,
                          float segmentationSigma
                         );
