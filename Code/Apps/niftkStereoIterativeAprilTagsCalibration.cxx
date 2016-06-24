@@ -29,7 +29,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 14)
+  if (argc < 15)
   {
     std::cerr << "Usage: niftkStereoIterativeAprilTagsCalibration modelPoints.txt "
               << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion optimise3D "
