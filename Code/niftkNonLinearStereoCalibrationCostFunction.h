@@ -60,7 +60,6 @@ protected:
 
 private:
   std::list<PointSet> *m_RightHandPoints;
-  unsigned int         m_NumberOfValues;
 };
 
 } // end namespace

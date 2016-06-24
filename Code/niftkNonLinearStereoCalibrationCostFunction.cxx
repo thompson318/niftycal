@@ -23,7 +23,6 @@ namespace niftk
 //-----------------------------------------------------------------------------
 NonLinearStereoCalibrationCostFunction::NonLinearStereoCalibrationCostFunction()
 : m_RightHandPoints(nullptr)
-, m_NumberOfValues(0)
 {
 }
 
@@ -50,7 +49,7 @@ void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(std::list<PointS
 //-----------------------------------------------------------------------------
 unsigned int NonLinearStereoCalibrationCostFunction::GetNumberOfValues(void) const
 {
-  return m_NumberOfValues;
+  return this->m_NumberOfValues;
 }
 
 
