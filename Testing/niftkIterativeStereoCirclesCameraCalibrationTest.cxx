@@ -151,6 +151,7 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
   cv::Mat leftToRightTranslationVector;
 
   cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
+        false,
         model,
         referenceImageData,
         originalImagesLeft,

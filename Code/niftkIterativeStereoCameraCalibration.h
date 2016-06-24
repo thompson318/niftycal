@@ -31,6 +31,7 @@ namespace niftk
 * \return rms re-projection and 3D reconstruction error
 */
 NIFTYCAL_WINEXPORT cv::Matx21d IterativeStereoCameraCalibration(
+    const bool& optimise3D, // only works if ITK is compiled in.
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,

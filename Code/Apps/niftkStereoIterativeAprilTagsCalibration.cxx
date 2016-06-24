@@ -32,7 +32,7 @@ int main(int argc, char ** argv)
   if (argc < 14)
   {
     std::cerr << "Usage: niftkStereoIterativeAprilTagsCalibration modelPoints.txt "
-              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion "
+              << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion optimise3D "
               << "leftImage1.png leftImage2.png ... leftImageN.txt "
               << "rightImage1.png rightImage2.png ... rightImageN.txt "
               << std::endl;
@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
 
   try
   {
-    int numberOfArgumentsBeforeImages = 8;
+    int numberOfArgumentsBeforeImages = 9;
     int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
     if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
@@ -76,6 +76,7 @@ int main(int argc, char ** argv)
     }
 
     int   zeroDistortion = atoi(argv[7]);
+    int   optimise3D = atoi(argv[8]);
 
     cv::Point2d originalScaleFactors;
     originalScaleFactors.x = rescaleX;
@@ -184,6 +185,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslationVector;
 
     cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
+          optimise3D,
           model,
           referenceImageData,
           originalImagesLeft,
