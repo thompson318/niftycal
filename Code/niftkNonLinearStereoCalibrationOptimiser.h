@@ -25,7 +25,8 @@ namespace niftk
 
 /**
 * \class NonLinearStereoCalibrationOptimiser
-* \brief Optimises standard OpenCV camera model by reconstructing the actual model position.
+* \brief Optimises standard OpenCV camera model by reconstructing the actual model position,
+* optimising intrinsic, extrinsic and stereo parameters.
 *
 * \see niftk::NonLinearStereoCalibrationCostFunction
 */

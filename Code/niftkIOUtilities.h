@@ -61,7 +61,7 @@ NIFTYCAL_WINEXPORT void SaveNifTKIntrinsics(const cv::Mat& intrinsics,
 * \brief Saves NifTK format right-to-left stereo extrinsics transform.
 *
 * Note: OpenCV and NiftyCal naturally uses left-to-right. NifTK uses right-to-left.
-* This output form is a 3x3 rotation matrix, followed by a translation as a row vector.
+* This output form is a 3x3 rotation matrix, followed by a translation as a 1x3 row vector.
 */
 NIFTYCAL_WINEXPORT void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
                                                   const cv::Mat& leftToRightTranslationVector,
@@ -83,7 +83,7 @@ NIFTYCAL_WINEXPORT void SaveRigidParams(const cv::Mat& rotationVector,
                                         );
 
 /**
-* \brief Simply writes a 4x4 matrix to file as 4 numbers per line.
+* \brief Writes a 4x4 matrix to file as 4 numbers per line.
 */
 NIFTYCAL_WINEXPORT void Save4x4Matrix(const cv::Mat& leftToRightRotationMatrix,
                                       const cv::Mat& leftToRightTranslationVector,
@@ -91,7 +91,7 @@ NIFTYCAL_WINEXPORT void Save4x4Matrix(const cv::Mat& leftToRightRotationMatrix,
                                      );
 
 /**
-* \brief Simply writes a 4x4 matrix to file as 4 numbers per line.
+* \brief Writes a 4x4 matrix to file as 4 numbers per line.
 */
 NIFTYCAL_WINEXPORT void Save4x4Matrix(const cv::Matx44d& matrix,
                                       const std::string& fileName

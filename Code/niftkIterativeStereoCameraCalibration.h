@@ -25,13 +25,15 @@ namespace niftk
 {
 
 /**
-* \brief Given a list of images, performs iterative stereo camera calibration,
+* \brief Given lists of detectors and images, performs iterative stereo camera calibration,
 * as an extension of <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474>Dutta 2009</a>.
+* \param optimise3D if true and ITK is compiled in, will additionally optimise all
+* camera parameters by minimise the RMS reconstruction error, reconstructing the target points in 3D.
 * \see niftk::StereoCameraCalibration
 * \return rms re-projection and 3D reconstruction error
 */
 NIFTYCAL_WINEXPORT cv::Matx21d IterativeStereoCameraCalibration(
-    const bool& optimise3D, // only works if ITK is compiled in.
+    const bool& optimise3D, // only works if ITK is compiled in, otherwise its ignored.
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,

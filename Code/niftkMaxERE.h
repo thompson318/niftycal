@@ -24,6 +24,7 @@
 *
 * See Algorithm 1, <a href="http://dx.doi.org/10.1109/IROS.2013.6696595">Richardson et al. IROS 2013</a>.
 *
+* NOTE: Not complete and not yet used.
 */
 namespace niftk
 {

@@ -24,7 +24,8 @@ namespace niftk
 
 /**
 * \class NonLinearStereoCalibrationCostFunction
-* \brief Computes cost as RMS reconstruction (3D) error.
+* \brief Computes cost as RMS reconstruction (3D) error
+* for intrinsic, extrinsic and stereo optimisation.
 *
 * \see niftk::NonLinearStereoCalibrationOptimiser
 */

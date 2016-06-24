@@ -24,7 +24,7 @@ namespace niftk
 
 /**
 * \class PointDetector
-* \brief Base class for  based IPoint2DDetectors, mainly to handle image
+* \brief Base class for IPoint2DDetectors, mainly to handle image
 * rescaling, and the resultant scaling of the detected points.
 *
 * This detector is not thread safe.

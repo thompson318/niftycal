@@ -25,7 +25,8 @@ namespace niftk
 
 /**
 * \class NonLinearCostFunction
-* \brief Base class for non-linear cost functions.
+* \brief Base class for non-linear cost functions used to
+* optimise 2D reprojection or 3D reconstruction error.
 */
 class NIFTYCAL_WINEXPORT NonLinearCostFunction :
     public itk::MultipleValuedCostFunction
