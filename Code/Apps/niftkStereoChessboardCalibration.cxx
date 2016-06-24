@@ -33,9 +33,9 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 13)
+  if (argc < 14)
   {
-    std::cerr << "Usage: niftkStereoChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion "
+    std::cerr << "Usage: niftkStereoChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion optimise3D "
               << "leftImage1.png leftImage2.png ... leftImageN.txt"
               << "rightImage1.png rightImage2.png ... rightImageN.txt"
               << std::endl;
@@ -44,7 +44,7 @@ int main(int argc, char ** argv)
 
   try
   {
-    int numberOfArgumentsBeforeImages = 7;
+    int numberOfArgumentsBeforeImages = 8;
     int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
     if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
@@ -85,6 +85,7 @@ int main(int argc, char ** argv)
     scaleFactors.y = rescaleY;
 
     int   zeroDistortion = atoi(argv[6]);
+    int   optimise3D = atoi(argv[7]);
 
     cv::Size2i imageSize;
     niftk::PointSet pointSet;
@@ -235,19 +236,22 @@ int main(int argc, char ** argv)
                                                                         );
 
 #ifdef NIFTYCAL_WITH_ITK
-    // Now optimise RMS reconstruction error.
-    niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
-        niftk::NonLinearStereoCalibrationOptimiser::New();
-    optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
-    rmsReconstructionError = optimiser->Optimise(intrinsicLeft,
-                                                 distortionLeft,
-                                                 intrinsicRight,
-                                                 distortionRight,
-                                                 rvecsLeft,
-                                                 tvecsLeft,
-                                                 leftToRightRotationMatrix,
-                                                 leftToRightTranslationVector
-                                                );
+    if (optimise3D)
+    {
+      // Now optimise RMS reconstruction error.
+      niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
+          niftk::NonLinearStereoCalibrationOptimiser::New();
+      optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
+      rmsReconstructionError = optimiser->Optimise(intrinsicLeft,
+                                                   distortionLeft,
+                                                   intrinsicRight,
+                                                   distortionRight,
+                                                   rvecsLeft,
+                                                   tvecsLeft,
+                                                   leftToRightRotationMatrix,
+                                                   leftToRightTranslationVector
+                                                  );
+    }
 #endif
 
     std::cout << "niftkStereoChessboardCalibration:(" << imageSize.width << "," << imageSize.height <<  ") "
