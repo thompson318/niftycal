@@ -242,6 +242,7 @@ int main(int argc, char ** argv)
       niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
           niftk::NonLinearStereoCalibrationOptimiser::New();
       optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
+
       rmsReconstructionError = optimiser->Optimise(intrinsicLeft,
                                                    distortionLeft,
                                                    intrinsicRight,
@@ -251,6 +252,19 @@ int main(int argc, char ** argv)
                                                    leftToRightRotationMatrix,
                                                    leftToRightTranslationVector
                                                   );
+
+      rms = niftk::ComputeRMSReprojectionError(model,
+                                               listOfPointsLeft,
+                                               listOfPointsRight,
+                                               intrinsicLeft,
+                                               distortionLeft,
+                                               rvecsLeft,
+                                               tvecsLeft,
+                                               intrinsicRight,
+                                               distortionRight,
+                                               leftToRightRotationMatrix,
+                                               leftToRightTranslationVector
+                                              );
     }
 #endif
 
