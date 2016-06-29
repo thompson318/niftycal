@@ -335,6 +335,19 @@ cv::Matx21d IterativeStereoCameraCalibration(
                                                leftToRightRotationMatrix,
                                                leftToRightTranslationVector
                                               );
+
+        projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                          distortedPointsFromCanonicalImagesLeft,
+                                                          distortedPointsFromCanonicalImagesRight,
+                                                          intrinsicLeft,
+                                                          distortionLeft,
+                                                          rvecsLeft,
+                                                          tvecsLeft,
+                                                          intrinsicRight,
+                                                          distortionRight,
+                                                          leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector
+                                                         );
       }
 #endif
     }
