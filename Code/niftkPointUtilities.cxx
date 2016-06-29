@@ -854,4 +854,101 @@ double ComputeRMSReconstructionError(const Model3D& model,
   return rms;
 }
 
+
+//-----------------------------------------------------------------------------
+double ComputeRMSReprojectionError(
+    const Model3D& model,
+    const std::list<PointSet>& listOfLeftHandPointSets,
+    const std::list<PointSet>& listOfRightHandPointSets,
+    const cv::Mat& leftIntrinsics,
+    const cv::Mat& leftDistortionParams,
+    const std::vector<cv::Mat>& rvecsLeft,
+    const std::vector<cv::Mat>& tvecsLeft,
+    const cv::Mat& rightIntrinsics,
+    const cv::Mat& rightDistortionParams,
+    const cv::Mat& leftToRightRotationMatrix,
+    const cv::Mat& leftToRightTranslationVector
+    )
+{
+  double rms = 0;
+  unsigned int pointCounter = 0;
+  unsigned int viewCounter = 0;
+
+  if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left and right points.";
+  }
+  if (listOfLeftHandPointSets.size() != rvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and rotation vectors.";
+  }
+  if (listOfLeftHandPointSets.size() != tvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and translation vectors.";
+  }
+
+  cv::Matx44d leftToRight = niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix,
+                                                                  leftToRightTranslationVector
+                                                                 );
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+
+  for (leftIter = listOfLeftHandPointSets.begin(),
+       rightIter = listOfRightHandPointSets.begin();
+       leftIter != listOfLeftHandPointSets.end() &&
+       rightIter != listOfRightHandPointSets.end();
+       ++leftIter,
+       ++rightIter
+       )
+  {
+
+    std::vector<cv::Point2f> observed;
+    std::vector<cv::Point2f> projected;
+    std::vector<niftk::NiftyCalIdType> ids;
+
+    cv::Matx44d leftExtrinsic = niftk::RodriguesToMatrix(rvecsLeft[viewCounter], tvecsLeft[viewCounter]);
+    unsigned int numberOfPointsInLeft = niftk::ProjectMatchingPoints(model,
+                                                                     *leftIter,
+                                                                     leftExtrinsic,
+                                                                     leftIntrinsics,
+                                                                     leftDistortionParams,
+                                                                     observed,
+                                                                     projected,
+                                                                     ids
+                                                                     );
+
+    for (unsigned int i = 0; i < numberOfPointsInLeft; i++)
+    {
+      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
+    }
+    cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
+    unsigned int numberOfPointsInRight = niftk::ProjectMatchingPoints(model,
+                                                                      *rightIter,
+                                                                      rightExtrinsic,
+                                                                      rightIntrinsics,
+                                                                      rightDistortionParams,
+                                                                      observed,
+                                                                      projected,
+                                                                      ids
+                                                                      );
+    for (unsigned int i = 0; i < numberOfPointsInRight; i++)
+    {
+      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
+      rms += ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+    }
+    pointCounter += (numberOfPointsInLeft + numberOfPointsInRight);
+    viewCounter++;
+  }
+
+  if (pointCounter != 0)
+  {
+    rms /= static_cast<double>(pointCounter);
+  }
+
+  rms = sqrt(rms);
+
+  return rms;
+}
+
 } // end namespace
