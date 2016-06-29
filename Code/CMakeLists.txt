@@ -54,6 +54,8 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiStereoHandEyeOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationCostFunction.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})

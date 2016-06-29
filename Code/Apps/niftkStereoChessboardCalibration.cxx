@@ -24,7 +24,7 @@
 #include <cstdlib>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoCalibrationOptimiser.h>
+#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
 #endif
 
 /**
@@ -239,15 +239,17 @@ int main(int argc, char ** argv)
     if (optimise3D)
     {
       // Now optimise RMS reconstruction error.
-      niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
-          niftk::NonLinearStereoCalibrationOptimiser::New();
-      optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
+      niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer optimiser =
+          niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
 
-      rmsReconstructionError = optimiser->Optimise(intrinsicLeft,
-                                                   distortionLeft,
-                                                   intrinsicRight,
-                                                   distortionRight,
-                                                   rvecsLeft,
+      optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
+      optimiser->SetIntrinsics(&intrinsicLeft,
+                               &distortionLeft,
+                               &intrinsicRight,
+                               &distortionRight
+                               );
+
+      rmsReconstructionError = optimiser->Optimise(rvecsLeft,
                                                    tvecsLeft,
                                                    leftToRightRotationMatrix,
                                                    leftToRightTranslationVector
