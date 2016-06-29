@@ -23,7 +23,7 @@
 #include <highgui.h>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoCalibrationOptimiser.h>
+#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
 #endif
 
 namespace niftk
@@ -319,18 +319,20 @@ cv::Matx21d IterativeStereoCameraCalibration(
       if (optimise3D)
       {
         // Now optimise RMS reconstruction error.
-        niftk::NonLinearStereoCalibrationOptimiser::Pointer optimiser =
-            niftk::NonLinearStereoCalibrationOptimiser::New();
+        niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer optimiser =
+            niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
         Model3D* tmpModel = const_cast<Model3D*>(&model);
         optimiser->SetModelAndPoints(tmpModel,
                                      &distortedPointsFromCanonicalImagesLeft,
                                      &distortedPointsFromCanonicalImagesRight);
 
-        reconstructedRMS = optimiser->Optimise(intrinsicLeft,
-                                               distortionLeft,
-                                               intrinsicRight,
-                                               distortionRight,
-                                               rvecsLeft,
+        optimiser->SetIntrinsics(&intrinsicLeft,
+                                 &distortionLeft,
+                                 &intrinsicRight,
+                                 &distortionRight
+                                 );
+
+        reconstructedRMS = optimiser->Optimise(rvecsLeft,
                                                tvecsLeft,
                                                leftToRightRotationMatrix,
                                                leftToRightTranslationVector

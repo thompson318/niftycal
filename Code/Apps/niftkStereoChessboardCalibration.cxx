@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
   if (argc < 14)
   {
     std::cerr << "Usage: niftkStereoChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion optimise3D "
-              << "leftImage1.png leftImage2.png ... leftImageN.txt"
+              << "leftImage1.png leftImage2.png ... leftImageN.txt "
               << "rightImage1.png rightImage2.png ... rightImageN.txt"
               << std::endl;
     return EXIT_FAILURE;
