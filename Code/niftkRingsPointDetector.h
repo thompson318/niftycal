@@ -39,7 +39,9 @@ namespace niftk
 *   <li>Convert the outer contours to an image of big blobs. </li>
 *   <li>Use cv::findCirclesGrid() using cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
 *       on both little and big blobs</li>
-*   <li>Take the average position of each pair of little/big blobs.
+*   <li>Take the average position of each pair of little/big blobs, or if only 1 of these little/big.
+*       blob detectors works, will just use that. It is assumed that this whole blob detection thing
+*       is just to initialise a template matching. So, as long as we have an initial starting point we are ok.
 * </ol>
 * This detector is not thread safe.
 */

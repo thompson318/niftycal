@@ -29,7 +29,7 @@ RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
 : TemplateMatchingPointDetector(patternSize, offsetForTemplate)
 , m_UseOuterContour(true)
 , m_ThresholdValue(50)
-, m_AdaptiveThreshold(75)
+, m_AdaptiveThreshold(20)
 {
 }
 
@@ -106,6 +106,7 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
   cv::Scalar black( 0, 0, 0);
 
   cv::threshold(image, thresholdedImage, m_ThresholdValue, 255, cv::THRESH_BINARY);
+
   this->ExtractIndexes(thresholdedImage, hierarchy, contours, innerRingIndexes, outerRingIndexes);
 
   if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
@@ -120,7 +121,6 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
                           cv::THRESH_BINARY, blockSize, m_AdaptiveThreshold);
 
     this->ExtractIndexes(thresholdedImage, hierarchy, contours, innerRingIndexes, outerRingIndexes);
-
     if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
         || outerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height))
     {
@@ -167,33 +167,35 @@ PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
     , blobDetector
     );
 
-  if (!foundBig || !foundLittle)
+  if (!foundBig && !foundLittle)
   {
     return result;
   }
 
-  assert(littleCentres.size() == bigCentres.size());
-
-  if (   littleCentres.size() == numberOfRings
-      && bigCentres.size() == numberOfRings
-      )
+  for ( unsigned int k = 0; k < numberOfRings; ++k)
   {
-    for ( unsigned int k = 0; k < numberOfRings; ++k)
+    Point2D tmp;
+    tmp.point.x = 0;
+    tmp.point.y = 0;
+
+    unsigned int counter = 0;
+    if (m_UseOuterContour && foundBig && k < bigCentres.size())
     {
-      Point2D tmp;
-      if (m_UseOuterContour)
-      {
-        tmp.point.x = (littleCentres[k].x + bigCentres[k].x)/2.0;
-        tmp.point.y = (littleCentres[k].y + bigCentres[k].y)/2.0;
-      }
-      else
-      {
-        tmp.point.x = (littleCentres[k].x);
-        tmp.point.y = (littleCentres[k].y);
-      }
-      tmp.id = k;
-      result.insert(IdPoint2D(tmp.id, tmp));
+      tmp.point.x += bigCentres[k].x;
+      tmp.point.y += bigCentres[k].y;
+      counter++;
     }
+    if (foundLittle && k < littleCentres.size())
+    {
+      tmp.point.x += littleCentres[k].x;
+      tmp.point.y += littleCentres[k].y;
+      counter++;
+    }
+    assert(counter > 0); // because one, or other, or both lists should have point.
+    tmp.point.x /= static_cast<double>(counter);
+    tmp.point.y /= static_cast<double>(counter);
+    tmp.id = k;
+    result.insert(IdPoint2D(tmp.id, tmp));
   }
   return result;
 }
