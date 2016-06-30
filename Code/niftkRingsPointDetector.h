@@ -26,6 +26,21 @@ namespace niftk
 * \brief Detects rings pattern, as seen in
 * <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>.
 *
+* Our method for finding blobs is:
+* <ol>
+*   <li>Threshold using cv::threshold and m_ThresholdValue which defaults to 50.
+*       This can be changed via the SetThreshold() method.</li>
+*   <li>Use cv::findContours() to find inner and outer contours.
+*   <li>If the full set of contours is not found, try adaptive thresholding using
+*       cv::adaptiveThreshold() and ADAPTIVE_THRESH_MEAN_C, and m_AdaptiveThreshold which
+*       defaults to 75. This can also be changed with SetAdaptiveThreshold().</li>
+*   <li>If the full set of contours is not found, give up. </li>
+*   <li>Convert the inner contours to an image of little blobs. </li>
+*   <li>Convert the outer contours to an image of big blobs. </li>
+*   <li>Use cv::findCirclesGrid() using cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
+*       on both little and big blobs</li>
+*   <li>Take the average position of each pair of little/big blobs.
+* </ol>
 * This detector is not thread safe.
 */
 class NIFTYCAL_WINEXPORT RingsPointDetector : public TemplateMatchingPointDetector
@@ -38,6 +53,8 @@ public:
                     );
   virtual ~RingsPointDetector();
   void SetUseOuterContour(const bool& useIt);     // Default to true.
+  void SetThreshold(const unsigned char& thresholdValue); // Default to 50.
+  void SetAdaptiveThreshold(const unsigned char& thresholdValue); // Default to 75;
 
 protected:
 
@@ -49,7 +66,15 @@ protected:
 private:
 
   void ExtractBlobs(const cv::Mat& image, cv::Mat& bigBlobs, cv::Mat& littleBlobs);
-  bool m_UseOuterContour;
+  void ExtractIndexes(const cv::Mat& image,
+                      std::vector<cv::Vec4i>& hierarchy,
+                      std::vector<std::vector<cv::Point> >& contours,
+                      std::vector<unsigned int>& inner,
+                      std::vector<unsigned int>& outer);
+
+  bool          m_UseOuterContour;
+  unsigned char m_ThresholdValue;
+  unsigned char m_AdaptiveThreshold;
 };
 
 } // end namespace
