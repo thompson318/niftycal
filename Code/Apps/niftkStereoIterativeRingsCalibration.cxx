@@ -91,7 +91,7 @@ int main(int argc, char ** argv)
     }
 
     int   zeroDistortion = atoi(argv[9]);
-    int   optimise3D = atoi(argv[8]);
+    int   optimise3D = atoi(argv[10]);
 
     // This is passed through to cv::findCirclesGrid, for which the documentation
     // says "patternSize = Size(points_per_row, points_per_colum)"
