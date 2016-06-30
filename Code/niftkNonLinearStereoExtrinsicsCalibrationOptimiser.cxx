@@ -185,8 +185,10 @@ double NonLinearStereoExtrinsicsCalibrationOptimiser::Optimise(std::vector<cv::M
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearStereoExtrinsicsCalibrationCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-  niftk::NonLinearStereoExtrinsicsCalibrationCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearStereoExtrinsicsCalibrationCostFunction::ParametersType finalParameters
+      = optimiser->GetCurrentPosition();
+  niftk::NonLinearStereoExtrinsicsCalibrationCostFunction::MeasureType finalValues
+      = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
   for (int i = startingPointOfExtrinsics; i < finalParameters.GetSize(); i++)
