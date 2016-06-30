@@ -231,7 +231,11 @@ NIFTYCAL_WINEXPORT void TriangulatePointPairs(const PointSet& leftDistortedPoint
                                              );
 
 /**
-* \brief Used to evaluate a stereo calibration's RMS reconstruction error, using triangulation.
+* \brief Computes stereo RMS reconstruction error, using triangulation, via camera matrices.
+*
+* This takes the 2D camera points, in left and right hand camera, triangulates to a 3D
+* position in the left hand camera space, multiplies by the inverse of each
+* left camera intrinsic matrix, and compares to the model position.
 */
 NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
                                                         const std::list<PointSet>& listOfLeftHandPointSets,
@@ -247,6 +251,42 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
                                                         cv::Point3d& rmsForEachAxis
                                                        );
 
+/**
+* \brief Computes stereo RMS reconstruction error, using triangulation, via tracking matrices.
+*
+* This takes the 2D camera points, in left and right hand camera, triangulates to a 3D
+* position in the left hand camera space, multiplies by the inverse of the hand-eye
+* matrix, the inverse of the tracking matrix and the inverse of the model-to-world matrix.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
+                                                        const std::list<PointSet>& listOfLeftHandPointSets,
+                                                        const std::list<PointSet>& listOfRightHandPointSets,
+                                                        const cv::Mat& leftIntrinsics,
+                                                        const cv::Mat& leftDistortionParams,
+                                                        const std::vector<cv::Mat>& rvecsLeft,
+                                                        const std::vector<cv::Mat>& tvecsLeft,
+                                                        const cv::Mat& rightIntrinsics,
+                                                        const cv::Mat& rightDistortionParams,
+                                                        const cv::Mat& leftToRightRotationMatrix,
+                                                        const cv::Mat& leftToRightTranslationVector,
+                                                        const std::list<cv::Matx44d>& trackingMatrices,
+                                                        const cv::Matx44d& handEyeMatrix,
+                                                        const cv::Matx44d& modelToWorldMatrix
+                                                       );
+
+
+/**
+* \brief Computes mono reconstruction error, taking model points, and multiplying
+* through camera, hand-eye, tracking and modelToWorld matrices.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
+                                                        const std::list<PointSet>& pointSets,
+                                                        const std::vector<cv::Mat>& rvecs,
+                                                        const std::vector<cv::Mat>& tvecs,
+                                                        const std::list<cv::Matx44d>& trackingMatrices,
+                                                        const cv::Matx44d& handEyeMatrix,
+                                                        const cv::Matx44d& modelToWorldMatrix
+                                                       );
 
 /**
 * \brief Used to evaluate a stereo calibration's RMS re-projection error.

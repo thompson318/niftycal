@@ -28,6 +28,8 @@ RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
                                       )
 : TemplateMatchingPointDetector(patternSize, offsetForTemplate)
 , m_UseOuterContour(true)
+, m_ThresholdValue(50)
+, m_AdaptiveThreshold(20)
 {
 }
 
@@ -46,14 +48,14 @@ void RingsPointDetector::SetUseOuterContour(const bool& useIt)
 
 
 //-----------------------------------------------------------------------------
-void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
-                                            cv::Mat& bigBlobs,
-                                            cv::Mat& littleBlobs
-                                           )
+void RingsPointDetector::ExtractIndexes(const cv::Mat& image,
+                                        std::vector<cv::Vec4i>& hierarchy,
+                                        std::vector<std::vector<cv::Point> >& contours,
+                                        std::vector<unsigned int>& innerRingIndexes,
+                                        std::vector<unsigned int>& outerRingIndexes)
 {
-
-  cv::Mat thresholdedImage;
-  cv::threshold(image, thresholdedImage, 50, 255, cv::THRESH_BINARY);
+  innerRingIndexes.clear();
+  outerRingIndexes.clear();
 
   // cv::RETR_CCOMP is important.
   //
@@ -65,12 +67,7 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
   //
   // And using RETR_CCOMP, the inner holes come out first.
 
-  std::vector<cv::Vec4i> hierarchy;
-  std::vector<std::vector<cv::Point> > contours;
-  std::vector<unsigned int> innerRingIndexes;
-  std::vector<unsigned int> outerRingIndexes;
-
-  cv::findContours(thresholdedImage, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_NONE);
+  cv::findContours(image, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_NONE);
 
   unsigned int counter = 0;
   while(   counter < hierarchy.size()
@@ -86,24 +83,55 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
   {
     outerRingIndexes.push_back(counter++);
   }
+}
+
+
+//-----------------------------------------------------------------------------
+void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
+                                            cv::Mat& bigBlobs,
+                                            cv::Mat& littleBlobs
+                                           )
+{
+
+  cv::Mat thresholdedImage;
+  std::vector<cv::Vec4i> hierarchy;
+  std::vector<std::vector<cv::Point> > contours;
+  std::vector<unsigned int> innerRingIndexes;
+  std::vector<unsigned int> outerRingIndexes;
+
+  bigBlobs = image.clone();
+  bigBlobs.setTo(255);
+  littleBlobs = image.clone();
+  littleBlobs.setTo(255);
+  cv::Scalar black( 0, 0, 0);
+
+  cv::threshold(image, thresholdedImage, m_ThresholdValue, 255, cv::THRESH_BINARY);
+
+  this->ExtractIndexes(thresholdedImage, hierarchy, contours, innerRingIndexes, outerRingIndexes);
 
   if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
       || outerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height))
   {
-    return;
+    int blockSize = image.cols / m_PatternSize.width;
+    if (blockSize %2 == 0)
+    {
+      blockSize += 1;
+    }
+    cv::adaptiveThreshold(image, thresholdedImage, 255, cv::ADAPTIVE_THRESH_MEAN_C,
+                          cv::THRESH_BINARY, blockSize, m_AdaptiveThreshold);
+
+    this->ExtractIndexes(thresholdedImage, hierarchy, contours, innerRingIndexes, outerRingIndexes);
+    if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
+        || outerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height))
+    {
+      return;
+    }
   }
 
-  cv::Scalar black( 0, 0, 0);
-
-  bigBlobs = image.clone();
-  bigBlobs.setTo(255);
   for (int i = 0; i < outerRingIndexes.size(); i++)
   {
     drawContours( bigBlobs, contours, outerRingIndexes[i], black, CV_FILLED, 8, hierarchy );
   }
-
-  littleBlobs = image.clone();
-  littleBlobs.setTo(255);
   for (int i = 0; i < innerRingIndexes.size(); i++)
   {
     drawContours( littleBlobs, contours, innerRingIndexes[i], black, CV_FILLED, 8, hierarchy );
@@ -139,33 +167,35 @@ PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
     , blobDetector
     );
 
-  if (!foundBig || !foundLittle)
+  if (!foundBig && !foundLittle)
   {
     return result;
   }
 
-  assert(littleCentres.size() == bigCentres.size());
-
-  if (   littleCentres.size() == numberOfRings
-      && bigCentres.size() == numberOfRings
-      )
+  for ( unsigned int k = 0; k < numberOfRings; ++k)
   {
-    for ( unsigned int k = 0; k < numberOfRings; ++k)
+    Point2D tmp;
+    tmp.point.x = 0;
+    tmp.point.y = 0;
+
+    unsigned int counter = 0;
+    if (m_UseOuterContour && foundBig && k < bigCentres.size())
     {
-      Point2D tmp;
-      if (m_UseOuterContour)
-      {
-        tmp.point.x = (littleCentres[k].x + bigCentres[k].x)/2.0;
-        tmp.point.y = (littleCentres[k].y + bigCentres[k].y)/2.0;
-      }
-      else
-      {
-        tmp.point.x = (littleCentres[k].x);
-        tmp.point.y = (littleCentres[k].y);
-      }
-      tmp.id = k;
-      result.insert(IdPoint2D(tmp.id, tmp));
+      tmp.point.x += bigCentres[k].x;
+      tmp.point.y += bigCentres[k].y;
+      counter++;
     }
+    if (foundLittle && k < littleCentres.size())
+    {
+      tmp.point.x += littleCentres[k].x;
+      tmp.point.y += littleCentres[k].y;
+      counter++;
+    }
+    assert(counter > 0); // because one, or other, or both lists should have point.
+    tmp.point.x /= static_cast<double>(counter);
+    tmp.point.y /= static_cast<double>(counter);
+    tmp.id = k;
+    result.insert(IdPoint2D(tmp.id, tmp));
   }
   return result;
 }
