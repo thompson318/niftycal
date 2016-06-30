@@ -263,6 +263,8 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
                                                         const std::list<PointSet>& listOfRightHandPointSets,
                                                         const cv::Mat& leftIntrinsics,
                                                         const cv::Mat& leftDistortionParams,
+                                                        const std::vector<cv::Mat>& rvecsLeft,
+                                                        const std::vector<cv::Mat>& tvecsLeft,
                                                         const cv::Mat& rightIntrinsics,
                                                         const cv::Mat& rightDistortionParams,
                                                         const cv::Mat& leftToRightRotationMatrix,
@@ -272,6 +274,19 @@ NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
                                                         const cv::Matx44d& modelToWorldMatrix
                                                        );
 
+
+/**
+* \brief Computes mono reconstruction error, taking model points, and multiplying
+* through camera, hand-eye, tracking and modelToWorld matrices.
+*/
+NIFTYCAL_WINEXPORT double ComputeRMSReconstructionError(const Model3D& model,
+                                                        const std::list<PointSet>& pointSets,
+                                                        const std::vector<cv::Mat>& rvecs,
+                                                        const std::vector<cv::Mat>& tvecs,
+                                                        const std::list<cv::Matx44d>& trackingMatrices,
+                                                        const cv::Matx44d& handEyeMatrix,
+                                                        const cv::Matx44d& modelToWorldMatrix
+                                                       );
 
 /**
 * \brief Used to evaluate a stereo calibration's RMS re-projection error.

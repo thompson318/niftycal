@@ -958,6 +958,8 @@ double ComputeRMSReconstructionError(const Model3D& model,
                                      const std::list<PointSet>& listOfRightHandPointSets,
                                      const cv::Mat& leftIntrinsics,
                                      const cv::Mat& leftDistortionParams,
+                                     const std::vector<cv::Mat>& rvecsLeft,
+                                     const std::vector<cv::Mat>& tvecsLeft,
                                      const cv::Mat& rightIntrinsics,
                                      const cv::Mat& rightDistortionParams,
                                      const cv::Mat& leftToRightRotationMatrix,
@@ -979,9 +981,15 @@ double ComputeRMSReconstructionError(const Model3D& model,
   {
     niftkNiftyCalThrow() << "Unequal number of left points and tracking matrices.";
   }
+  if (listOfLeftHandPointSets.size() != rvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and rotation vectors.";
+  }
+  if (listOfLeftHandPointSets.size() != tvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left points and translation vectors.";
+  }
 
-  cv::Mat leftCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat leftCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Matx44d eyeHandMatrix = handEyeMatrix.inv(cv::DECOMP_SVD);
   cv::Matx44d worldToModel = modelToWorldMatrix.inv(cv::DECOMP_SVD);
 
@@ -1007,8 +1015,8 @@ double ComputeRMSReconstructionError(const Model3D& model,
       *rightIter,
       leftIntrinsics,
       leftDistortionParams,
-      leftCameraRotationVector,
-      leftCameraTranslationVector,
+      rvecsLeft[viewCounter],
+      tvecsLeft[viewCounter],
       leftToRightRotationMatrix,
       leftToRightTranslationVector,
       rightIntrinsics,
@@ -1031,6 +1039,79 @@ double ComputeRMSReconstructionError(const Model3D& model,
 
     pointCounter += (*leftIter).size();
     rms += (viewRMS*viewRMS*static_cast<double>((*leftIter).size()));
+
+    viewCounter++;
+  }
+
+  if (pointCounter != 0)
+  {
+    rms /= static_cast<double>(pointCounter);
+  }
+
+  rms = sqrt(rms);
+
+  viewCounter++;
+  return rms;
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeRMSReconstructionError(const Model3D& model,
+                                     const std::list<PointSet>& pointSets,
+                                     const std::vector<cv::Mat>& rvecs,
+                                     const std::vector<cv::Mat>& tvecs,
+                                     const std::list<cv::Matx44d>& trackingMatrices,
+                                     const cv::Matx44d& handEyeMatrix,
+                                     const cv::Matx44d& modelToWorldMatrix
+                                    )
+{
+  double rms = 0;
+  unsigned int pointCounter = 0;
+  unsigned int viewCounter = 0;
+
+  if (pointSets.size() != trackingMatrices.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of points and tracking matrices.";
+  }
+  if (pointSets.size() != rvecs.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of points and rotation vectors.";
+  }
+  if (pointSets.size() != tvecs.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of points and translation vectors.";
+  }
+
+  cv::Matx44d eyeHandMatrix = handEyeMatrix.inv(cv::DECOMP_SVD);
+  cv::Matx44d worldToModel = modelToWorldMatrix.inv(cv::DECOMP_SVD);
+
+  std::list<PointSet>::const_iterator pointSetIter;
+  std::list<cv::Matx44d>::const_iterator matrixIter;
+
+  for (pointSetIter = pointSets.begin(),
+       matrixIter = trackingMatrices.begin();
+       pointSetIter != pointSets.end() &&
+       matrixIter != trackingMatrices.end();
+       ++pointSetIter,
+       ++matrixIter
+       )
+  {
+    cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvecs[viewCounter], tvecs[viewCounter]);
+    cv::Matx44d transform = worldToModel * (*matrixIter) * eyeHandMatrix * extrinsic;
+
+    Model3D transformedPoints = niftk::TransformModel(model, transform);
+
+    cv::Point3d cameraViewRMS;
+    cv::Point3d cameraViewSSE;
+
+    double viewRMS = niftk::ComputeRMSDifferenceBetweenMatchingPoints(model,
+                                                                      transformedPoints,
+                                                                      cameraViewSSE,
+                                                                      cameraViewRMS
+                                                                     );
+
+    pointCounter += (*pointSetIter).size();
+    rms += (viewRMS*viewRMS*static_cast<double>((*pointSetIter).size()));
 
     viewCounter++;
   }
