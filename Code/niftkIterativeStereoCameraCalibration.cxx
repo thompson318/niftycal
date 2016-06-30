@@ -314,50 +314,50 @@ cv::Matx21d IterativeStereoCameraCalibration(
       tmpLeftToRightTranslationVector.copyTo(leftToRightTranslationVector);
       tmpEssentialMatrix.copyTo(essentialMatrix);
       tmpFundamentalMatrix.copyTo(fundamentalMatrix);
-
-#ifdef NIFTYCAL_WITH_ITK
-      if (optimise3D)
-      {
-        // Now optimise RMS reconstruction error.
-        niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer optimiser =
-            niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
-        Model3D* tmpModel = const_cast<Model3D*>(&model);
-        optimiser->SetModelAndPoints(tmpModel,
-                                     &distortedPointsFromCanonicalImagesLeft,
-                                     &distortedPointsFromCanonicalImagesRight);
-
-        optimiser->SetIntrinsics(&intrinsicLeft,
-                                 &distortionLeft,
-                                 &intrinsicRight,
-                                 &distortionRight
-                                 );
-
-        reconstructedRMS = optimiser->Optimise(rvecsLeft,
-                                               tvecsLeft,
-                                               leftToRightRotationMatrix,
-                                               leftToRightTranslationVector
-                                              );
-
-        projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                          distortedPointsFromCanonicalImagesLeft,
-                                                          distortedPointsFromCanonicalImagesRight,
-                                                          intrinsicLeft,
-                                                          distortionLeft,
-                                                          rvecsLeft,
-                                                          tvecsLeft,
-                                                          intrinsicRight,
-                                                          distortionRight,
-                                                          leftToRightRotationMatrix,
-                                                          leftToRightTranslationVector
-                                                         );
-      }
-#endif
     }
     else
     {
       projectedRMS = previousRMS;
     }
   } // end while
+
+#ifdef NIFTYCAL_WITH_ITK
+  if (optimise3D)
+  {
+    // Now optimise RMS reconstruction error.
+    niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer optimiser =
+        niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
+    Model3D* tmpModel = const_cast<Model3D*>(&model);
+    optimiser->SetModelAndPoints(tmpModel,
+                                 &distortedPointsFromCanonicalImagesLeft,
+                                 &distortedPointsFromCanonicalImagesRight);
+
+    optimiser->SetIntrinsics(&intrinsicLeft,
+                             &distortionLeft,
+                             &intrinsicRight,
+                             &distortionRight
+                             );
+
+    reconstructedRMS = optimiser->Optimise(rvecsLeft,
+                                           tvecsLeft,
+                                           leftToRightRotationMatrix,
+                                           leftToRightTranslationVector
+                                          );
+
+    projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                      distortedPointsFromCanonicalImagesLeft,
+                                                      distortedPointsFromCanonicalImagesRight,
+                                                      intrinsicLeft,
+                                                      distortionLeft,
+                                                      rvecsLeft,
+                                                      tvecsLeft,
+                                                      intrinsicRight,
+                                                      distortionRight,
+                                                      leftToRightRotationMatrix,
+                                                      leftToRightTranslationVector
+                                                     );
+  }
+#endif
 
   std::cout << "Final stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
