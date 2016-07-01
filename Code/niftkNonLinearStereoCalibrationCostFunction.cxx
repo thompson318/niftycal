@@ -34,14 +34,14 @@ NonLinearStereoCalibrationCostFunction::~NonLinearStereoCalibrationCostFunction(
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
+void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(const std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {
     niftkNiftyCalThrow() << "Null right hand points.";
   }
 
-  m_RightHandPoints = points;
+  m_RightHandPoints = const_cast<std::list<PointSet>*>(points);
   this->Modified();
 }
 

@@ -45,7 +45,7 @@ public:
   typedef Superclass::DerivativeType             DerivativeType;
   typedef Superclass::MeasureType                MeasureType;
 
-  void SetRightHandPoints(std::list<PointSet>* const points);
+  void SetRightHandPoints(const std::list<PointSet>* const points);
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
   itkSetMacro(NumberOfValues, unsigned int);
 
