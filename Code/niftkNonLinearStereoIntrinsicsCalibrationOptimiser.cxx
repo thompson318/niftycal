@@ -15,6 +15,7 @@
 #include "niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h"
 #include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
 #include "niftkMatrixUtilities.h"
+#include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
@@ -31,6 +32,24 @@ NonLinearStereoIntrinsicsCalibrationOptimiser::NonLinearStereoIntrinsicsCalibrat
 //-----------------------------------------------------------------------------
 NonLinearStereoIntrinsicsCalibrationOptimiser::~NonLinearStereoIntrinsicsCalibrationOptimiser()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoIntrinsicsCalibrationOptimiser::SetModelAndPoints(const Model3D* const model,
+                                                                      const std::list<PointSet>* const leftPoints,
+                                                                      const std::list<PointSet>* const rightPoints
+                                                                     )
+{
+  m_CostFunction->SetModel(const_cast<Model3D* const>(model));
+  m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
+  m_CostFunction->SetRightHandPoints(const_cast<std::list<PointSet>* const>(rightPoints));
+
+  unsigned long int numberOfTriangulatablePoints
+    = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
+
+  m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
+  this->Modified();
 }
 
 

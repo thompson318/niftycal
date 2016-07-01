@@ -31,16 +31,20 @@ namespace niftk
 *
 * \see niftk::NonLinearStereoExtrinsicsCalibrationCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationOptimiser
-  : public niftk::NonLinearStereoCalibrationOptimiser
+class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationOptimiser : public itk::Object
 {
 
 public:
 
   typedef  NonLinearStereoExtrinsicsCalibrationOptimiser Self;
-  typedef  niftk::NonLinearStereoCalibrationOptimiser    Superclass;
+  typedef  itk::Object                                   Superclass;
   typedef  itk::SmartPointer<Self>                       Pointer;
   itkNewMacro(Self);
+
+  void SetModelAndPoints(const Model3D* const model,
+                         const std::list<PointSet>* const leftPoints,
+                         const std::list<PointSet>* const rightPoints
+                        );
 
   void SetDistortionParameters(cv::Mat* const leftDistortion,
                                cv::Mat* const rightDistortion

@@ -43,8 +43,8 @@ public:
   typedef Superclass::DerivativeType      DerivativeType;
   typedef Superclass::MeasureType         MeasureType;
 
-  void SetModel(const Model3D* const model);
-  void SetPoints(const std::list<PointSet>* const points);
+  void SetModel(Model3D* const model);
+  void SetPoints(std::list<PointSet>* const points);
   itkSetMacro(NumberOfParameters, unsigned int);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
@@ -63,10 +63,10 @@ protected:
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const = 0;
 
-  Model3D              *m_Model;
-  std::list<PointSet>  *m_Points;
-  unsigned int          m_NumberOfParameters;
-  unsigned int          m_NumberOfValues;
+  Model3D             *m_Model;
+  std::list<PointSet> *m_Points;
+  unsigned int         m_NumberOfParameters;
+  unsigned int         m_NumberOfValues;
 };
 
 } // end namespace

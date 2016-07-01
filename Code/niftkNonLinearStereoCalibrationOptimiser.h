@@ -43,7 +43,7 @@ public:
   void SetModelAndPoints(const Model3D* const model,
                          const std::list<PointSet>* const leftPoints,
                          const std::list<PointSet>* const rightPoints
-                         );
+                        );
 
   /**
   * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.

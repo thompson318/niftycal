@@ -34,7 +34,7 @@ NonLinearStereoCalibrationCostFunction::~NonLinearStereoCalibrationCostFunction(
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(const std::list<PointSet>* const points)
+void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {
@@ -157,7 +157,7 @@ NonLinearStereoCalibrationCostFunction::InternalGetValue(const ParametersType& p
          )
     {
       niftk::NiftyCalIdType id = (*modelIter).first;
-      Model3D::iterator goldIter = m_Model->find(id);
+      Model3D::const_iterator goldIter = m_Model->find(id);
       if (goldIter == m_Model->end())
       {
         niftkNiftyCalThrow() << "Failed to find point " << id << " in gold standard model.";

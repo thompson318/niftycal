@@ -41,9 +41,9 @@ void NonLinearStereoCalibrationOptimiser::SetModelAndPoints(const Model3D* const
                                                             const std::list<PointSet>* const rightPoints
                                                            )
 {
-  m_CostFunction->SetModel(model);
-  m_CostFunction->SetPoints(leftPoints);
-  m_CostFunction->SetRightHandPoints(rightPoints);
+  m_CostFunction->SetModel(const_cast<Model3D* const>(model));
+  m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
+  m_CostFunction->SetRightHandPoints(const_cast<std::list<PointSet>* const>(rightPoints));
 
   unsigned long int numberOfTriangulatablePoints
     = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
