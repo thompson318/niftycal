@@ -27,10 +27,10 @@
 #include <chrono>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearMalti12DOFHandEyeOptimiser.h>
-#include <niftkNonLinearMaltiNDOFHandEyeOptimiser.h>
-#include <niftkNonLinearMaltiStereoHandEyeOptimiser.h>
 #include <niftkNonLinearMaltiHandEyeOptimiser.h>
+#include <niftkNonLinear12DOFHandEyeOptimiser.h>
+#include <niftkNonLinearNDOFHandEyeOptimiser.h>
+#include <niftkNonLinearStereoHandEyeOptimiser.h>
 #endif
 
 TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
@@ -197,7 +197,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::cerr << "Doing non-linear optimisation - 12 DOF" << std::endl;
 
-  niftk::NonLinearMalti12DOFHandEyeOptimiser::Pointer optimiser12DOF = niftk::NonLinearMalti12DOFHandEyeOptimiser::New();
+  niftk::NonLinear12DOFHandEyeOptimiser::Pointer optimiser12DOF = niftk::NonLinear12DOFHandEyeOptimiser::New();
   optimiser12DOF->SetModel(&model);
   optimiser12DOF->SetPoints(&listOfPoints);
   optimiser12DOF->SetHandMatrices(&trackingMatrices);
@@ -217,7 +217,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::cerr << "Doing non-linear optimisation - N DOF" << std::endl;
 
-  niftk::NonLinearMaltiNDOFHandEyeOptimiser::Pointer optimiserNDOF = niftk::NonLinearMaltiNDOFHandEyeOptimiser::New();
+  niftk::NonLinearNDOFHandEyeOptimiser::Pointer optimiserNDOF = niftk::NonLinearNDOFHandEyeOptimiser::New();
   optimiserNDOF->SetModel(&model);
   optimiserNDOF->SetPoints(&listOfPoints);
   optimiserNDOF->SetHandMatrices(&trackingMatrices);
@@ -237,7 +237,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::cerr << "Doing non-linear optimisation - stereo" << std::endl;
 
-  niftk::NonLinearMaltiStereoHandEyeOptimiser::Pointer optimiserStereo = niftk::NonLinearMaltiStereoHandEyeOptimiser::New();
+  niftk::NonLinearStereoHandEyeOptimiser::Pointer optimiserStereo = niftk::NonLinearStereoHandEyeOptimiser::New();
   optimiserStereo->SetModel(&model);
   optimiserStereo->SetPoints(&listOfPoints);
   optimiserStereo->SetRightHandPoints(&listOfPoints);

@@ -82,45 +82,11 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetExtrinsics(std::vector<cv
                                                                   cv::Mat* const leftToRightTranslationVector
                                                                  )
 {
-  if (rvecsLeft == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null left camera rotation vectors.";
-  }
-
-  if (tvecsLeft == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null left camera translation vectors.";
-  }
-
-  if (leftToRightRotationMatrix == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null leftToRightRotationMatrix.";
-  }
-
-  if (leftToRightTranslationVector == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null leftToRightTranslationVector.";
-  }
-
-  if (leftToRightRotationMatrix->rows != 3 || leftToRightRotationMatrix->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Left to Right rotation matrix should be 3x3, and its ("
-                         << leftToRightRotationMatrix->cols << ", " << leftToRightRotationMatrix->rows << ")";
-  }
-
-  if (leftToRightTranslationVector->rows != 3 || leftToRightTranslationVector->cols != 1)
-  {
-    niftkNiftyCalThrow() << "Left to Right translation vector matrix should be 3x1, and its ("
-                         << leftToRightTranslationVector->rows << ", " << leftToRightTranslationVector->cols << ")";
-  }
-
-  if (rvecsLeft->size() != tvecsLeft->size())
-  {
-    niftkNiftyCalThrow() << "Unequal extrinsic vectors: " << rvecsLeft->size()
-                         << ", versus " << tvecsLeft->size();
-  }
-
-  m_CostFunction->SetExtrinsics(rvecsLeft, tvecsLeft, leftToRightRotationMatrix, leftToRightTranslationVector);
+  m_CostFunction->SetExtrinsics(rvecsLeft,
+                                tvecsLeft,
+                                leftToRightRotationMatrix,
+                                leftToRightTranslationVector
+                               );
   this->Modified();
 }
 
@@ -130,26 +96,6 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetDistortionParameters(cv::
                                                                             cv::Mat* const rightDistortion
                                                                            )
 {
-  if (leftDistortion == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null left distortion parameters.";
-  }
-
-  if (rightDistortion == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null right distortion parameters.";
-  }
-
-  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
-  }
-
-  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
-  }
-
   m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
   this->Modified();
 }

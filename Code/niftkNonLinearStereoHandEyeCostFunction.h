@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearMaltiStereoHandEyeCostFunction_h
-#define niftkNonLinearMaltiStereoHandEyeCostFunction_h
+#ifndef niftkNonLinearStereoHandEyeCostFunction_h
+#define niftkNonLinearStereoHandEyeCostFunction_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNonLinearHandEyeCostFunction.h"
@@ -22,28 +22,26 @@ namespace niftk
 {
 
 /**
-* \class NonLinearMaltiStereoHandEyeCostFunction
+* \class NonLinearStereoHandEyeCostFunction
 * \brief Computes cost as RMS re-projection error for stereo, extrinsic,
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
-*
-* \see niftk::NonLinearMaltiStereoHandEyeOptimiser
 */
-class NIFTYCAL_WINEXPORT NonLinearMaltiStereoHandEyeCostFunction :
+class NIFTYCAL_WINEXPORT NonLinearStereoHandEyeCostFunction :
     public niftk::NonLinearHandEyeCostFunction
 {
 
 public:
 
-  typedef NonLinearMaltiStereoHandEyeCostFunction Self;
-  typedef NonLinearHandEyeCostFunction          Superclass;
-  typedef itk::SmartPointer<Self>               Pointer;
-  typedef itk::SmartPointer<const Self>         ConstPointer;
+  typedef NonLinearStereoHandEyeCostFunction Self;
+  typedef NonLinearHandEyeCostFunction            Superclass;
+  typedef itk::SmartPointer<Self>                 Pointer;
+  typedef itk::SmartPointer<const Self>           ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType            ParametersType;
-  typedef Superclass::DerivativeType            DerivativeType;
-  typedef Superclass::MeasureType               MeasureType;
+  typedef Superclass::ParametersType              ParametersType;
+  typedef Superclass::DerivativeType              DerivativeType;
+  typedef Superclass::MeasureType                 MeasureType;
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
   void SetLeftIntrinsic(cv::Mat* const intrinsic);
@@ -55,11 +53,11 @@ public:
 
 protected:
 
-  NonLinearMaltiStereoHandEyeCostFunction();
-  virtual ~NonLinearMaltiStereoHandEyeCostFunction();
+  NonLinearStereoHandEyeCostFunction();
+  virtual ~NonLinearStereoHandEyeCostFunction();
 
-  NonLinearMaltiStereoHandEyeCostFunction(const NonLinearMaltiStereoHandEyeCostFunction&);
-  NonLinearMaltiStereoHandEyeCostFunction& operator=(const NonLinearMaltiStereoHandEyeCostFunction&);
+  NonLinearStereoHandEyeCostFunction(const NonLinearStereoHandEyeCostFunction&);
+  NonLinearStereoHandEyeCostFunction& operator=(const NonLinearStereoHandEyeCostFunction&);
 
   void ProjectPoints(const PointSet& points,
                      const cv::Matx44d& extrinsic,

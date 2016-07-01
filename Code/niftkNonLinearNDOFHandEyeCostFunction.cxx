@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearMaltiNDOFHandEyeCostFunction.h"
+#include "niftkNonLinearNDOFHandEyeCostFunction.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
@@ -21,49 +21,20 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearMaltiNDOFHandEyeCostFunction::NonLinearMaltiNDOFHandEyeCostFunction()
-: m_Intrinsic(nullptr)
-, m_Distortion(nullptr)
+NonLinearNDOFHandEyeCostFunction::NonLinearNDOFHandEyeCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearMaltiNDOFHandEyeCostFunction::~NonLinearMaltiNDOFHandEyeCostFunction()
+NonLinearNDOFHandEyeCostFunction::~NonLinearNDOFHandEyeCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiNDOFHandEyeCostFunction::SetIntrinsic(cv::Mat* const intrinsic)
-{
-  if (intrinsic->rows != 3 || intrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
-                         << intrinsic->cols << ", " << intrinsic->rows << ")";
-  }
-
-  m_Intrinsic = intrinsic;
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearMaltiNDOFHandEyeCostFunction::SetDistortion(cv::Mat* const distortion)
-{
-  if (distortion->rows != 1)
-  {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
-  }
-
-  m_Distortion = distortion;
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-NonLinearMaltiNDOFHandEyeCostFunction::MeasureType
-NonLinearMaltiNDOFHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
+NonLinearNDOFHandEyeCostFunction::MeasureType
+NonLinearNDOFHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());

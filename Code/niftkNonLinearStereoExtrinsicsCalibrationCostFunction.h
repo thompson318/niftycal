@@ -17,7 +17,7 @@
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearStereoCalibrationCostFunction.h"
 
 namespace niftk
 {
@@ -30,22 +30,20 @@ namespace niftk
 * \see niftk::NonLinearStereoExtrinsicsCalibrationOptimiser
 */
 class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationCostFunction :
-    public niftk::NonLinearCostFunction
+    public niftk::NonLinearStereoCalibrationCostFunction
 {
 
 public:
 
   typedef NonLinearStereoExtrinsicsCalibrationCostFunction Self;
-  typedef niftk::NonLinearCostFunction           Superclass;
-  typedef itk::SmartPointer<Self>                Pointer;
-  typedef itk::SmartPointer<const Self>          ConstPointer;
+  typedef niftk::NonLinearStereoCalibrationCostFunction    Superclass;
+  typedef itk::SmartPointer<Self>                          Pointer;
+  typedef itk::SmartPointer<const Self>                    ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType             ParametersType;
-  typedef Superclass::DerivativeType             DerivativeType;
-  typedef Superclass::MeasureType                MeasureType;
-
-  void SetRightHandPoints(std::list<PointSet>* const points);
+  typedef Superclass::ParametersType                       ParametersType;
+  typedef Superclass::DerivativeType                       DerivativeType;
+  typedef Superclass::MeasureType                          MeasureType;
 
   void SetDistortionParameters(cv::Mat* const leftDistortion,
                                cv::Mat* const rightDistortion
@@ -54,9 +52,6 @@ public:
   void SetIntrinsics(cv::Mat* const leftIntrinsic,
                      cv::Mat* const rightIntrinsic
                     );
-
-  virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
-  itkSetMacro(NumberOfValues, unsigned int);
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
@@ -69,7 +64,6 @@ protected:
   NonLinearStereoExtrinsicsCalibrationCostFunction& operator=(const NonLinearStereoExtrinsicsCalibrationCostFunction&);
 
 private:
-  std::list<PointSet> *m_RightHandPoints;
   cv::Mat             *m_LeftIntrinsic;
   cv::Mat             *m_LeftDistortion;
   cv::Mat             *m_RightIntrinsic;

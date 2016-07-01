@@ -35,13 +35,11 @@ public:
   typedef NonLinearHandEyeCostFunction             Superclass;
   typedef itk::SmartPointer<Self>                  Pointer;
   typedef itk::SmartPointer<const Self>            ConstPointer;
-  itkNewMacro(Self);
 
   typedef Superclass::ParametersType               ParametersType;
   typedef Superclass::DerivativeType               DerivativeType;
   typedef Superclass::MeasureType                  MeasureType;
 
-  virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
   void SetIntrinsic(cv::Mat* const intrinsic);
   void SetDistortion(cv::Mat* const distortion);
 
@@ -53,10 +51,9 @@ protected:
   NonLinearNoIntrinsicsHandEyeCostFunction(const NonLinearNoIntrinsicsHandEyeCostFunction&);
   NonLinearNoIntrinsicsHandEyeCostFunction& operator=(const NonLinearNoIntrinsicsHandEyeCostFunction&);
 
-private:
-
   cv::Mat* m_Intrinsic;
   cv::Mat* m_Distortion;
+
 };
 
 } // end namespace

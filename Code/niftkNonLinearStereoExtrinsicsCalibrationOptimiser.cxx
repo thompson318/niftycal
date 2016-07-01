@@ -80,16 +80,6 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetDistortionParameters(cv::
                                                                             cv::Mat* const rightDistortion
                                                                            )
 {
-  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
-  }
-
-  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
-  }
-
   m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
   this->Modified();
 }
@@ -100,18 +90,6 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetIntrinsics(cv::Mat* const
                                                                   cv::Mat* const rightIntrinsic
                                                                  )
 {
-  if (leftIntrinsic->rows != 3 || leftIntrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Left intrinsic matrix should be 3x3, and its ("
-                         << leftIntrinsic->cols << ", " << leftIntrinsic->rows << ")";
-  }
-
-  if (rightIntrinsic->rows != 3 || rightIntrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
-                         << rightIntrinsic->cols << ", " << rightIntrinsic->rows << ")";
-  }
-
   m_CostFunction->SetIntrinsics(leftIntrinsic, rightIntrinsic);
   this->Modified();
 }

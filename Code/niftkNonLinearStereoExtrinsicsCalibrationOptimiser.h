@@ -54,7 +54,7 @@ public:
                     );
 
   /**
-  * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.
+  * \brief Optimises extrinsic parameters, and returns the 3D RMS reconstruction error.
   *
   * Note: You probably need a very good calibration before calling this.
   */

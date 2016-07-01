@@ -17,7 +17,7 @@
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearStereoCalibrationCostFunction.h"
 
 namespace niftk
 {
@@ -30,13 +30,13 @@ namespace niftk
 * \see niftk::NonLinearStereoIntrinsicsCalibrationOptimiser
 */
 class NIFTYCAL_WINEXPORT NonLinearStereoIntrinsicsCalibrationCostFunction :
-    public niftk::NonLinearCostFunction
+    public niftk::NonLinearStereoCalibrationCostFunction
 {
 
 public:
 
   typedef NonLinearStereoIntrinsicsCalibrationCostFunction Self;
-  typedef niftk::NonLinearCostFunction                     Superclass;
+  typedef niftk::NonLinearStereoCalibrationCostFunction    Superclass;
   typedef itk::SmartPointer<Self>                          Pointer;
   typedef itk::SmartPointer<const Self>                    ConstPointer;
   itkNewMacro(Self);
@@ -44,8 +44,6 @@ public:
   typedef Superclass::ParametersType                       ParametersType;
   typedef Superclass::DerivativeType                       DerivativeType;
   typedef Superclass::MeasureType                          MeasureType;
-
-  void SetRightHandPoints(std::list<PointSet>* const points);
 
   void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
                      std::vector<cv::Mat>* const tvecsLeft,
@@ -56,9 +54,6 @@ public:
   void SetDistortionParameters(cv::Mat* const leftDistortion,
                                cv::Mat* const rightDistortion
                                );
-
-  virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
-  itkSetMacro(NumberOfValues, unsigned int);
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
@@ -71,7 +66,6 @@ protected:
   NonLinearStereoIntrinsicsCalibrationCostFunction& operator=(const NonLinearStereoIntrinsicsCalibrationCostFunction&);
 
 private:
-  std::list<PointSet>  *m_RightHandPoints;
   std::vector<cv::Mat> *m_RvecsLeft;
   std::vector<cv::Mat> *m_TvecsLeft;
   cv::Mat              *m_LeftToRightRotationMatrix;

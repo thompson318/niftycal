@@ -22,8 +22,7 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearStereoExtrinsicsCalibrationCostFunction::NonLinearStereoExtrinsicsCalibrationCostFunction()
-: m_RightHandPoints(nullptr)
-, m_LeftIntrinsic(nullptr)
+: m_LeftIntrinsic(nullptr)
 , m_LeftDistortion(nullptr)
 , m_RightIntrinsic(nullptr)
 , m_RightDistortion(nullptr)
@@ -38,23 +37,22 @@ NonLinearStereoExtrinsicsCalibrationCostFunction::~NonLinearStereoExtrinsicsCali
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
-{
-  if (points == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null right hand points.";
-  }
-
-  m_RightHandPoints = points;
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationCostFunction::SetIntrinsics(cv::Mat* const leftIntrinsic,
                                                                      cv::Mat* const rightIntrinsic
                                                                     )
 {
+  if (leftIntrinsic->rows != 3 || leftIntrinsic->cols != 3)
+  {
+    niftkNiftyCalThrow() << "Left intrinsic matrix should be 3x3, and its ("
+                         << leftIntrinsic->cols << ", " << leftIntrinsic->rows << ")";
+  }
+
+  if (rightIntrinsic->rows != 3 || rightIntrinsic->cols != 3)
+  {
+    niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
+                         << rightIntrinsic->cols << ", " << rightIntrinsic->rows << ")";
+  }
+
   m_LeftIntrinsic = leftIntrinsic;
   m_RightIntrinsic = rightIntrinsic;
   this->Modified();
@@ -66,16 +64,19 @@ void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(c
                                                                                cv::Mat* const rightDistortion
                                                                               )
 {
+  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
+  }
+
+  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
+  }
+
   m_LeftDistortion = leftDistortion;
   m_RightDistortion = rightDistortion;
   this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-unsigned int NonLinearStereoExtrinsicsCalibrationCostFunction::GetNumberOfValues(void) const
-{
-  return this->m_NumberOfValues;
 }
 
 
