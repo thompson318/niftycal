@@ -26,6 +26,8 @@ NonLinearStereoIntrinsicsCalibrationCostFunction::NonLinearStereoIntrinsicsCalib
 , m_TvecsLeft(nullptr)
 , m_LeftToRightRotationMatrix(nullptr)
 , m_LeftToRightTranslationVector(nullptr)
+, m_LeftDistortion(nullptr)
+, m_RightDistortion(nullptr)
 {
 }
 

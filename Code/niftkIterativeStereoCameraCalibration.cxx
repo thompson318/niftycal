@@ -322,6 +322,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
   } // end while
 
+  std::cout << "Iterative calibration finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
@@ -343,9 +345,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
-    reconstructedRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                                     intrinsicRight
-                                                    );
+    intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                  intrinsicRight
+                                 );
 
     // Now optimise RMS reconstruction error via extrinsics.
     niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
@@ -381,6 +383,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
                                                       leftToRightTranslationVector
                                                      );
   }
+
+  std::cout << "3D optimisation finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+
 #endif
 
   std::cout << "Final stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
