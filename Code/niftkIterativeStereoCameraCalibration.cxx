@@ -198,7 +198,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
   bestPointSetsSoFarLeft = pointsFromOriginalImagesLeft;
   bestPointSetsSoFarRight = pointsFromOriginalImagesRight;
 
-  std::cout << "Initial stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+  std::cout << "Initial stereo calibration, rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS
+            << std::endl;
+
   std::cout << "Initial Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Initial Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Initial Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
@@ -331,7 +334,12 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
   } // end while
 
-  std::cout << "Iterative calibration finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+  std::cout << "Iterative calibration finished, rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS
+            << ", over " << bestPointSetsSoFarLeft.size()
+            << ", left PointSets and " << bestPointSetsSoFarRight.size()
+            << ", right PointSets."
+            << std::endl;
 
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
