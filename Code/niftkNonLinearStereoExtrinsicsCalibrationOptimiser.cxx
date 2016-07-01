@@ -34,7 +34,6 @@ NonLinearStereoExtrinsicsCalibrationOptimiser::~NonLinearStereoExtrinsicsCalibra
 }
 
 
-
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                             cv::Mat* const rightDistortion

@@ -116,8 +116,12 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::ParametersType finalParameters
+      = optimiser->GetCurrentPosition();
+
+  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType finalValues
+      = m_CostFunction->GetValue(finalParameters);
+
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
   for (int i = 0; i < finalParameters.GetSize(); i++)
