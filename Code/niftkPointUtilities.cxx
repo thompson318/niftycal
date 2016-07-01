@@ -1127,4 +1127,45 @@ double ComputeRMSReconstructionError(const Model3D& model,
   return rms;
 }
 
+
+//-----------------------------------------------------------------------------
+unsigned long int GetNumberOfTriangulatablePoints(const Model3D& model,
+                                                  const std::list<PointSet>& leftPoints,
+                                                  const std::list<PointSet>& rightPoints
+                                                 )
+{
+  if (leftPoints.size() != rightPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of left and right points.";
+  }
+
+  unsigned long int numberOfTriangulatablePoints = 0;
+  std::list<PointSet>::const_iterator leftViewIter;
+  std::list<PointSet>::const_iterator rightViewIter;
+  niftk::PointSet::const_iterator pointIter;
+
+  for (leftViewIter = leftPoints.begin(),
+       rightViewIter = rightPoints.begin();
+       leftViewIter != leftPoints.end() && rightViewIter != rightPoints.end();
+       ++leftViewIter,
+       ++rightViewIter
+       )
+  {
+    for (pointIter = leftViewIter->begin();
+         pointIter != leftViewIter->end();
+         ++pointIter
+         )
+    {
+      niftk::NiftyCalIdType id = (*pointIter).first;
+      if (rightViewIter->find(id) != rightViewIter->end()
+          && model.find(id) != model.end()
+          )
+      {
+        numberOfTriangulatablePoints++;
+      }
+    }
+  }
+  return numberOfTriangulatablePoints;
+}
+
 } // end namespace

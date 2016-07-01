@@ -18,7 +18,8 @@
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h>
+#include "niftkNonLinearStereoCalibrationOptimiser.h"
+#include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
 
 namespace niftk
 {
@@ -30,20 +31,16 @@ namespace niftk
 *
 * \see niftk::NonLinearStereoIntrinsicsCalibrationCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoIntrinsicsCalibrationOptimiser : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinearStereoIntrinsicsCalibrationOptimiser
+  : public niftk::NonLinearStereoCalibrationOptimiser
 {
 
 public:
 
   typedef  NonLinearStereoIntrinsicsCalibrationOptimiser Self;
-  typedef  itk::Object                                   Superclass;
+  typedef  niftk::NonLinearStereoCalibrationOptimiser    Superclass;
   typedef  itk::SmartPointer<Self>                       Pointer;
   itkNewMacro(Self);
-
-  void SetModelAndPoints(Model3D* const model,
-                         std::list<PointSet>* const leftPoints,
-                         std::list<PointSet>* const rightPoints
-                         );
 
   void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
                      std::vector<cv::Mat>* const tvecsLeft,

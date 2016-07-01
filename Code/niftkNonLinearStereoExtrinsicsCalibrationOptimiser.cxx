@@ -13,9 +13,9 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h"
+#include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
-#include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
 namespace niftk
@@ -34,53 +34,15 @@ NonLinearStereoExtrinsicsCalibrationOptimiser::~NonLinearStereoExtrinsicsCalibra
 }
 
 
-//-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationOptimiser::SetModelAndPoints(Model3D* const model,
-                                                            std::list<PointSet>* const leftPoints,
-                                                            std::list<PointSet>* const rightPoints
-                                                           )
-{
-  m_CostFunction->SetModel(model);
-  m_CostFunction->SetPoints(leftPoints);
-  m_CostFunction->SetRightHandPoints(rightPoints);
-
-  unsigned long int numberOfTriangulatablePoints = 0;
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
-  niftk::PointSet::const_iterator pointIter;
-
-  for (leftViewIter = leftPoints->begin(),
-       rightViewIter = rightPoints->begin();
-       leftViewIter != leftPoints->end() && rightViewIter != rightPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
-       )
-  {
-    for (pointIter = leftViewIter->begin();
-         pointIter != leftViewIter->end();
-         ++pointIter
-         )
-    {
-      niftk::NiftyCalIdType id = (*pointIter).first;
-      if (rightViewIter->find(id) != rightViewIter->end()
-          && model->find(id) != model->end()
-          )
-      {
-        numberOfTriangulatablePoints++;
-      }
-    }
-  }
-  m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
-  this->Modified();
-}
-
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                             cv::Mat* const rightDistortion
                                                                            )
 {
-  m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
+  m_CostFunction->SetDistortionParameters(leftDistortion,
+                                          rightDistortion
+                                         );
   this->Modified();
 }
 
@@ -90,7 +52,9 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetIntrinsics(cv::Mat* const
                                                                   cv::Mat* const rightIntrinsic
                                                                  )
 {
-  m_CostFunction->SetIntrinsics(leftIntrinsic, rightIntrinsic);
+  m_CostFunction->SetIntrinsics(leftIntrinsic,
+                                rightIntrinsic
+                               );
   this->Modified();
 }
 

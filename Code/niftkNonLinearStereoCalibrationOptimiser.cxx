@@ -14,6 +14,7 @@
 
 #include "niftkNonLinearStereoCalibrationOptimiser.h"
 #include "niftkMatrixUtilities.h"
+#include "niftkPointUtilities.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkNonLinearStereoCalibrationCostFunction.h"
 #include <itkLevenbergMarquardtOptimizer.h>
@@ -35,41 +36,18 @@ NonLinearStereoCalibrationOptimiser::~NonLinearStereoCalibrationOptimiser()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoCalibrationOptimiser::SetModelAndPoints(Model3D* const model,
-                                                            std::list<PointSet>* const leftPoints,
-                                                            std::list<PointSet>* const rightPoints
+void NonLinearStereoCalibrationOptimiser::SetModelAndPoints(const Model3D* const model,
+                                                            const std::list<PointSet>* const leftPoints,
+                                                            const std::list<PointSet>* const rightPoints
                                                            )
 {
   m_CostFunction->SetModel(model);
   m_CostFunction->SetPoints(leftPoints);
   m_CostFunction->SetRightHandPoints(rightPoints);
 
-  unsigned long int numberOfTriangulatablePoints = 0;
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
-  niftk::PointSet::const_iterator pointIter;
+  unsigned long int numberOfTriangulatablePoints
+    = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
 
-  for (leftViewIter = leftPoints->begin(),
-       rightViewIter = rightPoints->begin();
-       leftViewIter != leftPoints->end() && rightViewIter != rightPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
-       )
-  {
-    for (pointIter = leftViewIter->begin();
-         pointIter != leftViewIter->end();
-         ++pointIter
-         )
-    {
-      niftk::NiftyCalIdType id = (*pointIter).first;
-      if (rightViewIter->find(id) != rightViewIter->end()
-          && model->find(id) != model->end()
-          )
-      {
-        numberOfTriangulatablePoints++;
-      }
-    }
-  }
   m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
   this->Modified();
 }
