@@ -51,15 +51,17 @@ public:
                      cv::Mat* const leftToRightTranslationVector
                      );
 
+  void SetDistortionParameters(cv::Mat* const leftDistortion,
+                               cv::Mat* const rightDistortion
+                               );
+
   /**
   * \brief Optimises intrinsic parameters, and returns the 3D RMS reconstruction error.
   *
   * Note: You probably need a very good calibration before calling this.
   */
   double Optimise(cv::Mat& leftIntrinsic,
-                  cv::Mat& leftDistortion,
-                  cv::Mat& rightIntrinsic,
-                  cv::Mat& rightDistortion
+                  cv::Mat& rightIntrinsic
                  );
 
 protected:

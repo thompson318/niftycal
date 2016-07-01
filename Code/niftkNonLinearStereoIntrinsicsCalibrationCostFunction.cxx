@@ -66,6 +66,17 @@ void NonLinearStereoIntrinsicsCalibrationCostFunction::SetExtrinsics(std::vector
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoIntrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
+                                                                               cv::Mat* const rightDistortion
+                                                                              )
+{
+  m_LeftDistortion = leftDistortion;
+  m_RightDistortion = rightDistortion;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 unsigned int NonLinearStereoIntrinsicsCalibrationCostFunction::GetNumberOfValues(void) const
 {
   return this->m_NumberOfValues;
@@ -92,24 +103,12 @@ NonLinearStereoIntrinsicsCalibrationCostFunction::InternalGetValue(const Paramet
   leftIntrinsic.at<double>(1, 2) = parameters[counter++];
   leftIntrinsic.at<double>(2, 2) = 1;
 
-  cv::Mat leftDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
-  for (int i = 0; i < 5; i++)
-  {
-    leftDistortion.at<double>(0, i) = parameters[counter++];
-  }
-
   cv::Mat rightIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
   rightIntrinsic.at<double>(0, 0) = parameters[counter++];
   rightIntrinsic.at<double>(1, 1) = parameters[counter++];
   rightIntrinsic.at<double>(0, 2) = parameters[counter++];
   rightIntrinsic.at<double>(1, 2) = parameters[counter++];
   rightIntrinsic.at<double>(2, 2) = 1;
-
-  cv::Mat rightDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
-  for (int i = 0; i < 5; i++)
-  {
-    rightDistortion.at<double>(0, i) = parameters[counter++];
-  }
 
   int numberOfViews = 0;
   unsigned long int pointCounter = 0;
@@ -130,13 +129,13 @@ NonLinearStereoIntrinsicsCalibrationCostFunction::InternalGetValue(const Paramet
       *leftViewIter,
       *rightViewIter,
       leftIntrinsic,
-      leftDistortion,
+      *m_LeftDistortion,
       (*m_RvecsLeft)[numberOfViews],
       (*m_TvecsLeft)[numberOfViews],
       *m_LeftToRightRotationMatrix,
       *m_LeftToRightTranslationVector,
       rightIntrinsic,
-      rightDistortion,
+      *m_RightDistortion,
       triangulatedModelInLeftCameraSpace
     );
 

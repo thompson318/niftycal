@@ -53,6 +53,10 @@ public:
                      cv::Mat* const leftToRightTranslationVector
                      );
 
+  void SetDistortionParameters(cv::Mat* const leftDistortion,
+                               cv::Mat* const rightDistortion
+                               );
+
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
   itkSetMacro(NumberOfValues, unsigned int);
 
@@ -72,6 +76,8 @@ private:
   std::vector<cv::Mat> *m_TvecsLeft;
   cv::Mat              *m_LeftToRightRotationMatrix;
   cv::Mat              *m_LeftToRightTranslationVector;
+  cv::Mat              *m_LeftDistortion;
+  cv::Mat              *m_RightDistortion;
 };
 
 } // end namespace

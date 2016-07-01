@@ -126,10 +126,38 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetExtrinsics(std::vector<cv
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoIntrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
+                                                                            cv::Mat* const rightDistortion
+                                                                           )
+{
+  if (leftDistortion == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null left distortion parameters.";
+  }
+
+  if (rightDistortion == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null right distortion parameters.";
+  }
+
+  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
+  }
+
+  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
+  }
+
+  m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
-                                                               cv::Mat& leftDistortion,
-                                                               cv::Mat& rightIntrinsic,
-                                                               cv::Mat& rightDistortion
+                                                               cv::Mat& rightIntrinsic
                                                               )
 {
   if (leftIntrinsic.rows != 3 || leftIntrinsic.cols != 3)
@@ -138,27 +166,15 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
                          << leftIntrinsic.cols << ", " << leftIntrinsic.rows << ")";
   }
 
-  if (leftDistortion.rows != 1 || leftDistortion.cols != 5)
-  {
-    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
-  }
-
   if (rightIntrinsic.rows != 3 || rightIntrinsic.cols != 3)
   {
     niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
                          << rightIntrinsic.cols << ", " << rightIntrinsic.rows << ")";
   }
 
-  if (rightDistortion.rows != 1 || rightDistortion.cols != 5)
-  {
-    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
-  }
-
   niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::ParametersType initialParameters;
   initialParameters.SetSize(  4  // left intrinsic
-                            + 5  // left distortion
                             + 4  // right intrinsic
-                            + 5  // right distortion
                            );
 
   // Set initial parameters.
@@ -167,18 +183,10 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   initialParameters[counter++] = leftIntrinsic.at<double>(1, 1);
   initialParameters[counter++] = leftIntrinsic.at<double>(0, 2);
   initialParameters[counter++] = leftIntrinsic.at<double>(1, 2);
-  for (int i = 0; i < leftDistortion.cols; i++)
-  {
-    initialParameters[counter++] = leftDistortion.at<double>(0, i);
-  }
   initialParameters[counter++] = rightIntrinsic.at<double>(0, 0);
   initialParameters[counter++] = rightIntrinsic.at<double>(1, 1);
   initialParameters[counter++] = rightIntrinsic.at<double>(0, 2);
   initialParameters[counter++] = rightIntrinsic.at<double>(1, 2);
-  for (int i = 0; i < rightDistortion.cols; i++)
-  {
-    initialParameters[counter++] = rightDistortion.at<double>(0, i);
-  }
 
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
@@ -218,18 +226,10 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   leftIntrinsic.at<double>(1, 1) = finalParameters[counter++];
   leftIntrinsic.at<double>(0, 2) = finalParameters[counter++];
   leftIntrinsic.at<double>(1, 2) = finalParameters[counter++];
-  for (int i = 0; i < leftDistortion.cols; i++)
-  {
-    leftDistortion.at<double>(0, i) = finalParameters[counter++];
-  }
   rightIntrinsic.at<double>(0, 0) = finalParameters[counter++];
   rightIntrinsic.at<double>(1, 1) = finalParameters[counter++];
   rightIntrinsic.at<double>(0, 2) = finalParameters[counter++];
   rightIntrinsic.at<double>(1, 2) = finalParameters[counter++];
-  for (int i = 0; i < rightDistortion.cols; i++)
-  {
-    rightDistortion.at<double>(0, i) = finalParameters[counter++];
-  }
 
   std::cout << "NonLinearStereoIntrinsicsCalibrationOptimiser: initial rms=" << initialRMS
             << ", final rms=" << finalRMS
