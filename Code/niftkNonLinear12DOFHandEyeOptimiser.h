@@ -12,33 +12,29 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearMalti12DOFHandEyeOptimiser_h
-#define niftkNonLinearMalti12DOFHandEyeOptimiser_h
+#ifndef niftkNonLinear12DOFHandEyeOptimiser_h
+#define niftkNonLinear12DOFHandEyeOptimiser_h
 
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNonLinearMalti12DOFHandEyeCostFunction.h>
+#include <niftkNonLinear12DOFHandEyeCostFunction.h>
 
 namespace niftk
 {
 
 /**
-* \class NonLinearMalti12DOFHandEyeOptimiser
+* \class NonLinear12DOFHandEyeOptimiser
 * \brief Optimises only hand-eye and model-to-world.
-*
-* \see niftk::NonLinearMalti12DOFHandEyeCostFunction
-* \see niftk::NonLinearMaltiHandEyeCostFunction
-* \see niftk::NonLinearMaltiHandEyeOptimiser
 */
-class NIFTYCAL_WINEXPORT NonLinearMalti12DOFHandEyeOptimiser : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinear12DOFHandEyeOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearMalti12DOFHandEyeOptimiser Self;
-  typedef  itk::Object                         Superclass;
-  typedef  itk::SmartPointer<Self>             Pointer;
+  typedef  NonLinear12DOFHandEyeOptimiser Self;
+  typedef  itk::Object                    Superclass;
+  typedef  itk::SmartPointer<Self>        Pointer;
   itkNewMacro(Self);
 
   void SetModel(Model3D* const model);
@@ -50,14 +46,14 @@ public:
 
 protected:
 
-  NonLinearMalti12DOFHandEyeOptimiser();
-  virtual ~NonLinearMalti12DOFHandEyeOptimiser();
+  NonLinear12DOFHandEyeOptimiser();
+  virtual ~NonLinear12DOFHandEyeOptimiser();
 
-  NonLinearMalti12DOFHandEyeOptimiser(const NonLinearMalti12DOFHandEyeOptimiser&);
-  NonLinearMalti12DOFHandEyeOptimiser& operator=(const NonLinearMalti12DOFHandEyeOptimiser&);
+  NonLinear12DOFHandEyeOptimiser(const NonLinear12DOFHandEyeOptimiser&);
+  NonLinear12DOFHandEyeOptimiser& operator=(const NonLinear12DOFHandEyeOptimiser&);
 
 private:
-  niftk::NonLinearMalti12DOFHandEyeCostFunction::Pointer m_CostFunction;
+  niftk::NonLinear12DOFHandEyeCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

@@ -12,30 +12,28 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearMaltiStereoHandEyeOptimiser_h
-#define niftkNonLinearMaltiStereoHandEyeOptimiser_h
+#ifndef niftkNonLinearStereoHandEyeOptimiser_h
+#define niftkNonLinearStereoHandEyeOptimiser_h
 
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNonLinearMaltiStereoHandEyeCostFunction.h>
+#include <niftkNonLinearStereoHandEyeCostFunction.h>
 
 namespace niftk
 {
 
 /**
-* \class NonLinearMaltiStereoHandEyeOptimiser
+* \class NonLinearStereoHandEyeOptimiser
 * \brief Optimises camera stereo extrinsic, hand-eye and model-to-world,
 * as an extension of <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
-*
-* \see niftk::NonLinearMaltiStereoHandEyeCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearMaltiStereoHandEyeOptimiser : public itk::Object
+class NIFTYCAL_WINEXPORT NonLinearStereoHandEyeOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearMaltiStereoHandEyeOptimiser Self;
+  typedef  NonLinearStereoHandEyeOptimiser Self;
   typedef  itk::Object                        Superclass;
   typedef  itk::SmartPointer<Self>            Pointer;
   itkNewMacro(Self);
@@ -56,14 +54,14 @@ public:
 
 protected:
 
-  NonLinearMaltiStereoHandEyeOptimiser();
-  virtual ~NonLinearMaltiStereoHandEyeOptimiser();
+  NonLinearStereoHandEyeOptimiser();
+  virtual ~NonLinearStereoHandEyeOptimiser();
 
-  NonLinearMaltiStereoHandEyeOptimiser(const NonLinearMaltiStereoHandEyeOptimiser&);
-  NonLinearMaltiStereoHandEyeOptimiser& operator=(const NonLinearMaltiStereoHandEyeOptimiser&);
+  NonLinearStereoHandEyeOptimiser(const NonLinearStereoHandEyeOptimiser&);
+  NonLinearStereoHandEyeOptimiser& operator=(const NonLinearStereoHandEyeOptimiser&);
 
 private:
-  niftk::NonLinearMaltiStereoHandEyeCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearStereoHandEyeCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

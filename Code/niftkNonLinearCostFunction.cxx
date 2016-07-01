@@ -44,7 +44,7 @@ void NonLinearCostFunction::SetModel(Model3D* const model)
     niftkNiftyCalThrow() << "Model is NULL.";
   }
 
-  m_Model = model;
+  m_Model = const_cast<Model3D*>(model);
   this->Modified();
 }
 
@@ -68,7 +68,7 @@ void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points)
     num += (*iter).size();
   }
   m_NumberOfValues = num;
-  m_Points = points;
+  m_Points = const_cast<std::list<PointSet>*>(points);
   this->Modified();
 }
 

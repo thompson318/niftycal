@@ -13,9 +13,10 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h"
-#include "niftkMatrixUtilities.h"
-#include "niftkNiftyCalExceptionMacro.h"
 #include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
+#include "niftkMatrixUtilities.h"
+#include "niftkPointUtilities.h"
+#include "niftkNiftyCalExceptionMacro.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
 namespace niftk
@@ -35,77 +36,43 @@ NonLinearStereoExtrinsicsCalibrationOptimiser::~NonLinearStereoExtrinsicsCalibra
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationOptimiser::SetModelAndPoints(Model3D* const model,
-                                                            std::list<PointSet>* const leftPoints,
-                                                            std::list<PointSet>* const rightPoints
-                                                           )
+void NonLinearStereoExtrinsicsCalibrationOptimiser::SetModelAndPoints(const Model3D* const model,
+                                                                      const std::list<PointSet>* const leftPoints,
+                                                                      const std::list<PointSet>* const rightPoints
+                                                                     )
 {
-  m_CostFunction->SetModel(model);
-  m_CostFunction->SetPoints(leftPoints);
-  m_CostFunction->SetRightHandPoints(rightPoints);
+  m_CostFunction->SetModel(const_cast<Model3D* const>(model));
+  m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
+  m_CostFunction->SetRightHandPoints(const_cast<std::list<PointSet>* const>(rightPoints));
 
-  unsigned long int numberOfTriangulatablePoints = 0;
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
-  niftk::PointSet::const_iterator pointIter;
+  unsigned long int numberOfTriangulatablePoints
+    = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
 
-  for (leftViewIter = leftPoints->begin(),
-       rightViewIter = rightPoints->begin();
-       leftViewIter != leftPoints->end() && rightViewIter != rightPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
-       )
-  {
-    for (pointIter = leftViewIter->begin();
-         pointIter != leftViewIter->end();
-         ++pointIter
-         )
-    {
-      niftk::NiftyCalIdType id = (*pointIter).first;
-      if (rightViewIter->find(id) != rightViewIter->end()
-          && model->find(id) != model->end()
-          )
-      {
-        numberOfTriangulatablePoints++;
-      }
-    }
-  }
   m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoExtrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
+                                                                            cv::Mat* const rightDistortion
+                                                                           )
+{
+  m_CostFunction->SetDistortionParameters(leftDistortion,
+                                          rightDistortion
+                                         );
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationOptimiser::SetIntrinsics(cv::Mat* const leftIntrinsic,
-                                                                  cv::Mat* const leftDistortion,
-                                                                  cv::Mat* const rightIntrinsic,
-                                                                  cv::Mat* const rightDistortion
+                                                                  cv::Mat* const rightIntrinsic
                                                                  )
 {
-  if (leftIntrinsic->rows != 3 || leftIntrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Left intrinsic matrix should be 3x3, and its ("
-                         << leftIntrinsic->cols << ", " << leftIntrinsic->rows << ")";
-  }
-
-  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
-  }
-
-  if (rightIntrinsic->rows != 3 || rightIntrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
-                         << rightIntrinsic->cols << ", " << rightIntrinsic->rows << ")";
-  }
-
-  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
-  }
-
-  m_CostFunction->SetIntrinsics(leftIntrinsic, leftDistortion,
-                                rightIntrinsic, rightDistortion);
+  m_CostFunction->SetIntrinsics(leftIntrinsic,
+                                rightIntrinsic
+                               );
   this->Modified();
 }
 
@@ -169,10 +136,10 @@ double NonLinearStereoExtrinsicsCalibrationOptimiser::Optimise(std::vector<cv::M
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(1000);
-  optimiser->SetGradientTolerance(0.0001);
-  optimiser->SetEpsilonFunction(0.0001);
-  optimiser->SetValueTolerance(0.0001);
+  optimiser->SetNumberOfIterations(100);
+  optimiser->SetGradientTolerance(0.001);
+  optimiser->SetEpsilonFunction(0.001);
+  optimiser->SetValueTolerance(0.001);
 
   niftk::NonLinearStereoExtrinsicsCalibrationCostFunction::MeasureType initialValues =
     m_CostFunction->GetValue(initialParameters);

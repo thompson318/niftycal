@@ -304,6 +304,11 @@ NIFTYCAL_WINEXPORT double ComputeRMSReprojectionError(const Model3D& model,
                                                       const cv::Mat& leftToRightTranslationVector
                                                      );
 
+NIFTYCAL_WINEXPORT unsigned long int GetNumberOfTriangulatablePoints(const Model3D& model,
+                                                                     const std::list<PointSet>& listOfLeftHandPointSets,
+                                                                     const std::list<PointSet>& listOfRightHandPointSets
+                                                                    );
+
 } // end namespace
 
 #endif

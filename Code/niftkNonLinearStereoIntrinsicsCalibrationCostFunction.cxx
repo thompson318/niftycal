@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
+#include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
@@ -21,49 +21,91 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::NonLinearStereoExtrinsicsCalibrationCostFunction()
-: m_LeftIntrinsic(nullptr)
+NonLinearStereoIntrinsicsCalibrationCostFunction::NonLinearStereoIntrinsicsCalibrationCostFunction()
+: m_RvecsLeft(nullptr)
+, m_TvecsLeft(nullptr)
+, m_LeftToRightRotationMatrix(nullptr)
+, m_LeftToRightTranslationVector(nullptr)
 , m_LeftDistortion(nullptr)
-, m_RightIntrinsic(nullptr)
 , m_RightDistortion(nullptr)
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::~NonLinearStereoExtrinsicsCalibrationCostFunction()
+NonLinearStereoIntrinsicsCalibrationCostFunction::~NonLinearStereoIntrinsicsCalibrationCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationCostFunction::SetIntrinsics(cv::Mat* const leftIntrinsic,
-                                                                     cv::Mat* const rightIntrinsic
+void NonLinearStereoIntrinsicsCalibrationCostFunction::SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
+                                                                     std::vector<cv::Mat>* const tvecsLeft,
+                                                                     cv::Mat* const leftToRightRotationMatrix,
+                                                                     cv::Mat* const leftToRightTranslationVector
                                                                     )
 {
-  if (leftIntrinsic->rows != 3 || leftIntrinsic->cols != 3)
+  if (rvecsLeft == nullptr)
   {
-    niftkNiftyCalThrow() << "Left intrinsic matrix should be 3x3, and its ("
-                         << leftIntrinsic->cols << ", " << leftIntrinsic->rows << ")";
+    niftkNiftyCalThrow() << "Null left camera rotation vectors.";
   }
 
-  if (rightIntrinsic->rows != 3 || rightIntrinsic->cols != 3)
+  if (tvecsLeft == nullptr)
   {
-    niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
-                         << rightIntrinsic->cols << ", " << rightIntrinsic->rows << ")";
+    niftkNiftyCalThrow() << "Null left camera translation vectors.";
   }
 
-  m_LeftIntrinsic = leftIntrinsic;
-  m_RightIntrinsic = rightIntrinsic;
+  if (leftToRightRotationMatrix == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null leftToRightRotationMatrix.";
+  }
+
+  if (leftToRightTranslationVector == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null leftToRightTranslationVector.";
+  }
+
+  if (leftToRightRotationMatrix->rows != 3 || leftToRightRotationMatrix->cols != 3)
+  {
+    niftkNiftyCalThrow() << "Left to Right rotation matrix should be 3x3, and its ("
+                         << leftToRightRotationMatrix->cols << ", " << leftToRightRotationMatrix->rows << ")";
+  }
+
+  if (leftToRightTranslationVector->rows != 3 || leftToRightTranslationVector->cols != 1)
+  {
+    niftkNiftyCalThrow() << "Left to Right translation vector matrix should be 3x1, and its ("
+                         << leftToRightTranslationVector->rows << ", " << leftToRightTranslationVector->cols << ")";
+  }
+
+  if (rvecsLeft->size() != tvecsLeft->size())
+  {
+    niftkNiftyCalThrow() << "Unequal extrinsic vectors: " << rvecsLeft->size()
+                         << ", versus " << tvecsLeft->size();
+  }
+
+  m_RvecsLeft = rvecsLeft;
+  m_TvecsLeft = tvecsLeft;
+  m_LeftToRightRotationMatrix = leftToRightRotationMatrix;
+  m_LeftToRightTranslationVector = leftToRightTranslationVector;
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
+void NonLinearStereoIntrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                                cv::Mat* const rightDistortion
                                                                               )
 {
+  if (leftDistortion == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null left distortion parameters.";
+  }
+
+  if (rightDistortion == nullptr)
+  {
+    niftkNiftyCalThrow() << "Null right distortion parameters.";
+  }
+
   if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
   {
     niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
@@ -81,8 +123,8 @@ void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(c
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::MeasureType
-NonLinearStereoExtrinsicsCalibrationCostFunction::InternalGetValue(const ParametersType& parameters) const
+NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType
+NonLinearStereoIntrinsicsCalibrationCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
   if (m_Points->size() != m_RightHandPoints->size())
   {
@@ -93,18 +135,19 @@ NonLinearStereoExtrinsicsCalibrationCostFunction::InternalGetValue(const Paramet
   result.SetSize(this->GetNumberOfValues());
 
   int counter = 0;
-  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
-  leftToRightRotationVector.at<double>(0, 0) = parameters[counter++];
-  leftToRightRotationVector.at<double>(0, 1) = parameters[counter++];
-  leftToRightRotationVector.at<double>(0, 2) = parameters[counter++];
+  cv::Mat leftIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
+  leftIntrinsic.at<double>(0, 0) = parameters[counter++];
+  leftIntrinsic.at<double>(1, 1) = parameters[counter++];
+  leftIntrinsic.at<double>(0, 2) = parameters[counter++];
+  leftIntrinsic.at<double>(1, 2) = parameters[counter++];
+  leftIntrinsic.at<double>(2, 2) = 1;
 
-  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
-  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
-
-  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  leftToRightTranslationVector.at<double>(0, 0) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 1) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 2) = parameters[counter++];
+  cv::Mat rightIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
+  rightIntrinsic.at<double>(0, 0) = parameters[counter++];
+  rightIntrinsic.at<double>(1, 1) = parameters[counter++];
+  rightIntrinsic.at<double>(0, 2) = parameters[counter++];
+  rightIntrinsic.at<double>(1, 2) = parameters[counter++];
+  rightIntrinsic.at<double>(2, 2) = 1;
 
   int numberOfViews = 0;
   unsigned long int pointCounter = 0;
@@ -119,33 +162,23 @@ NonLinearStereoExtrinsicsCalibrationCostFunction::InternalGetValue(const Paramet
        ++rightViewIter
        )
   {
-    cv::Mat leftCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    leftCameraRotationVector.at<double>(0, 0) = parameters[counter++];
-    leftCameraRotationVector.at<double>(0, 1) = parameters[counter++];
-    leftCameraRotationVector.at<double>(0, 2) = parameters[counter++];
-
-    cv::Mat leftCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-    leftCameraTranslationVector.at<double>(0, 0) = parameters[counter++];
-    leftCameraTranslationVector.at<double>(0, 1) = parameters[counter++];
-    leftCameraTranslationVector.at<double>(0, 2) = parameters[counter++];
-
     niftk::Model3D triangulatedModelInLeftCameraSpace;
 
     niftk::TriangulatePointPairs(
       *leftViewIter,
       *rightViewIter,
-      *m_LeftIntrinsic,
+      leftIntrinsic,
       *m_LeftDistortion,
-      leftCameraRotationVector,
-      leftCameraTranslationVector,
-      leftToRightRotationMatrix,
-      leftToRightTranslationVector,
-      *m_RightIntrinsic,
+      (*m_RvecsLeft)[numberOfViews],
+      (*m_TvecsLeft)[numberOfViews],
+      *m_LeftToRightRotationMatrix,
+      *m_LeftToRightTranslationVector,
+      rightIntrinsic,
       *m_RightDistortion,
       triangulatedModelInLeftCameraSpace
     );
 
-    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix(leftCameraRotationVector, leftCameraTranslationVector);
+    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix((*m_RvecsLeft)[numberOfViews], (*m_TvecsLeft)[numberOfViews]);
     cv::Matx44d cameraToModel = modelToCamera.inv(cv::DECOMP_SVD);
 
     niftk::Model3D triangulatedModelInModelSpace = niftk::TransformModel(triangulatedModelInLeftCameraSpace,

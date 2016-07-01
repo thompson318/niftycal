@@ -52,8 +52,6 @@ protected:
   NonLinearHandEyeCostFunction(const NonLinearHandEyeCostFunction&); // Purposefully not implemented.
   NonLinearHandEyeCostFunction& operator=(const NonLinearHandEyeCostFunction&); // Purposefully not implemented.
 
-  virtual MeasureType InternalGetValue( const ParametersType & parameters ) const = 0;
-
   std::list<cv::Matx44d> *m_HandMatrices;
 };
 

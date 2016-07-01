@@ -44,18 +44,28 @@ endif()
 if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearHandEyeCostFunction.cxx)
+
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiHandEyeOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMalti12DOFHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMalti12DOFHandEyeOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiNDOFHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiNDOFHandEyeOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiStereoHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiStereoHandEyeOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearNoIntrinsicsHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinear12DOFHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinear12DOFHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearNDOFHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearNDOFHandEyeOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoHandEyeOptimiser.cxx)
+
   list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationOptimiser.cxx)
+
   list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoIntrinsicsCalibrationCostFunction.cxx)  
+  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoIntrinsicsCalibrationOptimiser.cxx)
+
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})

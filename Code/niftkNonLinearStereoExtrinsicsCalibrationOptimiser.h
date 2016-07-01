@@ -18,7 +18,8 @@
 #include "niftkWin32ExportHeader.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h>
+#include "niftkNonLinearStereoCalibrationOptimiser.h"
+#include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
 
 namespace niftk
 {
@@ -36,22 +37,25 @@ class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationOptimiser : public 
 public:
 
   typedef  NonLinearStereoExtrinsicsCalibrationOptimiser Self;
-  typedef  itk::Object                         Superclass;
-  typedef  itk::SmartPointer<Self>             Pointer;
+  typedef  itk::Object                                   Superclass;
+  typedef  itk::SmartPointer<Self>                       Pointer;
   itkNewMacro(Self);
 
-  void SetModelAndPoints(Model3D* const model,
-                         std::list<PointSet>* const leftPoints,
-                         std::list<PointSet>* const rightPoints
-                         );
+  void SetModelAndPoints(const Model3D* const model,
+                         const std::list<PointSet>* const leftPoints,
+                         const std::list<PointSet>* const rightPoints
+                        );
+
+  void SetDistortionParameters(cv::Mat* const leftDistortion,
+                               cv::Mat* const rightDistortion
+                              );
 
   void SetIntrinsics(cv::Mat* const leftIntrinsic,
-                     cv::Mat* const leftDistortion,
-                     cv::Mat* const rightIntrinsic,
-                     cv::Mat* const rightDistortion
+                     cv::Mat* const rightIntrinsic
                     );
+
   /**
-  * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.
+  * \brief Optimises extrinsic parameters, and returns the 3D RMS reconstruction error.
   *
   * Note: You probably need a very good calibration before calling this.
   */

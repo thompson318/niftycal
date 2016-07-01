@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearMaltiStereoHandEyeCostFunction.h"
+#include "niftkNonLinearStereoHandEyeCostFunction.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
@@ -21,7 +21,7 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearMaltiStereoHandEyeCostFunction::NonLinearMaltiStereoHandEyeCostFunction()
+NonLinearStereoHandEyeCostFunction::NonLinearStereoHandEyeCostFunction()
 : m_LeftIntrinsic(nullptr)
 , m_LeftDistortion(nullptr)
 , m_RightIntrinsic(nullptr)
@@ -33,13 +33,13 @@ NonLinearMaltiStereoHandEyeCostFunction::NonLinearMaltiStereoHandEyeCostFunction
 
 
 //-----------------------------------------------------------------------------
-NonLinearMaltiStereoHandEyeCostFunction::~NonLinearMaltiStereoHandEyeCostFunction()
+NonLinearStereoHandEyeCostFunction::~NonLinearStereoHandEyeCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::SetLeftIntrinsic(cv::Mat* const intrinsic)
+void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -53,7 +53,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetLeftIntrinsic(cv::Mat* const in
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::SetLeftDistortion(cv::Mat* const distortion)
+void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
@@ -66,7 +66,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetLeftDistortion(cv::Mat* const d
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::SetRightIntrinsic(cv::Mat* const intrinsic)
+void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -80,7 +80,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetRightIntrinsic(cv::Mat* const i
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::SetRightDistortion(cv::Mat* const distortion)
+void NonLinearStereoHandEyeCostFunction::SetRightDistortion(cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
@@ -93,7 +93,7 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetRightDistortion(cv::Mat* const 
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
+void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {
@@ -117,14 +117,14 @@ void NonLinearMaltiStereoHandEyeCostFunction::SetRightHandPoints(std::list<Point
 
 
 //-----------------------------------------------------------------------------
-unsigned int NonLinearMaltiStereoHandEyeCostFunction::GetNumberOfValues(void) const
+unsigned int NonLinearStereoHandEyeCostFunction::GetNumberOfValues(void) const
 {
   return (this->m_NumberOfValues + m_NumberOfRightHandValues) * 2;
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,
+void NonLinearStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,
                                                             const cv::Matx44d& extrinsic,
                                                             const cv::Mat& intrinsic,
                                                             const cv::Mat& distortion,
@@ -155,8 +155,8 @@ void NonLinearMaltiStereoHandEyeCostFunction::ProjectPoints(const PointSet& poin
 
 
 //-----------------------------------------------------------------------------
-NonLinearMaltiStereoHandEyeCostFunction::MeasureType
-NonLinearMaltiStereoHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
+NonLinearStereoHandEyeCostFunction::MeasureType
+NonLinearStereoHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
   if (m_Points->size() != m_RightHandPoints->size())
   {

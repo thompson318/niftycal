@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearStereoExtrinsicsCalibrationCostFunction_h
-#define niftkNonLinearStereoExtrinsicsCalibrationCostFunction_h
+#ifndef niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
+#define niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkNiftyCalTypes.h"
@@ -23,19 +23,19 @@ namespace niftk
 {
 
 /**
-* \class NonLinearStereoExtrinsicsCalibrationCostFunction
+* \class NonLinearStereoIntrinsicsCalibrationCostFunction
 * \brief Computes cost as RMS reconstruction (3D) error
-* for extrinsic and stereo optimisation.
+* where the parameters array contains only intrinsic parameters.
 *
-* \see niftk::NonLinearStereoExtrinsicsCalibrationOptimiser
+* \see niftk::NonLinearStereoIntrinsicsCalibrationOptimiser
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationCostFunction :
+class NIFTYCAL_WINEXPORT NonLinearStereoIntrinsicsCalibrationCostFunction :
     public niftk::NonLinearStereoCalibrationCostFunction
 {
 
 public:
 
-  typedef NonLinearStereoExtrinsicsCalibrationCostFunction Self;
+  typedef NonLinearStereoIntrinsicsCalibrationCostFunction Self;
   typedef niftk::NonLinearStereoCalibrationCostFunction    Superclass;
   typedef itk::SmartPointer<Self>                          Pointer;
   typedef itk::SmartPointer<const Self>                    ConstPointer;
@@ -45,29 +45,33 @@ public:
   typedef Superclass::DerivativeType                       DerivativeType;
   typedef Superclass::MeasureType                          MeasureType;
 
+  void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
+                     std::vector<cv::Mat>* const tvecsLeft,
+                     cv::Mat* const leftToRightRotationMatrix,
+                     cv::Mat* const leftToRightTranslationVector
+                     );
+
   void SetDistortionParameters(cv::Mat* const leftDistortion,
                                cv::Mat* const rightDistortion
-                              );
-
-  void SetIntrinsics(cv::Mat* const leftIntrinsic,
-                     cv::Mat* const rightIntrinsic
-                    );
+                               );
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
 
-  NonLinearStereoExtrinsicsCalibrationCostFunction();
-  virtual ~NonLinearStereoExtrinsicsCalibrationCostFunction();
+  NonLinearStereoIntrinsicsCalibrationCostFunction();
+  virtual ~NonLinearStereoIntrinsicsCalibrationCostFunction();
 
-  NonLinearStereoExtrinsicsCalibrationCostFunction(const NonLinearStereoExtrinsicsCalibrationCostFunction&);
-  NonLinearStereoExtrinsicsCalibrationCostFunction& operator=(const NonLinearStereoExtrinsicsCalibrationCostFunction&);
+  NonLinearStereoIntrinsicsCalibrationCostFunction(const NonLinearStereoIntrinsicsCalibrationCostFunction&);
+  NonLinearStereoIntrinsicsCalibrationCostFunction& operator=(const NonLinearStereoIntrinsicsCalibrationCostFunction&);
 
 private:
-  cv::Mat             *m_LeftIntrinsic;
-  cv::Mat             *m_LeftDistortion;
-  cv::Mat             *m_RightIntrinsic;
-  cv::Mat             *m_RightDistortion;
+  std::vector<cv::Mat> *m_RvecsLeft;
+  std::vector<cv::Mat> *m_TvecsLeft;
+  cv::Mat              *m_LeftToRightRotationMatrix;
+  cv::Mat              *m_LeftToRightTranslationVector;
+  cv::Mat              *m_LeftDistortion;
+  cv::Mat              *m_RightDistortion;
 };
 
 } // end namespace

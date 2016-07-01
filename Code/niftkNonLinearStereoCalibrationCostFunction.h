@@ -59,7 +59,6 @@ protected:
   NonLinearStereoCalibrationCostFunction(const NonLinearStereoCalibrationCostFunction&);
   NonLinearStereoCalibrationCostFunction& operator=(const NonLinearStereoCalibrationCostFunction&);
 
-private:
   std::list<PointSet> *m_RightHandPoints;
 };
 

@@ -24,6 +24,7 @@
 #include <cstdlib>
 
 #ifdef NIFTYCAL_WITH_ITK
+#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
 #include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
 #endif
 
@@ -238,23 +239,46 @@ int main(int argc, char ** argv)
 #ifdef NIFTYCAL_WITH_ITK
     if (optimise3D)
     {
-      // Now optimise RMS reconstruction error.
-      niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer optimiser =
+      // Now optimise RMS reconstruction error via intrinsics.
+      niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::Pointer intrinsicsOptimiser =
+          niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::New();
+
+      intrinsicsOptimiser->SetModelAndPoints(&model,
+                                             &listOfPointsLeft,
+                                             &listOfPointsRight);
+
+      intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
+                                         &tvecsLeft,
+                                         &leftToRightRotationMatrix,
+                                         &leftToRightTranslationVector);
+
+      intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+
+      rmsReconstructionError = intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                                             intrinsicRight
+                                                             );
+
+      // Now optimise RMS reconstruction error via extrinsics.
+      niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
           niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
 
-      optimiser->SetModelAndPoints(&model, &listOfPointsLeft, &listOfPointsRight);
-      optimiser->SetIntrinsics(&intrinsicLeft,
-                               &distortionLeft,
-                               &intrinsicRight,
-                               &distortionRight
-                               );
+      extrinsicsOptimiser->SetModelAndPoints(&model,
+                                             &listOfPointsLeft,
+                                             &listOfPointsRight);
 
-      rmsReconstructionError = optimiser->Optimise(rvecsLeft,
-                                                   tvecsLeft,
-                                                   leftToRightRotationMatrix,
-                                                   leftToRightTranslationVector
-                                                  );
+      extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
+                                         &intrinsicRight
+                                        );
 
+      extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+
+      rmsReconstructionError = extrinsicsOptimiser->Optimise(rvecsLeft,
+                                                             tvecsLeft,
+                                                             leftToRightRotationMatrix,
+                                                             leftToRightTranslationVector
+                                                            );
+
+      // Recompute re-projection error, as it will now be different.
       rms = niftk::ComputeRMSReprojectionError(model,
                                                listOfPointsLeft,
                                                listOfPointsRight,
