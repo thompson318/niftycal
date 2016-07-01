@@ -52,14 +52,21 @@ void NonLinearStereoExtrinsicsCalibrationCostFunction::SetRightHandPoints(std::l
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationCostFunction::SetIntrinsics(cv::Mat* const leftIntrinsic,
-                                                                     cv::Mat* const leftDistortion,
-                                                                     cv::Mat* const rightIntrinsic,
-                                                                     cv::Mat* const rightDistortion
+                                                                     cv::Mat* const rightIntrinsic
                                                                     )
 {
   m_LeftIntrinsic = leftIntrinsic;
-  m_LeftDistortion = leftDistortion;
   m_RightIntrinsic = rightIntrinsic;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
+                                                                               cv::Mat* const rightDistortion
+                                                                              )
+{
+  m_LeftDistortion = leftDistortion;
   m_RightDistortion = rightDistortion;
   this->Modified();
 }

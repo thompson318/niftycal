@@ -76,10 +76,28 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetModelAndPoints(Model3D* c
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoExtrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
+                                                                            cv::Mat* const rightDistortion
+                                                                           )
+{
+  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
+  }
+
+  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
+  }
+
+  m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibrationOptimiser::SetIntrinsics(cv::Mat* const leftIntrinsic,
-                                                                  cv::Mat* const leftDistortion,
-                                                                  cv::Mat* const rightIntrinsic,
-                                                                  cv::Mat* const rightDistortion
+                                                                  cv::Mat* const rightIntrinsic
                                                                  )
 {
   if (leftIntrinsic->rows != 3 || leftIntrinsic->cols != 3)
@@ -88,24 +106,13 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetIntrinsics(cv::Mat* const
                          << leftIntrinsic->cols << ", " << leftIntrinsic->rows << ")";
   }
 
-  if (leftDistortion->rows != 1 || leftDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Left distortion vector should be a 1x5 vector.";
-  }
-
   if (rightIntrinsic->rows != 3 || rightIntrinsic->cols != 3)
   {
     niftkNiftyCalThrow() << "Right intrinsic matrix should be 3x3, and its ("
                          << rightIntrinsic->cols << ", " << rightIntrinsic->rows << ")";
   }
 
-  if (rightDistortion->rows != 1 || rightDistortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Right distortion vector should be a 1x5 vector.";
-  }
-
-  m_CostFunction->SetIntrinsics(leftIntrinsic, leftDistortion,
-                                rightIntrinsic, rightDistortion);
+  m_CostFunction->SetIntrinsics(leftIntrinsic, rightIntrinsic);
   this->Modified();
 }
 

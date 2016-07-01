@@ -45,11 +45,14 @@ public:
                          std::list<PointSet>* const rightPoints
                          );
 
+  void SetDistortionParameters(cv::Mat* const leftDistortion,
+                               cv::Mat* const rightDistortion
+                              );
+
   void SetIntrinsics(cv::Mat* const leftIntrinsic,
-                     cv::Mat* const leftDistortion,
-                     cv::Mat* const rightIntrinsic,
-                     cv::Mat* const rightDistortion
+                     cv::Mat* const rightIntrinsic
                     );
+
   /**
   * \brief Optimises all parameters, and returns the 3D RMS reconstruction error.
   *

@@ -47,10 +47,12 @@ public:
 
   void SetRightHandPoints(std::list<PointSet>* const points);
 
+  void SetDistortionParameters(cv::Mat* const leftDistortion,
+                               cv::Mat* const rightDistortion
+                              );
+
   void SetIntrinsics(cv::Mat* const leftIntrinsic,
-                     cv::Mat* const leftDistortion,
-                     cv::Mat* const rightIntrinsic,
-                     cv::Mat* const rightDistortion
+                     cv::Mat* const rightIntrinsic
                     );
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;

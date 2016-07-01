@@ -267,10 +267,10 @@ int main(int argc, char ** argv)
                                              &listOfPointsRight);
 
       extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
-                                         &distortionLeft,
-                                         &intrinsicRight,
-                                         &distortionRight
+                                         &intrinsicRight
                                         );
+
+      extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
       rmsReconstructionError = extrinsicsOptimiser->Optimise(rvecsLeft,
                                                              tvecsLeft,
@@ -278,6 +278,7 @@ int main(int argc, char ** argv)
                                                              leftToRightTranslationVector
                                                             );
 
+      // Recompute re-projection error, as it will now be different.
       rms = niftk::ComputeRMSReprojectionError(model,
                                                listOfPointsLeft,
                                                listOfPointsRight,
