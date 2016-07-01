@@ -101,8 +101,8 @@ int main(int argc, char ** argv)
     dots.height = dotsInX;
 
     cv::Size2i offset;
-    offset.width = 5;
-    offset.height = 5;
+    offset.width = templateImage.cols / 10;
+    offset.height = templateImage.rows / 10;
 
     cv::Point2d originalScaleFactors;
     originalScaleFactors.x = rescaleX;
