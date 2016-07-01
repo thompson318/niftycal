@@ -99,6 +99,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
   std::list<PointSet> pointsFromOriginalImagesLeft;
   std::list<PointSet> distortedPointsFromCanonicalImagesLeft;
+  std::list<PointSet> bestPointSetsSoFarLeft;
 
   ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesLeft,
                                   pointsFromOriginalImagesLeft,
@@ -107,6 +108,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
   std::list<PointSet> pointsFromOriginalImagesRight;
   std::list<PointSet> distortedPointsFromCanonicalImagesRight;
+  std::list<PointSet> bestPointSetsSoFarRight;
 
   ExtractTwoCopiesOfControlPoints(detectorAndOriginalImagesRight,
                                   pointsFromOriginalImagesRight,
@@ -193,6 +195,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
                                                           rmsInEachAxis
                                                          );
 
+  bestPointSetsSoFarLeft = pointsFromOriginalImagesLeft;
+  bestPointSetsSoFarRight = pointsFromOriginalImagesRight;
+
   std::cout << "Initial stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
   std::cout << "Initial Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Initial Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
@@ -222,7 +227,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << "Initial T3=" << leftToRightTranslationVector.at<double>(0,2) << std::endl;
   std::cout << std::endl;
 
-  unsigned int count = 0;
+  unsigned int iterationCount = 0;
   double previousRMS = std::numeric_limits<double>::max();
 
   while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
@@ -274,7 +279,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
           iterativeCvFlags
           );
 
-    std::cout << "Iterative calibration iter=" << count++
+    std::cout << "Iterative calibration iter=" << iterationCount++
               << ", prms=" << previousRMS
               << ", rms2D=" << projectedRMS
               << std::endl;
@@ -315,6 +320,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
       tmpLeftToRightTranslationVector.copyTo(leftToRightTranslationVector);
       tmpEssentialMatrix.copyTo(essentialMatrix);
       tmpFundamentalMatrix.copyTo(fundamentalMatrix);
+
+      bestPointSetsSoFarLeft = distortedPointsFromCanonicalImagesLeft;
+      bestPointSetsSoFarRight = distortedPointsFromCanonicalImagesRight;
+
     }
     else
     {
@@ -334,8 +343,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
         niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::New();
 
     intrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &distortedPointsFromCanonicalImagesLeft,
-                                           &distortedPointsFromCanonicalImagesRight
+                                           &bestPointSetsSoFarLeft,
+                                           &bestPointSetsSoFarRight
                                           );
 
     intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
@@ -354,8 +363,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
         niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
 
     extrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &distortedPointsFromCanonicalImagesLeft,
-                                           &distortedPointsFromCanonicalImagesRight);
+                                           &bestPointSetsSoFarLeft,
+                                           &bestPointSetsSoFarRight);
 
     extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
                                        &intrinsicRight
@@ -371,8 +380,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     // Recompute re-projection error, as it will now be different.
     projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                      distortedPointsFromCanonicalImagesLeft,
-                                                      distortedPointsFromCanonicalImagesRight,
+                                                      bestPointSetsSoFarLeft,
+                                                      bestPointSetsSoFarRight,
                                                       intrinsicLeft,
                                                       distortionLeft,
                                                       rvecsLeft,
@@ -382,9 +391,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
                                                       leftToRightRotationMatrix,
                                                       leftToRightTranslationVector
                                                      );
-  }
 
-  std::cout << "3D optimisation finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+    std::cout << "3D optimisation finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+
+  }
 
 #endif
 
