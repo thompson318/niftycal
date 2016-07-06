@@ -22,6 +22,7 @@
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
+#include <chrono>
 
 TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
@@ -60,8 +61,12 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
   cv::Size2i internalCorners(expectedInternalCornersX, expectedInternalCornersY);
   niftk::ChessboardPointDetector detector(internalCorners);
+  detector.SetCaching(true);
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
+
+  std::chrono::time_point<std::chrono::system_clock> start;
+  start = std::chrono::system_clock::now();
 
   niftk::PointSet points;
 
@@ -75,6 +80,16 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
     REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
   }
   REQUIRE( points.size() == expectedNumberOfCorners );
+
+  std::chrono::time_point<std::chrono::system_clock> endFirstGrab = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = endFirstGrab - start;
+  std::cout << "TIME:First grab=" << elapsed_seconds.count() << std::endl;
+
+  points = detector.GetPoints();
+
+  std::chrono::time_point<std::chrono::system_clock> endSecondGrab = std::chrono::system_clock::now();
+  elapsed_seconds = endSecondGrab - endFirstGrab;
+  std::cout << "TIME:Second grab=" << elapsed_seconds.count() << std::endl;
 
   if (points.size() > 0)
   {
