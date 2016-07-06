@@ -21,6 +21,8 @@ namespace niftk {
 //-----------------------------------------------------------------------------
 PointDetector::PointDetector()
 : m_Image(nullptr)
+, m_Caching(false)
+, m_NeedsUpdating(true)
 {
   m_ScaleFactors.x = 1;
   m_ScaleFactors.y = 1;
@@ -34,6 +36,14 @@ PointDetector::~PointDetector()
 
 
 //-----------------------------------------------------------------------------
+void PointDetector::SetCaching(const bool& isCaching)
+{
+  m_Caching = isCaching;
+  m_NeedsUpdating = true;
+}
+
+
+//-----------------------------------------------------------------------------
 void PointDetector::SetImage(cv::Mat* image)
 {
   if (image == nullptr)
@@ -41,6 +51,7 @@ void PointDetector::SetImage(cv::Mat* image)
     niftkNiftyCalThrow() << "Null image provided.";
   }
   m_Image = image;
+  m_NeedsUpdating = true;
 }
 
 
@@ -56,6 +67,7 @@ void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
     niftkNiftyCalThrow() << "Y scale factor <= 0.";
   }
   m_ScaleFactors = scaleFactor;
+  m_NeedsUpdating = true;
 }
 
 
@@ -63,6 +75,7 @@ void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
 void PointDetector::SetInitialGuess(const PointSet& guess)
 {
   m_InitialGuess = guess;
+  m_NeedsUpdating = true;
 }
 
 
@@ -72,6 +85,11 @@ PointSet PointDetector::GetPoints()
   if (m_Image == nullptr)
   {
     niftkNiftyCalThrow() << "Image is Null.";
+  }
+
+  if (m_Caching && !m_NeedsUpdating)
+  {
+    return m_CachedResult; // even if its empty, i.e. previous attempt returned zero points.
   }
 
   PointSet result;
@@ -90,6 +108,8 @@ PointSet PointDetector::GetPoints()
     scaleDownFactors.y = 1.0/m_ScaleFactors.y;
     result = niftk::RescalePoints(points, scaleDownFactors);
   }
+  m_CachedResult = result;
+  m_NeedsUpdating = false;
   return result;
 }
 

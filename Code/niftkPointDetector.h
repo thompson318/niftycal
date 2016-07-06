@@ -51,6 +51,12 @@ public:
   void SetImageScaleFactor(const cv::Point2d& scaleFactor);
 
   /**
+  * \brief If true, will cache points, so once detected, the detection process
+  * will not be run again until the SetImage method is called providing another image.
+  */
+  void SetCaching(const bool& isCaching);
+
+  /**
   * \brief Implements IPoint2DDetector::GetPoints()
   * and derived classes should reimplement InternalGetPoints().
   */
@@ -74,6 +80,9 @@ private:
   cv::Mat*        m_Image;
   cv::Mat         m_RescaledImage;
   cv::Point2d     m_ScaleFactors;
+  bool            m_Caching;
+  bool            m_NeedsUpdating;
+  niftk::PointSet m_CachedResult;
 };
 
 } // end namespace
