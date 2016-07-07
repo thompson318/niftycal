@@ -403,7 +403,7 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
 
   // Beware: OpenCV and NiftyCal calculate "left-to-right".
   //         NifTK uses "right-to-left", so here we deliberately invert.
-  cv::Matx44d matInv = mat.inv();
+  cv::Matx44d matInv = mat.inv(cv::DECOMP_SVD);
 
   // And here we deliberately output the inverted matrix.
   for (int r = 0; r < 3; r++)
@@ -455,16 +455,16 @@ void LoadNifTKStereoExtrinsics(const std::string& fileName,
       leftToRightRotationMatrix.at<double>(r, c) = tmpFromFile.at<double>(r, c);
     }
   }
-  for (int c = 0; c < 3; c++)
+  for (int r = 0; r < 3; r++)
   {
-    leftToRightTranslationVector.at<double>(0, c) = tmpFromFile.at<double>(3, c);
+    leftToRightTranslationVector.at<double>(r, 0) = tmpFromFile.at<double>(3, r);
   }
 
   // Beware: OpenCV and NiftyCal calculate "left-to-right".
   //         NifTK uses "right-to-left", so here we deliberately invert.
 
   cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix, leftToRightTranslationVector);
-  cv::Matx44d matInv = mat.inv();
+  cv::Matx44d matInv = mat.inv(cv::DECOMP_SVD);
 
   for (int r = 0; r < 3; r++)
   {
@@ -473,9 +473,9 @@ void LoadNifTKStereoExtrinsics(const std::string& fileName,
       leftToRightRotationMatrix.at<double>(r, c) = matInv(r, c);
     }
   }
-  for (int c = 0; c < 3; c++)
+  for (int r = 0; r < 3; r++)
   {
-    leftToRightTranslationVector.at<double>(0, c) = matInv(3, c);
+    leftToRightTranslationVector.at<double>(r, 0) = matInv(3, r);
   }
 }
 
