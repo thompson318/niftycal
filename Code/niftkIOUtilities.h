@@ -69,6 +69,11 @@ NIFTYCAL_WINEXPORT void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRota
                                                  );
 
 
+NIFTYCAL_WINEXPORT void LoadNifTKStereoExtrinsics(const std::string& fileName,
+                                                  cv::Mat& leftToRightRotationMatrix,
+                                                  cv::Mat& leftToRightTranslationVector
+                                                  );
+
 /**
 * \brief Does Rodrigues decomposition, and saves 6 parameters to file.
 */
