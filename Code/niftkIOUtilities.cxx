@@ -378,6 +378,16 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
     niftkNiftyCalThrow() << "Empty filename.";
   }
 
+  if (leftToRightRotationMatrix.rows != 3 || leftToRightRotationMatrix.cols != 3)
+  {
+    niftkNiftyCalThrow() << "Invalid rotation matrix size.";
+  }
+
+  if (leftToRightTranslationVector.rows != 3 || leftToRightTranslationVector.cols != 1)
+  {
+    niftkNiftyCalThrow() << "Invalid translation vector size.";
+  }
+
   std::ofstream ofs;
   ofs.precision(10);
   ofs.width(10);
@@ -393,7 +403,7 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
 
   // Beware: OpenCV and NiftyCal calculate "left-to-right".
   //         NifTK uses "right-to-left", so here we deliberately invert.
-  cv::Matx44d matInv = mat.inv();
+  cv::Matx44d matInv = mat.inv(cv::DECOMP_SVD);
 
   // And here we deliberately output the inverted matrix.
   for (int r = 0; r < 3; r++)
@@ -407,6 +417,66 @@ void SaveNifTKStereoExtrinsics(const cv::Mat& leftToRightRotationMatrix,
   ofs << matInv(0,3) << " " << matInv(1,3) << " " << matInv(2,3) << std::endl;
 
   ofs.close();
+}
+
+
+//-----------------------------------------------------------------------------
+void LoadNifTKStereoExtrinsics(const std::string& fileName,
+                               cv::Mat& leftToRightRotationMatrix,
+                               cv::Mat& leftToRightTranslationVector
+                              )
+{
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  if (leftToRightRotationMatrix.rows != 3 || leftToRightRotationMatrix.cols != 3)
+  {
+    niftkNiftyCalThrow() << "Invalid rotation matrix size.";
+  }
+
+  if (leftToRightTranslationVector.rows != 3 || leftToRightTranslationVector.cols != 1)
+  {
+    niftkNiftyCalThrow() << "Invalid translation vector size.";
+  }
+
+  cv::Mat tmpFromFile = niftk::LoadMatrix(fileName);
+
+  if (tmpFromFile.rows != 4 || tmpFromFile.cols != 3)
+  {
+    niftkNiftyCalThrow() << "Invalid left to right matrix size.";
+  }
+
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      leftToRightRotationMatrix.at<double>(r, c) = tmpFromFile.at<double>(r, c);
+    }
+  }
+  for (int r = 0; r < 3; r++)
+  {
+    leftToRightTranslationVector.at<double>(r, 0) = tmpFromFile.at<double>(3, r);
+  }
+
+  // Beware: OpenCV and NiftyCal calculate "left-to-right".
+  //         NifTK uses "right-to-left", so here we deliberately invert.
+
+  cv::Matx44d mat = niftk::RotationAndTranslationToMatrix(leftToRightRotationMatrix, leftToRightTranslationVector);
+  cv::Matx44d matInv = mat.inv(cv::DECOMP_SVD);
+
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      leftToRightRotationMatrix.at<double>(r, c) = matInv(r, c);
+    }
+  }
+  for (int r = 0; r < 3; r++)
+  {
+    leftToRightTranslationVector.at<double>(r, 0) = matInv(3, r);
+  }
 }
 
 

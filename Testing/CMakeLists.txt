@@ -13,11 +13,14 @@
 #============================================================================*/
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/Testing/Data)
+set(TMP_DIR ${CMAKE_BINARY_DIR}/Testing/Temporary)
+
 set(TEST_CASES
   niftkNiftyCalExceptionTest
   niftkPointUtilitiesTest
   niftkPointDistortionTest
   niftkMatrixAverageTest
+  niftkStereoMatrixIOTest
   niftkWarpChessboardByHomographyTest
   niftkInterpolateQuadraticSurfaceTest
   niftkExtractChessboardPointsTest
@@ -60,6 +63,7 @@ add_test(UNIT-WarpHomog1 ${EXECUTABLE_OUTPUT_PATH}/niftkWarpChessboardByHomograp
 add_test(UNIT-AveMatrix1 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4)
 add_test(UNIT-AveMatrix2 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
 add_test(UNIT-AveMatrix3 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
+add_test(UNIT-StereoMatrixIO-1 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoMatrixIOTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${TMP_DIR}/calib.r2l.txt)
 add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10 140 0)
 add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
