@@ -26,9 +26,10 @@ namespace niftk
 /**
 * \file niftkStereoCameraCalibration.h
 * \brief Performs a stereo camera calibration using the standard OpenCV approach.
+* \param optimise3D if true and ITK is compiled in, will additionally optimise all
+* camera parameters by minimise the RMS reconstruction error, reconstructing the target points in 3D.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
-* \return rms re-projection error over both views
-*
+* \return rms re-projection and 3D reconstruction error
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
 * and that each corresponding pair of point set has at least 4 corresponding points, meaning
 * the same point ID is visible in both left and right view.
@@ -38,25 +39,28 @@ namespace niftk
 * separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
 * or even CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC. etc.
 */
-NIFTYCAL_WINEXPORT double StereoCameraCalibration(const Model3D& model,
-                                                  const std::list<PointSet>& listOfLeftHandPointSets,
-                                                  const std::list<PointSet>& listOfRightHandPointSets,
-                                                  const cv::Size2i& imageSize,
-                                                  cv::Mat& intrinsicLeft,
-                                                  cv::Mat& distortionLeft,
-                                                  cv::Mat& intrinsicRight,
-                                                  cv::Mat& distortionRight,
-                                                  cv::Mat& leftToRightRotationMatrix,
-                                                  cv::Mat& leftToRightTranslationVector,
-                                                  cv::Mat& essentialMatrix,
-                                                  cv::Mat& fundamentalMatrix,
-                                                  const int& cvFlags = 0
-                                                 );
+NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const bool& optimise3D, // only if ITK is compiled in.
+                                                       const Model3D& model,
+                                                       const std::list<PointSet>& listOfLeftHandPointSets,
+                                                       const std::list<PointSet>& listOfRightHandPointSets,
+                                                       const cv::Size2i& imageSize,
+                                                       cv::Mat& intrinsicLeft,
+                                                       cv::Mat& distortionLeft,
+                                                       std::vector<cv::Mat>& rvecsLeft,
+                                                       std::vector<cv::Mat>& tvecsLeft,
+                                                       cv::Mat& intrinsicRight,
+                                                       cv::Mat& distortionRight,
+                                                       std::vector<cv::Mat>& rvecsRight,
+                                                       std::vector<cv::Mat>& tvecsRight,
+                                                       cv::Mat& leftToRightRotationMatrix,
+                                                       cv::Mat& leftToRightTranslationVector,
+                                                       cv::Mat& essentialMatrix,
+                                                       cv::Mat& fundamentalMatrix,
+                                                       const int& cvFlags = 0
+                                                      );
 
 /**
 * \brief Computes a consistent set of left and right extrinsics.
-*
-* Basically, you call this after a successful stereo calibration.
 * \return rms re-projection error for left camera as internally we run another mono calibration
 */
 NIFTYCAL_WINEXPORT double ComputeStereoExtrinsics(const Model3D& model,

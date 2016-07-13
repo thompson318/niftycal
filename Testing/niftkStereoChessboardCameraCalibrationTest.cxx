@@ -158,38 +158,30 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                flags
                               );
 
-  double rms = niftk::StereoCameraCalibration(model,
-                                              listOfPointsLeft,
-                                              listOfPointsRight,
-                                              imageSize,
-                                              intrinsicLeft,
-                                              distortionLeft,
-                                              intrinsicRight,
-                                              distortionRight,
-                                              leftToRightRotationMatrix,
-                                              leftToRightTranslationVector,
-                                              essentialMatrix,
-                                              fundamentalMatrix,
-                                              flags | CV_CALIB_USE_INTRINSIC_GUESS
-                                             );
-
-  niftk::ComputeStereoExtrinsics(model,
-                                 listOfPointsLeft,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 leftToRightRotationMatrix,
-                                 leftToRightTranslationVector,
-                                 rvecsLeft,
-                                 tvecsLeft,
-                                 rvecsRight,
-                                 tvecsRight
-                                );
+  cv::Matx21d result = niftk::StereoCameraCalibration(false, // just do optimisation of 2D reprojection error.
+                                                      model,
+                                                      listOfPointsLeft,
+                                                      listOfPointsRight,
+                                                      imageSize,
+                                                      intrinsicLeft,
+                                                      distortionLeft,
+                                                      rvecsLeft,
+                                                      tvecsLeft,
+                                                      intrinsicRight,
+                                                      distortionRight,
+                                                      rvecsRight,
+                                                      tvecsRight,
+                                                      leftToRightRotationMatrix,
+                                                      leftToRightTranslationVector,
+                                                      essentialMatrix,
+                                                      fundamentalMatrix,
+                                                      flags | CV_CALIB_USE_INTRINSIC_GUESS
+                                                     );
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
-  std::cout << "Stereo RMS=" << rms << std::endl;
+  std::cout << "Stereo RMS=" << result(0, 0) << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
