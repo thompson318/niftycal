@@ -71,6 +71,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Should have at least 2 right-hand views of calibration points.";
   }
+  if (detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size())
+  {
+    niftkNiftyCalThrow() << "Should have the same number of views in left and right channel.";
+  }
 
   if (   detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size()
       || detectorAndOriginalImagesLeft.size() != detectorAndCanonicalImagesLeft.size()
@@ -90,9 +94,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Invalid reference image poinst.";
   }
-
-  double projectedRMS = 0;
-  double reconstructedRMS = 0;
 
   // 1. Detect control points: Detect calibration pattern control
   // points (corners, circle or ring centers) in the input images.
@@ -151,55 +152,32 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
-  projectedRMS = niftk::StereoCameraCalibration(
-        model,
-        pointsFromOriginalImagesLeft,
-        pointsFromOriginalImagesRight,
-        imageSize,
-        intrinsicLeft,
-        distortionLeft,
-        intrinsicRight,
-        distortionRight,
-        leftToRightRotationMatrix,
-        leftToRightTranslationVector,
-        essentialMatrix,
-        fundamentalMatrix,
-        iterativeCvFlags
-        );
-
-  niftk::ComputeStereoExtrinsics(model,
-                                 pointsFromOriginalImagesLeft,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 leftToRightRotationMatrix,
-                                 leftToRightTranslationVector,
-                                 rvecsLeft,
-                                 tvecsLeft,
-                                 rvecsRight,
-                                 tvecsRight
-                                );
-
-  cv::Point3d rmsInEachAxis;
-  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
-                                                          pointsFromOriginalImagesLeft,
-                                                          pointsFromOriginalImagesRight,
-                                                          intrinsicLeft,
-                                                          distortionLeft,
-                                                          rvecsLeft,
-                                                          tvecsLeft,
-                                                          intrinsicRight,
-                                                          distortionRight,
-                                                          leftToRightRotationMatrix,
-                                                          leftToRightTranslationVector,
-                                                          rmsInEachAxis
-                                                         );
+  result = niftk::StereoCameraCalibration(
+    optimise3D,
+    model,
+    pointsFromOriginalImagesLeft,
+    pointsFromOriginalImagesRight,
+    imageSize,
+    intrinsicLeft,
+    distortionLeft,
+    rvecsLeft,
+    tvecsLeft,
+    intrinsicRight,
+    distortionRight,
+    rvecsRight,
+    tvecsRight,
+    leftToRightRotationMatrix,
+    leftToRightTranslationVector,
+    essentialMatrix,
+    fundamentalMatrix,
+    iterativeCvFlags
+    );
 
   bestPointSetsSoFarLeft = pointsFromOriginalImagesLeft;
   bestPointSetsSoFarRight = pointsFromOriginalImagesRight;
 
-  std::cout << "Initial stereo calibration, rms2D=" << projectedRMS
-            << ", rms3D=" << reconstructedRMS
+  std::cout << "Initial stereo calibration, rms2D=" << result(0,0)
+            << ", rms3D=" << result(1,0)
             << std::endl;
 
   std::cout << "Initial Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
@@ -231,6 +209,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << std::endl;
 
   unsigned int iterationCount = 0;
+  double projectedRMS = result(0, 0);
   double previousRMS = std::numeric_limits<double>::max();
 
   while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
@@ -266,21 +245,27 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat tmpEssentialMatrix = essentialMatrix.clone();
     cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
 
-    projectedRMS = niftk::StereoCameraCalibration(
-          model,
-          distortedPointsFromCanonicalImagesLeft,
-          distortedPointsFromCanonicalImagesRight,
-          imageSize,
-          tmpIntrinsicLeft,
-          tmpDistortionLeft,
-          tmpIntrinsicRight,
-          tmpDistortionRight,
-          tmpLeftToRightRotationMatrix,
-          tmpLeftToRightTranslationVector,
-          tmpEssentialMatrix,
-          tmpFundamentalMatrix,
-          iterativeCvFlags
-          );
+    result = niftk::StereoCameraCalibration(
+      optimise3D,
+      model,
+      distortedPointsFromCanonicalImagesLeft,
+      distortedPointsFromCanonicalImagesRight,
+      imageSize,
+      tmpIntrinsicLeft,
+      tmpDistortionLeft,
+      rvecsLeft,
+      tvecsLeft,
+      tmpIntrinsicRight,
+      tmpDistortionRight,
+      rvecsRight,
+      tvecsRight,
+      tmpLeftToRightRotationMatrix,
+      tmpLeftToRightTranslationVector,
+      tmpEssentialMatrix,
+      tmpFundamentalMatrix,
+      iterativeCvFlags
+     );
+    projectedRMS = result(0, 0);
 
     std::cout << "Iterative calibration iter=" << iterationCount++
               << ", prms=" << previousRMS
@@ -289,32 +274,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     if (projectedRMS < previousRMS)
     {
-      niftk::ComputeStereoExtrinsics(model,
-                                     distortedPointsFromCanonicalImagesLeft,
-                                     imageSize,
-                                     tmpIntrinsicLeft,
-                                     tmpDistortionLeft,
-                                     leftToRightRotationMatrix,
-                                     leftToRightTranslationVector,
-                                     rvecsLeft,
-                                     tvecsLeft,
-                                     rvecsRight,
-                                     tvecsRight
-                                    );
-
-      reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
-                                                              distortedPointsFromCanonicalImagesLeft,
-                                                              distortedPointsFromCanonicalImagesRight,
-                                                              tmpIntrinsicLeft,
-                                                              tmpDistortionLeft,
-                                                              rvecsLeft,
-                                                              tvecsLeft,
-                                                              tmpIntrinsicRight,
-                                                              tmpDistortionRight,
-                                                              tmpLeftToRightRotationMatrix,
-                                                              tmpLeftToRightTranslationVector,
-                                                              rmsInEachAxis
-                                                             );
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
@@ -326,87 +285,34 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
       bestPointSetsSoFarLeft = distortedPointsFromCanonicalImagesLeft;
       bestPointSetsSoFarRight = distortedPointsFromCanonicalImagesRight;
-
     }
     else
     {
       projectedRMS = previousRMS;
+
+      niftk::ComputeStereoExtrinsics(model,
+                                     bestPointSetsSoFarLeft,
+                                     imageSize,
+                                     intrinsicLeft,
+                                     distortionLeft,
+                                     leftToRightRotationMatrix,
+                                     leftToRightTranslationVector,
+                                     rvecsLeft,
+                                     tvecsLeft,
+                                     rvecsRight,
+                                     tvecsRight
+                                    );
     }
   } // end while
 
-  std::cout << "Iterative calibration finished, rms2D=" << projectedRMS
-            << ", rms3D=" << reconstructedRMS
+  std::cout << "Iterative calibration finished, rms2D=" << result(0, 0)
+            << ", rms3D=" << result(1, 0)
             << ", over " << bestPointSetsSoFarLeft.size()
             << ", left PointSets and " << bestPointSetsSoFarRight.size()
             << ", right PointSets."
             << std::endl;
 
-#ifdef NIFTYCAL_WITH_ITK
-  if (optimise3D)
-  {
-    Model3D* tmpModel = const_cast<Model3D*>(&model);
-
-    // Now optimise RMS reconstruction error via intrinsics.
-    niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::Pointer intrinsicsOptimiser =
-        niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::New();
-
-    intrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &bestPointSetsSoFarLeft,
-                                           &bestPointSetsSoFarRight
-                                          );
-
-    intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
-                                       &tvecsLeft,
-                                       &leftToRightRotationMatrix,
-                                       &leftToRightTranslationVector);
-
-    intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
-
-    intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                  intrinsicRight
-                                 );
-
-    // Now optimise RMS reconstruction error via extrinsics.
-    niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
-        niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
-
-    extrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &bestPointSetsSoFarLeft,
-                                           &bestPointSetsSoFarRight);
-
-    extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
-                                       &intrinsicRight
-                                      );
-
-    extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
-
-    reconstructedRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
-                                                     tvecsLeft,
-                                                     leftToRightRotationMatrix,
-                                                     leftToRightTranslationVector
-                                                    );
-
-    // Recompute re-projection error, as it will now be different.
-    projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                      bestPointSetsSoFarLeft,
-                                                      bestPointSetsSoFarRight,
-                                                      intrinsicLeft,
-                                                      distortionLeft,
-                                                      rvecsLeft,
-                                                      tvecsLeft,
-                                                      intrinsicRight,
-                                                      distortionRight,
-                                                      leftToRightRotationMatrix,
-                                                      leftToRightTranslationVector
-                                                     );
-
-    std::cout << "3D optimisation finished, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
-
-  }
-
-#endif
-
-  std::cout << "Final stereo calibration, rms2D=" << projectedRMS << ", rms3D=" << reconstructedRMS << std::endl;
+  std::cout << "Final stereo calibration, rms2D=" << result(0, 0) << ", rms3D=" << result(1, 0) << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Final Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Final Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
@@ -432,9 +338,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << "Final T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
   std::cout << "Final T2=" << leftToRightTranslationVector.at<double>(0,1) << std::endl;
   std::cout << "Final T3=" << leftToRightTranslationVector.at<double>(0,2) << std::endl;
-
-  result(0, 0) = projectedRMS;
-  result(1, 0) = reconstructedRMS;
 
   return result;
 }

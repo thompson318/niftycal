@@ -111,33 +111,25 @@ int main(int argc, char ** argv)
                                  tvecsRight
                                 );
 
-    double rms = niftk::StereoCameraCalibration(model,
-                                                leftPoints,
-                                                rightPoints,
-                                                imageSize,
-                                                intrinsicLeft,
-                                                distortionLeft,
-                                                intrinsicRight,
-                                                distortionRight,
-                                                leftToRightRotationMatrix,
-                                                leftToRightTranslation,
-                                                essentialMatrix,
-                                                fundamentalMatrix,
-                                                CV_CALIB_USE_INTRINSIC_GUESS
-                                               );
-
-    niftk::ComputeStereoExtrinsics(model,
-                                   leftPoints,
-                                   imageSize,
-                                   intrinsicLeft,
-                                   distortionLeft,
-                                   leftToRightRotationMatrix,
-                                   leftToRightTranslation,
-                                   rvecsLeft,
-                                   tvecsLeft,
-                                   rvecsRight,
-                                   tvecsRight
-                                  );
+    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
+                                                        model,
+                                                        leftPoints,
+                                                        rightPoints,
+                                                        imageSize,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        rvecsRight,
+                                                        tvecsRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslation,
+                                                        essentialMatrix,
+                                                        fundamentalMatrix,
+                                                        CV_CALIB_USE_INTRINSIC_GUESS
+                                                       );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     cv::Matx14d leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -172,7 +164,8 @@ int main(int argc, char ** argv)
               << leftToRightAxisAngle(0, 1) << " "
               << leftToRightAxisAngle(0, 2) << " "
               << leftToRightAxisAngle(0, 3) << " "
-              << rms
+              << result(0, 0) << " "
+              << result(1, 0)
               << std::endl;
 
     // Now we do simulation. First project all 3D points to 2D points,
@@ -247,33 +240,25 @@ int main(int argc, char ** argv)
                                  tvecsRight
                                 );
 
-    rms = niftk::StereoCameraCalibration(model,
-                                         leftGoldStandardPoints,
-                                         rightGoldStandardPoints,
-                                         imageSize,
-                                         intrinsicLeft,
-                                         distortionLeft,
-                                         intrinsicRight,
-                                         distortionRight,
-                                         leftToRightRotationMatrix,
-                                         leftToRightTranslation,
-                                         essentialMatrix,
-                                         fundamentalMatrix,
-                                         CV_CALIB_USE_INTRINSIC_GUESS
-                                         );
-
-    niftk::ComputeStereoExtrinsics(model,
-                                   leftGoldStandardPoints,
-                                   imageSize,
-                                   intrinsicLeft,
-                                   distortionLeft,
-                                   leftToRightRotationMatrix,
-                                   leftToRightTranslation,
-                                   rvecsLeft,
-                                   tvecsLeft,
-                                   rvecsRight,
-                                   tvecsRight
-                                  );
+    result = niftk::StereoCameraCalibration(false, // could be command line arg.
+                                            model,
+                                            leftGoldStandardPoints,
+                                            rightGoldStandardPoints,
+                                            imageSize,
+                                            intrinsicLeft,
+                                            distortionLeft,
+                                            rvecsLeft,
+                                            tvecsLeft,
+                                            intrinsicRight,
+                                            distortionRight,
+                                            rvecsRight,
+                                            tvecsRight,
+                                            leftToRightRotationMatrix,
+                                            leftToRightTranslation,
+                                            essentialMatrix,
+                                            fundamentalMatrix,
+                                            CV_CALIB_USE_INTRINSIC_GUESS
+                                           );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -308,7 +293,8 @@ int main(int argc, char ** argv)
               << leftToRightAxisAngle(0, 1) << " "
               << leftToRightAxisAngle(0, 2) << " "
               << leftToRightAxisAngle(0, 3) << " "
-              << rms
+              << result(0, 0) << " "
+              << result(1, 0)
               << std::endl;
 
     std::default_random_engine engine;
@@ -349,33 +335,25 @@ int main(int argc, char ** argv)
                                    tvecsRight
                                   );
 
-      rms = niftk::StereoCameraCalibration(model,
-                                           leftNoisyPoints,
-                                           rightNoisyPoints,
-                                           imageSize,
-                                           intrinsicLeft,
-                                           distortionLeft,
-                                           intrinsicRight,
-                                           distortionRight,
-                                           leftToRightRotationMatrix,
-                                           leftToRightTranslation,
-                                           essentialMatrix,
-                                           fundamentalMatrix,
-                                           CV_CALIB_USE_INTRINSIC_GUESS
-                                           );
-
-      niftk::ComputeStereoExtrinsics(model,
-                                     leftNoisyPoints,
-                                     imageSize,
-                                     intrinsicLeft,
-                                     distortionLeft,
-                                     leftToRightRotationMatrix,
-                                     leftToRightTranslation,
-                                     rvecsLeft,
-                                     tvecsLeft,
-                                     rvecsRight,
-                                     tvecsRight
-                                    );
+      result = niftk::StereoCameraCalibration(false, // could be command line arg.
+                                              model,
+                                              leftNoisyPoints,
+                                              rightNoisyPoints,
+                                              imageSize,
+                                              intrinsicLeft,
+                                              distortionLeft,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              intrinsicRight,
+                                              distortionRight,
+                                              rvecsRight,
+                                              tvecsRight,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslation,
+                                              essentialMatrix,
+                                              fundamentalMatrix,
+                                              CV_CALIB_USE_INTRINSIC_GUESS
+                                             );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
       leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -410,31 +388,14 @@ int main(int argc, char ** argv)
                 << leftToRightAxisAngle(0, 1) << " "
                 << leftToRightAxisAngle(0, 2) << " "
                 << leftToRightAxisAngle(0, 3) << " "
-                << rms
+                << result(0, 0) << " "
+                << result(1, 0)
                 << std::endl;
-
-      // Evaluate RMS
-      cv::Point3d rmsInEachAxis;
-      rms = niftk::ComputeRMSReconstructionError(model,
-                                                 leftNoisyPoints,
-                                                 rightNoisyPoints,
-                                                 intrinsicLeft,
-                                                 distortionLeft,
-                                                 rvecsLeft,
-                                                 tvecsLeft,
-                                                 intrinsicRight,
-                                                 distortionRight,
-                                                 leftToRightRotationMatrix,
-                                                 leftToRightTranslation,
-                                                 rmsInEachAxis
-                                                );
 
       std::cout << "niftkStereoSimulationFromPoints " << imageSize.width << " " << imageSize.height <<  " "
                 << leftPoints.size() << " "
-                << rms << " "
-                << rmsInEachAxis.x << " "
-                << rmsInEachAxis.y << " "
-                << rmsInEachAxis.z << " "
+                << result(0, 0) << " "
+                << result(1, 0)
                 << std::endl;
 
     } // end for each iter

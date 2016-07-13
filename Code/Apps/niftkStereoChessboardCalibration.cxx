@@ -190,109 +190,27 @@ int main(int argc, char ** argv)
                                  flags
                                 );
 
-    double rms = niftk::StereoCameraCalibration(model,
-                                                listOfPointsLeft,
-                                                listOfPointsRight,
-                                                imageSize,
-                                                intrinsicLeft,
-                                                distortionLeft,
-                                                intrinsicRight,
-                                                distortionRight,
-                                                leftToRightRotationMatrix,
-                                                leftToRightTranslationVector,
-                                                essentialMatrix,
-                                                fundamentalMatrix,
-                                                flags | CV_CALIB_USE_INTRINSIC_GUESS
-                                               );
-
-    niftk::ComputeStereoExtrinsics(model,
-                                   listOfPointsLeft,
-                                   imageSize,
-                                   intrinsicLeft,
-                                   distortionLeft,
-                                   leftToRightRotationMatrix,
-                                   leftToRightTranslationVector,
-                                   rvecsLeft,
-                                   tvecsLeft,
-                                   rvecsRight,
-                                   tvecsRight
-                                  );
+    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
+                                                        model,
+                                                        listOfPointsLeft,
+                                                        listOfPointsRight,
+                                                        imageSize,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        rvecsRight,
+                                                        tvecsRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslationVector,
+                                                        essentialMatrix,
+                                                        fundamentalMatrix,
+                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS
+                                                       );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
-
-    // Evaluate RMS reconstruction error.
-    cv::Point3d rmsInEachAxis;
-    double rmsReconstructionError = niftk::ComputeRMSReconstructionError(model,
-                                                                         listOfPointsLeft,
-                                                                         listOfPointsRight,
-                                                                         intrinsicLeft,
-                                                                         distortionLeft,
-                                                                         rvecsLeft,
-                                                                         tvecsLeft,
-                                                                         intrinsicRight,
-                                                                         distortionRight,
-                                                                         leftToRightRotationMatrix,
-                                                                         leftToRightTranslationVector,
-                                                                         rmsInEachAxis
-                                                                        );
-
-#ifdef NIFTYCAL_WITH_ITK
-    if (optimise3D)
-    {
-      // Now optimise RMS reconstruction error via intrinsics.
-      niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::Pointer intrinsicsOptimiser =
-          niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::New();
-
-      intrinsicsOptimiser->SetModelAndPoints(&model,
-                                             &listOfPointsLeft,
-                                             &listOfPointsRight);
-
-      intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
-                                         &tvecsLeft,
-                                         &leftToRightRotationMatrix,
-                                         &leftToRightTranslationVector);
-
-      intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
-
-      rmsReconstructionError = intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                                             intrinsicRight
-                                                             );
-
-      // Now optimise RMS reconstruction error via extrinsics.
-      niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
-          niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
-
-      extrinsicsOptimiser->SetModelAndPoints(&model,
-                                             &listOfPointsLeft,
-                                             &listOfPointsRight);
-
-      extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
-                                         &intrinsicRight
-                                        );
-
-      extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
-
-      rmsReconstructionError = extrinsicsOptimiser->Optimise(rvecsLeft,
-                                                             tvecsLeft,
-                                                             leftToRightRotationMatrix,
-                                                             leftToRightTranslationVector
-                                                            );
-
-      // Recompute re-projection error, as it will now be different.
-      rms = niftk::ComputeRMSReprojectionError(model,
-                                               listOfPointsLeft,
-                                               listOfPointsRight,
-                                               intrinsicLeft,
-                                               distortionLeft,
-                                               rvecsLeft,
-                                               tvecsLeft,
-                                               intrinsicRight,
-                                               distortionRight,
-                                               leftToRightRotationMatrix,
-                                               leftToRightTranslationVector
-                                              );
-    }
-#endif
 
     std::cout << "niftkStereoChessboardCalibration:(" << imageSize.width << "," << imageSize.height <<  ") "
               << listOfPointsLeft.size() << " "
@@ -320,11 +238,8 @@ int main(int argc, char ** argv)
               << leftToRightTranslationVector.at<double>(0,0) << " "
               << leftToRightTranslationVector.at<double>(0,1) << " "
               << leftToRightTranslationVector.at<double>(0,2) << " "
-              << rmsInEachAxis.x << " "
-              << rmsInEachAxis.y << " "
-              << rmsInEachAxis.z << " "
-              << rms << " "
-              << rmsReconstructionError << " "
+              << result(0, 0) << " "
+              << result(1, 0) << " "
               << std::endl;
   }
   catch (niftk::NiftyCalException& e)
