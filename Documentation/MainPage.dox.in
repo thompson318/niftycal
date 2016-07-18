@@ -17,7 +17,7 @@ NiftyCal provides:
 \li A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids,
 <a href="http://github.com/NifTK/apriltags">AprilTags</a>, and template matching of dots and rings.
 \li Camera calibration using iterative refinement of control points, as in
-<a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Dutta 2009</a>.
+<a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Datta 2009</a>.
 \li Hand-eye calibration using a direct matrix multiplication method as in
 <a href="http://dx.doi.org/10.1109/TMI.2002.806597">Shahidi 2002</a>.
 \li Hand-eye calibration using linear least-squares as in
