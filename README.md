@@ -8,8 +8,8 @@ NiftyCal provides:
  - 2D and 3D structures that store each point along with its identifier.
  - A simple IPoint2DDetector interface that all point detectors implement.
  - A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids, AprilTags,
-   and template matching of [dots and rings][Dutta].
- - Camera calibration using iterative refinement of control points, as in [Dutta 2009][Dutta].
+   and template matching of [dots and rings][Datta].
+ - Camera calibration using iterative refinement of control points, as in [Datta 2009][Datta].
  - Hand-eye calibration using a direct matrix multiplication method as in [Shahidi 2002][Shahidi].
  - Hand-eye calibration using linear least-squares as in [Tsai 1989][Tsai].
  - Hand-eye calibration using non-linear minimisation as in [Malti 2013][Malti].
@@ -89,7 +89,7 @@ Branching Workflow
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
 [matt]: http://www.mattclarkson.co.uk
 [April]: http://github.com/NifTK/apriltags
-[Dutta]: http://dx.doi.org/10.1109/ICCVW.2009.5457474
+[Datta]: http://dx.doi.org/10.1109/ICCVW.2009.5457474
 [Shahidi]: http://dx.doi.org/10.1109/TMI.2002.806597
 [Tsai]: http://dx.doi.org/10.1109/70.34770
 [Malti]: http://dx.doi.org/10.1002/rcs.1478
