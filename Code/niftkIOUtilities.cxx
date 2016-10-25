@@ -475,7 +475,7 @@ void LoadNifTKStereoExtrinsics(const std::string& fileName,
   }
   for (int r = 0; r < 3; r++)
   {
-    leftToRightTranslationVector.at<double>(r, 0) = matInv(3, r);
+    leftToRightTranslationVector.at<double>(r, 0) = matInv(r, 3);
   }
 }
 
