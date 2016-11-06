@@ -48,7 +48,6 @@ TEST_CASE( "Matrix IO", "[matrices]" ) {
   cv::Mat actualTranslationVector = cvCreateMat(3, 1, CV_64FC1);
   niftk::LoadNifTKStereoExtrinsics(niftk::argv[2], actualRotationMatrix, actualTranslationVector);
 
-  /*
   cv::Matx44d actualMatrix = niftk::RotationAndTranslationToMatrix(actualRotationMatrix, actualTranslationVector);
 
   for (int r = 0; r < 4; r++)
@@ -58,5 +57,5 @@ TEST_CASE( "Matrix IO", "[matrices]" ) {
       REQUIRE(fabs(actualMatrix(r,c) - inputMatrix(r,c)) < 0.0001);
     }
   }
-*/
+
 }

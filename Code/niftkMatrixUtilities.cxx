@@ -35,7 +35,7 @@ cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix,
     {
       mat(r,c) = rotationMatrix.at<double>(r,c);
     }
-    mat(r,3) = translationVector.at<double>(0, r);
+    mat(r,3) = translationVector.at<double>(r, 0);
   }
   return mat;
 }
