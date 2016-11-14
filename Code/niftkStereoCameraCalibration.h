@@ -27,7 +27,7 @@ namespace niftk
 * \file niftkStereoCameraCalibration.h
 * \brief Performs a stereo camera calibration using the standard OpenCV approach.
 * \param optimise3D if true and ITK is compiled in, will additionally optimise all
-* camera parameters by minimise the RMS reconstruction error, reconstructing the target points in 3D.
+* camera parameters by minimising the RMS reconstruction error, reconstructing the target points in 3D.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
 * \return rms re-projection and 3D reconstruction error
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),

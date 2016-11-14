@@ -17,6 +17,7 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkChessboardPointDetector.h>
 #include <niftkMonoCameraCalibration.h>
+#include <niftkHandEyeCalibration.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
 

@@ -22,11 +22,6 @@
 #include <Internal/niftkIterativeCalibrationUtilities_p.h>
 #include <highgui.h>
 
-#ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
-#endif
-
 namespace niftk
 {
 

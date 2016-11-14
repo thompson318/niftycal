@@ -67,36 +67,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
 
 
 /**
-* \brief Calculates Hand-Eye by matrix multiplication.
-*
-* Rather than have a tracked calibration object, we assume here that
-* the caller can provide a modelToTrackerTransform to convert model
-* points to tracker points. So, for example, the user has a stationary
-* chessboard, and uses point based registration to register model coordinates
-* to the tracker coordinates.
-*/
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
-    const cv::Matx44d&            modelToTrackerTransform,
-    const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices
-    );
-
-
-/**
-* \brief Calculates Hand-Eye by <a href="http://dx.doi.org/10.1109/70.34770">Tsai's 1989 method</a>.
-*
-* Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
-* in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
-*/
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
-    const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
-    double&                       residualRotation,
-    double&                       residualTranslation
-    );
-
-
-/**
 * \brief Given a 3x3 matrix, where the middle entry is the
 * maximum of that neighbourhood, will fit a quadratic surface
 * and then find the maximum, for sub-pixel resolution.
