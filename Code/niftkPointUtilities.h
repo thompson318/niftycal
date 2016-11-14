@@ -91,6 +91,13 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
                                             std::vector<niftk::NiftyCalIdType>& commonIds
                                            );
 
+NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
+                                            const PointSet& inputB,
+                                            std::vector<cv::Point3d>& outputA,
+                                            std::vector<cv::Point2d>& outputB,
+                                            std::vector<niftk::NiftyCalIdType>& commonIds
+                                           );
+
 /**
 * \brief Computes the RMS error between common (same identifier) points in a and b.
 * \throw if no common points.
@@ -304,10 +311,19 @@ NIFTYCAL_WINEXPORT double ComputeRMSReprojectionError(const Model3D& model,
                                                       const cv::Mat& leftToRightTranslationVector
                                                      );
 
+NIFTYCAL_WINEXPORT double ComputeRMSProjectionError(const Model3D& model,
+                                                    const PointSet& points,
+                                                    const cv::Mat& intrinsics,
+                                                    const cv::Mat& distortionParams,
+                                                    const cv::Mat& rvec,
+                                                    const cv::Mat& tvec
+                                                   );
+
 NIFTYCAL_WINEXPORT unsigned long int GetNumberOfTriangulatablePoints(const Model3D& model,
                                                                      const std::list<PointSet>& listOfLeftHandPointSets,
                                                                      const std::list<PointSet>& listOfRightHandPointSets
                                                                     );
+
 
 } // end namespace
 

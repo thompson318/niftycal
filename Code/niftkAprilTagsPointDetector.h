@@ -39,7 +39,7 @@ public:
   * is most accurate, as there is an averaging effect of computing the
   * centre from the 4 corners. So, if you want really accurate points,
   * just use the centre one. If you want lots of additional points,
-  * use all the corners aswell. The corners are ordered, and given a
+  * use all the corners as well. The corners are ordered, and given a
   * point ID, are output as 1000+ID, 2000+ID, 3000+ID and 4000+ID.
   */
   AprilTagsPointDetector(bool includeCorners,

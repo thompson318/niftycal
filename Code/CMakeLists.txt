@@ -35,6 +35,7 @@ set(NIFTYCAL_SRCS
   niftkIterativeStereoCameraCalibration.cxx
   niftkMaxERE.cxx
   niftkCalibrateTimingLag.cxx
+  niftkTsaiCameraCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

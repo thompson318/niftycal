@@ -35,6 +35,7 @@ set(TEST_CASES
   niftkIterativeMonoAprilTagsCameraCalibrationTest
   niftkMonoChessboardHandEyeCalibrationTest
   niftkIterativeTemplateMatchingCameraCalibrationTest
+  niftkTsaiCoplanarCalibrationTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -579,3 +580,8 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
 )
+
+add_test(REG-TsaiCPMono ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiCoplanarCalibrationTest
+         ${DATA_DIR}/CMU/TestRealImage/checker/1/img3.bmp
+         ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt
+         10 7 1024 768 2979.74590652 2979.74590652 288.00000000 288.00000000 0.00000000)
