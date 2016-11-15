@@ -27,14 +27,12 @@ set(NIFTYCAL_SRCS
   niftkHomographyUtilities.cxx
   niftkMatrixUtilities.cxx
   niftkIOUtilities.cxx
-  niftkMaxERE.cxx
   niftkIPoint2DDetector.cxx
   niftkTemplateMatching.cxx
   niftkMonoCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx
-  niftkTimingLagCalibration.cxx
   niftkHandEyeCalibration.cxx
   niftkTsaiCameraCalibration.cxx
 )
