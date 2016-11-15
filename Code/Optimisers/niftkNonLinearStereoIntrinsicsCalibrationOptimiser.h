@@ -18,7 +18,6 @@
 #include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "niftkNonLinearStereoCalibrationOptimiser.h"
 #include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
 
 namespace niftk

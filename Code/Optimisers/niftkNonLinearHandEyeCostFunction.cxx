@@ -34,14 +34,14 @@ NonLinearHandEyeCostFunction::~NonLinearHandEyeCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearHandEyeCostFunction::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+void NonLinearHandEyeCostFunction::SetHandMatrices(const std::list<cv::Matx44d>* const matrices)
 {
   if (matrices == nullptr)
   {
     niftkNiftyCalThrow() << "Hand matrices are NULL.";
   }
 
-  m_HandMatrices = matrices;
+  m_HandMatrices = const_cast<std::list<cv::Matx44d> *>(matrices);
   this->Modified();
 }
 

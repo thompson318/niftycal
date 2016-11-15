@@ -37,7 +37,7 @@ NonLinearCostFunction::~NonLinearCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearCostFunction::SetModel(Model3D* const model)
+void NonLinearCostFunction::SetModel(const Model3D* const model)
 {
   if (model == nullptr)
   {
@@ -50,7 +50,7 @@ void NonLinearCostFunction::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearCostFunction::SetPoints(std::list<PointSet>* const points)
+void NonLinearCostFunction::SetPoints(const std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {

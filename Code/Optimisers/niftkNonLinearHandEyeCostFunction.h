@@ -40,7 +40,7 @@ public:
   typedef Superclass::DerivativeType     DerivativeType;
   typedef Superclass::MeasureType        MeasureType;
 
-  void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
+  void SetHandMatrices(const std::list<cv::Matx44d>* const matrices);
   std::list<cv::Matx44d>* GetHandMatrices() const;
   virtual MeasureType GetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 

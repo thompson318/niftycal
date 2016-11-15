@@ -19,10 +19,10 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix,
-                                           const cv::Mat& translationVector)
+cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix3x3,
+                                           const cv::Mat& translationVector3x1)
 {
-  if (rotationMatrix.rows != 3 || rotationMatrix.cols != 3)
+  if (rotationMatrix3x3.rows != 3 || rotationMatrix3x3.cols != 3)
   {
     niftkNiftyCalThrow() << "Invalid rotation matrix size.";
   }
@@ -33,22 +33,27 @@ cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix,
   {
     for (int c = 0; c < 3; c++)
     {
-      mat(r,c) = rotationMatrix.at<double>(r,c);
+      mat(r,c) = rotationMatrix3x3.at<double>(r,c);
     }
-    mat(r,3) = translationVector.at<double>(r, 0);
+    mat(r,3) = translationVector3x1.at<double>(r, 0);
   }
   return mat;
 }
 
 
 //-----------------------------------------------------------------------------
-cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector,
-                              const cv::Mat& translationVector)
+cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x3,
+                              const cv::Mat& translationVector1x3)
 {
   cv::Mat rotationMatrix;
-  cv::Rodrigues(rotationVector, rotationMatrix);
+  cv::Rodrigues(rotationVector1x3, rotationMatrix);
 
-  return RotationAndTranslationToMatrix(rotationMatrix, translationVector);
+  cv::Mat t = cvCreateMat(3, 1, CV_64FC1);
+  t.at<double>(0, 0) = translationVector1x3.at<double>(0, 0);
+  t.at<double>(1, 0) = translationVector1x3.at<double>(0, 1);
+  t.at<double>(2, 0) = translationVector1x3.at<double>(0, 2);
+
+  return RotationAndTranslationToMatrix(rotationMatrix, t);
 }
 
 

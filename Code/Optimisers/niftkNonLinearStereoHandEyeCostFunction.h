@@ -44,11 +44,11 @@ public:
   typedef Superclass::MeasureType                 MeasureType;
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
-  void SetLeftIntrinsic(cv::Mat* const intrinsic);
-  void SetLeftDistortion(cv::Mat* const distortion);
-  void SetRightIntrinsic(cv::Mat* const intrinsic);
-  void SetRightDistortion(cv::Mat* const distortion);
-  void SetRightHandPoints(std::list<PointSet>* const points);
+  void SetLeftIntrinsic(const cv::Mat* const intrinsic);
+  void SetLeftDistortion(const cv::Mat* const distortion);
+  void SetRightIntrinsic(const cv::Mat* const intrinsic);
+  void SetRightDistortion(const cv::Mat* const distortion);
+  void SetRightHandPoints(const std::list<PointSet>* const points);
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
 
 protected:

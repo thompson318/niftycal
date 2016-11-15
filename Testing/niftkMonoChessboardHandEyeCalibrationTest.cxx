@@ -27,13 +27,6 @@
 #include <list>
 #include <chrono>
 
-#ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearMaltiHandEyeOptimiser.h>
-#include <niftkNonLinear12DOFHandEyeOptimiser.h>
-#include <niftkNonLinearNDOFHandEyeOptimiser.h>
-#include <niftkNonLinearStereoHandEyeOptimiser.h>
-#endif
-
 TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   std::chrono::time_point<std::chrono::system_clock> start;
@@ -159,19 +152,17 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   REQUIRE(trackingMatrices.size() == cameraMatrices.size());
 
-  double residualRotation = 0;
-  double residualTranslation = 0;
+  cv::Matx21d residuals;
 
   std::cout << "Camera matrices=" << cameraMatrices.size() << ", tracking matrices=" << trackingMatrices.size() << std::endl;
 
   cv::Matx44d handEye = niftk::CalculateHandEyeUsingTsaisMethod(
         trackingMatrices,
         cameraMatrices,
-        residualRotation,
-        residualTranslation
+        residuals
         );
 
-  std::cout << "Done hand-eye, rotation residual=" << residualRotation << ", translation residual=" << residualTranslation << std::endl;
+  std::cout << "Done hand-eye, rotation residual=" << residuals(0, 0) << ", translation residual=" << residuals(1, 0) << std::endl;
 
   std::chrono::time_point<std::chrono::system_clock> endTsai= std::chrono::system_clock::now();
   elapsed_seconds = endTsai - endCalib;
@@ -194,92 +185,24 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
 #ifdef NIFTYCAL_WITH_ITK
 
-  cv::Matx44d modelToWorld = niftk::CalculateAverageModelToWorld(handEye, trackingMatrices, cameraMatrices);
-
-  std::cerr << "Doing non-linear optimisation - 12 DOF" << std::endl;
-
-  niftk::NonLinear12DOFHandEyeOptimiser::Pointer optimiser12DOF = niftk::NonLinear12DOFHandEyeOptimiser::New();
-  optimiser12DOF->SetModel(&model);
-  optimiser12DOF->SetPoints(&listOfPoints);
-  optimiser12DOF->SetHandMatrices(&trackingMatrices);
-  optimiser12DOF->SetIntrinsic(&intrinsic);
-  optimiser12DOF->SetDistortion(&distortion);
-
-  reprojectionRMS = optimiser12DOF->Optimise(
-        modelToWorld,
-        handEye
-        );
-
-  std::cerr << "Doing non-linear optimisation - 12 DOF - DONE, rms=" << reprojectionRMS << std::endl;
-
-  std::chrono::time_point<std::chrono::system_clock> end12DOF= std::chrono::system_clock::now();
-  elapsed_seconds = end12DOF - endTsai;
-  std::cout << "TIME:12DOF=" << elapsed_seconds.count() << std::endl;
-
-  std::cerr << "Doing non-linear optimisation - N DOF" << std::endl;
-
-  niftk::NonLinearNDOFHandEyeOptimiser::Pointer optimiserNDOF = niftk::NonLinearNDOFHandEyeOptimiser::New();
-  optimiserNDOF->SetModel(&model);
-  optimiserNDOF->SetPoints(&listOfPoints);
-  optimiserNDOF->SetHandMatrices(&trackingMatrices);
-  optimiserNDOF->SetIntrinsic(&intrinsic);
-  optimiserNDOF->SetDistortion(&distortion);
-
-  reprojectionRMS = optimiserNDOF->Optimise(
-        modelToWorld,
-        handEye
-        );
-
-  std::cerr << "Doing non-linear optimisation - N DOF - DONE, rms=" << reprojectionRMS << std::endl;
-
-  std::chrono::time_point<std::chrono::system_clock> endNDOF= std::chrono::system_clock::now();
-  elapsed_seconds = endNDOF - end12DOF;
-  std::cout << "TIME:NDOF=" << elapsed_seconds.count() << std::endl;
-
-  std::cerr << "Doing non-linear optimisation - stereo" << std::endl;
-
-  niftk::NonLinearStereoHandEyeOptimiser::Pointer optimiserStereo = niftk::NonLinearStereoHandEyeOptimiser::New();
-  optimiserStereo->SetModel(&model);
-  optimiserStereo->SetPoints(&listOfPoints);
-  optimiserStereo->SetRightHandPoints(&listOfPoints);
-  optimiserStereo->SetHandMatrices(&trackingMatrices);
-  optimiserStereo->SetLeftIntrinsic(&intrinsic);
-  optimiserStereo->SetLeftDistortion(&distortion);
-  optimiserStereo->SetRightIntrinsic(&intrinsic);
-  optimiserStereo->SetRightDistortion(&distortion);
-
+  // Here, Im just testing that the stereo code runs to completion, as we only have mono data.
   cv::Matx44d stereoExtrinsics = cv::Matx44d::eye();
-
-  reprojectionRMS = optimiserStereo->Optimise(
-        modelToWorld,
-        handEye,
-        stereoExtrinsics
-        );
-
-  std::cerr << "Doing non-linear optimisation - stereo - DONE, rms=" << reprojectionRMS << std::endl;
+  handEye = niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, cameraMatrices, stereoExtrinsics, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endStereo= std::chrono::system_clock::now();
-  elapsed_seconds = endStereo - endNDOF;
-  std::cout << "TIME:Stereo=" << elapsed_seconds.count() << std::endl;
+  elapsed_seconds = endStereo - endTsai;
+  std::cout << "TIME:STEREO=" << elapsed_seconds.count() << std::endl;
 
-  std::cerr << "Doing non-linear optimisation - Malti" << std::endl;
+  handEye = niftk::CalculateHandEyeByOptimisingAllExtrinsic(model, listOfPoints, trackingMatrices, cameraMatrices, intrinsic, distortion, reprojectionRMS);
 
-  niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser21DOF = niftk::NonLinearMaltiHandEyeOptimiser::New();
-  optimiser21DOF->SetModel(&model);
-  optimiser21DOF->SetPoints(&listOfPoints);
-  optimiser21DOF->SetHandMatrices(&trackingMatrices);
+  std::chrono::time_point<std::chrono::system_clock> endNDOF= std::chrono::system_clock::now();
+  elapsed_seconds = endNDOF - endStereo;
+  std::cout << "TIME:NDOF=" << elapsed_seconds.count() << std::endl;
 
-  reprojectionRMS = optimiser21DOF->Optimise(
-        modelToWorld,
-        handEye,
-        intrinsic,
-        distortion
-        );
-
-  std::cerr << "Doing non-linear optimisation - Malti - DONE, rms=" << reprojectionRMS << std::endl;
+  handEye = niftk::CalculateHandEyeUsingMaltisMethod(model, listOfPoints, trackingMatrices, cameraMatrices, intrinsic, distortion, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endMalti= std::chrono::system_clock::now();
-  elapsed_seconds = endMalti - endStereo;
+  elapsed_seconds = endMalti - endNDOF;
   std::cout << "TIME:Malti=" << elapsed_seconds.count() << std::endl;
 
 #endif

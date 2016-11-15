@@ -39,7 +39,7 @@ NonLinearStereoHandEyeCostFunction::~NonLinearStereoHandEyeCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(cv::Mat* const intrinsic)
+void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -47,26 +47,26 @@ void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(cv::Mat* const intrins
                          << intrinsic->cols << ", " << intrinsic->rows << ")";
   }
 
-  m_LeftIntrinsic = intrinsic;
+  m_LeftIntrinsic = const_cast<cv::Mat*>(intrinsic);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(cv::Mat* const distortion)
+void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
     niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
   }
 
-  m_LeftDistortion = distortion;
+  m_LeftDistortion = const_cast<cv::Mat*>(distortion);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(cv::Mat* const intrinsic)
+void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -74,26 +74,26 @@ void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(cv::Mat* const intrin
                          << intrinsic->cols << ", " << intrinsic->rows << ")";
   }
 
-  m_RightIntrinsic = intrinsic;
+  m_RightIntrinsic = const_cast<cv::Mat*>(intrinsic);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightDistortion(cv::Mat* const distortion)
+void NonLinearStereoHandEyeCostFunction::SetRightDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
     niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
   }
 
-  m_RightDistortion = distortion;
+  m_RightDistortion = const_cast<cv::Mat*>(distortion);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
+void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(const std::list<PointSet>* const points)
 {
   if (points == nullptr)
   {
@@ -111,7 +111,7 @@ void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(std::list<PointSet>*
   }
 
   m_NumberOfRightHandValues = num;
-  m_RightHandPoints = points;
+  m_RightHandPoints = const_cast<std::list<PointSet>*>(points);
   this->Modified();
 }
 
@@ -125,12 +125,12 @@ unsigned int NonLinearStereoHandEyeCostFunction::GetNumberOfValues(void) const
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,
-                                                            const cv::Matx44d& extrinsic,
-                                                            const cv::Mat& intrinsic,
-                                                            const cv::Mat& distortion,
-                                                            MeasureType& values,
-                                                            unsigned int& totalPointCounter
-                                                           ) const
+                                                       const cv::Matx44d& extrinsic,
+                                                       const cv::Mat& intrinsic,
+                                                       const cv::Mat& distortion,
+                                                       MeasureType& values,
+                                                       unsigned int& totalPointCounter
+                                                      ) const
 {
   std::vector<cv::Point2f> observed(points.size());
   std::vector<cv::Point2f> projected(points.size());

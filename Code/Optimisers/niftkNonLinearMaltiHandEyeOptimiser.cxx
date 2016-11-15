@@ -35,7 +35,7 @@ NonLinearMaltiHandEyeOptimiser::~NonLinearMaltiHandEyeOptimiser()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiHandEyeOptimiser::SetModel(Model3D* const model)
+void NonLinearMaltiHandEyeOptimiser::SetModel(const Model3D* const model)
 {
   m_CostFunction->SetModel(model);
   this->Modified();
@@ -43,7 +43,7 @@ void NonLinearMaltiHandEyeOptimiser::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
+void NonLinearMaltiHandEyeOptimiser::SetPoints(const std::list<PointSet>* const points)
 {
   m_CostFunction->SetPoints(points);
   this->Modified();
@@ -51,7 +51,7 @@ void NonLinearMaltiHandEyeOptimiser::SetPoints(std::list<PointSet>* const points
 
 
 //-----------------------------------------------------------------------------
-void NonLinearMaltiHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+void NonLinearMaltiHandEyeOptimiser::SetHandMatrices(const std::list<cv::Matx44d>* const matrices)
 {
   m_CostFunction->SetHandMatrices(matrices);
   this->Modified();
@@ -85,8 +85,8 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
   niftk::NonLinearMaltiHandEyeCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(  6               // model to world
-                            + 6               // hand eye
+  initialParameters.SetSize(  6               // hand eye
+                            + 6               // model to world
                             + intrinsic.cols  // normally 4
                             + distortion.cols // could be 4..8
                            );
@@ -126,7 +126,8 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
 
   niftk::NonLinearMaltiHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
+
+  std::cout << "NonLinearMaltiHandEyeOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -158,16 +159,17 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
 
   niftk::NonLinearMaltiHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-  std::cout << "NonLinearHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
-  std::cout << "NonLinearHandEyeOptimiser: hand-eye="
+  std::cout << "NonLinearMaltiHandEyeOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+
+  std::cout << "NonLinearMaltiHandEyeOptimiser: hand-eye="
             << handEyeRotationVector.at<double>(0, 0) << ", "
             << handEyeRotationVector.at<double>(0, 1) << ", "
             << handEyeRotationVector.at<double>(0, 2) << ", "
             << handEyeTranslationVector.at<double>(0, 0) << ", "
             << handEyeTranslationVector.at<double>(0, 1) << ", "
             << handEyeTranslationVector.at<double>(0, 2) << std::endl;
-  std::cout << "NonLinearHandEyeOptimiser: model-to-world="
+  std::cout << "NonLinearMaltiHandEyeOptimiser: model-to-world="
             << modelToWorldRotationVector.at<double>(0, 0) << ", "
             << modelToWorldRotationVector.at<double>(0, 1) << ", "
             << modelToWorldRotationVector.at<double>(0, 2) << ", "
@@ -175,7 +177,7 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
             << modelToWorldTranslationVector.at<double>(0, 1) << ", "
             << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
 
-  std::cout << "NonLinearHandEyeOptimiser: rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearMaltiHandEyeOptimiser: rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

@@ -27,7 +27,7 @@ namespace niftk
 {
 
 NIFTYCAL_WINEXPORT cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix3x3,
-                                                              const cv::Mat& translationVector1x3);
+                                                              const cv::Mat& translationVector3x1);
 
 NIFTYCAL_WINEXPORT cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x3,
                                                  const cv::Mat& translationVector1x3);

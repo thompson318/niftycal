@@ -15,6 +15,12 @@
 #include "niftkHandEyeCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 
+#ifdef NIFTYCAL_WITH_ITK
+#include <niftkNonLinearMaltiHandEyeOptimiser.h>
+#include <niftkNonLinearNDOFHandEyeOptimiser.h>
+#include <niftkNonLinearStereoHandEyeOptimiser.h>
+#endif
+
 namespace niftk {
 
 //-----------------------------------------------------------------------------
@@ -100,8 +106,7 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& handMatrices,
     const std::list<cv::Matx44d >& eyeMatrices,
-    double& residualRotation,
-    double& residualTranslation
+    cv::Matx21d&                   residual
     )
 {
   if (handMatrices.size() < 3)
@@ -183,7 +188,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   cv::Mat errorRotation = A * pcgPrime - b;
   cv::Mat errorRotationTransMult = cvCreateMat(errorRotation.cols, errorRotation.cols, CV_64FC1);
   cv::mulTransposed (errorRotation, errorRotationTransMult, true);
-  residualRotation = sqrt(errorRotationTransMult.at<double>(0,0)/static_cast<double>((numberOfViews-1)));
+  residual(0, 0) = sqrt(errorRotationTransMult.at<double>(0,0)/static_cast<double>((numberOfViews-1)));
 
   // Step 3. Compute Pcg.
   cv::Mat pcg = 2 * pcgPrime / (sqrt(1 + cv::norm(pcgPrime) * cv::norm(pcgPrime)));
@@ -251,7 +256,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   cv::Mat errorTranslation = A * tcg - b;
   cv::Mat errorTranslationTransMult = cvCreateMat(errorTranslation.cols, errorTranslation.cols, CV_64FC1);
   cv::mulTransposed (errorTranslation, errorTranslationTransMult, true);
-  residualTranslation = sqrt(errorTranslationTransMult.at<double>(0,0)/(numberOfViews-1));
+  residual(1, 0) = sqrt(errorTranslationTransMult.at<double>(0,0)/(numberOfViews-1));
 
   cv::Matx44d eyeHand = cv::Matx44d::eye();
   for (int r = 0; r < 3; r++)
@@ -263,7 +268,12 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     eyeHand(r, 3) = tcg.at<double>(r, 0);
   }
 
-  return eyeHand.inv(cv::DECOMP_SVD);
+  cv::Matx44d handEye = eyeHand.inv(cv::DECOMP_SVD);
+  handEye(3,0) = 0;
+  handEye(3,1) = 0;
+  handEye(3,2) = 0;
+  handEye(3,3) = 1;
+  return handEye;
 }
 
 
@@ -314,5 +324,107 @@ cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
   finalHandEye = niftk::AverageMatricesUsingEigenValues(handEyes);
   return finalHandEye;
 }
+
+#ifdef NIFTYCAL_WITH_ITK
+
+//-----------------------------------------------------------------------------
+cv::Matx44d CalculateHandEyeUsingMaltisMethod(
+    const niftk::Model3D&         model3D,
+    const std::list<PointSet>&    listOfPointSets,
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
+    cv::Mat&                      intrinsic,
+    cv::Mat&                      distortion,
+    double&                       residual
+    )
+{
+  cv::Matx21d residuals;
+  cv::Matx44d initialHandEye = niftk::CalculateHandEyeUsingTsaisMethod(handMatrices, eyeMatrices, residuals);
+  cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
+
+  cv::Matx44d finalHandEye = initialHandEye;
+
+  niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser = niftk::NonLinearMaltiHandEyeOptimiser::New();
+  optimiser->SetModel(&model3D);
+  optimiser->SetPoints(&listOfPointSets);
+  optimiser->SetHandMatrices(&handMatrices);
+
+  residual = optimiser->Optimise(initialModelToWorld,
+                                 finalHandEye,
+                                 intrinsic,
+                                 distortion
+                                );
+
+  return finalHandEye;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
+    const niftk::Model3D&         model3D,
+    const std::list<PointSet>&    listOfPointSets,
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
+    const cv::Mat&                intrinsic,
+    const cv::Mat&                distortion,
+    double&                       residual
+    )
+{
+  cv::Matx21d residuals;
+  cv::Matx44d initialHandEye = niftk::CalculateHandEyeUsingTsaisMethod(handMatrices, eyeMatrices, residuals);
+  cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
+
+  cv::Matx44d finalHandEye = initialHandEye;
+
+  niftk::NonLinearNDOFHandEyeOptimiser::Pointer optimiser = niftk::NonLinearNDOFHandEyeOptimiser::New();
+  optimiser->SetModel(&model3D);
+  optimiser->SetPoints(&listOfPointSets);
+  optimiser->SetIntrinsic(&intrinsic);
+  optimiser->SetDistortion(&distortion);
+  optimiser->SetHandMatrices(&handMatrices);
+
+  residual = optimiser->Optimise(initialModelToWorld, finalHandEye);
+
+  return finalHandEye;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
+    const niftk::Model3D&         model3D,
+    const std::list<PointSet>&    leftPointSets,
+    const cv::Mat&                leftIntrinsic,
+    const cv::Mat&                leftDistortion,
+    const std::list<PointSet>&    rightPointSets,
+    const cv::Mat&                rightIntrinsic,
+    const cv::Mat&                rightDistortion,
+    const std::list<cv::Matx44d>& handMatrices,
+    const std::list<cv::Matx44d>& eyeMatrices,
+    cv::Matx44d&                  stereoExtrinsics,
+    double&                       residual
+    )
+{
+  cv::Matx21d residuals;
+  cv::Matx44d initialHandEye = niftk::CalculateHandEyeUsingTsaisMethod(handMatrices, eyeMatrices, residuals);
+  cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
+
+  cv::Matx44d finalHandEye = initialHandEye;
+
+  niftk::NonLinearStereoHandEyeOptimiser::Pointer optimiser = niftk::NonLinearStereoHandEyeOptimiser::New();
+  optimiser->SetModel(&model3D);
+  optimiser->SetPoints(&leftPointSets);
+  optimiser->SetRightHandPoints(&rightPointSets);
+  optimiser->SetHandMatrices(&handMatrices);
+  optimiser->SetLeftIntrinsic(&leftIntrinsic);
+  optimiser->SetLeftDistortion(&leftDistortion);
+  optimiser->SetRightIntrinsic(&rightIntrinsic);
+  optimiser->SetRightDistortion(&rightDistortion);
+
+  residual = optimiser->Optimise(initialModelToWorld, finalHandEye, stereoExtrinsics);
+
+  return finalHandEye;
+}
+
+#endif // NIFTYCAL_WITH_ITK
 
 } // end namespace

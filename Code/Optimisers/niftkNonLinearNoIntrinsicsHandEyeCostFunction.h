@@ -40,8 +40,8 @@ public:
   typedef Superclass::DerivativeType               DerivativeType;
   typedef Superclass::MeasureType                  MeasureType;
 
-  void SetIntrinsic(cv::Mat* const intrinsic);
-  void SetDistortion(cv::Mat* const distortion);
+  void SetIntrinsic(const cv::Mat* const intrinsic);
+  void SetDistortion(const cv::Mat* const distortion);
 
 protected:
 

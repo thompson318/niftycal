@@ -38,11 +38,11 @@ public:
   typedef  itk::SmartPointer<Self>            Pointer;
   itkNewMacro(Self);
 
-  void SetModel(Model3D* const model);
-  void SetPoints(std::list<PointSet>* const points);
-  void SetHandMatrices(std::list<cv::Matx44d>* const matrices);
-  void SetIntrinsic(cv::Mat* const intrinsic);
-  void SetDistortion(cv::Mat* const distortion);
+  void SetModel(const Model3D* const model);
+  void SetPoints(const std::list<PointSet>* const points);
+  void SetHandMatrices(const std::list<cv::Matx44d>* const matrices);
+  void SetIntrinsic(const cv::Mat* const intrinsic);
+  void SetDistortion(const cv::Mat* const distortion);
   double Optimise(cv::Matx44d& modelToWorld,
                   cv::Matx44d& handEye
                  );

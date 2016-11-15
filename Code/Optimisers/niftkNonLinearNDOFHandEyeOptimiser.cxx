@@ -35,7 +35,7 @@ NonLinearNDOFHandEyeOptimiser::~NonLinearNDOFHandEyeOptimiser()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNDOFHandEyeOptimiser::SetModel(Model3D* const model)
+void NonLinearNDOFHandEyeOptimiser::SetModel(const Model3D* const model)
 {
   m_CostFunction->SetModel(model);
   this->Modified();
@@ -43,7 +43,7 @@ void NonLinearNDOFHandEyeOptimiser::SetModel(Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNDOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
+void NonLinearNDOFHandEyeOptimiser::SetPoints(const std::list<PointSet>* const points)
 {
   m_CostFunction->SetPoints(points);
   this->Modified();
@@ -51,7 +51,7 @@ void NonLinearNDOFHandEyeOptimiser::SetPoints(std::list<PointSet>* const points)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNDOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* const matrices)
+void NonLinearNDOFHandEyeOptimiser::SetHandMatrices(const std::list<cv::Matx44d>* const matrices)
 {
   m_CostFunction->SetHandMatrices(matrices);
   this->Modified();
@@ -59,7 +59,7 @@ void NonLinearNDOFHandEyeOptimiser::SetHandMatrices(std::list<cv::Matx44d>* cons
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNDOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
+void NonLinearNDOFHandEyeOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   m_CostFunction->SetIntrinsic(intrinsic);
   this->Modified();
@@ -67,7 +67,7 @@ void NonLinearNDOFHandEyeOptimiser::SetIntrinsic(cv::Mat* const intrinsic)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNDOFHandEyeOptimiser::SetDistortion(cv::Mat* const distortion)
+void NonLinearNDOFHandEyeOptimiser::SetDistortion(const cv::Mat* const distortion)
 {
   m_CostFunction->SetDistortion(distortion);
   this->Modified();
@@ -147,6 +147,7 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearNDOFHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
 
+  /*
   for (int i = 12; i < initialParameters.GetSize(); i++)
   {
     std::cout << "NonLinearNDOFHandEyeOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
@@ -156,6 +157,8 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
     }
   }
   std::cout << ", rms=" << initialRMS << std::endl;
+  */
+  std::cout << "NonLinearNDOFHandEyeOptimiser: initial rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -181,6 +184,7 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearNDOFHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
+  /*
   for (int i = 12; i < finalParameters.GetSize(); i++)
   {
     std::cout << "NonLinearNDOFHandEyeOptimiser: final(" << i << ")=" << finalParameters[i]
@@ -192,6 +196,7 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
       std::cout << std::endl;
     }
   }
+  */
   std::cout << "NonLinearNDOFHandEyeOptimiser: hand-eye="
             << handEyeRotationVector.at<double>(0, 0) << ", "
             << handEyeRotationVector.at<double>(0, 1) << ", "
@@ -207,7 +212,7 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
             << modelToWorldTranslationVector.at<double>(0, 1) << ", "
             << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
 
-  std::cout << "NonLinearNDOFHandEyeOptimiser: rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearNDOFHandEyeOptimiser: final rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

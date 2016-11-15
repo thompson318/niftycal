@@ -35,7 +35,7 @@ NonLinearNoIntrinsicsHandEyeCostFunction::~NonLinearNoIntrinsicsHandEyeCostFunct
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(cv::Mat* const intrinsic)
+void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -43,20 +43,20 @@ void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(cv::Mat* const intri
                          << intrinsic->cols << ", " << intrinsic->rows << ")";
   }
 
-  m_Intrinsic = intrinsic;
+  m_Intrinsic = const_cast<cv::Mat*>(intrinsic);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNoIntrinsicsHandEyeCostFunction::SetDistortion(cv::Mat* const distortion)
+void NonLinearNoIntrinsicsHandEyeCostFunction::SetDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1)
   {
     niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
   }
 
-  m_Distortion = distortion;
+  m_Distortion = const_cast<cv::Mat*>(distortion);
   this->Modified();
 }
 
