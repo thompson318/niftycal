@@ -34,6 +34,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D
                                                             const cv::Size2i& imageSize,
                                                             const cv::Point2d& sensorDimensions,
                                                             const int& numberSensorElementsInX,
+                                                            const double& sx,
                                                             cv::Mat& intrinsic,
                                                             cv::Mat& distortion,
                                                             cv::Mat& rvec,

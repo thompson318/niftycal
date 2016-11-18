@@ -79,7 +79,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     REQUIRE( imagePoints.size() == numberInternalCornersInX*numberInternalCornersInY );
   }
 
-  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, imageSize, sensorDimensions, nx, intrinsic, distortion, rvec, tvec);
+  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, imageSize, sensorDimensions, nx, 1.0, intrinsic, distortion, rvec, tvec);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;

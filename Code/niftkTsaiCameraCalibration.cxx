@@ -68,6 +68,33 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
 
 
 //-----------------------------------------------------------------------------
+void CalculateApproximateFAndTz(const cv::Mat& R,
+                                const std::vector<cv::Point3d>& points3D,
+                                const std::vector<cv::Point2d>& points2D,
+                                const double& Ty,
+                                double& f,
+                                double& Tz)
+{
+  int numberOfPoints = points2D.size();
+  cv::Mat A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
+  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+  for (int i = 0; i < numberOfPoints; i++)
+  {
+    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
+    A.at<double>(i, 1) = -1.0*points2D[i].y;
+    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y)*points2D[i].y;
+  }
+
+  cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
+  cv::invert(A, pseudoInverse, CV_SVD);
+  cv::Mat X = pseudoInverse * B;
+
+  f = X.at<double>(0, 0);
+  Tz = X.at<double>(1, 0);
+}
+
+
+//-----------------------------------------------------------------------------
 double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
                                             const niftk::PointSet& imagePoints2D,
                                             const cv::Size2i& imageSize,
@@ -92,6 +119,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
                                          const cv::Size2i& imageSize,
                                          const cv::Point2d& sensorDimensions,
                                          const int& numberSensorElementsInX,
+                                         const double& sx,
                                          cv::Mat& intrinsic,
                                          cv::Mat& distortion,
                                          cv::Mat& rvec,
@@ -110,9 +138,6 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   }
 
   AllocateTsaiMatrices(intrinsic, distortion, rvec, tvec);
-
-  // Not optimised.
-  double sx = 1.0;
 
   // Step (a)(ii) - implement equation (6d).
   double dxPrime = sensorDimensions.x * static_cast<double>(numberSensorElementsInX) / static_cast<double>(imageSize.width);
@@ -166,7 +191,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   C.at<double>(1, 1) = X.at<double>(4, 0);
   double TySquared = 0;
 
-  double tol = 0.001;
+  double tol = 0.00000001;
   if (cv::norm(C.row(0)) < tol)
   {
     // Equation (13), row 1.
@@ -180,11 +205,11 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   else if (cv::norm(C.col(0)) < tol)
   {
     // Equation (13), col 1.
-    TySquared = 1.0/(C.at<double>(1, 0) * C.at<double>(1, 0) + C.at<double>(1, 1) * C.at<double>(1, 1));
+    TySquared = 1.0/(C.at<double>(0, 1) * C.at<double>(0, 1) + C.at<double>(1, 1) * C.at<double>(1, 1));
   }
   else if (cv::norm(C.col(1)) < tol)
   {
-    // Equation (13), col 2.
+    // Equation (13), col 0.
     TySquared = 1.0/(C.at<double>(0, 0) * C.at<double>(0, 0) + C.at<double>(1, 0) * C.at<double>(1, 0));
   }
   else
@@ -204,13 +229,17 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   // Pick the object point furthest from the image centre.
   double bestDistanceSoFar = 0;
+  double distance = 0;
   int bestIndexSoFar = -1;
   for (int i = 0; i < numberOfPoints; i++)
   {
-    if (  (points2D[i].x - imageCentre.x) * (points2D[i].x - imageCentre.x)
-        + (points2D[i].y - imageCentre.y) * (points2D[i].y - imageCentre.y) > bestDistanceSoFar)
+    distance = sqrt(  (points2D[i].x - imageCentre.x) * (points2D[i].x - imageCentre.x)
+                    + (points2D[i].y - imageCentre.y) * (points2D[i].y - imageCentre.y)
+                   );
+    if (distance > bestDistanceSoFar)
     {
       bestIndexSoFar = i;
+      bestDistanceSoFar = distance;
     }
   }
   if (bestIndexSoFar == -1 || bestIndexSoFar == numberOfPoints)
@@ -230,10 +259,11 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
             + Ty;
 
   // (c)(iv) - set the sign of Ty.
-  if (!(   signum(x) == signum(points2D[bestIndexSoFar].x)
-        && signum(y) == signum(points2D[bestIndexSoFar].y)))
+  if (   signum(x) != signum(points2D[bestIndexSoFar].x)
+      || signum(y) != signum(points2D[bestIndexSoFar].y))
   {
     Ty = -1.0 * Ty;
+    Tx = X.at<double>(2, 0)*Ty;
   }
 
   // (3)(ii) - compute equation (14a).
@@ -259,23 +289,10 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   R.at<double>(2, 2) = r9;
 
   // Stage 2 - F, Tz, k.
-  A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
-  B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
-  for (int i = 0; i < numberOfPoints; i++)
-  {
-    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
-    A.at<double>(i, 1) = -1.0*sensorDimensions.y*points2D[i].y;
-    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y)
-                         *sensorDimensions.y*points2D[i].y;
-  }
-
-  pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
-  cv::invert(A, pseudoInverse, CV_SVD);
-  X = pseudoInverse * B;
-
-  double f = X.at<double>(0, 0);
-  double Tz = X.at<double>(1, 0);
+  double f = 0;
+  double Tz = 0;
   double k1 = 0;
+  niftk::CalculateApproximateFAndTz(R, points3D, points2D, Tx, f, Tz);
 
   // (3)(iii) - Equation (14b)
   if (f < 0)
@@ -284,6 +301,12 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
     R.at<double>(1, 2) = -R.at<double>(1, 2);
     R.at<double>(2, 0) = -R.at<double>(2, 0);
     R.at<double>(2, 1) = -R.at<double>(2, 1);
+    niftk::CalculateApproximateFAndTz(R, points3D, points2D, Tx, f, Tz);
+
+    if (f < 0)
+    {
+      niftkNiftyCalThrow() << "Possible handedness problem with data.";
+    }
   }
 
   // (e): Insert non-linear optimisation of f, Tz and K1 here.
@@ -293,7 +316,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   intrinsic.at<double>(0, 1) = 0;
   intrinsic.at<double>(0, 2) = imageCentre.x;
   intrinsic.at<double>(1, 0) = 0;
-  intrinsic.at<double>(1, 1) = f * sx;        // Not optimised.
+  intrinsic.at<double>(1, 1) = f * sx;        // sx not optimised.
   intrinsic.at<double>(1, 2) = imageCentre.y;
   intrinsic.at<double>(2, 0) = 0;
   intrinsic.at<double>(2, 1) = 0;
