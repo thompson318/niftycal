@@ -79,8 +79,6 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     detector.SetImage(&greyImage);
     detector.SetImageScaleFactor(cv::Point2d(sx, sy));
 
-    cv::imwrite("/tmp/matt.png", greyImage);
-
     imagePoints = detector.GetPoints();
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
   }
