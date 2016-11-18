@@ -19,8 +19,9 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-CirclesPointDetector::CirclesPointDetector(cv::Size2i patternSize)
+CirclesPointDetector::CirclesPointDetector(cv::Size2i patternSize, int flags)
 : m_PatternSize(patternSize)
+, m_Flags(flags)
 {
   if (m_PatternSize.width < 2)
   {
@@ -51,12 +52,7 @@ PointSet CirclesPointDetector::InternalGetPoints(const cv::Mat& imageToUse)
   params.maxArea = 10e4;
   cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
 
-  bool found = cv::findCirclesGrid(
-    imageToUse, m_PatternSize, circles,
-    cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
-    , blobDetector
-    );
-
+  bool found = cv::findCirclesGrid(imageToUse, m_PatternSize, circles, m_Flags, blobDetector);
   if ( circles.size() == 0 )
   {
     return result;

@@ -35,10 +35,10 @@ NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D
                                                             const cv::Point2d& sensorDimensions,
                                                             const int& numberSensorElementsInX,
                                                             const double& sx,
-                                                            cv::Mat& intrinsic,
-                                                            cv::Mat& distortion,
-                                                            cv::Mat& rvec,
-                                                            cv::Mat& tvec
+                                                            cv::Mat& intrinsic3x3,
+                                                            cv::Mat& distortion1x4,
+                                                            cv::Mat& rvec1x3,
+                                                            cv::Mat& tvec1x3
                                                            );
 
 /**
@@ -51,10 +51,10 @@ NIFTYCAL_WINEXPORT double TsaiMonoNonCoplanarCameraCalibration(const niftk::Mode
                                                                const cv::Size2i& imageSize,
                                                                const cv::Point2d& sensorDimensions,
                                                                const int& numberSensorElementsInX,
-                                                               cv::Mat& intrinsic,
-                                                               cv::Mat& distortion,
-                                                               cv::Mat& rvec,
-                                                               cv::Mat& tvec
+                                                               cv::Mat& intrinsic3x3,
+                                                               cv::Mat& distortion1x4,
+                                                               cv::Mat& rvec1x3,
+                                                               cv::Mat& tvec1x3
                                                               );
 
 

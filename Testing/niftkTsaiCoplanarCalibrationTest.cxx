@@ -17,7 +17,7 @@
 #include <niftkNiftyCalTypes.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkTsaiCameraCalibration.h>
-#include <niftkChessboardPointDetector.h>
+#include <niftkCirclesPointDetector.h>
 #include <niftkIOUtilities.h>
 
 #include <cv.h>
@@ -26,31 +26,33 @@
 
 TEST_CASE( "Tsai mono", "[mono]" ) {
 
-  int expectedNumberOfArguments =  12;
+  int expectedNumberOfArguments =  14;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiCoplanarCalibrationTest image.png model.txt cornersX cornersY nx ny fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiCoplanarCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
   std::string imageFileName = niftk::argv[1];
   std::string modelFileName = niftk::argv[2];
-  int numberInternalCornersInX = atoi(niftk::argv[3]);
-  int numberInternalCornersInY = atoi(niftk::argv[4]);
+  int dotsInX = atoi(niftk::argv[3]);
+  int dotsInY = atoi(niftk::argv[4]);
   int nx = atoi(niftk::argv[5]);
   int ny = atoi(niftk::argv[6]);
-  float eFx = atof(niftk::argv[7]);
-  float eFy = atof(niftk::argv[8]);
-  float eCx = atof(niftk::argv[9]);
-  float eCy = atof(niftk::argv[10]);
-  float dist = atof(niftk::argv[11]);
+  float sx = atof(niftk::argv[7]);
+  float sy = atof(niftk::argv[8]);
+  float eFx = atof(niftk::argv[9]);
+  float eFy = atof(niftk::argv[10]);
+  float eCx = atof(niftk::argv[11]);
+  float eCy = atof(niftk::argv[12]);
+  float dist = atof(niftk::argv[13]);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
-  REQUIRE( model.size() == numberInternalCornersInY*numberInternalCornersInX );
+  REQUIRE( model.size() == dotsInX*dotsInY );
 
   // Loads image data.
-  cv::Size2i corners(numberInternalCornersInX, numberInternalCornersInY);
+  cv::Size2i patternSize(dotsInX, dotsInY);
 
   niftk::PointSet imagePoints;
   cv::Mat intrinsic;
@@ -73,10 +75,14 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     REQUIRE( imageSize.width == nx );
     REQUIRE( imageSize.height == ny );
 
-    niftk::ChessboardPointDetector detector(corners);
+    niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
     detector.SetImage(&greyImage);
+    detector.SetImageScaleFactor(cv::Point2d(sx, sy));
+
+    cv::imwrite("/tmp/matt.png", greyImage);
+
     imagePoints = detector.GetPoints();
-    REQUIRE( imagePoints.size() == numberInternalCornersInX*numberInternalCornersInY );
+    REQUIRE( imagePoints.size() == dotsInX*dotsInY );
   }
 
   double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, imageSize, sensorDimensions, nx, 1.0, intrinsic, distortion, rvec, tvec);
@@ -90,6 +96,12 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   std::cout << "d2=" << distortion.at<double>(0,1) << std::endl;
   std::cout << "d3=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "d4=" << distortion.at<double>(0,3) << std::endl;
+  std::cout << "R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "Tx=" << tvec.at<double>(0,0) << std::endl;
+  std::cout << "Ty=" << tvec.at<double>(0,1) << std::endl;
+  std::cout << "Tz=" << tvec.at<double>(0,2) << std::endl;
 
   double tol = 0.01;
 

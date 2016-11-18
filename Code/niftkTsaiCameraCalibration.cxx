@@ -137,6 +137,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
     }
   }
 
+  // This is for consistencies sake, as other OpenCV routines self-allocate arrays.
   AllocateTsaiMatrices(intrinsic, distortion, rvec, tvec);
 
   // Step (a)(ii) - implement equation (6d).
@@ -152,9 +153,10 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   niftk::ExtractCommonPoints(model3D, imagePoints2D, points3D, points2D, id);
   unsigned int numberOfPoints = points3D.size();
 
-  if (numberOfPoints < 10)
+  // Check for minimum points.
+  if (numberOfPoints < 7)
   {
-    niftkNiftyCalThrow() << "Too few points. You should have at least 10."; // haven't checked this yet.
+    niftkNiftyCalThrow() << "Too few points. You should have at least 7."; // haven't checked this yet.
   }
 
   for (int i = 0; i < numberOfPoints; i++)
