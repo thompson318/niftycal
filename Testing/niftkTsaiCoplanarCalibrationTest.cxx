@@ -19,6 +19,7 @@
 #include <niftkTsaiCameraCalibration.h>
 #include <niftkCirclesPointDetector.h>
 #include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 
 #include <cv.h>
 #include <highgui.h>
@@ -60,9 +61,6 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   cv::Mat rvec;
   cv::Mat tvec;
   cv::Size imageSize;
-  cv::Point2d sensorDimensions;
-  sensorDimensions.x = 1;
-  sensorDimensions.y = 1;
 
   cv::Mat image = cv::imread(imageFileName);
   if (image.rows > 0 && image.cols > 0)
@@ -83,11 +81,21 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
   }
 
-  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, imageSize, sensorDimensions, nx, 1.0, intrinsic, distortion, rvec, tvec);
+  //niftk::DumpPoints(std::cerr, imagePoints);
+
+  double sensorScaleInX = 1;
+
+  cv::Point2d sensorDimensions;
+  sensorDimensions.x = 1;
+  sensorDimensions.y = 1;
+
+  cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
+  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
   std::cout << "Fy=" << intrinsic.at<double>(1,1) << std::endl;
+  std::cout << "Sx=" << sensorScaleInX << std::endl;
   std::cout << "Cx=" << intrinsic.at<double>(0,2) << std::endl;
   std::cout << "Cy=" << intrinsic.at<double>(1,2) << std::endl;
   std::cout << "d1=" << distortion.at<double>(0,0) << std::endl;

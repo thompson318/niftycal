@@ -583,5 +583,5 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 
 add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiCoplanarCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
-         ${DATA_DIR}/CMU/TestSyntheticData/chessboard_10_7_3.txt
-         10 7 1920 540 1 2 2979.74590652 2979.74590652 288.00000000 288.00000000 0.00000000)
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1703.16 1715.55 910.668 520.445 -0.223725)

@@ -102,11 +102,13 @@ PointSet PointDetector::GetPoints()
   {
     cv::resize(*m_Image, m_RescaledImage, cv::Size(0, 0), m_ScaleFactors.x, m_ScaleFactors.y, cv::INTER_LINEAR);
     PointSet points = InternalGetPoints(m_RescaledImage);
-
+    result = points;
+/*
     cv::Point2d scaleDownFactors;
     scaleDownFactors.x = 1.0/m_ScaleFactors.x;
     scaleDownFactors.y = 1.0/m_ScaleFactors.y;
     result = niftk::RescalePoints(points, scaleDownFactors);
+*/
   }
   m_CachedResult = result;
   m_NeedsUpdating = false;

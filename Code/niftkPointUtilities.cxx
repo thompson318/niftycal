@@ -24,6 +24,28 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
+void DumpPoints(std::ostream& s, const PointSet& p)
+{
+  PointSet::const_iterator iter;
+  for (iter = p.begin(); iter != p.end(); iter++)
+  {
+    s << (*iter).second.id << ":" << (*iter).second.point << std::endl;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void DumpPoints(std::ostream& s, const Model3D& p)
+{
+  Model3D::const_iterator iter;
+  for (iter = p.begin(); iter != p.end(); iter++)
+  {
+    s << (*iter).second.id << ":" << (*iter).second.point << std::endl;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b)
 {
   return sqrt(  (a.x - b.x) * (a.x - b.x)

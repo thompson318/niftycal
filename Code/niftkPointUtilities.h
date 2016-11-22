@@ -19,6 +19,7 @@
 #include "niftkNiftyCalTypes.h"
 #include <list>
 #include <random>
+#include <ostream>
 
 /**
 * \file niftkPointUtilities.h
@@ -26,6 +27,16 @@
 */
 namespace niftk
 {
+
+/**
+* \brief Writes points to stream.
+*/
+NIFTYCAL_WINEXPORT void DumpPoints(std::ostream& s, const PointSet& p);
+
+/**
+* \brief Writes points to stream.
+*/
+NIFTYCAL_WINEXPORT void DumpPoints(std::ostream& s, const Model3D& p);
 
 /**
 * \brief Computes the Euclidean distance between two points a and b.

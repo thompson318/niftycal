@@ -26,7 +26,7 @@ namespace niftk
 * \file niftkTsaiCameraCalibration.h
 * \brief Performs a mono camera calibration using Tsai 1987 coplanar method.
 * If ITK is not compiled in, you just have the initial linear bit.
-* \throw Throws niftk::NiftyCalException if z coordinate of any model points is not zero.
+* \throw Throws niftk::NiftyCalException if z coordinate of any model point is not zero.
 * \return rms re-projection error.
 */
 NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
@@ -34,7 +34,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D
                                                             const cv::Size2i& imageSize,
                                                             const cv::Point2d& sensorDimensions,
                                                             const int& numberSensorElementsInX,
-                                                            const double& sx,
+                                                            double& sx,
                                                             cv::Mat& intrinsic3x3,
                                                             cv::Mat& distortion1x4,
                                                             cv::Mat& rvec1x3,
@@ -44,6 +44,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D
 /**
 * \brief Performs a mono camera calibration using Tsai 1987 non co-planar method.
 * If ITK is not compiled in, you just have the initial linear bit.
+* \throw Throws niftk::NiftyCalException if z coordinate of all model points is zero.
 * \return rms re-projection error.
 */
 NIFTYCAL_WINEXPORT double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,

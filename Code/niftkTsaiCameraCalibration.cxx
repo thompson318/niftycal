@@ -16,6 +16,11 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
+#include "niftkNonLinearTsai3ParamOptimiser.h"
+#include "niftkNonLinearTsai5ParamOptimiser.h"
+#include "niftkNonLinearTsai8ParamOptimiser.h"
+#include "niftkNonLinearTsai10ParamOptimiser.h"
+#include "niftkNonLinearTsai11ParamOptimiser.h"
 #include <vector>
 
 namespace niftk
@@ -71,6 +76,7 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
 void CalculateApproximateFAndTz(const cv::Mat& R,
                                 const std::vector<cv::Point3d>& points3D,
                                 const std::vector<cv::Point2d>& points2D,
+                                const double& sensorDy,
                                 const double& Ty,
                                 double& f,
                                 double& Tz)
@@ -78,11 +84,12 @@ void CalculateApproximateFAndTz(const cv::Mat& R,
   int numberOfPoints = points2D.size();
   cv::Mat A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
   cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+
   for (int i = 0; i < numberOfPoints; i++)
   {
     A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
-    A.at<double>(i, 1) = -1.0*points2D[i].y;
-    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y)*points2D[i].y;
+    A.at<double>(i, 1) = -1.0*sensorDy*points2D[i].y;
+    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y)*sensorDy*points2D[i].y;
   }
 
   cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
@@ -119,7 +126,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
                                          const cv::Size2i& imageSize,
                                          const cv::Point2d& sensorDimensions,
                                          const int& numberSensorElementsInX,
-                                         const double& sx,
+                                         double& sx,
                                          cv::Mat& intrinsic,
                                          cv::Mat& distortion,
                                          cv::Mat& rvec,
@@ -235,8 +242,8 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   int bestIndexSoFar = -1;
   for (int i = 0; i < numberOfPoints; i++)
   {
-    distance = sqrt(  (points2D[i].x - imageCentre.x) * (points2D[i].x - imageCentre.x)
-                    + (points2D[i].y - imageCentre.y) * (points2D[i].y - imageCentre.y)
+    distance = sqrt(  (points2D[i].x * points2D[i].x)
+                    + (points2D[i].y * points2D[i].y)
                    );
     if (distance > bestDistanceSoFar)
     {
@@ -280,6 +287,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double r7 = r2*r6 - r5*r3;
   double r8 = -1.0*(r1*r6 - r4*r3);
   double r9 = r1*r5 - r4*r2;
+
   R.at<double>(0, 0) = r1;
   R.at<double>(0, 1) = r2;
   R.at<double>(0, 2) = r3;
@@ -294,7 +302,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double f = 0;
   double Tz = 0;
   double k1 = 0;
-  niftk::CalculateApproximateFAndTz(R, points3D, points2D, Tx, f, Tz);
+  niftk::CalculateApproximateFAndTz(R, points3D, points2D, sensorDimensions.y, Ty, f, Tz);
 
   // (3)(iii) - Equation (14b)
   if (f < 0)
@@ -303,7 +311,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
     R.at<double>(1, 2) = -R.at<double>(1, 2);
     R.at<double>(2, 0) = -R.at<double>(2, 0);
     R.at<double>(2, 1) = -R.at<double>(2, 1);
-    niftk::CalculateApproximateFAndTz(R, points3D, points2D, Tx, f, Tz);
+    niftk::CalculateApproximateFAndTz(R, points3D, points2D, sensorDimensions.y, Ty, f, Tz);
 
     if (f < 0)
     {
@@ -311,14 +319,12 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
     }
   }
 
-  // (e): Insert non-linear optimisation of f, Tz and K1 here.
-
-  // Prepare output.
-  intrinsic.at<double>(0, 0) = f;
+  // Initial guess.
+  intrinsic.at<double>(0, 0) = f * sx;        // sx not optimised.
   intrinsic.at<double>(0, 1) = 0;
   intrinsic.at<double>(0, 2) = imageCentre.x;
   intrinsic.at<double>(1, 0) = 0;
-  intrinsic.at<double>(1, 1) = f * sx;        // sx not optimised.
+  intrinsic.at<double>(1, 1) = f;
   intrinsic.at<double>(1, 2) = imageCentre.y;
   intrinsic.at<double>(2, 0) = 0;
   intrinsic.at<double>(2, 1) = 0;
@@ -334,6 +340,78 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   tvec.at<double>(0, 2) = Tz;
 
   cv::Rodrigues(R, rvec);
+
+#ifdef NIFTYCAL_WITH_ITK
+
+  cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+  std::list<niftk::PointSet> listOfPoints;
+  listOfPoints.push_back(imagePoints2D);
+
+  // (e): Non-linear optimisation of f, Tz and K1.
+  niftk::NonLinearTsai3ParamOptimiser::Pointer tsai3Param = niftk::NonLinearTsai3ParamOptimiser::New();
+  tsai3Param->SetModel(&model3D);
+  tsai3Param->SetPoints(&listOfPoints);
+  tsai3Param->SetIntrinsic(&intrinsic);
+  tsai3Param->SetDistortion(&distortion);
+  tsai3Param->SetExtrinsic(&extrinsic);
+  tsai3Param->Optimise(Tz, f, k1);
+  tvec.at<double>(0, 2) = Tz;
+  intrinsic.at<double>(0, 0) = f * sx;
+  intrinsic.at<double>(1, 1) = f;
+  distortion.at<double>(0, 0) = k1;
+
+  // (e): Non-linear optimisation of F, Tz, K1, Cx and Cy.
+  niftk::NonLinearTsai5ParamOptimiser::Pointer tsai5Param = niftk::NonLinearTsai5ParamOptimiser::New();
+  tsai5Param->SetModel(&model3D);
+  tsai5Param->SetPoints(&listOfPoints);
+  tsai5Param->SetIntrinsic(&intrinsic);
+  tsai5Param->SetDistortion(&distortion);
+  tsai5Param->SetExtrinsic(&extrinsic);
+  tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
+  tvec.at<double>(0, 2) = Tz;
+  intrinsic.at<double>(0, 0) = f * sx;
+  intrinsic.at<double>(1, 1) = f;
+  intrinsic.at<double>(0, 2) = imageCentre.x;
+  intrinsic.at<double>(1, 2) = imageCentre.y;
+  distortion.at<double>(0, 0) = k1;
+
+  // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f and k1.
+  niftk::NonLinearTsai8ParamOptimiser::Pointer tsai8Param = niftk::NonLinearTsai8ParamOptimiser::New();
+  tsai8Param->SetModel(&model3D);
+  tsai8Param->SetPoints(&listOfPoints);
+  tsai8Param->SetIntrinsic(&intrinsic);
+  tsai8Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                       tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                       f, k1);
+  distortion.at<double>(0, 0) = k1;
+  intrinsic.at<double>(0, 0) = f * sx;
+  intrinsic.at<double>(1, 1) = f;
+
+  // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx and Cy.
+  niftk::NonLinearTsai10ParamOptimiser::Pointer tsai10Param = niftk::NonLinearTsai10ParamOptimiser::New();
+  tsai10Param->SetModel(&model3D);
+  tsai10Param->SetPoints(&listOfPoints);
+  tsai10Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                        tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                        f,
+                        intrinsic.at<double>(0, 2), intrinsic.at<double>(1, 2),
+                        distortion.at<double>(0, 0));
+  intrinsic.at<double>(0, 0) = f * sx;
+  intrinsic.at<double>(1, 1) = f;
+
+  // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx, Cy and sx.
+  niftk::NonLinearTsai11ParamOptimiser::Pointer tsai11Param = niftk::NonLinearTsai11ParamOptimiser::New();
+  tsai11Param->SetModel(&model3D);
+  tsai11Param->SetPoints(&listOfPoints);
+  tsai11Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                        tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                        intrinsic.at<double>(0, 0), intrinsic.at<double>(1, 1),
+                        intrinsic.at<double>(0, 2), intrinsic.at<double>(1, 2),
+                        distortion.at<double>(0, 0));
+  sx = intrinsic.at<double>(0, 0) / intrinsic.at<double>(1, 1);
+
+#endif
 
   double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
   return rms;

@@ -66,6 +66,21 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearStereoIntrinsicsCalibrationCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearStereoIntrinsicsCalibrationOptimiser.cxx)
 
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai3ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai3ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai5ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai5ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai8ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai8ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai10ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai10ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai11ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Optimisers/niftkNonLinearTsai11ParamCostFunction.cxx)
+
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
