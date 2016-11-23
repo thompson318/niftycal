@@ -21,6 +21,7 @@ namespace niftk {
 //-----------------------------------------------------------------------------
 PointDetector::PointDetector()
 : m_Image(nullptr)
+, m_RescalePoints(true)
 , m_Caching(false)
 , m_NeedsUpdating(true)
 {
@@ -56,7 +57,7 @@ void PointDetector::SetImage(cv::Mat* image)
 
 
 //-----------------------------------------------------------------------------
-void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
+void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor, const bool& rescalePoints)
 {
   if (scaleFactor.x <= 0)
   {
@@ -67,6 +68,7 @@ void PointDetector::SetImageScaleFactor(const cv::Point2d& scaleFactor)
     niftkNiftyCalThrow() << "Y scale factor <= 0.";
   }
   m_ScaleFactors = scaleFactor;
+  m_RescalePoints = rescalePoints;
   m_NeedsUpdating = true;
 }
 
@@ -103,12 +105,14 @@ PointSet PointDetector::GetPoints()
     cv::resize(*m_Image, m_RescaledImage, cv::Size(0, 0), m_ScaleFactors.x, m_ScaleFactors.y, cv::INTER_LINEAR);
     PointSet points = InternalGetPoints(m_RescaledImage);
     result = points;
-/*
-    cv::Point2d scaleDownFactors;
-    scaleDownFactors.x = 1.0/m_ScaleFactors.x;
-    scaleDownFactors.y = 1.0/m_ScaleFactors.y;
-    result = niftk::RescalePoints(points, scaleDownFactors);
-*/
+
+    if (m_RescalePoints)
+    {
+      cv::Point2d scaleDownFactors;
+      scaleDownFactors.x = 1.0/m_ScaleFactors.x;
+      scaleDownFactors.y = 1.0/m_ScaleFactors.y;
+      result = niftk::RescalePoints(points, scaleDownFactors);
+    }
   }
   m_CachedResult = result;
   m_NeedsUpdating = false;

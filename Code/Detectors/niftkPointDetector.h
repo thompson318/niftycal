@@ -48,7 +48,7 @@ public:
   * e.g. your image is 1920x540, and you need 1920x1080,
   * so you can set cv::Point2d(1,2).
   */
-  void SetImageScaleFactor(const cv::Point2d& scaleFactor);
+  void SetImageScaleFactor(const cv::Point2d& scaleFactor, const bool& rescalePoints=true);
 
   /**
   * \brief If true, will cache points, so once detected, the detection process
@@ -80,6 +80,7 @@ private:
   cv::Mat*        m_Image;
   cv::Mat         m_RescaledImage;
   cv::Point2d     m_ScaleFactors;
+  bool            m_RescalePoints;
   bool            m_Caching;
   bool            m_NeedsUpdating;
   niftk::PointSet m_CachedResult;
