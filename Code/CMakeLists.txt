@@ -15,6 +15,7 @@
 set(NIFTYCAL_SRCS
   Internal/niftkIterativeCalibrationUtilities.cxx
   Internal/niftkTriangulationUtilities.cxx
+  Internal/niftkTsaiUtilities.cxx
   Detectors/niftkPointDetector.cxx
   Detectors/niftkChessboardPointDetector.cxx
   Detectors/niftkCirclesPointDetector.cxx

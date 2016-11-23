@@ -75,7 +75,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
 
     niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
     detector.SetImage(&greyImage);
-    detector.SetImageScaleFactor(cv::Point2d(sx, sy));
+    detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
 
     imagePoints = detector.GetPoints();
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
