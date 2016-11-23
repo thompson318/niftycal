@@ -34,6 +34,13 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
                           cv::Mat& tvec);
 
 
+std::vector<cv::Point2d> NormalisePoints(const std::vector<cv::Point2d>& points2D,
+                                         const double& dxPrime,
+                                         const cv::Point2d& imageCentre,
+                                         const cv::Point2d& sensorDimensions,
+                                         const double& sx
+                                        );
+
 void CalculateApproximateFAndTz(const cv::Mat& R,
                                 const std::vector<cv::Point3d>& points3D,
                                 const std::vector<cv::Point2d>& points2D,

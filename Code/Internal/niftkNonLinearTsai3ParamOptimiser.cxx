@@ -13,7 +13,6 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai3ParamOptimiser.h"
-#include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 
@@ -65,14 +64,6 @@ void NonLinearTsai3ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
 void NonLinearTsai3ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   m_CostFunction->SetIntrinsic(intrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearTsai3ParamOptimiser::SetDistortion(const cv::Mat* const distortion)
-{
-  m_CostFunction->SetDistortion(distortion);
   this->Modified();
 }
 

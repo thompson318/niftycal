@@ -13,7 +13,6 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai8ParamOptimiser.h"
-#include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 

@@ -43,8 +43,6 @@ public:
   void SetPoints(const std::list<PointSet>* const points); // Must be a list of length 1.
   void SetExtrinsic(const cv::Matx44d* extrinsic);
   void SetIntrinsic(const cv::Mat* const intrinsic);
-  void SetDistortion(const cv::Mat* const distortion);
-
   double Optimise(double& Tz, double& f, double &k1);
 
 protected:

@@ -92,12 +92,8 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
     niftkNiftyCalThrow() << "Too few points. You should have at least 7."; // haven't checked this yet.
   }
 
-  // Step (a)(iv) - compute real image coordinates.
-  for (int i = 0; i < numberOfPoints; i++)
-  {
-    points2D[i].x =            dxPrime*(points2D[i].x - imageCentre.x)/sx;
-    points2D[i].y = sensorDimensions.y*(points2D[i].y - imageCentre.y);
-  }
+  // Step (a)(iv) - Normalises points with respect to image centre.
+  points2D = niftk::NormalisePoints(points2D, dxPrime, imageCentre, sensorDimensions, sx);
 
   cv::Mat X = niftk::CalculateEquation10(points3D, points2D);
 
@@ -146,7 +142,6 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   tsai3Param->SetModel(&model3D);
   tsai3Param->SetPoints(&listOfPoints);
   tsai3Param->SetIntrinsic(&intrinsic);
-  tsai3Param->SetDistortion(&distortion);
   tsai3Param->SetExtrinsic(&extrinsic);
   tsai3Param->Optimise(Tz, f, k1);
   tvec.at<double>(0, 2) = Tz;
@@ -154,13 +149,11 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   intrinsic.at<double>(1, 1) = f;
   distortion.at<double>(0, 0) = k1;
 
-  // (e): Non-linear optimisation of F, Tz, K1, Cx and Cy.
+  // (e): Non-linear optimisation of f, Tz, K1, Cx and Cy.
   niftk::NonLinearTsai5ParamOptimiser::Pointer tsai5Param = niftk::NonLinearTsai5ParamOptimiser::New();
   tsai5Param->SetModel(&model3D);
   tsai5Param->SetPoints(&listOfPoints);
-  tsai5Param->SetIntrinsic(&intrinsic);
-  tsai5Param->SetDistortion(&distortion);
-  tsai5Param->SetExtrinsic(&extrinsic);
+  tsai5Param->SetCameraConstants(dxPrime, sensorDimensions, sx);
   tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
   tvec.at<double>(0, 2) = Tz;
   intrinsic.at<double>(0, 0) = f * sx;
@@ -194,6 +187,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   intrinsic.at<double>(1, 1) = f;
 
   // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx, Cy and sx.
+/*
   niftk::NonLinearTsai11ParamOptimiser::Pointer tsai11Param = niftk::NonLinearTsai11ParamOptimiser::New();
   tsai11Param->SetModel(&model3D);
   tsai11Param->SetPoints(&listOfPoints);
@@ -203,7 +197,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
                         intrinsic.at<double>(0, 2), intrinsic.at<double>(1, 2),
                         distortion.at<double>(0, 0));
   sx = intrinsic.at<double>(0, 0) / intrinsic.at<double>(1, 1);
-
+*/
 #endif
 
   double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);

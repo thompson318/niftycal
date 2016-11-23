@@ -13,9 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai11ParamCostFunction.h"
-#include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
-#include <niftkPointUtilities.h>
 
 namespace niftk
 {
@@ -38,13 +36,6 @@ NonLinearTsai11ParamCostFunction::InternalGetValue(const ParametersType& paramet
 {
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
-
-  std::list<niftk::PointSet>::const_iterator iter = m_Points->begin();
-
-  unsigned int totalPointCounter = 0;
-  std::vector<cv::Point2f> observed(iter->size());
-  std::vector<cv::Point2f> projected(iter->size());
-  std::vector<niftk::NiftyCalIdType> ids(iter->size());
 
   cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
   rvec.at<double>(0, 0) = parameters[0];
@@ -75,21 +66,7 @@ NonLinearTsai11ParamCostFunction::InternalGetValue(const ParametersType& paramet
   distortion.at<double>(0, 2) = 0;
   distortion.at<double>(0, 3) = 0;
 
-  niftk::ProjectMatchingPoints(*m_Model,
-                               *iter,
-                               extrinsic,
-                               intrinsic,
-                               distortion,
-                               observed,
-                               projected,
-                               ids
-                              );
-
-  for (unsigned int i = 0; i < observed.size(); i++)
-  {
-    result[totalPointCounter++] = (observed[i].x - projected[i].x);
-    result[totalPointCounter++] = (observed[i].y - projected[i].y);
-  }
+  this->ComputeErrorValues(*m_Model, *(m_Points->begin()), extrinsic, intrinsic, distortion, result);
 
   return result;
 }

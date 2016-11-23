@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearTsai8ParamCostFunction_h
 #define niftkNonLinearTsai8ParamCostFunction_h
 
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearTsaiCostFunction.h"
 
 namespace niftk
 {
@@ -25,13 +25,13 @@ namespace niftk
 * \brief Cost function, to optimise 2D reprojection error over Rx, Ry, Rz, Tx, Ty, Tz, f and k.
 * \see niftk::NonLinearTsai8ParamOptimiser
 */
-class NonLinearTsai8ParamCostFunction : public niftk::NonLinearCostFunction
+class NonLinearTsai8ParamCostFunction : public niftk::NonLinearTsaiCostFunction
 {
 
 public:
 
   typedef NonLinearTsai8ParamCostFunction Self;
-  typedef NonLinearCostFunction           Superclass;
+  typedef NonLinearTsaiCostFunction       Superclass;
   typedef itk::SmartPointer<Self>         Pointer;
   typedef itk::SmartPointer<const Self>   ConstPointer;
   itkNewMacro(Self);
@@ -41,6 +41,7 @@ public:
   typedef Superclass::MeasureType         MeasureType;
 
   void SetIntrinsic(const cv::Mat* const intrinsic);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -51,7 +52,7 @@ protected:
   NonLinearTsai8ParamCostFunction(const NonLinearTsai8ParamCostFunction&); // deliberately not implemented
   NonLinearTsai8ParamCostFunction& operator=(const NonLinearTsai8ParamCostFunction&); // deliberately not implemented
 
-  cv::Mat*     m_Intrinsic;
+  cv::Mat*  m_Intrinsic;
 };
 
 } // end namespace

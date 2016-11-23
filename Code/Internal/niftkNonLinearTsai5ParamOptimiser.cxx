@@ -13,7 +13,6 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai5ParamOptimiser.h"
-#include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 
@@ -54,25 +53,9 @@ void NonLinearTsai5ParamOptimiser::SetPoints(const std::list<PointSet>* const po
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
+void NonLinearTsai5ParamOptimiser::SetCameraConstants(const double& dxPrime, const cv::Point2d& sensorDimensions, const double& sx)
 {
-  m_CostFunction->SetExtrinsic(extrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
-{
-  m_CostFunction->SetIntrinsic(intrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetDistortion(const cv::Mat* const distortion)
-{
-  m_CostFunction->SetDistortion(distortion);
+  m_CostFunction->SetCameraConstants(dxPrime, sensorDimensions, sx);
   this->Modified();
 }
 

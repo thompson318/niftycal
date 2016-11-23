@@ -65,6 +65,29 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
 
 
 //-----------------------------------------------------------------------------
+std::vector<cv::Point2d> NormalisePoints(const std::vector<cv::Point2d>& points2D,
+                                         const double& dxPrime,
+                                         const cv::Point2d& imageCentre,
+                                         const cv::Point2d& sensorDimensions,
+                                         const double& sx
+                                        )
+{
+  unsigned int numberOfPoints = points2D.size();
+
+  std::vector<cv::Point2d> result(numberOfPoints);
+
+  // Step (a)(iv) - compute real image coordinates.
+  for (int i = 0; i < numberOfPoints; i++)
+  {
+    result[i].x =            dxPrime*(points2D[i].x - imageCentre.x)/sx;
+    result[i].y = sensorDimensions.y*(points2D[i].y - imageCentre.y);
+  }
+
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
 void CalculateApproximateFAndTz(const cv::Mat& R,
                                 const std::vector<cv::Point3d>& points3D,
                                 const std::vector<cv::Point2d>& points2D,
