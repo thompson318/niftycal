@@ -39,9 +39,25 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
                                             cv::Mat& tvec
                                            )
 {
-  double rms = 0;
+  // Give up if all 3D points have a z component equal to zero.
+  bool foundNonZero = false;
+  niftk::Model3D::const_iterator iter;
+  for (iter = model3D.begin(); iter != model3D.end(); iter++)
+  {
+    if (iter->second.point.z != 0)
+    {
+      foundNonZero = true;
+    }
+  }
+  if (!foundNonZero)
+  {
+    niftkNiftyCalThrow() << "For Tsai's non-coplanar method, z can't all be zero";
+  }
+
+  // This is for consistencies sake, as other OpenCV routines self-allocate arrays.
   AllocateTsaiMatrices(intrinsic, distortion, rvec, tvec);
 
+  double rms = 0;
   return rms;
 }
 
@@ -188,6 +204,8 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx, Cy and sx.
 /*
+ * Currently deemed to be somewhat unstable.
+ *
   niftk::NonLinearTsai11ParamOptimiser::Pointer tsai11Param = niftk::NonLinearTsai11ParamOptimiser::New();
   tsai11Param->SetModel(&model3D);
   tsai11Param->SetPoints(&listOfPoints);
