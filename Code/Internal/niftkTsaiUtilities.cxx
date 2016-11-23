@@ -88,35 +88,6 @@ std::vector<cv::Point2d> NormalisePoints(const std::vector<cv::Point2d>& points2
 
 
 //-----------------------------------------------------------------------------
-void CalculateApproximateFAndTz(const cv::Mat& R,
-                                const std::vector<cv::Point3d>& points3D,
-                                const std::vector<cv::Point2d>& points2D,
-                                const double& sensorDy,
-                                const double& Ty,
-                                double& f,
-                                double& Tz)
-{
-  int numberOfPoints = points2D.size();
-  cv::Mat A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
-  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
-
-  for (int i = 0; i < numberOfPoints; i++)
-  {
-    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
-    A.at<double>(i, 1) = -1.0*sensorDy*points2D[i].y;
-    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y)*sensorDy*points2D[i].y;
-  }
-
-  cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
-  cv::invert(A, pseudoInverse, CV_SVD);
-  cv::Mat X = pseudoInverse * B;
-
-  f = X.at<double>(0, 0);
-  Tz = X.at<double>(1, 0);
-}
-
-
-//-----------------------------------------------------------------------------
 cv::Mat CalculateEquation10(const std::vector<cv::Point3d>& points3D,
                             const std::vector<cv::Point2d>& points2D
                            )
@@ -144,16 +115,8 @@ cv::Mat CalculateEquation10(const std::vector<cv::Point3d>& points3D,
 
 
 //-----------------------------------------------------------------------------
-void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
-                      const std::vector<cv::Point2d>& points2D,
-                      const cv::Mat& X,
-                      double& Tx,
-                      double& Ty
-                     )
+double CalculateTySquaredForCoplanar(const cv::Mat& X)
 {
-
-  unsigned int numberOfPoints = points2D.size();
-
   // Step (c). Compute (r_1, ..., r_9, T_x, T_y).
   // Step (c1). Compute abs(T_y).
 
@@ -200,6 +163,21 @@ void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
     TySquared = (Sr - sqrt(Sr*Sr - 4.0*r1r5mr4r2Squared))
                 / (2.0 * r1r5mr4r2Squared);
   }
+  return TySquared;
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
+                      const std::vector<cv::Point2d>& points2D,
+                      const cv::Mat& X,
+                      const double& TySquared,
+                      double& Tx,
+                      double& Ty
+                     )
+{
+
+  unsigned int numberOfPoints = points2D.size();
 
   // Pick the object point furthest from the image centre.
   double bestDistanceSoFar = 0;
@@ -243,15 +221,38 @@ void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
 
 
 //-----------------------------------------------------------------------------
-void CalculateRWithApproxTzAndF(const std::vector<cv::Point3d>& points3D,
+void CalculateApproximateFAndTz(const cv::Mat& R,
+                                const std::vector<cv::Point3d>& points3D,
                                 const std::vector<cv::Point2d>& points2D,
-                                const cv::Point2d& sensorDimensions,
+                                const double& sensorDy,
                                 const double& Ty,
-                                const cv::Mat& X,
-                                cv::Mat& R,
-                                double& Tz,
-                                double& f
-                               )
+                                double& f,
+                                double& Tz)
+{
+  int numberOfPoints = points2D.size();
+  cv::Mat A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
+  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+
+  for (int i = 0; i < numberOfPoints; i++)
+  {
+    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
+    A.at<double>(i, 1) = -1.0*sensorDy*points2D[i].y;
+    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y)*sensorDy*points2D[i].y;
+  }
+
+  cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
+  cv::invert(A, pseudoInverse, CV_SVD);
+  cv::Mat X = pseudoInverse * B;
+
+  f = X.at<double>(0, 0);
+  Tz = X.at<double>(1, 0);
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateRForCoplanar(const cv::Mat& X,
+                           const double& Ty,
+                           cv::Mat& R)
 {
   // (3)(ii) - compute equation (14a).
   double r1 = X.at<double>(0, 0) * Ty;
@@ -274,7 +275,19 @@ void CalculateRWithApproxTzAndF(const std::vector<cv::Point3d>& points3D,
   R.at<double>(2, 0) = r7;
   R.at<double>(2, 1) = r8;
   R.at<double>(2, 2) = r9;
+}
 
+
+//-----------------------------------------------------------------------------
+void CalculateRWithFAndTz(const std::vector<cv::Point3d>& points3D,
+                          const std::vector<cv::Point2d>& points2D,
+                          const cv::Point2d& sensorDimensions,
+                          const double& Ty,
+                          cv::Mat& R,
+                          double& Tz,
+                          double& f
+                         )
+{
   niftk::CalculateApproximateFAndTz(R, points3D, points2D, sensorDimensions.y, Ty, f, Tz);
 
   // (3)(iii) - Equation (14b)
@@ -291,6 +304,82 @@ void CalculateRWithApproxTzAndF(const std::vector<cv::Point3d>& points3D,
       niftkNiftyCalThrow() << "Possible handedness problem with data.";
     }
   }
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Mat CalculateEquation16(const std::vector<cv::Point3d>& points3D,
+                            const std::vector<cv::Point2d>& points2D)
+{
+  unsigned int numberOfPoints = points2D.size();
+  cv::Mat A = cvCreateMat ( numberOfPoints, 7, CV_64FC1 );
+  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+
+  // Section G, NonCoplanar, Stage 1, Part (b) - implement and solve equation (16).
+  for (int i = 0; i < numberOfPoints; i++)
+  {
+    A.at<double>(i, 0) =   points2D[i].y * points3D[i].x;
+    A.at<double>(i, 1) =   points2D[i].y * points3D[i].y;
+    A.at<double>(i, 2) =   points2D[i].y * points3D[i].z;
+    A.at<double>(i, 3) =   points2D[i].y;
+    A.at<double>(i, 4) = -(points2D[i].x * points3D[i].x);
+    A.at<double>(i, 5) = -(points2D[i].x * points3D[i].y);
+    A.at<double>(i, 6) = -(points2D[i].x * points3D[i].z);
+    B.at<double>(i, 0) =   points2D[i].x;
+  }
+
+  cv::Mat pseudoInverse = cvCreateMat(7, numberOfPoints, CV_64FC1);
+  cv::invert(A, pseudoInverse, CV_SVD);
+  cv::Mat X = pseudoInverse * B;
+  return X;
+}
+
+
+//-----------------------------------------------------------------------------
+double CalculateAbsTyForNonCoplanar(const cv::Mat& X)
+{
+  double ty = sqrt(  (X.at<double>(4, 0) * X.at<double>(4, 0))
+                   + (X.at<double>(5, 0) * X.at<double>(5, 0))
+                   + (X.at<double>(6, 0) * X.at<double>(6, 0))
+                  );
+  return ty;
+}
+
+
+//-----------------------------------------------------------------------------
+double CalculateSxForNonConplanar(const cv::Mat& X, const double& absTy)
+{
+  double sx = absTy * sqrt(  (X.at<double>(0, 0) * X.at<double>(0, 0))
+                           + (X.at<double>(1, 0) * X.at<double>(1, 0))
+                           + (X.at<double>(2, 0) * X.at<double>(2, 0))
+                          );
+  return sx;
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateRForNonCoplanar(const cv::Mat& X,  const double& sx, const double& Ty, cv::Mat& R, double& Tx)
+{
+  double r1 = X.at<double>(0, 0) * Ty / sx;
+  double r2 = X.at<double>(1, 0) * Ty / sx;
+  double r3 = X.at<double>(2, 0) * Ty / sx;
+  Tx        = X.at<double>(3, 0) * Ty;
+  double r4 = X.at<double>(4, 0) * Ty;
+  double r5 = X.at<double>(5, 0) * Ty;
+  double r6 = X.at<double>(6, 0) * Ty;
+  double r7 = r2*r6 - r5*r3;
+  double r8 = -1.0*(r1*r6 - r4*r3);
+  double r9 = r1*r5 - r4*r2;
+
+  R.at<double>(0, 0) = r1;
+  R.at<double>(0, 1) = r2;
+  R.at<double>(0, 2) = r3;
+  R.at<double>(1, 0) = r4;
+  R.at<double>(1, 1) = r5;
+  R.at<double>(1, 2) = r6;
+  R.at<double>(2, 0) = r7;
+  R.at<double>(2, 1) = r8;
+  R.at<double>(2, 2) = r9;
 }
 
 } // end namespace

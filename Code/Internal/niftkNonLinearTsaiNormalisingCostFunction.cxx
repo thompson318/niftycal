@@ -63,13 +63,16 @@ void NonLinearTsaiNormalisingCostFunction::ComputeRTxAndTy(const niftk::Model3D&
   points2D = niftk::NormalisePoints(points2D, m_DxPrime, imageCentre, m_SensorDimensions, m_Sx);
 
   cv::Mat X = niftk::CalculateEquation10(points3D, points2D);
+  double TySquared = niftk::CalculateTySquaredForCoplanar(X);
 
-  niftk::CalculateTxAndTy(points3D, points2D, X, Tx, Ty);
+  niftk::CalculateTxAndTy(points3D, points2D, X, TySquared, Tx, Ty);
 
   double f = 0;
   double Tz = 0;
   cv::Mat R = cvCreateMat ( 3, 3, CV_64FC1 );
-  niftk::CalculateRWithApproxTzAndF(points3D, points2D, m_SensorDimensions, Ty, X, R, Tz, f);
+
+  niftk::CalculateRForCoplanar(X, Ty, R);
+  niftk::CalculateRWithFAndTz(points3D, points2D, m_SensorDimensions, Ty, R, Tz, f);
 
   cv::Rodrigues(R, rvec);
 }
