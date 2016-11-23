@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearTsai8ParamCostFunction_h
 #define niftkNonLinearTsai8ParamCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include "niftkNonLinearCostFunction.h"
 
 namespace niftk
@@ -26,7 +25,7 @@ namespace niftk
 * \brief Cost function, to optimise 2D reprojection error over Rx, Ry, Rz, Tx, Ty, Tz, f and k.
 * \see niftk::NonLinearTsai8ParamOptimiser
 */
-class NIFTYCAL_WINEXPORT NonLinearTsai8ParamCostFunction : public niftk::NonLinearCostFunction
+class NonLinearTsai8ParamCostFunction : public niftk::NonLinearCostFunction
 {
 
 public:

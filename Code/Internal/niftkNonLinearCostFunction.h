@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearCostFunction_h
 #define niftkNonLinearCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include <niftkNiftyCalTypes.h>
 #include <cv.h>
 #include <itkMultipleValuedCostFunction.h>
@@ -28,7 +27,7 @@ namespace niftk
 * \brief Base class for non-linear cost functions used to
 * optimise 2D reprojection or 3D reconstruction error.
 */
-class NIFTYCAL_WINEXPORT NonLinearCostFunction :
+class NonLinearCostFunction :
     public itk::MultipleValuedCostFunction
 {
 

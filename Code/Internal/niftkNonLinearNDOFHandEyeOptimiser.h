@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearNDOFHandEyeOptimiser_h
 #define niftkNonLinearNDOFHandEyeOptimiser_h
 
-#include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include "niftkNonLinearNDOFHandEyeCostFunction.h"
@@ -28,7 +27,7 @@ namespace niftk
 * \brief Optimises camera extrinsic, hand-eye and model-to-world,
 * as an extension of <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NIFTYCAL_WINEXPORT NonLinearNDOFHandEyeOptimiser : public itk::Object
+class NonLinearNDOFHandEyeOptimiser : public itk::Object
 {
 
 public:

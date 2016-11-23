@@ -15,7 +15,6 @@
 #ifndef niftkNonLinear12DOFHandEyeOptimiser_h
 #define niftkNonLinear12DOFHandEyeOptimiser_h
 
-#include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include "niftkNonLinear12DOFHandEyeCostFunction.h"
@@ -27,7 +26,7 @@ namespace niftk
 * \class NonLinear12DOFHandEyeOptimiser
 * \brief Optimises only hand-eye and model-to-world using niftk::NonLinear12DOFHandEyeCostFunction.
 */
-class NIFTYCAL_WINEXPORT NonLinear12DOFHandEyeOptimiser : public itk::Object
+class NonLinear12DOFHandEyeOptimiser : public itk::Object
 {
 
 public:

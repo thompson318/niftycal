@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearNoIntrinsicsHandEyeCostFunction_h
 #define niftkNonLinearNoIntrinsicsHandEyeCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include "niftkNonLinearHandEyeCostFunction.h"
 
 namespace niftk
@@ -25,7 +24,7 @@ namespace niftk
 * \class NonLinearNoIntrinsicsHandEyeCostFunction
 * \brief Base class for hand-eye cost functions that don't optimise intrinsic parameters.
 */
-class NIFTYCAL_WINEXPORT NonLinearNoIntrinsicsHandEyeCostFunction :
+class NonLinearNoIntrinsicsHandEyeCostFunction :
     public niftk::NonLinearHandEyeCostFunction
 {
 

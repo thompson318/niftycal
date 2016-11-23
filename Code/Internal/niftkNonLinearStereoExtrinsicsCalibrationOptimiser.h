@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearStereoExtrinsicsCalibrationOptimiser_h
 #define niftkNonLinearStereoExtrinsicsCalibrationOptimiser_h
 
-#include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
@@ -30,7 +29,7 @@ namespace niftk
 *
 * \see niftk::NonLinearStereoExtrinsicsCalibrationCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoExtrinsicsCalibrationOptimiser : public itk::Object
+class NonLinearStereoExtrinsicsCalibrationOptimiser : public itk::Object
 {
 
 public:

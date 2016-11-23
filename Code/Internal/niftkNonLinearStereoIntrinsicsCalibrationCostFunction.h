@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
 #define niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include <niftkNiftyCalTypes.h>
 #include "niftkNonLinearStereoCalibrationCostFunction.h"
 
@@ -29,7 +28,7 @@ namespace niftk
 *
 * \see niftk::NonLinearStereoIntrinsicsCalibrationOptimiser
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoIntrinsicsCalibrationCostFunction :
+class NonLinearStereoIntrinsicsCalibrationCostFunction :
     public niftk::NonLinearStereoCalibrationCostFunction
 {
 

@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearMaltiHandEyeOptimiser_h
 #define niftkNonLinearMaltiHandEyeOptimiser_h
 
-#include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include "niftkNonLinearMaltiHandEyeCostFunction.h"
@@ -30,7 +29,7 @@ namespace niftk
 *
 * \see niftk::NonLinearMaltiHandEyeCostFunction
 */
-class NIFTYCAL_WINEXPORT NonLinearMaltiHandEyeOptimiser : public itk::Object
+class NonLinearMaltiHandEyeOptimiser : public itk::Object
 {
 
 public:

@@ -12,30 +12,29 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearTsai5ParamOptimiser_h
-#define niftkNonLinearTsai5ParamOptimiser_h
+#ifndef niftkNonLinearTsai3ParamOptimiser_h
+#define niftkNonLinearTsai3ParamOptimiser_h
 
-#include <niftkWin32ExportHeader.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "niftkNonLinearTsai5ParamCostFunction.h"
+#include "niftkNonLinearTsai3ParamCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearTsai5ParamOptimiser
-* \brief Optimises Tz, f, k, Cx and Cy using niftk::NonLinearTsai5ParamHandCostFunction.
+* \class NonLinearTsai3ParamOptimiser
+* \brief Optimises Tz, f and k using niftk::NonLinearTsai3ParamHandCostFunction.
 * \see Tsai 1987 paper "A Versatile Camera Calibration Techniaue for
 * High-Accuracy 3D Machine Vision Metrology Using Off-the-shelf TV Cameras and Lenses",
 * IEEE JOURNAL OF ROBOTICS AND AUTOMATION, VOL. RA-3, NO. 4, AUGUST 1987
 */
-class NIFTYCAL_WINEXPORT NonLinearTsai5ParamOptimiser : public itk::Object
+class NonLinearTsai3ParamOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearTsai5ParamOptimiser Self;
+  typedef  NonLinearTsai3ParamOptimiser Self;
   typedef  itk::Object                  Superclass;
   typedef  itk::SmartPointer<Self>      Pointer;
   itkNewMacro(Self);
@@ -46,18 +45,18 @@ public:
   void SetIntrinsic(const cv::Mat* const intrinsic);
   void SetDistortion(const cv::Mat* const distortion);
 
-  double Optimise(double& Tz, double& f, double& k1, double& Cx, double& Cy);
+  double Optimise(double& Tz, double& f, double &k1);
 
 protected:
 
-  NonLinearTsai5ParamOptimiser(); // deliberately protected.
-  virtual ~NonLinearTsai5ParamOptimiser(); // deliberately protected.
+  NonLinearTsai3ParamOptimiser(); // deliberately protected.
+  virtual ~NonLinearTsai3ParamOptimiser(); // deliberately protected.
 
-  NonLinearTsai5ParamOptimiser(const NonLinearTsai5ParamOptimiser&); // deliberately not implemented
-  NonLinearTsai5ParamOptimiser& operator=(const NonLinearTsai5ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai3ParamOptimiser(const NonLinearTsai3ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai3ParamOptimiser& operator=(const NonLinearTsai3ParamOptimiser&); // deliberately not implemented
 
 private:
-  niftk::NonLinearTsai5ParamCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearTsai3ParamCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

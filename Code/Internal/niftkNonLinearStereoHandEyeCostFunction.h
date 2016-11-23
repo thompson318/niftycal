@@ -15,7 +15,6 @@
 #ifndef niftkNonLinearStereoHandEyeCostFunction_h
 #define niftkNonLinearStereoHandEyeCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include "niftkNonLinearHandEyeCostFunction.h"
 
 namespace niftk
@@ -27,7 +26,7 @@ namespace niftk
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NIFTYCAL_WINEXPORT NonLinearStereoHandEyeCostFunction :
+class NonLinearStereoHandEyeCostFunction :
     public niftk::NonLinearHandEyeCostFunction
 {
 

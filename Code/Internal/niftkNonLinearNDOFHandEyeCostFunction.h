@@ -12,28 +12,27 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinear12DOFHandEyeCostFunction_h
-#define niftkNonLinear12DOFHandEyeCostFunction_h
+#ifndef niftkNonLinearNDOFHandEyeCostFunction_h
+#define niftkNonLinearNDOFHandEyeCostFunction_h
 
-#include <niftkWin32ExportHeader.h>
 #include "niftkNonLinearNoIntrinsicsHandEyeCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinear12DOFHandEyeCostFunction
-* \brief Computes cost as the RMS re-projection error for hand-eye and model-to-world optimisation.
-*
-* \see niftk::NonLinear12DOFHandEyeOptimiser
+* \class NonLinearNDOFHandEyeCostFunction
+* \brief Computes cost as RMS re-projection error for extrinsic,
+* hand-eye and model-to-world optimisation, as an extension of
+* <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NIFTYCAL_WINEXPORT NonLinear12DOFHandEyeCostFunction :
+class NonLinearNDOFHandEyeCostFunction :
     public niftk::NonLinearNoIntrinsicsHandEyeCostFunction
 {
 
 public:
 
-  typedef NonLinear12DOFHandEyeCostFunction        Self;
+  typedef NonLinearNDOFHandEyeCostFunction         Self;
   typedef NonLinearNoIntrinsicsHandEyeCostFunction Superclass;
   typedef itk::SmartPointer<Self>                  Pointer;
   typedef itk::SmartPointer<const Self>            ConstPointer;
@@ -47,12 +46,11 @@ public:
 
 protected:
 
-  NonLinear12DOFHandEyeCostFunction();
-  virtual ~NonLinear12DOFHandEyeCostFunction();
+  NonLinearNDOFHandEyeCostFunction();
+  virtual ~NonLinearNDOFHandEyeCostFunction();
 
-  NonLinear12DOFHandEyeCostFunction(const NonLinear12DOFHandEyeCostFunction&);
-  NonLinear12DOFHandEyeCostFunction& operator=(const NonLinear12DOFHandEyeCostFunction&);
-
+  NonLinearNDOFHandEyeCostFunction(const NonLinearNDOFHandEyeCostFunction&);
+  NonLinearNDOFHandEyeCostFunction& operator=(const NonLinearNDOFHandEyeCostFunction&);
 };
 
 } // end namespace

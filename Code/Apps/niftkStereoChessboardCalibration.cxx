@@ -24,8 +24,8 @@
 #include <cstdlib>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
+#include <Internal/niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
+#include <Internal/niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
 #endif
 
 /**

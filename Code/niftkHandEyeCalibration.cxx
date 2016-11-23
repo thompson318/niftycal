@@ -16,9 +16,9 @@
 #include "niftkNiftyCalExceptionMacro.h"
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearMaltiHandEyeOptimiser.h>
-#include <niftkNonLinearNDOFHandEyeOptimiser.h>
-#include <niftkNonLinearStereoHandEyeOptimiser.h>
+#include <Internal/niftkNonLinearMaltiHandEyeOptimiser.h>
+#include <Internal/niftkNonLinearNDOFHandEyeOptimiser.h>
+#include <Internal/niftkNonLinearStereoHandEyeOptimiser.h>
 #endif
 
 namespace niftk {

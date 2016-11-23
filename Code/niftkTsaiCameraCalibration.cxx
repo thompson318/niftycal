@@ -16,11 +16,11 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
-#include "niftkNonLinearTsai3ParamOptimiser.h"
-#include "niftkNonLinearTsai5ParamOptimiser.h"
-#include "niftkNonLinearTsai8ParamOptimiser.h"
-#include "niftkNonLinearTsai10ParamOptimiser.h"
-#include "niftkNonLinearTsai11ParamOptimiser.h"
+#include "Internal/niftkNonLinearTsai3ParamOptimiser.h"
+#include "Internal/niftkNonLinearTsai5ParamOptimiser.h"
+#include "Internal/niftkNonLinearTsai8ParamOptimiser.h"
+#include "Internal/niftkNonLinearTsai10ParamOptimiser.h"
+#include "Internal/niftkNonLinearTsai11ParamOptimiser.h"
 #include <vector>
 
 namespace niftk
