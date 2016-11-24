@@ -33,7 +33,7 @@ namespace niftk
 *   <li>Use cv::findContours() to find inner and outer contours.
 *   <li>If the full set of contours is not found, try adaptive thresholding using
 *       cv::adaptiveThreshold() and ADAPTIVE_THRESH_MEAN_C, and m_AdaptiveThreshold which
-*       defaults to 75. This can also be changed with SetAdaptiveThreshold().</li>
+*       defaults to 20. This can also be changed with SetAdaptiveThreshold().</li>
 *   <li>If the full set of contours is not found, give up. </li>
 *   <li>Convert the inner contours to an image of little blobs. </li>
 *   <li>Convert the outer contours to an image of big blobs. </li>
@@ -56,7 +56,7 @@ public:
   virtual ~RingsPointDetector();
   void SetUseOuterContour(const bool& useIt);     // Default to true.
   void SetThreshold(const unsigned char& thresholdValue); // Default to 50.
-  void SetAdaptiveThreshold(const unsigned char& thresholdValue); // Default to 75;
+  void SetAdaptiveThreshold(const unsigned char& thresholdValue); // Default to 20;
 
 protected:
 

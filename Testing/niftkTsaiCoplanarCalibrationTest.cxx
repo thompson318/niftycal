@@ -81,8 +81,6 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
   }
 
-  //niftk::DumpPoints(std::cerr, imagePoints);
-
   double sensorScaleInX = 1;
 
   cv::Point2d sensorDimensions;
@@ -90,7 +88,7 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
   sensorDimensions.y = 1;
 
   cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
-  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec);
+  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec, true);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;

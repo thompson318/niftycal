@@ -77,17 +77,20 @@ TEST_CASE( "Tsai non coplanar mono", "[mono]" ) {
     cv::Rect leftRect(0, 0, nx/2, ny);
     cv::Rect rightRect(nx/2, 0, nx/2, ny);
 
-    cv::Mat leftImage = greyImage(leftRect);
-    cv::Mat rightImage = greyImage(rightRect);
+    cv::Mat leftImageRoi = greyImage(leftRect);
+    cv::Mat leftImageRoiClone = leftImageRoi.clone();
+
+    cv::Mat rightImageRoi = greyImage(rightRect);
+    cv::Mat rightImageRoiClone = rightImageRoi.clone();
 
     niftk::CirclesPointDetector leftDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-    leftDetector.SetImage(&leftImage);
+    leftDetector.SetImage(&leftImageRoiClone);
     leftDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
     imagePoints = leftDetector.GetPoints();
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
 
     niftk::CirclesPointDetector rightDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-    rightDetector.SetImage(&rightImage);
+    rightDetector.SetImage(&rightImageRoiClone);
     rightDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
     niftk::PointSet rightImagePoints = rightDetector.GetPoints();
     REQUIRE( rightImagePoints.size() == dotsInX*dotsInY );
@@ -105,6 +108,7 @@ TEST_CASE( "Tsai non coplanar mono", "[mono]" ) {
     }
   }
   REQUIRE( imagePoints.size() == dotsInX*dotsInY*2 ); // twice as many points.
+
   niftk::DumpPoints(std::cerr, imagePoints);
 
   double sensorScaleInX = 1;

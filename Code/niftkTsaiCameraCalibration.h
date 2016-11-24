@@ -38,7 +38,8 @@ NIFTYCAL_WINEXPORT double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D
                                                             cv::Mat& intrinsic3x3,
                                                             cv::Mat& distortion1x4,
                                                             cv::Mat& rvec1x3,
-                                                            cv::Mat& tvec1x3
+                                                            cv::Mat& tvec1x3,
+                                                            const bool& fullOptimisation = false
                                                            );
 
 /**
@@ -56,7 +57,8 @@ NIFTYCAL_WINEXPORT double TsaiMonoNonCoplanarCameraCalibration(const niftk::Mode
                                                                cv::Mat& intrinsic3x3,
                                                                cv::Mat& distortion1x4,
                                                                cv::Mat& rvec1x3,
-                                                               cv::Mat& tvec1x3
+                                                               cv::Mat& tvec1x3,
+                                                               const bool& fullOptimisation = false
                                                               );
 
 
