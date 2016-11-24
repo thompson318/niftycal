@@ -25,12 +25,12 @@
 #include <highgui.h>
 #include <fstream>
 
-TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
+TEST_CASE( "Tsai non coplanar mono", "[mono]" ) {
 
   int expectedNumberOfArguments =  14;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiCoplanarCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiNonCoplanarCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -73,15 +73,39 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
     REQUIRE( imageSize.width == nx );
     REQUIRE( imageSize.height == ny );
 
-    niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-    detector.SetImage(&greyImage);
-    detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+    // We know image should be left/right from laparoscope.
+    cv::Rect leftRect(0, 0, nx/2, ny);
+    cv::Rect rightRect(nx/2, 0, nx/2, ny);
 
-    imagePoints = detector.GetPoints();
+    cv::Mat leftImage = greyImage(leftRect);
+    cv::Mat rightImage = greyImage(rightRect);
+
+    niftk::CirclesPointDetector leftDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+    leftDetector.SetImage(&leftImage);
+    leftDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+    imagePoints = leftDetector.GetPoints();
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
-  }
 
-  //niftk::DumpPoints(std::cerr, imagePoints);
+    niftk::CirclesPointDetector rightDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+    rightDetector.SetImage(&rightImage);
+    rightDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+    niftk::PointSet rightImagePoints = rightDetector.GetPoints();
+    REQUIRE( rightImagePoints.size() == dotsInX*dotsInY );
+
+    // Merge the two point sets
+    unsigned int pointsInLeft = imagePoints.size();
+    niftk::PointSet::const_iterator rightPointsIter;
+    for (rightPointsIter = rightImagePoints.begin(); rightPointsIter != rightImagePoints.end(); ++rightPointsIter)
+    {
+      niftk::Point2D p;
+      p.id = (*rightPointsIter).first + pointsInLeft;
+      p.point.x = (*rightPointsIter).second.point.x + nx/2;
+      p.point.y = (*rightPointsIter).second.point.y;
+      imagePoints.insert(niftk::IdPoint2D(p.id, p));
+    }
+  }
+  REQUIRE( imagePoints.size() == dotsInX*dotsInY*2 ); // twice as many points.
+  niftk::DumpPoints(std::cerr, imagePoints);
 
   double sensorScaleInX = 1;
 
@@ -90,7 +114,7 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
   sensorDimensions.y = 1;
 
   cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
-  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec);
+  double rms = niftk::TsaiMonoNonCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
@@ -119,5 +143,4 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
   REQUIRE( fabs(distortion.at<double>(0,1) - 0) < tol );
   REQUIRE( fabs(distortion.at<double>(0,2) - 0) < tol );
   REQUIRE( fabs(distortion.at<double>(0,3) - 0) < tol );
-
 }
