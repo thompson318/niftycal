@@ -146,13 +146,13 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (listOfLeftHandPointSets.size() < 2)
+  if (listOfLeftHandPointSets.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for left camera.";
+    niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for left camera.";
   }
-  if (listOfRightHandPointSets.size() < 2)
+  if (listOfRightHandPointSets.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for right camera.";
+    niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for right camera.";
   }
   if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
   {

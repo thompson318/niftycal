@@ -153,24 +153,25 @@ int main(int argc, char ** argv)
                                        true // full optimisation.
                                       );
 
-      double rms = niftk::TsaiStereoCameraCalibration(model,
-                                                      imageSize,
-                                                      *(leftPoints.begin()),
-                                                      intrinsicLeft,
-                                                      distortionLeft,
-                                                      rvecLeft,
-                                                      tvecLeft,
-                                                      *(rightPoints.begin()),
-                                                      intrinsicRight,
-                                                      distortionRight,
-                                                      rvecRight,
-                                                      tvecRight,
-                                                      leftToRightRotationMatrix,
-                                                      leftToRightTranslation
-                                                     );
-
-      result(0, 0) = rms;
-      result(1, 0) = 0;
+      result = niftk::TsaiStereoCameraCalibration(model,
+                                                  *(leftPoints.begin()),
+                                                  *(rightPoints.begin()),
+                                                  imageSize,
+                                                  intrinsicLeft,
+                                                  distortionLeft,
+                                                  rvecLeft,
+                                                  tvecLeft,
+                                                  intrinsicRight,
+                                                  distortionRight,
+                                                  rvecRight,
+                                                  tvecRight,
+                                                  leftToRightRotationMatrix,
+                                                  leftToRightTranslation,
+                                                  essentialMatrix,
+                                                  fundamentalMatrix,
+                                                  CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
+                                                  false // optimise3D, could be command line arg.
+                                                 );
     }
     else
     {

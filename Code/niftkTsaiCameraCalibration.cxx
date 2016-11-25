@@ -16,6 +16,7 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
+#include "niftkStereoCameraCalibration.h"
 #include "Internal/niftkTsaiUtilities_p.h"
 #include "Internal/niftkNonLinearTsai3ParamOptimiser.h"
 #include "Internal/niftkNonLinearTsai5ParamOptimiser.h"
@@ -352,26 +353,65 @@ double TsaiMonoCameraCalibration(const niftk::Model3D& model3D,
 
 
 //-----------------------------------------------------------------------------
-double TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
-                                   const cv::Size2i& imageSize,
-                                   const niftk::PointSet& points2DLeft,
-                                   cv::Mat& intrinsic3x3Left,
-                                   cv::Mat& distortion1x4Left,
-                                   cv::Mat& rvec1x3Left,
-                                   cv::Mat& tvec1x3Left,
-                                   const niftk::PointSet& points2DRight,
-                                   cv::Mat& intrinsic3x3Right,
-                                   cv::Mat& distortion1x4Right,
-                                   cv::Mat& rvec1x3Right,
-                                   cv::Mat& tvec1x3Right,
-                                   cv::Mat& leftToRightRotationMatrix3x3,
-                                   cv::Mat& leftToRightTranslationVector3x1
-                                  )
+cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
+                                        const niftk::PointSet& points2DLeft,
+                                        const niftk::PointSet& points2DRight,
+                                        const cv::Size2i& imageSize,
+                                        cv::Mat& intrinsic3x3Left,
+                                        cv::Mat& distortion1x4Left,
+                                        cv::Mat& rvec1x3Left,
+                                        cv::Mat& tvec1x3Left,
+                                        cv::Mat& intrinsic3x3Right,
+                                        cv::Mat& distortion1x4Right,
+                                        cv::Mat& rvec1x3Right,
+                                        cv::Mat& tvec1x3Right,
+                                        cv::Mat& leftToRightRotationMatrix3x3,
+                                        cv::Mat& leftToRightTranslationVector3x1,
+                                        cv::Mat& essentialMatrix,
+                                        cv::Mat& fundamentalMatrix,
+                                        const int& cvFlags,
+                                        const bool& optimise3D // only if true AND ITK is compiled in.
+                                       )
 {
-  leftToRightRotationMatrix3x3 = cv::Mat::eye(3, 3, CV_64FC1 );
-  leftToRightTranslationVector3x1 = cv::Mat::zeros(3, 1, CV_64FC1 );
+  std::list<niftk::PointSet> leftPoints;
+  leftPoints.push_back(points2DLeft);
 
-  return 0;
+  std::list<niftk::PointSet> rightPoints;
+  rightPoints.push_back(points2DRight);
+
+  std::vector<cv::Mat> rvecsLeft;
+  rvecsLeft.push_back(rvec1x3Left);
+
+  std::vector<cv::Mat> tvecsLeft;
+  tvecsLeft.push_back(tvec1x3Left);
+
+  std::vector<cv::Mat> rvecsRight;
+  rvecsRight.push_back(rvec1x3Right);
+
+  std::vector<cv::Mat> tvecsRight;
+  tvecsRight.push_back(tvec1x3Right);
+
+  cv::Matx21d rms = niftk::StereoCameraCalibration(model3D,
+                                                   leftPoints,
+                                                   rightPoints,
+                                                   imageSize,
+                                                   intrinsic3x3Left,
+                                                   distortion1x4Left,
+                                                   rvecsLeft,
+                                                   tvecsLeft,
+                                                   intrinsic3x3Right,
+                                                   distortion1x4Right,
+                                                   rvecsRight,
+                                                   tvecsRight,
+                                                   leftToRightRotationMatrix3x3,
+                                                   leftToRightTranslationVector3x1,
+                                                   essentialMatrix,
+                                                   fundamentalMatrix,
+                                                   cvFlags,
+                                                   optimise3D
+                                                  );
+
+  return rms;
 }
 
 } // end namespace
