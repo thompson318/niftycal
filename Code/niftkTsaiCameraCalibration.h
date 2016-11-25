@@ -53,6 +53,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 * Will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * This method computes Tsai 1987 for left and right camera, and then optimises
 * the full intrinsic (2 x 4 DOF), distortion (2 x 1 DOF) and extrinsic (2 x 6 DOF) = 22 DOF.
+* \param fullOptimisation defaults to false, to most closely match the paper.
 * \return rms re-projection error.
 */
 NIFTYCAL_WINEXPORT double TsaiStereoCoplanarCameraCalibration(const niftk::Model3D& model3D,
