@@ -236,6 +236,23 @@ void ExtractCommonPoints(const Model3D& inputA,
 
 
 //-----------------------------------------------------------------------------
+bool ModelIsPlanar(const Model3D& model)
+{
+  bool result = true;
+
+   Model3D::const_iterator iter;
+   for (iter = model.begin(); iter != model.end(); ++iter)
+   {
+     if ((*iter).second.point.z != 0)
+     {
+       result = false;
+     }
+   }
+   return result;
+}
+
+
+//-----------------------------------------------------------------------------
 void ExtractCommonPoints(const Model3D& inputA,
                          const PointSet& inputB,
                          std::vector<cv::Point3d>& outputA,

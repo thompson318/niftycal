@@ -110,6 +110,13 @@ NIFTYCAL_WINEXPORT void ExtractCommonPoints(const Model3D& inputA,
                                            );
 
 /**
+* \brief Returns true if model is planar and false otherwise.
+*
+* Currently, just checks if all z-components are zero, which is the most common case.
+*/
+NIFTYCAL_WINEXPORT bool ModelIsPlanar(const Model3D& model);
+
+/**
 * \brief Computes the RMS error between common (same identifier) points in a and b.
 * \throw if no common points.
 */
