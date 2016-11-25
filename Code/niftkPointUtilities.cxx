@@ -29,7 +29,9 @@ void DumpPoints(std::ostream& s, const PointSet& p)
   PointSet::const_iterator iter;
   for (iter = p.begin(); iter != p.end(); iter++)
   {
-    s << (*iter).second.id << ":" << (*iter).second.point << std::endl;
+    s << (*iter).second.id << " "
+      << (*iter).second.point.x << " "
+      << (*iter).second.point.y << std::endl;
   }
 }
 
@@ -40,7 +42,11 @@ void DumpPoints(std::ostream& s, const Model3D& p)
   Model3D::const_iterator iter;
   for (iter = p.begin(); iter != p.end(); iter++)
   {
-    s << (*iter).second.id << ":" << (*iter).second.point << std::endl;
+    s << (*iter).second.id << " "
+      << (*iter).second.point.x << " "
+      << (*iter).second.point.y << " "
+      << (*iter).second.point.z << " "
+      << std::endl;
   }
 }
 
