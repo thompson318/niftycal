@@ -28,7 +28,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 6)
+  if (argc < 5)
   {
     std::cerr << "Usage: niftkMonoCalibrationFromPoints imageSizeX imageSizeY modelPoints.txt "
               << "imagePoints1.txt imagePoints2.txt ... imagePointsN.txt" << std::endl;
@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
       // Can try Tsai 1987 calibration.
 
       cv::Point2d sensorDimensions(1,1);
-      double sx = 1.0;
+      double sensorScaleInX = 1;
       cv::Mat rvec;
       cv::Mat tvec;
 
@@ -88,7 +88,7 @@ int main(int argc, char ** argv)
                                                        imageSize,
                                                        sensorDimensions,
                                                        imageSize.width,
-                                                       sx,
+                                                       sensorScaleInX,
                                                        intrinsic,
                                                        distortion,
                                                        rvec,
@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
                                                           imageSize,
                                                           sensorDimensions,
                                                           imageSize.width,
-                                                          sx,
+                                                          sensorScaleInX,
                                                           intrinsic,
                                                           distortion,
                                                           rvec,
@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
 
       std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
                 << points.size() << " "
-                << sx << " "
+                << sensorScaleInX << " "
                 << intrinsic.at<double>(0,0) << " "
                 << intrinsic.at<double>(1,1) << " "
                 << intrinsic.at<double>(0,2) << " "

@@ -81,6 +81,8 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
     REQUIRE( imagePoints.size() == dotsInX*dotsInY );
   }
 
+  niftk::DumpPoints(std::cout, imagePoints);
+
   double sensorScaleInX = 1;
 
   cv::Point2d sensorDimensions;
