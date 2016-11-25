@@ -15,6 +15,7 @@
 #include <niftkIOUtilities.h>
 #include <niftkMonoCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
+#include <niftkTsaiCameraCalibration.h>
 #include <niftkPointUtilities.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -110,9 +111,62 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslation;
 
-    if (leftPoints.size() == 1 && rightPoints.size() == 0)
+    if (leftPoints.size() == 1 && rightPoints.size() == 1)
     {
       // Can try Tsai 1987 calibration.
+      cv::Mat rvecLeft;
+      cv::Mat tvecLeft;
+      cv::Mat rvecRight;
+      cv::Mat tvecRight;
+
+      double sensorScaleInX = 1;
+
+      cv::Point2d sensorDimensions;
+      sensorDimensions.x = 1;
+      sensorDimensions.y = 1;
+
+      niftk::TsaiMonoCameraCalibration(model,
+                                       *(leftPoints.begin()),
+                                       imageSize,
+                                       sensorDimensions,
+                                       imageSize.width,
+                                       sensorScaleInX,
+                                       intrinsicLeft,
+                                       distortionLeft,
+                                       rvecLeft,
+                                       tvecLeft,
+                                       true // full optimisation.
+                                      );
+
+      niftk::TsaiMonoCameraCalibration(model,
+                                       *(rightPoints.begin()),
+                                       imageSize,
+                                       sensorDimensions,
+                                       imageSize.width,
+                                       sensorScaleInX,
+                                       intrinsicRight,
+                                       distortionRight,
+                                       rvecRight,
+                                       tvecRight,
+                                       true // full optimisation.
+                                      );
+
+      niftk::TsaiStereoCoplanarCameraCalibration(model,
+                                                 imageSize,
+                                                 *(leftPoints.begin()),
+                                                 intrinsicLeft,
+                                                 distortionLeft,
+                                                 rvecLeft,
+                                                 tvecLeft,
+                                                 *(rightPoints.begin()),
+                                                 intrinsicRight,
+                                                 distortionRight,
+                                                 rvecRight,
+                                                 tvecRight,
+                                                 leftToRightRotationMatrix,
+                                                 leftToRightTranslation
+                                                );
+
     }
     else
     {
