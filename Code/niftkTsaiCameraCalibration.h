@@ -60,21 +60,21 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 *
 * \return rms re-projection error.
 */
-NIFTYCAL_WINEXPORT double TsaiStereoCoplanarCameraCalibration(const niftk::Model3D& model3D,
-                                                              const cv::Size2i& imageSize,
-                                                              const niftk::PointSet& points2DLeft,
-                                                              cv::Mat& intrinsic3x3Left,
-                                                              cv::Mat& distortion1x4Left,
-                                                              cv::Mat& rvec1x3Left,
-                                                              cv::Mat& tvec1x3Left,
-                                                              const niftk::PointSet& points2DRight,
-                                                              cv::Mat& intrinsic3x3Right,
-                                                              cv::Mat& distortion1x4Right,
-                                                              cv::Mat& rvec1x3Right,
-                                                              cv::Mat& tvec1x3Right,
-                                                              cv::Mat& leftToRightRotationMatrix3x3,
-                                                              cv::Mat& leftToRightTranslationVector3x1
-                                                             );
+NIFTYCAL_WINEXPORT double TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
+                                                      const cv::Size2i& imageSize,
+                                                      const niftk::PointSet& points2DLeft,
+                                                      cv::Mat& intrinsic3x3Left,
+                                                      cv::Mat& distortion1x4Left,
+                                                      cv::Mat& rvec1x3Left,
+                                                      cv::Mat& tvec1x3Left,
+                                                      const niftk::PointSet& points2DRight,
+                                                      cv::Mat& intrinsic3x3Right,
+                                                      cv::Mat& distortion1x4Right,
+                                                      cv::Mat& rvec1x3Right,
+                                                      cv::Mat& tvec1x3Right,
+                                                      cv::Mat& leftToRightRotationMatrix3x3,
+                                                      cv::Mat& leftToRightTranslationVector3x1
+                                                     );
 
 } // end namespace
 

@@ -23,7 +23,7 @@ namespace niftk
 
 /**
 * \class CirclesPointDetector
-* \brief Detects asymmetric circles pattern in grey scale images using cv::findCirclesGrid.
+* \brief Detects circles pattern in grey scale images using OpenCV cv::findCirclesGrid.
 *
 * This detector is not thread safe.
 */

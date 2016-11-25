@@ -111,6 +111,8 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslation;
 
+    cv::Matx21d result;
+
     if (leftPoints.size() == 1 && rightPoints.size() == 1)
     {
       // Can try Tsai 1987 calibration.
@@ -151,22 +153,24 @@ int main(int argc, char ** argv)
                                        true // full optimisation.
                                       );
 
-      niftk::TsaiStereoCoplanarCameraCalibration(model,
-                                                 imageSize,
-                                                 *(leftPoints.begin()),
-                                                 intrinsicLeft,
-                                                 distortionLeft,
-                                                 rvecLeft,
-                                                 tvecLeft,
-                                                 *(rightPoints.begin()),
-                                                 intrinsicRight,
-                                                 distortionRight,
-                                                 rvecRight,
-                                                 tvecRight,
-                                                 leftToRightRotationMatrix,
-                                                 leftToRightTranslation
-                                                );
+      double rms = niftk::TsaiStereoCameraCalibration(model,
+                                                      imageSize,
+                                                      *(leftPoints.begin()),
+                                                      intrinsicLeft,
+                                                      distortionLeft,
+                                                      rvecLeft,
+                                                      tvecLeft,
+                                                      *(rightPoints.begin()),
+                                                      intrinsicRight,
+                                                      distortionRight,
+                                                      rvecRight,
+                                                      tvecRight,
+                                                      leftToRightRotationMatrix,
+                                                      leftToRightTranslation
+                                                     );
 
+      result(0, 0) = rms;
+      result(1, 0) = 0;
     }
     else
     {
@@ -190,58 +194,60 @@ int main(int argc, char ** argv)
                                    tvecsRight
                                   );
 
-      cv::Matx21d result = niftk::StereoCameraCalibration(model,
-                                                          leftPoints,
-                                                          rightPoints,
-                                                          imageSize,
-                                                          intrinsicLeft,
-                                                          distortionLeft,
-                                                          rvecsLeft,
-                                                          tvecsLeft,
-                                                          intrinsicRight,
-                                                          distortionRight,
-                                                          rvecsRight,
-                                                          tvecsRight,
-                                                          leftToRightRotationMatrix,
-                                                          leftToRightTranslation,
-                                                          essentialMatrix,
-                                                          fundamentalMatrix,
-                                                          CV_CALIB_USE_INTRINSIC_GUESS,
-                                                          false // optimise3D, could be command line arg.
-                                                         );
-
-      cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
-
-      std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-                << leftPoints.size() << " "
-                << intrinsicLeft.at<double>(0,0) << " "
-                << intrinsicLeft.at<double>(1,1) << " "
-                << intrinsicLeft.at<double>(0,2) << " "
-                << intrinsicLeft.at<double>(1,2) << " "
-                << distortionLeft.at<double>(0,0) << " "
-                << distortionLeft.at<double>(0,1) << " "
-                << distortionLeft.at<double>(0,2) << " "
-                << distortionLeft.at<double>(0,3) << " "
-                << distortionLeft.at<double>(0,4) << " "
-                << intrinsicRight.at<double>(0,0) << " "
-                << intrinsicRight.at<double>(1,1) << " "
-                << intrinsicRight.at<double>(0,2) << " "
-                << intrinsicRight.at<double>(1,2) << " "
-                << distortionRight.at<double>(0,0) << " "
-                << distortionRight.at<double>(0,1) << " "
-                << distortionRight.at<double>(0,2) << " "
-                << distortionRight.at<double>(0,3) << " "
-                << distortionRight.at<double>(0,4) << " "
-                << leftToRightRotationVector.at<double>(0,0) << " "
-                << leftToRightRotationVector.at<double>(0,1) << " "
-                << leftToRightRotationVector.at<double>(0,2) << " "
-                << leftToRightTranslation.at<double>(0,0) << " "
-                << leftToRightTranslation.at<double>(0,1) << " "
-                << leftToRightTranslation.at<double>(0,2) << " "
-                << result(0, 0) << " " // 2D error
-                << result(1, 0)        // 3D error
-                << std::endl;
+      result = niftk::StereoCameraCalibration(model,
+                                              leftPoints,
+                                              rightPoints,
+                                              imageSize,
+                                              intrinsicLeft,
+                                              distortionLeft,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              intrinsicRight,
+                                              distortionRight,
+                                              rvecsRight,
+                                              tvecsRight,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslation,
+                                              essentialMatrix,
+                                              fundamentalMatrix,
+                                              CV_CALIB_USE_INTRINSIC_GUESS,
+                                              false // optimise3D, could be command line arg.
+                                             );
     }
+
+    cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+
+    std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+              << leftPoints.size() << " "
+              << intrinsicLeft.at<double>(0,0) << " "
+              << intrinsicLeft.at<double>(1,1) << " "
+              << intrinsicLeft.at<double>(0,2) << " "
+              << intrinsicLeft.at<double>(1,2) << " ";
+
+    for (int i = 0; i < distortionLeft.cols; i++)
+    {
+      std::cout << distortionLeft.at<double>(0,i) << " ";
+    }
+
+    std::cout << intrinsicRight.at<double>(0,0) << " "
+              << intrinsicRight.at<double>(1,1) << " "
+              << intrinsicRight.at<double>(0,2) << " "
+              << intrinsicRight.at<double>(1,2) << " ";
+
+    for (int i = 0; i < distortionRight.cols; i++)
+    {
+      std::cout << distortionRight.at<double>(0,i) << " ";
+    }
+
+    std::cout << leftToRightRotationVector.at<double>(0,0) << " "
+              << leftToRightRotationVector.at<double>(0,1) << " "
+              << leftToRightRotationVector.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(0,0) << " "
+              << leftToRightTranslation.at<double>(0,1) << " "
+              << leftToRightTranslation.at<double>(0,2) << " "
+              << result(0, 0) << " " // 2D error
+              << result(1, 0)        // 3D error
+              << std::endl;
   }
   catch (niftk::NiftyCalException& e)
   {
