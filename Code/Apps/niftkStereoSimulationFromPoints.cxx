@@ -111,8 +111,7 @@ int main(int argc, char ** argv)
                                  tvecsRight
                                 );
 
-    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                                        model,
+    cv::Matx21d result = niftk::StereoCameraCalibration(model,
                                                         leftPoints,
                                                         rightPoints,
                                                         imageSize,
@@ -128,7 +127,8 @@ int main(int argc, char ** argv)
                                                         leftToRightTranslation,
                                                         essentialMatrix,
                                                         fundamentalMatrix,
-                                                        CV_CALIB_USE_INTRINSIC_GUESS
+                                                        CV_CALIB_USE_INTRINSIC_GUESS,
+                                                        false // could be command line arg.
                                                        );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
@@ -240,8 +240,7 @@ int main(int argc, char ** argv)
                                  tvecsRight
                                 );
 
-    result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                            model,
+    result = niftk::StereoCameraCalibration(model,
                                             leftGoldStandardPoints,
                                             rightGoldStandardPoints,
                                             imageSize,
@@ -257,7 +256,8 @@ int main(int argc, char ** argv)
                                             leftToRightTranslation,
                                             essentialMatrix,
                                             fundamentalMatrix,
-                                            CV_CALIB_USE_INTRINSIC_GUESS
+                                            CV_CALIB_USE_INTRINSIC_GUESS,
+                                            false // could be command line arg.
                                            );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
@@ -335,8 +335,7 @@ int main(int argc, char ** argv)
                                    tvecsRight
                                   );
 
-      result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                              model,
+      result = niftk::StereoCameraCalibration(model,
                                               leftNoisyPoints,
                                               rightNoisyPoints,
                                               imageSize,
@@ -352,7 +351,8 @@ int main(int argc, char ** argv)
                                               leftToRightTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS
+                                              CV_CALIB_USE_INTRINSIC_GUESS,
+                                              false // could be command line arg.
                                              );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);

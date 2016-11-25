@@ -28,7 +28,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 8)
+  if (argc < 6)
   {
     std::cerr << "Usage: niftkStereoCalibrationFromPoints imageSizeX imageSizeY modelPoints.txt "
               << "leftImagePoints1.txt leftImagePoints2.txt ... leftImagePointsN.txt "
@@ -81,6 +81,18 @@ int main(int argc, char ** argv)
         }
       }
     }
+    if (leftPoints.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No valid left camera points were read.";
+    }
+    if (rightPoints.size() == 0)
+    {
+      niftkNiftyCalThrow() << "No valid right camera points were read.";
+    }
+    if (leftPoints.size() != rightPoints.size())
+    {
+      niftkNiftyCalThrow() << "A different number of left and right point sets were read.";
+    }
 
     cv::Mat intrinsicLeft;
     cv::Mat distortionLeft;
@@ -98,75 +110,84 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslation;
 
-    niftk::MonoCameraCalibration(model,
-                                 leftPoints,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 rvecsLeft,
-                                 tvecsLeft
-                                );
+    if (leftPoints.size() == 1 && rightPoints.size() == 0)
+    {
+      // Can try Tsai 1987 calibration.
+    }
+    else
+    {
+      // Can try Zhang 2000 calibration.
 
-    niftk::MonoCameraCalibration(model,
-                                 rightPoints,
-                                 imageSize,
-                                 intrinsicRight,
-                                 distortionRight,
-                                 rvecsRight,
-                                 tvecsRight
-                                );
+      niftk::MonoCameraCalibration(model,
+                                   leftPoints,
+                                   imageSize,
+                                   intrinsicLeft,
+                                   distortionLeft,
+                                   rvecsLeft,
+                                   tvecsLeft
+                                  );
 
-    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                                        model,
-                                                        leftPoints,
-                                                        rightPoints,
-                                                        imageSize,
-                                                        intrinsicLeft,
-                                                        distortionLeft,
-                                                        rvecsLeft,
-                                                        tvecsLeft,
-                                                        intrinsicRight,
-                                                        distortionRight,
-                                                        rvecsRight,
-                                                        tvecsRight,
-                                                        leftToRightRotationMatrix,
-                                                        leftToRightTranslation,
-                                                        essentialMatrix,
-                                                        fundamentalMatrix,
-                                                        CV_CALIB_USE_INTRINSIC_GUESS
-                                                       );
+      niftk::MonoCameraCalibration(model,
+                                   rightPoints,
+                                   imageSize,
+                                   intrinsicRight,
+                                   distortionRight,
+                                   rvecsRight,
+                                   tvecsRight
+                                  );
 
-    cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+      cv::Matx21d result = niftk::StereoCameraCalibration(model,
+                                                          leftPoints,
+                                                          rightPoints,
+                                                          imageSize,
+                                                          intrinsicLeft,
+                                                          distortionLeft,
+                                                          rvecsLeft,
+                                                          tvecsLeft,
+                                                          intrinsicRight,
+                                                          distortionRight,
+                                                          rvecsRight,
+                                                          tvecsRight,
+                                                          leftToRightRotationMatrix,
+                                                          leftToRightTranslation,
+                                                          essentialMatrix,
+                                                          fundamentalMatrix,
+                                                          CV_CALIB_USE_INTRINSIC_GUESS,
+                                                          false // optimise3D, could be command line arg.
+                                                         );
 
-    std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
-              << leftPoints.size() << " "
-              << intrinsicLeft.at<double>(0,0) << " "
-              << intrinsicLeft.at<double>(1,1) << " "
-              << intrinsicLeft.at<double>(0,2) << " "
-              << intrinsicLeft.at<double>(1,2) << " "
-              << distortionLeft.at<double>(0,0) << " "
-              << distortionLeft.at<double>(0,1) << " "
-              << distortionLeft.at<double>(0,2) << " "
-              << distortionLeft.at<double>(0,3) << " "
-              << distortionLeft.at<double>(0,4) << " "
-              << intrinsicRight.at<double>(0,0) << " "
-              << intrinsicRight.at<double>(1,1) << " "
-              << intrinsicRight.at<double>(0,2) << " "
-              << intrinsicRight.at<double>(1,2) << " "
-              << distortionRight.at<double>(0,0) << " "
-              << distortionRight.at<double>(0,1) << " "
-              << distortionRight.at<double>(0,2) << " "
-              << distortionRight.at<double>(0,3) << " "
-              << distortionRight.at<double>(0,4) << " "
-              << leftToRightRotationVector.at<double>(0,0) << " "
-              << leftToRightRotationVector.at<double>(0,1) << " "
-              << leftToRightRotationVector.at<double>(0,2) << " "
-              << leftToRightTranslation.at<double>(0,0) << " "
-              << leftToRightTranslation.at<double>(0,1) << " "
-              << leftToRightTranslation.at<double>(0,2) << " "
-              << result(0, 0) << " " // 2D error
-              << result(1, 0)        // 3D error
-              << std::endl;
+      cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+
+      std::cout << "niftkStereoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
+                << leftPoints.size() << " "
+                << intrinsicLeft.at<double>(0,0) << " "
+                << intrinsicLeft.at<double>(1,1) << " "
+                << intrinsicLeft.at<double>(0,2) << " "
+                << intrinsicLeft.at<double>(1,2) << " "
+                << distortionLeft.at<double>(0,0) << " "
+                << distortionLeft.at<double>(0,1) << " "
+                << distortionLeft.at<double>(0,2) << " "
+                << distortionLeft.at<double>(0,3) << " "
+                << distortionLeft.at<double>(0,4) << " "
+                << intrinsicRight.at<double>(0,0) << " "
+                << intrinsicRight.at<double>(1,1) << " "
+                << intrinsicRight.at<double>(0,2) << " "
+                << intrinsicRight.at<double>(1,2) << " "
+                << distortionRight.at<double>(0,0) << " "
+                << distortionRight.at<double>(0,1) << " "
+                << distortionRight.at<double>(0,2) << " "
+                << distortionRight.at<double>(0,3) << " "
+                << distortionRight.at<double>(0,4) << " "
+                << leftToRightRotationVector.at<double>(0,0) << " "
+                << leftToRightRotationVector.at<double>(0,1) << " "
+                << leftToRightRotationVector.at<double>(0,2) << " "
+                << leftToRightTranslation.at<double>(0,0) << " "
+                << leftToRightTranslation.at<double>(0,1) << " "
+                << leftToRightTranslation.at<double>(0,2) << " "
+                << result(0, 0) << " " // 2D error
+                << result(1, 0)        // 3D error
+                << std::endl;
+    }
   }
   catch (niftk::NiftyCalException& e)
   {

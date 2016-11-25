@@ -17,7 +17,6 @@
 #include <niftkTsaiCameraCalibration.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
-#include <niftkPointUtilities.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
@@ -81,36 +80,18 @@ int main(int argc, char ** argv)
       cv::Mat rvec;
       cv::Mat tvec;
 
-      if (niftk::ModelIsPlanar(model))
-      {
-        rms = niftk::TsaiMonoCoplanarCameraCalibration(model,
-                                                       *(points.begin()),
-                                                       imageSize,
-                                                       sensorDimensions,
-                                                       imageSize.width,
-                                                       sensorScaleInX,
-                                                       intrinsic,
-                                                       distortion,
-                                                       rvec,
-                                                       tvec,
-                                                       true // full optimisation
-                                                       );
-      }
-      else
-      {
-        rms = niftk::TsaiMonoNonCoplanarCameraCalibration(model,
-                                                          *(points.begin()),
-                                                          imageSize,
-                                                          sensorDimensions,
-                                                          imageSize.width,
-                                                          sensorScaleInX,
-                                                          intrinsic,
-                                                          distortion,
-                                                          rvec,
-                                                          tvec,
-                                                          true // full optimisation
-                                                         );
-      }
+      rms = niftk::TsaiMonoCameraCalibration(model,
+                                             *(points.begin()),
+                                             imageSize,
+                                             sensorDimensions,
+                                             imageSize.width,
+                                             sensorScaleInX,
+                                             intrinsic,
+                                             distortion,
+                                             rvec,
+                                             tvec,
+                                             true // full optimisation
+                                            );
 
       std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
                 << points.size() << " "
@@ -148,6 +129,7 @@ int main(int argc, char ** argv)
                                          rvecs,
                                          tvecs
                                         );
+
       std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
                 << points.size() << " "
                 << intrinsic.at<double>(0,0) << " "
@@ -161,7 +143,6 @@ int main(int argc, char ** argv)
                 << distortion.at<double>(0,4) << " "
                 << rms
                 << std::endl;
-
     }
   }
   catch (niftk::NiftyCalException& e)

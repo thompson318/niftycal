@@ -158,8 +158,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                flags
                               );
 
-  cv::Matx21d result = niftk::StereoCameraCalibration(false, // just do optimisation of 2D reprojection error.
-                                                      model,
+  cv::Matx21d result = niftk::StereoCameraCalibration(model,
                                                       listOfPointsLeft,
                                                       listOfPointsRight,
                                                       imageSize,
@@ -175,7 +174,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                       leftToRightTranslationVector,
                                                       essentialMatrix,
                                                       fundamentalMatrix,
-                                                      flags | CV_CALIB_USE_INTRINSIC_GUESS
+                                                      flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                      false // just do optimisation of 2D reprojection error.
                                                      );
 
   cv::Mat rvec;

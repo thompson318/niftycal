@@ -27,7 +27,6 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 cv::Matx21d IterativeStereoCameraCalibration(
-    const bool& optimise3D,
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
@@ -47,7 +46,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat& leftToRightTranslationVector,
     cv::Mat& essentialMatrix,
     cv::Mat& fundamentalMatrix,
-    const int& cvFlags
+    const int& cvFlags,
+    const bool& optimise3D
     )
 {
   cv::Matx21d result;
@@ -148,7 +148,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
   result = niftk::StereoCameraCalibration(
-    optimise3D,
     model,
     pointsFromOriginalImagesLeft,
     pointsFromOriginalImagesRight,
@@ -165,7 +164,8 @@ cv::Matx21d IterativeStereoCameraCalibration(
     leftToRightTranslationVector,
     essentialMatrix,
     fundamentalMatrix,
-    iterativeCvFlags
+    iterativeCvFlags,
+    optimise3D
     );
 
   bestPointSetsSoFarLeft = pointsFromOriginalImagesLeft;
@@ -241,7 +241,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
 
     result = niftk::StereoCameraCalibration(
-      optimise3D,
       model,
       distortedPointsFromCanonicalImagesLeft,
       distortedPointsFromCanonicalImagesRight,
@@ -258,8 +257,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
       tmpLeftToRightTranslationVector,
       tmpEssentialMatrix,
       tmpFundamentalMatrix,
-      iterativeCvFlags
+      iterativeCvFlags,
+      optimise3D
      );
+
     projectedRMS = result(0, 0);
 
     std::cout << "Iterative calibration iter=" << iterationCount++

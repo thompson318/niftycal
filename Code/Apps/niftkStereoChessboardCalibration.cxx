@@ -190,8 +190,7 @@ int main(int argc, char ** argv)
                                  flags
                                 );
 
-    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                                        model,
+    cv::Matx21d result = niftk::StereoCameraCalibration(model,
                                                         listOfPointsLeft,
                                                         listOfPointsRight,
                                                         imageSize,
@@ -207,7 +206,8 @@ int main(int argc, char ** argv)
                                                         leftToRightTranslationVector,
                                                         essentialMatrix,
                                                         fundamentalMatrix,
-                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS
+                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                        false // could be command line arg.
                                                        );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);

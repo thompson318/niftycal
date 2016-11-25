@@ -185,7 +185,6 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslationVector;
 
     cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
-          optimise3D,
           model,
           referenceImageData,
           originalImagesLeft,
@@ -205,7 +204,8 @@ int main(int argc, char ** argv)
           leftToRightTranslationVector,
           essentialMatrix,
           fundamentalMatrix,
-          flags
+          flags,
+          optimise3D
           );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);

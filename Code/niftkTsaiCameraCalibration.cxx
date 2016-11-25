@@ -28,21 +28,21 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-void TsaiNonLinearOptimisation(const niftk::Model3D& model3D,
-                               const niftk::PointSet& imagePoints2D,
-                               const double& dxPrime,
-                               const cv::Point2d& sensorDimensions,
-                               double& sx,
-                               double& Tz,
-                               double& f,
-                               double& k1,
-                               cv::Point2d& imageCentre,
-                               cv::Mat& intrinsic,
-                               cv::Mat& distortion,
-                               cv::Mat& rvec,
-                               cv::Mat& tvec,
-                               const bool& fullOptimisation
-                              )
+void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
+                                   const niftk::PointSet& imagePoints2D,
+                                   const double& dxPrime,
+                                   const cv::Point2d& sensorDimensions,
+                                   double& sx,
+                                   double& Tz,
+                                   double& f,
+                                   double& k1,
+                                   cv::Point2d& imageCentre,
+                                   cv::Mat& intrinsic,
+                                   cv::Mat& distortion,
+                                   cv::Mat& rvec,
+                                   cv::Mat& tvec,
+                                   const bool& fullOptimisation
+                                  )
 {
 #ifdef NIFTYCAL_WITH_ITK
 
@@ -204,7 +204,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   cv::Rodrigues(R, rvec);
 
-  niftk::TsaiNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
+  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
 
   double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
   return rms;
@@ -299,10 +299,83 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   cv::Rodrigues(R, rvec);
 
-  niftk::TsaiNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
+  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
 
   double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
   return rms;
+}
+
+
+//-----------------------------------------------------------------------------
+double TsaiMonoCameraCalibration(const niftk::Model3D& model3D,
+                                 const niftk::PointSet& imagePoints2D,
+                                 const cv::Size2i& imageSize,
+                                 const cv::Point2d& sensorDimensions,
+                                 const int& numberSensorElementsInX,
+                                 double& sx,
+                                 cv::Mat& intrinsic,
+                                 cv::Mat& distortion,
+                                 cv::Mat& rvec,
+                                 cv::Mat& tvec,
+                                 const bool& fullOptimisation
+                                )
+{
+  if (niftk::ModelIsPlanar(model3D))
+  {
+    return TsaiMonoCoplanarCameraCalibration(model3D,
+                                             imagePoints2D,
+                                             imageSize,
+                                             sensorDimensions,
+                                             numberSensorElementsInX,
+                                             sx,
+                                             intrinsic,
+                                             distortion,
+                                             rvec,
+                                             tvec,
+                                             fullOptimisation);
+  }
+  else
+  {
+    return TsaiMonoNonCoplanarCameraCalibration(model3D,
+                                                imagePoints2D,
+                                                imageSize,
+                                                sensorDimensions,
+                                                numberSensorElementsInX,
+                                                sx,
+                                                intrinsic,
+                                                distortion,
+                                                rvec,
+                                                tvec,
+                                                fullOptimisation);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+double TsaiStereoCoplanarCameraCalibration(const niftk::Model3D& model3D,
+                                           const cv::Size2i& imageSize,
+                                           const niftk::PointSet& points2DLeft,
+                                           const cv::Point2d& sensorDimensionsLeft,
+                                           const int& numberSensorElementsInXLeft,
+                                           double& sensorScaleInXLeft,
+                                           cv::Mat& intrinsic3x3Left,
+                                           cv::Mat& distortion1x4Left,
+                                           cv::Mat& rvec1x3Left,
+                                           cv::Mat& tvec1x3Left,
+                                           const niftk::PointSet& points2DRight,
+                                           const cv::Point2d& sensorDimensionsRight,
+                                           const int& numberSensorElementsInXRight,
+                                           double& sensorScaleInXRight,
+                                           cv::Mat& intrinsic3x3Right,
+                                           cv::Mat& distortion1x4Right,
+                                           cv::Mat& rvec1x3Right,
+                                           cv::Mat& tvec1x3Right,
+                                           cv::Mat& leftToRightRotationMatrix3x3,
+                                           cv::Mat& leftToRightTranslationVector3x1,
+                                           const bool& fullOptimisation
+                                          )
+{
+  return 0;
 }
 
 } // end namespace

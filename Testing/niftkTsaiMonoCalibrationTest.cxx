@@ -25,12 +25,12 @@
 #include <highgui.h>
 #include <fstream>
 
-TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
+TEST_CASE( "Tsai mono", "[mono]" ) {
 
   int expectedNumberOfArguments =  14;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiCoplanarCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiMonoCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -73,12 +73,20 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
     REQUIRE( imageSize.width == nx );
     REQUIRE( imageSize.height == ny );
 
-    niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-    detector.SetImage(&greyImage);
-    detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+    if (niftk::ModelIsPlanar(model))
+    {
+      // Coplanar case.
+      niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+      detector.SetImage(&greyImage);
+      detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
 
-    imagePoints = detector.GetPoints();
-    REQUIRE( imagePoints.size() == dotsInX*dotsInY );
+      imagePoints = detector.GetPoints();
+      REQUIRE( imagePoints.size() == dotsInX*dotsInY );
+    }
+    else
+    {
+      // Noncoplanar case.
+    }
   }
 
   niftk::DumpPoints(std::cout, imagePoints);
@@ -90,7 +98,7 @@ TEST_CASE( "Tsai coplanar mono", "[mono]" ) {
   sensorDimensions.y = 1;
 
   cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
-  double rms = niftk::TsaiMonoCoplanarCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec, true);
+  double rms = niftk::TsaiMonoCameraCalibration(model, imagePoints, scaledSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec, true);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;

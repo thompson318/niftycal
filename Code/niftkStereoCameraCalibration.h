@@ -39,8 +39,7 @@ namespace niftk
 * separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
 * or even CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC. etc.
 */
-NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const bool& optimise3D, // only if ITK is compiled in.
-                                                       const Model3D& model,
+NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        const std::list<PointSet>& listOfLeftHandPointSets,
                                                        const std::list<PointSet>& listOfRightHandPointSets,
                                                        const cv::Size2i& imageSize,
@@ -56,11 +55,15 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const bool& optimise3D, /
                                                        cv::Mat& leftToRightTranslationVector,
                                                        cv::Mat& essentialMatrix,
                                                        cv::Mat& fundamentalMatrix,
-                                                       const int& cvFlags = 0
+                                                       const int& cvFlags = 0,
+                                                       const bool& optimise3D = false // only if true AND ITK is compiled in.
                                                       );
 
+
 /**
-* \brief Computes a consistent set of left and right extrinsics.
+* \brief Computes a consistent set of left and right extrinsics,
+* by taking the left extrinsics, and the right-to-left transformation
+* and computing the corresponding right extrinsics.
 * \return rms re-projection error for left camera as internally we run another mono calibration
 */
 NIFTYCAL_WINEXPORT double ComputeStereoExtrinsics(const Model3D& model,

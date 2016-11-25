@@ -115,8 +115,7 @@ double ComputeStereoExtrinsics(const Model3D& model,
 
 
 //-----------------------------------------------------------------------------
-cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
-                                    const Model3D& model,
+cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                     const std::list<PointSet>& listOfLeftHandPointSets,
                                     const std::list<PointSet>& listOfRightHandPointSets,
                                     const cv::Size2i& imageSize,
@@ -132,7 +131,8 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
                                     cv::Mat& leftToRightTranslationVector,
                                     cv::Mat& essentialMatrix,
                                     cv::Mat& fundamentalMatrix,
-                                    const int& cvFlags
+                                    const int& cvFlags,
+                                    const bool& optimise3D
                                    )
 {
   cv::Matx21d result;
