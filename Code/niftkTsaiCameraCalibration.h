@@ -30,8 +30,7 @@ namespace niftk
 /**
 * \brief Performs a mono camera calibration using Tsai 1987 method.
 * If ITK is not compiled in, you just have the initial linear bit.
-* Will check for planarity by checking the z-coordinate of the model,
-* and then switch to either the coplanar or the non-coplanar method.
+* Will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * \param fullOptimisation defaults to false, to most closely match the paper.
 * \return rms re-projection error.
 */
@@ -51,8 +50,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 /**
 * \brief Performs a stereo camera calibration using Tsai 1987 method.
 * If ITK is not compiled in, you just have the initial linear bit.
-* Will check for planarity by checking the z-coordinate of the model,
-* and then switch to either the coplanar or the non-coplanar method.
+* Will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * This method computes Tsai 1987 for left and right camera, and then optimises
 * the full intrinsic (2 x 4 DOF), distortion (2 x 1 DOF) and extrinsic (2 x 6 DOF) = 22 DOF.
 * \return rms re-projection error.
