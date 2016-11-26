@@ -13,8 +13,7 @@
 =============================================================================*/
 
 #include <niftkIOUtilities.h>
-#include <niftkMonoCameraCalibration.h>
-#include <niftkStereoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkChessboardPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -30,7 +29,7 @@
 
 /**
 * \file niftkStereoChessboardCalibration.cxx
-* \brief Calibrate stereo camera, using standard chessboard and OpenCV.
+* \brief Calibrate stereo camera, using standard chessboard and Zhang 2000/OpenCV.
 */
 int main(int argc, char ** argv)
 {
@@ -170,45 +169,45 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslationVector;
 
-    niftk::MonoCameraCalibration(model,
-                                 listOfPointsLeft,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 rvecsLeft,
-                                 tvecsLeft,
-                                 flags
-                                );
+    niftk::ZhangMonoCameraCalibration(model,
+                                      listOfPointsLeft,
+                                      imageSize,
+                                      intrinsicLeft,
+                                      distortionLeft,
+                                      rvecsLeft,
+                                      tvecsLeft,
+                                      flags
+                                     );
 
-    niftk::MonoCameraCalibration(model,
-                                 listOfPointsRight,
-                                 imageSize,
-                                 intrinsicRight,
-                                 distortionRight,
-                                 rvecsRight,
-                                 tvecsRight,
-                                 flags
-                                );
+    niftk::ZhangMonoCameraCalibration(model,
+                                      listOfPointsRight,
+                                      imageSize,
+                                      intrinsicRight,
+                                      distortionRight,
+                                      rvecsRight,
+                                      tvecsRight,
+                                      flags
+                                     );
 
-    cv::Matx21d result = niftk::StereoCameraCalibration(model,
-                                                        listOfPointsLeft,
-                                                        listOfPointsRight,
-                                                        imageSize,
-                                                        intrinsicLeft,
-                                                        distortionLeft,
-                                                        rvecsLeft,
-                                                        tvecsLeft,
-                                                        intrinsicRight,
-                                                        distortionRight,
-                                                        rvecsRight,
-                                                        tvecsRight,
-                                                        leftToRightRotationMatrix,
-                                                        leftToRightTranslationVector,
-                                                        essentialMatrix,
-                                                        fundamentalMatrix,
-                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                        false // could be command line arg.
-                                                       );
+    cv::Matx21d result = niftk::ZhangStereoCameraCalibration(model,
+                                                             listOfPointsLeft,
+                                                             listOfPointsRight,
+                                                             imageSize,
+                                                             intrinsicLeft,
+                                                             distortionLeft,
+                                                             rvecsLeft,
+                                                             tvecsLeft,
+                                                             intrinsicRight,
+                                                             distortionRight,
+                                                             rvecsRight,
+                                                             tvecsRight,
+                                                             leftToRightRotationMatrix,
+                                                             leftToRightTranslationVector,
+                                                             essentialMatrix,
+                                                             fundamentalMatrix,
+                                                             flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                             false // could be command line arg.
+                                                            );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 

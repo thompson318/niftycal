@@ -13,16 +13,16 @@
 =============================================================================*/
 
 #include "niftkTsaiCameraCalibration.h"
+#include "niftkZhangCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
-#include "niftkStereoCameraCalibration.h"
-#include "Internal/niftkTsaiUtilities_p.h"
-#include "Internal/niftkNonLinearTsai3ParamOptimiser.h"
-#include "Internal/niftkNonLinearTsai5ParamOptimiser.h"
-#include "Internal/niftkNonLinearTsai8ParamOptimiser.h"
-#include "Internal/niftkNonLinearTsai10ParamOptimiser.h"
-#include "Internal/niftkNonLinearTsai11ParamOptimiser.h"
+#include <Internal/niftkTsaiUtilities_p.h>
+#include <Internal/niftkNonLinearTsai3ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai5ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai8ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai10ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai11ParamOptimiser.h>
 #include <vector>
 
 namespace niftk
@@ -404,25 +404,26 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
   double rmsLeftBefore = niftk::ComputeRMSProjectionError(model3D, points2DLeft, intrinsic3x3Left, distortion1x4Left, rvec1x3Left, tvec1x3Left);
   double rmsRightBefore = niftk::ComputeRMSProjectionError(model3D, points2DRight, intrinsic3x3Right, distortion1x4Right, rvec1x3Right, tvec1x3Right);
 
-  cv::Matx21d rms = niftk::StereoCameraCalibration(model3D,
-                                                   leftPoints,
-                                                   rightPoints,
-                                                   imageSize,
-                                                   intrinsic3x3Left,
-                                                   distortion1x4Left,
-                                                   rvecsLeft,
-                                                   tvecsLeft,
-                                                   intrinsic3x3Right,
-                                                   distortion1x4Right,
-                                                   rvecsRight,
-                                                   tvecsRight,
-                                                   leftToRightRotationMatrix3x3,
-                                                   leftToRightTranslationVector3x1,
-                                                   essentialMatrix,
-                                                   fundamentalMatrix,
-                                                   cvFlags,
-                                                   optimise3D
-                                                  );
+  // Re-using the OpenCV stereo optimiser.
+  cv::Matx21d rms = niftk::ZhangStereoCameraCalibration(model3D,
+                                                        leftPoints,
+                                                        rightPoints,
+                                                        imageSize,
+                                                        intrinsic3x3Left,
+                                                        distortion1x4Left,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsic3x3Right,
+                                                        distortion1x4Right,
+                                                        rvecsRight,
+                                                        tvecsRight,
+                                                        leftToRightRotationMatrix3x3,
+                                                        leftToRightTranslationVector3x1,
+                                                        essentialMatrix,
+                                                        fundamentalMatrix,
+                                                        cvFlags,
+                                                        optimise3D
+                                                       );
 
   rvecsLeft[0].copyTo(rvec1x3Left);
   tvecsLeft[0].copyTo(tvec1x3Left);

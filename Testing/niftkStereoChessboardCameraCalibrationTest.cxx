@@ -15,8 +15,7 @@
 #include "catch.hpp"
 #include "niftkCatchMain.h"
 #include <niftkChessboardPointDetector.h>
-#include <niftkMonoCameraCalibration.h>
-#include <niftkStereoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
@@ -138,45 +137,45 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   cv::Mat leftToRightRotationMatrix;
   cv::Mat leftToRightTranslationVector;
 
-  niftk::MonoCameraCalibration(model,
-                               listOfPointsLeft,
-                               imageSize,
-                               intrinsicLeft,
-                               distortionLeft,
-                               rvecsLeft,
-                               tvecsLeft,
-                               flags
-                              );
+  niftk::ZhangMonoCameraCalibration(model,
+                                    listOfPointsLeft,
+                                    imageSize,
+                                    intrinsicLeft,
+                                    distortionLeft,
+                                    rvecsLeft,
+                                    tvecsLeft,
+                                    flags
+                                   );
 
-  niftk::MonoCameraCalibration(model,
-                               listOfPointsRight,
-                               imageSize,
-                               intrinsicRight,
-                               distortionRight,
-                               rvecsRight,
-                               tvecsRight,
-                               flags
-                              );
+  niftk::ZhangMonoCameraCalibration(model,
+                                    listOfPointsRight,
+                                    imageSize,
+                                    intrinsicRight,
+                                    distortionRight,
+                                    rvecsRight,
+                                    tvecsRight,
+                                    flags
+                                   );
 
-  cv::Matx21d result = niftk::StereoCameraCalibration(model,
-                                                      listOfPointsLeft,
-                                                      listOfPointsRight,
-                                                      imageSize,
-                                                      intrinsicLeft,
-                                                      distortionLeft,
-                                                      rvecsLeft,
-                                                      tvecsLeft,
-                                                      intrinsicRight,
-                                                      distortionRight,
-                                                      rvecsRight,
-                                                      tvecsRight,
-                                                      leftToRightRotationMatrix,
-                                                      leftToRightTranslationVector,
-                                                      essentialMatrix,
-                                                      fundamentalMatrix,
-                                                      flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                      false // just do optimisation of 2D reprojection error.
-                                                     );
+  cv::Matx21d result = niftk::ZhangStereoCameraCalibration(model,
+                                                           listOfPointsLeft,
+                                                           listOfPointsRight,
+                                                           imageSize,
+                                                           intrinsicLeft,
+                                                           distortionLeft,
+                                                           rvecsLeft,
+                                                           tvecsLeft,
+                                                           intrinsicRight,
+                                                           distortionRight,
+                                                           rvecsRight,
+                                                           tvecsRight,
+                                                           leftToRightRotationMatrix,
+                                                           leftToRightTranslationVector,
+                                                           essentialMatrix,
+                                                           fundamentalMatrix,
+                                                           flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                           false // just do optimisation of 2D reprojection error.
+                                                          );
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);

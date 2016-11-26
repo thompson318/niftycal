@@ -13,8 +13,7 @@
 =============================================================================*/
 
 #include "niftkIterativeStereoCameraCalibration.h"
-#include "niftkMonoCameraCalibration.h"
-#include "niftkStereoCameraCalibration.h"
+#include "niftkZhangCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
@@ -119,7 +118,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
   {
     #pragma omp section
     {
-      niftk::MonoCameraCalibration(
+      niftk::ZhangMonoCameraCalibration(
         model,
         pointsFromOriginalImagesLeft,
         imageSize,
@@ -133,7 +132,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
      
     #pragma omp section
     {
-      niftk::MonoCameraCalibration(
+      niftk::ZhangMonoCameraCalibration(
         model,
         pointsFromOriginalImagesRight,
         imageSize,
@@ -148,7 +147,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
-  result = niftk::StereoCameraCalibration(
+  result = niftk::ZhangStereoCameraCalibration(
     model,
     pointsFromOriginalImagesLeft,
     pointsFromOriginalImagesRight,
@@ -241,7 +240,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat tmpEssentialMatrix = essentialMatrix.clone();
     cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
 
-    result = niftk::StereoCameraCalibration(
+    result = niftk::ZhangStereoCameraCalibration(
       model,
       distortedPointsFromCanonicalImagesLeft,
       distortedPointsFromCanonicalImagesRight,

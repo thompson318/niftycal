@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include "niftkIterativeMonoCameraCalibration.h"
-#include "niftkMonoCameraCalibration.h"
+#include "niftkZhangCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
@@ -74,7 +74,7 @@ double IterativeMonoCameraCalibration(
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
-  projectedRMS = niftk::MonoCameraCalibration(
+  projectedRMS = niftk::ZhangMonoCameraCalibration(
         model,
         pointsFromOriginalImages,
         imageSize,
@@ -116,7 +116,7 @@ double IterativeMonoCameraCalibration(
     // the camera parameters using Levenberg-Marquardt.
     cv::Mat tmpIntrinsic = intrinsic.clone();
     cv::Mat tmpDistortion = distortion.clone();
-    projectedRMS = niftk::MonoCameraCalibration(
+    projectedRMS = niftk::ZhangMonoCameraCalibration(
           model,
           distortedPointsFromCanonicalImages,
           imageSize,

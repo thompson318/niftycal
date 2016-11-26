@@ -16,7 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkChessboardPointDetector.h>
-#include <niftkMonoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkIOUtilities.h>
 
 #include <cv.h>
@@ -108,15 +108,15 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::vector<cv::Mat> rvecs;
   std::vector<cv::Mat> tvecs;
 
-  double rms = niftk::MonoCameraCalibration(model,
-                                            listOfPoints,
-                                            imageSize,
-                                            intrinsic,
-                                            distortion,
-                                            rvecs,
-                                            tvecs,
-                                            flags
-                                            );
+  double rms = niftk::ZhangMonoCameraCalibration(model,
+                                                 listOfPoints,
+                                                 imageSize,
+                                                 intrinsic,
+                                                 distortion,
+                                                 rvecs,
+                                                 tvecs,
+                                                 flags
+                                                 );
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;

@@ -31,12 +31,11 @@ set(NIFTYCAL_SRCS
   niftkIOUtilities.cxx
   niftkIPoint2DDetector.cxx
   niftkTemplateMatching.cxx
-  niftkMonoCameraCalibration.cxx
-  niftkStereoCameraCalibration.cxx
+  niftkZhangCameraCalibration.cxx
+  niftkTsaiCameraCalibration.cxx
+  niftkHandEyeCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx
-  niftkHandEyeCalibration.cxx
-  niftkTsaiCameraCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)

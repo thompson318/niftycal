@@ -16,7 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkChessboardPointDetector.h>
-#include <niftkMonoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkHandEyeCalibration.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
@@ -117,14 +117,14 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   std::chrono::duration<double> elapsed_seconds = endStartup - start;
   std::cout << "TIME:Startup=" << elapsed_seconds.count() << std::endl;
 
-  double rms = niftk::MonoCameraCalibration(model,
-                                            listOfPoints,
-                                            imageSize,
-                                            intrinsic,
-                                            distortion,
-                                            rvecs,
-                                            tvecs
-                                            );
+  double rms = niftk::ZhangMonoCameraCalibration(model,
+                                                 listOfPoints,
+                                                 imageSize,
+                                                 intrinsic,
+                                                 distortion,
+                                                 rvecs,
+                                                 tvecs
+                                                 );
 
   std::cout << "Mono intrinsic calibration RMS=" << rms << std::endl;
 

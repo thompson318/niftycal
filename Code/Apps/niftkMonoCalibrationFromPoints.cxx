@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include <niftkIOUtilities.h>
-#include <niftkMonoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkTsaiCameraCalibration.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -121,14 +121,14 @@ int main(int argc, char ** argv)
       std::vector<cv::Mat> rvecs;
       std::vector<cv::Mat> tvecs;
 
-      rms = niftk::MonoCameraCalibration(model,
-                                         points,
-                                         imageSize,
-                                         intrinsic,
-                                         distortion,
-                                         rvecs,
-                                         tvecs
-                                        );
+      rms = niftk::ZhangMonoCameraCalibration(model,
+                                              points,
+                                              imageSize,
+                                              intrinsic,
+                                              distortion,
+                                              rvecs,
+                                              tvecs
+                                             );
 
       std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
                 << points.size() << " "
