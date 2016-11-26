@@ -20,6 +20,7 @@
 #include "niftkPointUtilities.h"
 #include <Internal/niftkTriangulationUtilities_p.h>
 #include <Internal/niftkIterativeCalibrationUtilities_p.h>
+#include <Internal/niftkCalibrationUtilities_p.h>
 #include <highgui.h>
 
 namespace niftk

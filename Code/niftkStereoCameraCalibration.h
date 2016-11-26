@@ -59,20 +59,6 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        const bool& optimise3D = false // only if true AND ITK is compiled in.
                                                       );
 
-
-/**
-* \brief Computes a consistent set of left and right extrinsics,
-* by taking the left extrinsics, and the right-to-left transformation
-* and computing the corresponding right extrinsics.
-*/
-NIFTYCAL_WINEXPORT void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
-                                                const std::vector<cv::Mat>& tvecsLeft,
-                                                const cv::Mat& leftToRightRotationMatrix,
-                                                const cv::Mat& leftToRightTranslationVector,
-                                                std::vector<cv::Mat>& rvecsRight,
-                                                std::vector<cv::Mat>& tvecsRight
-                                               );
-
 } // end namespace
 
 #endif
