@@ -286,15 +286,10 @@ cv::Matx21d IterativeStereoCameraCalibration(
     {
       projectedRMS = previousRMS;
 
-      niftk::ComputeStereoExtrinsics(model,
-                                     bestPointSetsSoFarLeft,
-                                     imageSize,
-                                     intrinsicLeft,
-                                     distortionLeft,
+      niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                     tvecsLeft,
                                      leftToRightRotationMatrix,
                                      leftToRightTranslationVector,
-                                     rvecsLeft,
-                                     tvecsLeft,
                                      rvecsRight,
                                      tvecsRight
                                     );

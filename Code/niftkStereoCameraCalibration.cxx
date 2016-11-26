@@ -26,35 +26,14 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double ComputeStereoExtrinsics(const Model3D& model,
-                               const std::list<PointSet>& listOfLeftHandPointSets,
-                               const cv::Size2i& imageSize,
-                               const cv::Mat& intrinsicLeft,
-                               const cv::Mat& distortionLeft,
-                               const cv::Mat& leftToRightRotationMatrix,
-                               const cv::Mat& leftToRightTranslationVector,
-                               std::vector<cv::Mat>& rvecsLeft,
-                               std::vector<cv::Mat>& tvecsLeft,
-                               std::vector<cv::Mat>& rvecsRight,
-                               std::vector<cv::Mat>& tvecsRight
-                              )
+void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
+                             const std::vector<cv::Mat>& tvecsLeft,
+                             const cv::Mat& leftToRightRotationMatrix,
+                             const cv::Mat& leftToRightTranslationVector,
+                             std::vector<cv::Mat>& rvecsRight,
+                             std::vector<cv::Mat>& tvecsRight
+                            )
 {
-  // We do mono calib, but turn off intrinsic optimisation,
-  // which internally falls back to calling solvePnP.
-
-  cv::Mat tmpIntrinsicLeft = intrinsicLeft.clone(); // to get round const issues.
-  cv::Mat tmpDistortionLeft = distortionLeft.clone(); // to get round const issues.
-
-  double rms = niftk::MonoCameraCalibration(model,
-                                            listOfLeftHandPointSets,
-                                            imageSize,
-                                            tmpIntrinsicLeft,
-                                            tmpDistortionLeft,
-                                            rvecsLeft,
-                                            tvecsLeft,
-                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
-                                            );
-
   // First make sure we have the right number of rvecsRight and rvecsLeft allocated.
   rvecsRight.clear();
   tvecsRight.clear();
@@ -64,7 +43,7 @@ double ComputeStereoExtrinsics(const Model3D& model,
     tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
   }
 
-  // Additionally make sure rvecs and tvecs are consistent left and right.
+  // Then make sure rvecs and tvecs are consistent left and right.
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
     cv::Mat leftRot;
@@ -109,8 +88,6 @@ double ComputeStereoExtrinsics(const Model3D& model,
     tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
     tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
   }
-
-  return rms;
 }
 
 
@@ -273,19 +250,14 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      leftToRightTranslationVector,
                                      essentialMatrix,
                                      fundamentalMatrix,
-                                     cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
+                                     cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-10),
                                      cvFlags
                                     );
 
-  niftk::ComputeStereoExtrinsics(model,
-                                 listOfLeftHandPointSets,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsRight,
                                  leftToRightRotationMatrix,
                                  leftToRightTranslationVector,
-                                 rvecsLeft,
-                                 tvecsLeft,
                                  rvecsRight,
                                  tvecsRight
                                 );

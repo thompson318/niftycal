@@ -28,7 +28,7 @@ namespace niftk
 * \brief Given lists of detectors and images, performs iterative stereo camera calibration,
 * as an extension of <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474>Datta 2009</a>.
 * \param optimise3D if true and ITK is compiled in, will additionally optimise all
-* camera parameters by minimise the RMS reconstruction error, reconstructing the target points in 3D.
+* camera parameters by minimising the RMS reconstruction error, reconstructing the target points in 3D.
 * \return rms re-projection and 3D reconstruction error
 */
 NIFTYCAL_WINEXPORT cv::Matx21d IterativeStereoCameraCalibration(

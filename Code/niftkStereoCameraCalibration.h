@@ -64,20 +64,14 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
 * \brief Computes a consistent set of left and right extrinsics,
 * by taking the left extrinsics, and the right-to-left transformation
 * and computing the corresponding right extrinsics.
-* \return rms re-projection error for left camera as internally we run another mono calibration
 */
-NIFTYCAL_WINEXPORT double ComputeStereoExtrinsics(const Model3D& model,
-                                                  const std::list<PointSet>& listOfLeftHandPointSets,
-                                                  const cv::Size2i& imageSize,
-                                                  const cv::Mat& intrinsicLeft,
-                                                  const cv::Mat& distortionLeft,
-                                                  const cv::Mat& leftToRightRotationMatrix,
-                                                  const cv::Mat& leftToRightTranslationVector,
-                                                  std::vector<cv::Mat>& rvecsLeft,
-                                                  std::vector<cv::Mat>& tvecsLeft,
-                                                  std::vector<cv::Mat>& rvecsRight,
-                                                  std::vector<cv::Mat>& tvecsRight
-                                                 );
+NIFTYCAL_WINEXPORT void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
+                                                const std::vector<cv::Mat>& tvecsLeft,
+                                                const cv::Mat& leftToRightRotationMatrix,
+                                                const cv::Mat& leftToRightTranslationVector,
+                                                std::vector<cv::Mat>& rvecsRight,
+                                                std::vector<cv::Mat>& tvecsRight
+                                               );
 
 } // end namespace
 

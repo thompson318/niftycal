@@ -424,10 +424,16 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                    optimise3D
                                                   );
 
+  rvecsLeft[0].copyTo(rvec1x3Left);
+  tvecsLeft[0].copyTo(tvec1x3Left);
+  rvecsRight[0].copyTo(rvec1x3Right);
+  tvecsRight[0].copyTo(tvec1x3Right);
+
   double rmsLeftAfter = niftk::ComputeRMSProjectionError(model3D, points2DLeft, intrinsic3x3Left, distortion1x4Left, rvec1x3Left, tvec1x3Left);
   double rmsRightAfter = niftk::ComputeRMSProjectionError(model3D, points2DRight, intrinsic3x3Right, distortion1x4Right, rvec1x3Right, tvec1x3Right);
 
-  std::cout << "TsaiStereoCameraCalibration: " << rmsLeftBefore << " " << rmsLeftAfter << " " << rmsRightBefore << " " << rmsRightAfter << std::endl;
+  std::cout.precision(10);
+  std::cout << "TsaiStereoCameraCalibration: " << rmsLeftBefore << " " << rmsRightBefore << " " << rmsLeftAfter << " " << rmsRightAfter << std::endl;
 
   return rms;
 }
