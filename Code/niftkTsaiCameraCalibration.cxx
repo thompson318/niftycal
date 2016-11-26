@@ -205,10 +205,15 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   cv::Rodrigues(R, rvec);
 
+  double rmsLinear = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
+
   niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
 
-  double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
-  return rms;
+  double rmsNonLinear = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
+
+  std::cout << "TsaiMonoNonCoplanarCameraCalibration: " << rmsLinear << " " << rmsNonLinear << std::endl;
+
+  return rmsNonLinear;
 }
 
 
@@ -300,10 +305,15 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   cv::Rodrigues(R, rvec);
 
+  double rmsLinear = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
+
   niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
 
-  double rms = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
-  return rms;
+  double rmsNonLinear = niftk::ComputeRMSProjectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
+
+  std::cout << "TsaiMonoCoplanarCameraCalibration: " << rmsLinear << " " << rmsNonLinear << std::endl;
+
+  return rmsNonLinear;
 }
 
 
@@ -391,6 +401,9 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
   std::vector<cv::Mat> tvecsRight;
   tvecsRight.push_back(tvec1x3Right);
 
+  double rmsLeftBefore = niftk::ComputeRMSProjectionError(model3D, points2DLeft, intrinsic3x3Left, distortion1x4Left, rvec1x3Left, tvec1x3Left);
+  double rmsRightBefore = niftk::ComputeRMSProjectionError(model3D, points2DRight, intrinsic3x3Right, distortion1x4Right, rvec1x3Right, tvec1x3Right);
+
   cv::Matx21d rms = niftk::StereoCameraCalibration(model3D,
                                                    leftPoints,
                                                    rightPoints,
@@ -410,6 +423,11 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                    cvFlags,
                                                    optimise3D
                                                   );
+
+  double rmsLeftAfter = niftk::ComputeRMSProjectionError(model3D, points2DLeft, intrinsic3x3Left, distortion1x4Left, rvec1x3Left, tvec1x3Left);
+  double rmsRightAfter = niftk::ComputeRMSProjectionError(model3D, points2DRight, intrinsic3x3Right, distortion1x4Right, rvec1x3Right, tvec1x3Right);
+
+  std::cout << "TsaiStereoCameraCalibration: " << rmsLeftBefore << " " << rmsLeftAfter << " " << rmsRightBefore << " " << rmsRightAfter << std::endl;
 
   return rms;
 }

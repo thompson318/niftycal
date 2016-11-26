@@ -87,11 +87,11 @@ double NonLinearTsai10ParamOptimiser::Optimise(double& Rx, double& Ry, double& R
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
+  /*
   niftk::NonLinearTsai10ParamCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-
-  std::cout << "NonLinearTsai10ParamOptimiser: initial=" << initialParameters
-            << ", rms=" << initialRMS << std::endl;
+  std::cout << "NonLinearTsai10ParamOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
+  */
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -109,10 +109,11 @@ double NonLinearTsai10ParamOptimiser::Optimise(double& Rx, double& Ry, double& R
   Cy = finalParameters[8];
   k1 = finalParameters[9];
 
+
   niftk::NonLinearTsai10ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  std::cout << "NonLinearTsai10ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+//  std::cout << "NonLinearTsai10ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }
