@@ -14,6 +14,7 @@
 
 #include "niftkIterativeMonoCameraCalibration.h"
 #include "niftkZhangCameraCalibration.h"
+#include "niftkTsaiCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
@@ -43,9 +44,9 @@ double IterativeMonoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (detectorAndOriginalImages.size() < 2)
+  if (detectorAndOriginalImages.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 1 view of calibration points.";
   }
   if (detectorAndOriginalImages.size() != detectorAndCanonicalImages.size())
   {
@@ -59,6 +60,9 @@ double IterativeMonoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Invalid reference image poinst.";
   }
+
+  cv::Point2d sensorDimensions(1,1);
+  double sx = 1.0;
 
   double projectedRMS = 0;
 
@@ -74,16 +78,35 @@ double IterativeMonoCameraCalibration(
 
   // 2. Parameter Fitting: Use the detected control points to estimate
   // camera parameters using Levenberg-Marquardt.
-  projectedRMS = niftk::ZhangMonoCameraCalibration(
-        model,
-        pointsFromOriginalImages,
-        imageSize,
-        intrinsic,
-        distortion,
-        rvecs,
-        tvecs,
-        cvFlags
-        );
+  if (pointsFromOriginalImages.size() == 1)
+  {
+    projectedRMS = niftk::TsaiMonoCameraCalibration(
+          model,
+          *(pointsFromOriginalImages.begin()),
+          imageSize,
+          sensorDimensions,
+          imageSize.width,
+          sx,
+          intrinsic,
+          distortion,
+          rvecs[0],
+          tvecs[0],
+          true
+          );
+  }
+  else
+  {
+    projectedRMS = niftk::ZhangMonoCameraCalibration(
+          model,
+          pointsFromOriginalImages,
+          imageSize,
+          intrinsic,
+          distortion,
+          rvecs,
+          tvecs,
+          cvFlags
+          );
+  }
 
   std::cout << "Initial calibration, rms=" << projectedRMS << std::endl;
   std::cout << "Initial Fx=" << intrinsic.at<double>(0,0) << std::endl;
@@ -116,16 +139,36 @@ double IterativeMonoCameraCalibration(
     // the camera parameters using Levenberg-Marquardt.
     cv::Mat tmpIntrinsic = intrinsic.clone();
     cv::Mat tmpDistortion = distortion.clone();
-    projectedRMS = niftk::ZhangMonoCameraCalibration(
-          model,
-          distortedPointsFromCanonicalImages,
-          imageSize,
-          tmpIntrinsic,
-          tmpDistortion,
-          rvecs,
-          tvecs,
-          iterativeCvFlags
-          );
+
+    if (pointsFromOriginalImages.size() == 1)
+    {
+      projectedRMS = niftk::TsaiMonoCameraCalibration(
+            model,
+            *(distortedPointsFromCanonicalImages.begin()),
+            imageSize,
+            sensorDimensions,
+            imageSize.width,
+            sx,
+            tmpIntrinsic,
+            tmpDistortion,
+            rvecs[0],
+            tvecs[0],
+            true
+            );
+    }
+    else
+    {
+      projectedRMS = niftk::ZhangMonoCameraCalibration(
+            model,
+            distortedPointsFromCanonicalImages,
+            imageSize,
+            tmpIntrinsic,
+            tmpDistortion,
+            rvecs,
+            tvecs,
+            iterativeCvFlags
+            );
+    }
 
     std::cout << "Iterative calibration iter=" << count++
               << ", prms=" << previousRMS
