@@ -1248,13 +1248,13 @@ unsigned long int GetNumberOfTriangulatablePoints(const Model3D& model,
 
 
 //-----------------------------------------------------------------------------
-double ComputeRMSProjectionError(const Model3D& model,
-                                 const PointSet& imagePoints,
-                                 const cv::Mat& intrinsic,
-                                 const cv::Mat& distortion,
-                                 const cv::Mat& rvec,
-                                 const cv::Mat& tvec
-                                )
+double ComputeRMSReprojectionError(const Model3D& model,
+                                   const PointSet& imagePoints,
+                                   const cv::Mat& intrinsic,
+                                   const cv::Mat& distortion,
+                                   const cv::Mat& rvec,
+                                   const cv::Mat& tvec
+                                  )
 {
   cv::Mat t = cvCreateMat(3, 1, CV_64FC1);
   t.at<double>(0, 0) = tvec.at<double>(0, 0);

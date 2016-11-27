@@ -75,13 +75,16 @@ NIFTYCAL_WINEXPORT void LoadNifTKStereoExtrinsics(const std::string& fileName,
                                                   );
 
 /**
-* \brief Does Rodrigues decomposition, and saves 6 parameters to file.
+* \brief Does Rodrigues decomposition, and saves 6 parameters to file as single line.
 */
 NIFTYCAL_WINEXPORT void SaveRigidParams(const cv::Matx44d& matrix,
                                         const std::string& fileName
                                         );
 
 
+/**
+* \brief Saves 6 parameters to file as single line.
+*/
 NIFTYCAL_WINEXPORT void SaveRigidParams(const cv::Mat& rotationVector,
                                         const cv::Mat& translationVector,
                                         const std::string& fileName

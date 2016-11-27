@@ -26,21 +26,35 @@
 namespace niftk
 {
 
+/**
+* \brief Converts 3x3 rotation and 3x1 translation (i.e. stereo extrinsics) to a 4x4 matrix.
+*/
 NIFTYCAL_WINEXPORT cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix3x3,
                                                               const cv::Mat& translationVector3x1);
 
+
+/**
+* \brief Converts 1x3 rotation (i.e. Rodrigues parameters) and 1x3 translation to a 4x4 matrix.
+*/
 NIFTYCAL_WINEXPORT cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x3,
                                                  const cv::Mat& translationVector1x3);
 
 
+/**
+* \brief Converts 4x4 transformation to 1x3 rotation (i.e. Rodrigues parameters) and 1x3 translation.
+*/
 NIFTYCAL_WINEXPORT void MatrixToRodrigues(const cv::Matx44d& mat,
                                           cv::Mat& rotationVector1x3,
                                           cv::Mat& translationVector1x3);
 
+/**
+* \brief Convers 1x3 Rodrigues rotation parameters to Axis-Angle representation.
+*/
 NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3);
 
+
 /**
-* \brief Converts a list to a vector, in order, enabling you to set a limit to how many you convert.
+* \brief Converts a list of 4x4 matrices to a vector, in order, enabling you to set a limit to how many you convert.
 */
 NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices,
                                                                const unsigned int& maximumSize);
@@ -56,8 +70,8 @@ NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<c
 
 
 /**
-* \brief Given a hand-eye matrix, and tracking matrices, gives an average
-* estimate of the modelToWorld transform.
+* \brief Given ordered hand-eye matrices and corresponding tracking matrices,
+* gives an estimate of the average modelToWorld transform.
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
     const cv::Matx44d&             handEyeMatrix,
