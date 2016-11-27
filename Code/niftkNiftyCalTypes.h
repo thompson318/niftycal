@@ -23,6 +23,8 @@
 * \file niftkNiftyCalTypes.h
 * \brief Defines types used in this library.
 */
+
+//! Single namespace for all code in this package
 namespace niftk
 {
 
