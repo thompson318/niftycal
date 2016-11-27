@@ -28,7 +28,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 17)
+  if (argc < 13)
   {
     std::cerr << "Usage: niftkStereoIterativeRingsCalibration modelPoints.txt "
               << " referenceImage.png referencePoints templateImage dotsInX dotsInY rescaleX rescaleY zeroDistortion optimise3D "

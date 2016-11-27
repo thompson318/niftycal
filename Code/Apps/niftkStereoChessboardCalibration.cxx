@@ -33,7 +33,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 14)
+  if (argc < 10)
   {
     std::cerr << "Usage: niftkStereoChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion optimise3D "
               << "leftImage1.png leftImage2.png ... leftImageN.txt "
@@ -206,7 +206,7 @@ int main(int argc, char ** argv)
                                                              essentialMatrix,
                                                              fundamentalMatrix,
                                                              flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                             false // could be command line arg.
+                                                             optimise3D
                                                             );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
