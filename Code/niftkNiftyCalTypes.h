@@ -20,6 +20,31 @@
 #include <map>
 
 /**
+* \defgroup types types
+* \brief Package-wide data types.
+*/
+
+/**
+* \defgroup utilities utilities
+* \brief Groups of c-style functions.
+*/
+
+/**
+* \defgroup detectors detectors
+* \brief A suite of classes for point detection in images.
+*/
+
+/**
+* \defgroup calibration calibration
+* \brief The main calibration routines.
+*/
+
+/**
+* \defgroup applications applications
+* \brief Small, end-user applications, most likely for testing.
+*/
+
+/**
 * \file niftkNiftyCalTypes.h
 * \brief Defines types used in this library.
 * \ingroup types
