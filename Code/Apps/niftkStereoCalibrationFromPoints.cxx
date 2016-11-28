@@ -25,6 +25,7 @@
 /**
 * \file niftkStereoCalibrationFromPoints.cxx
 * \brief Calibrate stereo camera from pre-extracted points.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {

@@ -25,6 +25,7 @@
 * \file niftkStereoIterativeRingsCalibration.cxx
 * \brief Calibrate stereo camera, using Ring features, and
 * the <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Datta 2009</a> iterative optimisation.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {

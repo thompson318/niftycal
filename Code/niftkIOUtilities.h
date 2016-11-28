@@ -24,6 +24,8 @@
 * \brief Utilities to read/write points/models/matrices as plain text files.
 *
 * If PointSet/Model3D has zero points, we read/write an empty file. Its not an error.
+*
+* \ingroup utilities
 */
 namespace niftk
 {

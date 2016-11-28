@@ -28,6 +28,8 @@ namespace niftk
 * rescaling, and the resultant scaling of the detected points.
 *
 * This detector is not thread safe.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT PointDetector : public IPoint2DDetector
 {

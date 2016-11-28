@@ -24,6 +24,7 @@
 /**
 * \file niftkHandEyeCalibration.h
 * \brief Entry point for a range of hand-eye calibration techniques.
+* \ingroup calibration
 */
 namespace niftk
 {

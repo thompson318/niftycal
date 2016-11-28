@@ -22,6 +22,7 @@
 /**
 * \file niftkMatrixUtilities.h
 * \brief Utilities for various matrix based functions.
+* \ingroup utilities
 */
 namespace niftk
 {

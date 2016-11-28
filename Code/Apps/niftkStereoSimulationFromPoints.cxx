@@ -23,8 +23,10 @@
 #include <random>
 
 /**
+ * \file niftkStereoSimulationFromPoints.cxx
  * \brief Runs stereo simulation, using pre-extracted points, to
  * assess the 3D reconstruction error, and the effect of noise.
+ * \ingroup applications
  */
 int main(int argc, char ** argv)
 {
@@ -91,7 +93,6 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslation;
 
-    // First we do a 'standard' stereo calibration.
     niftk::ZhangMonoCameraCalibration(model,
                                       leftPoints,
                                       imageSize,
@@ -220,7 +221,7 @@ int main(int argc, char ** argv)
       viewCounter++;
     }
 
-    // sanity check. Do calibration with pseudo gold-standard.
+    // Sanity check. Do calibration with pseudo gold-standard, RMS should be zero.
     niftk::ZhangMonoCameraCalibration(model,
                                       leftGoldStandardPoints,
                                       imageSize,

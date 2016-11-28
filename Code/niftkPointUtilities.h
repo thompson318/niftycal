@@ -24,6 +24,7 @@
 /**
 * \file niftkPointUtilities.h
 * \brief Utilities to process points.
+* \ingroup utilities
 */
 namespace niftk
 {

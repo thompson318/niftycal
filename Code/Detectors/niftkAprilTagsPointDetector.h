@@ -26,6 +26,8 @@ namespace niftk
 * \brief Detects AprilTags markers in a grey scale image.
 *
 * This detector is not thread safe.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT AprilTagsPointDetector : public PointDetector
 {

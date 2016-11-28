@@ -29,7 +29,8 @@
 
 /**
 * \file niftkStereoChessboardCalibration.cxx
-* \brief Calibrate stereo camera, using standard chessboard and Zhang 2000/OpenCV.
+* \brief Calibrate stereo camera, using standard chessboard and the Zhang 2000/OpenCV method.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {

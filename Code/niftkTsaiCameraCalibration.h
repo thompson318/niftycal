@@ -25,6 +25,7 @@ namespace niftk
 /**
 * \file niftkTsaiCameraCalibration.h
 * \brief Mono and Stereo calibration routines using Tsai 1987 method.
+* \ingroup calibration
 */
 
 /**

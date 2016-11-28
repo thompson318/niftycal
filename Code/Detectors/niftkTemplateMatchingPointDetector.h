@@ -27,6 +27,8 @@ namespace niftk
 * <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Datta 2009</a>.
 *
 * This detector is not thread safe.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT TemplateMatchingPointDetector : public PointDetector
 {

@@ -44,6 +44,8 @@ namespace niftk
 *       is just to initialise a template matching. So, as long as we have an initial starting point we are ok.
 * </ol>
 * This detector is not thread safe.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT RingsPointDetector : public TemplateMatchingPointDetector
 {

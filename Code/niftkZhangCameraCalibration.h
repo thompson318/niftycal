@@ -26,6 +26,7 @@ namespace niftk
 /**
 * \file niftkZhangCameraCalibration.h
 * \brief Mono and Stereo calibration routines using Zhang 2000 method.
+* \ingroup calibration
 */
 
 /**

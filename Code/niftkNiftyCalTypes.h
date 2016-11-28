@@ -22,6 +22,7 @@
 /**
 * \file niftkNiftyCalTypes.h
 * \brief Defines types used in this library.
+* \ingroup types
 */
 
 //! Single namespace for all code in this package

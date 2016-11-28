@@ -26,6 +26,8 @@ namespace niftk
 * \brief Detects circles pattern in grey scale images using OpenCV cv::findCirclesGrid.
 *
 * This detector is not thread safe.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT CirclesPointDetector : public PointDetector
 {
