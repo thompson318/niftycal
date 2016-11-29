@@ -23,7 +23,7 @@
 #include <random>
 
 /**
- * \file niftkStereoSimulationFromPoints.cxx
+ * \file niftkStereoSimulationWithNoise.cxx
  * \brief Runs stereo simulation, using pre-extracted points, to
  * assess the 3D reconstruction error, and the effect of noise.
  * \ingroup applications
@@ -32,7 +32,7 @@ int main(int argc, char ** argv)
 {
   if (argc < 10)
   {
-    std::cerr << "Usage: niftkStereoSimulationFromPoints sigma iters imageSizeX imageSizeY modelPoints.txt "
+    std::cerr << "Usage: niftkStereoSimulationWithNoise sigma iters imageSizeX imageSizeY modelPoints.txt "
               << "leftImagePoints1.txt leftImagePoints2.txt ... leftImagePointsN.txt "
               << "rightImagePoints1.txt rightImagePoints2.txt ... rightImagePointsN.txt " << std::endl;
 
@@ -158,8 +158,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslation.at<double>(0,0) << " "
-              << leftToRightTranslation.at<double>(0,1) << " "
-              << leftToRightTranslation.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(1,0) << " "
+              << leftToRightTranslation.at<double>(2,0) << " "
               << leftToRightAxisAngle(0, 0) << " "
               << leftToRightAxisAngle(0, 1) << " "
               << leftToRightAxisAngle(0, 2) << " "
@@ -287,8 +287,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslation.at<double>(0,0) << " "
-              << leftToRightTranslation.at<double>(0,1) << " "
-              << leftToRightTranslation.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(1,0) << " "
+              << leftToRightTranslation.at<double>(2,0) << " "
               << leftToRightAxisAngle(0, 0) << " "
               << leftToRightAxisAngle(0, 1) << " "
               << leftToRightAxisAngle(0, 2) << " "
@@ -382,8 +382,8 @@ int main(int argc, char ** argv)
                 << leftToRightRotationVector.at<double>(0,1) << " "
                 << leftToRightRotationVector.at<double>(0,2) << " "
                 << leftToRightTranslation.at<double>(0,0) << " "
-                << leftToRightTranslation.at<double>(0,1) << " "
-                << leftToRightTranslation.at<double>(0,2) << " "
+                << leftToRightTranslation.at<double>(1,0) << " "
+                << leftToRightTranslation.at<double>(2,0) << " "
                 << leftToRightAxisAngle(0, 0) << " "
                 << leftToRightAxisAngle(0, 1) << " "
                 << leftToRightAxisAngle(0, 2) << " "

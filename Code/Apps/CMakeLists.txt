@@ -12,9 +12,10 @@
 #
 #============================================================================*/
 set(NIFTYCAL_APPS
+  niftkStereoSimulationWithNoise
+  niftkStereoSimulationByParameter
   niftkMonoCalibrationFromPoints
   niftkStereoCalibrationFromPoints
-  niftkStereoSimulationFromPoints
   niftkStereoIterativeAprilTagsCalibration
   niftkStereoIterativeRingsCalibration
   niftkStereoChessboardCalibration

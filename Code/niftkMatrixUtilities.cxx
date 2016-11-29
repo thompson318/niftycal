@@ -90,6 +90,17 @@ NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVecto
 
 
 //-----------------------------------------------------------------------------
+cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
+{
+  cv::Mat rodrigues = cvCreateMat(1, 3, CV_64FC1);
+  rodrigues.at<double>(0, 0) = axisAngle(0, 0) * axisAngle(0, 3);
+  rodrigues.at<double>(0, 1) = axisAngle(0, 1) * axisAngle(0, 3);
+  rodrigues.at<double>(0, 2) = axisAngle(0, 2) * axisAngle(0, 3);
+  return rodrigues;
+}
+
+
+//-----------------------------------------------------------------------------
 std::vector<cv::Matx44d> MatrixListToVector(
     const std::list<cv::Matx44d>& list,
     const unsigned int& maximum

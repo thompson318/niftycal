@@ -55,6 +55,12 @@ NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVecto
 
 
 /**
+* \brief Convers Axis-Angle representation to Rodrigues parameters.
+*/
+NIFTYCAL_WINEXPORT cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle);
+
+
+/**
 * \brief Converts a list of 4x4 matrices to a vector, in order, enabling you to set a limit to how many you convert.
 */
 NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices,
