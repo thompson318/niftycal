@@ -38,24 +38,21 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
   // Then make sure rvecs and tvecs are consistent left and right.
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
-    cv::Mat leftRot;
+    cv::Mat leftRot = cvCreateMat(3, 3, CV_64FC1);
     cv::Rodrigues(rvecsLeft[i], leftRot);
 
-    cv::Matx44d leftExtrinsic;
-    cv::Matx44d leftToRight;
-
-    leftExtrinsic = leftExtrinsic.eye();
-    leftToRight = leftToRight.eye();
+    cv::Matx44d leftExtrinsic = cv::Matx44d::eye();
+    cv::Matx44d leftToRight = cv::Matx44d::eye();
 
     for (int r = 0; r < 3; r++)
     {
       for (int c = 0; c < 3; c++)
       {
-        leftExtrinsic(r, c) = leftRot.at<double>(r,c);
+        leftExtrinsic(r, c) = leftRot.at<double>(r, c);
         leftToRight(r, c) = leftToRightRotationMatrix.at<double>(r, c);
       }
       leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
-      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(0, r);
+      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(r, 0);
     }
 
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
@@ -65,11 +62,11 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
     {
       for (int c = 0; c < 3; c++)
       {
-        rightRotation(r, c) = rightExtrinsic(r,c);
+        rightRotation(r, c) = rightExtrinsic(r, c);
       }
     }
 
-    cv::Mat rightRotationVec;
+    cv::Mat rightRotationVec = cvCreateMat(1, 3, CV_64FC1);
     cv::Rodrigues(rightRotation, rightRotationVec);
 
     rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);
