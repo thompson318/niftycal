@@ -123,7 +123,7 @@ int main(int argc, char ** argv)
                                                              leftToRightTranslation,
                                                              essentialMatrix,
                                                              fundamentalMatrix,
-                                                             CV_CALIB_USE_INTRINSIC_GUESS,
+                                                             CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                                              false // could be command line arg.
                                                             );
 
@@ -252,7 +252,7 @@ int main(int argc, char ** argv)
                                                  leftToRightTranslation,
                                                  essentialMatrix,
                                                  fundamentalMatrix,
-                                                 CV_CALIB_USE_INTRINSIC_GUESS,
+                                                 CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                                  false // could be command line arg.
                                                 );
 
@@ -298,7 +298,7 @@ int main(int argc, char ** argv)
     cv::Matx14d axisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
 
     const int numberOfParameters = 4; // 3 translation, and 1 angle about axis.
-    const int numberOfSteps = 100;
+    const int numberOfSteps = 101;
 
     double parameters[numberOfParameters] = {leftToRightTranslation.at<double>(0, 0),
                                              leftToRightTranslation.at<double>(1, 0),
@@ -316,7 +316,7 @@ int main(int argc, char ** argv)
 
       for (int s = 0; s < numberOfSteps; s++)
       {
-        cv::Mat tmpLeftToRightTrans = cvCreateMat(1, 3, CV_64FC1);
+        cv::Mat tmpLeftToRightTrans = cvCreateMat(3, 1, CV_64FC1);
         tmpLeftToRightTrans.at<double>(0, 0) = parameters[0];
         tmpLeftToRightTrans.at<double>(1, 0) = parameters[1];
         tmpLeftToRightTrans.at<double>(2, 0) = parameters[2];
@@ -350,8 +350,6 @@ int main(int argc, char ** argv)
                   << parameters[1] << " "
                   << parameters[2] << " "
                   << parameters[3] << " "
-                  << parameters[4] << " "
-                  << parameters[5] << " "
                   << rmsPerAxis.x << " "
                   << rmsPerAxis.y << " "
                   << rmsPerAxis.z << " "
