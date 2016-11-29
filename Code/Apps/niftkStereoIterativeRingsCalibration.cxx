@@ -285,8 +285,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslationVector.at<double>(0,0) << " "
-              << leftToRightTranslationVector.at<double>(0,1) << " "
-              << leftToRightTranslationVector.at<double>(0,2) << " "
+              << leftToRightTranslationVector.at<double>(1,0) << " "
+              << leftToRightTranslationVector.at<double>(2,0) << " "
               << rms(0, 0) << " "
               << rms(1, 0)
               << std::endl;

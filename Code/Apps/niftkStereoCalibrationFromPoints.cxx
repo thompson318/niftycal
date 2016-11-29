@@ -244,8 +244,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslation.at<double>(0,0) << " "
-              << leftToRightTranslation.at<double>(0,1) << " "
-              << leftToRightTranslation.at<double>(0,2) << " "
+              << leftToRightTranslation.at<double>(1,0) << " "
+              << leftToRightTranslation.at<double>(2,0) << " "
               << result(0, 0) << " " // 2D error
               << result(1, 0)        // 3D error
               << std::endl;
