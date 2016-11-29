@@ -309,9 +309,25 @@ int main(int argc, char ** argv)
     for (int p = 0; p < numberOfParameters; p++)
     {
       double originalValue = parameters[p];
-      double minValue = parameters[p] * 0.9;
-      double maxValue = parameters[p] * 1.1;
-      double stepSize = (maxValue - minValue)/static_cast<double>(numberOfSteps - 1);
+      double minValue = 0;
+      double maxValue = 0;
+      double stepSize = 0;
+
+      if (p < 3)
+      {
+        // Translation
+        minValue = parameters[p] - 1; // mm
+        maxValue = parameters[p] + 1; // mm
+        stepSize = (maxValue - minValue)/static_cast<double>(numberOfSteps - 1);
+      }
+      else
+      {
+        // Rotation
+        minValue = parameters[p] - (1*3.141592653589793/180);
+        maxValue = parameters[p] + (1*3.141592653589793/180);
+        stepSize = (maxValue - minValue)/static_cast<double>(numberOfSteps - 1);
+      }
+
       parameters[p] = minValue;
 
       for (int s = 0; s < numberOfSteps; s++)
