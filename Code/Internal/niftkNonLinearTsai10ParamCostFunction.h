@@ -15,23 +15,23 @@
 #ifndef niftkNonLinearTsai10ParamCostFunction_h
 #define niftkNonLinearTsai10ParamCostFunction_h
 
-#include "niftkNonLinearTsaiCostFunction.h"
+#include "niftkNonLinearCostFunction.h"
 
 namespace niftk
 {
 
 /**
 * \class NonLinearTsai10ParamCostFunction
-* \brief Cost function, to optimise 2D reprojection error over Rx, Ry, Rz, Tx, Ty, Tz, f, k, Cx and Cy.
+* \brief Cost function, to optimise 2D projection error over R1, R2, R3 (Rodrigues), Tx, Ty, Tz, f, k, Cx and Cy.
 * \see niftk::NonLinearTsai10ParamOptimiser
 */
-class NonLinearTsai10ParamCostFunction : public niftk::NonLinearTsaiCostFunction
+class NonLinearTsai10ParamCostFunction : public niftk::NonLinearCostFunction
 {
 
 public:
 
   typedef NonLinearTsai10ParamCostFunction Self;
-  typedef NonLinearTsaiCostFunction        Superclass;
+  typedef NonLinearCostFunction            Superclass;
   typedef itk::SmartPointer<Self>          Pointer;
   typedef itk::SmartPointer<const Self>    ConstPointer;
   itkNewMacro(Self);

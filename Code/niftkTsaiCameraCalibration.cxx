@@ -22,7 +22,6 @@
 #include <Internal/niftkNonLinearTsai5ParamOptimiser.h>
 #include <Internal/niftkNonLinearTsai8ParamOptimiser.h>
 #include <Internal/niftkNonLinearTsai10ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai11ParamOptimiser.h>
 #include <vector>
 
 namespace niftk

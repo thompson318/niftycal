@@ -20,6 +20,11 @@
 #include <map>
 
 /**
+* \defgroup internal internal
+* \brief Internal stuff, not for end-users.
+*/
+
+/**
 * \defgroup types types
 * \brief Package-wide data types.
 */

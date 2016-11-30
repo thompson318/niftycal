@@ -105,7 +105,7 @@ double NonLinearTsai5ParamOptimiser::Optimise(double& Tz, double& f, double& k1,
   niftk::NonLinearTsai5ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-//  std::cout << "NonLinearTsai5ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
+  //std::cout << "NonLinearTsai5ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

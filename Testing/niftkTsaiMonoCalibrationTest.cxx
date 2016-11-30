@@ -89,8 +89,6 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     }
   }
 
-  niftk::DumpPoints(std::cout, imagePoints);
-
   double sensorScaleInX = 1;
 
   cv::Point2d sensorDimensions;

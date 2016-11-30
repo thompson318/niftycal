@@ -306,6 +306,7 @@ int main(int argc, char ** argv)
                                              axisAngle(0, 3) // angle about axis (presumably nearly vertical).
                                             };
 
+    double pi = 3.141592653589793;
     for (int p = 0; p < numberOfParameters; p++)
     {
       double originalValue = parameters[p];
@@ -323,8 +324,8 @@ int main(int argc, char ** argv)
       else
       {
         // Rotation
-        minValue = parameters[p] - (1*3.141592653589793/180);
-        maxValue = parameters[p] + (1*3.141592653589793/180);
+        minValue = parameters[p] - (1*pi/180);
+        maxValue = parameters[p] + (1*pi/180);
         stepSize = (maxValue - minValue)/static_cast<double>(numberOfSteps - 1);
       }
 
@@ -366,6 +367,7 @@ int main(int argc, char ** argv)
                   << parameters[1] << " "
                   << parameters[2] << " "
                   << parameters[3] << " "
+                  << 180*parameters[3]/pi << " "
                   << rmsPerAxis.x << " "
                   << rmsPerAxis.y << " "
                   << rmsPerAxis.z << " "

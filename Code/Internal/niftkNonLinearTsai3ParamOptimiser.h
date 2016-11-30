@@ -25,9 +25,6 @@ namespace niftk
 /**
 * \class NonLinearTsai3ParamOptimiser
 * \brief Optimises Tz, f and k using niftk::NonLinearTsai3ParamHandCostFunction.
-* \see Tsai 1987 paper "A Versatile Camera Calibration Techniaue for
-* High-Accuracy 3D Machine Vision Metrology Using Off-the-shelf TV Cameras and Lenses",
-* IEEE JOURNAL OF ROBOTICS AND AUTOMATION, VOL. RA-3, NO. 4, AUGUST 1987
 */
 class NonLinearTsai3ParamOptimiser : public itk::Object
 {

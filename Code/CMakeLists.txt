@@ -67,9 +67,6 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibrationCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibrationOptimiser.cxx)
 
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsaiCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsaiNormalisingCostFunction.cxx)
-
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamCostFunction.cxx)
 
@@ -81,9 +78,6 @@ if(ITK_FOUND)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamCostFunction.cxx)
-
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamCostFunction.cxx)
 
 endif()
 

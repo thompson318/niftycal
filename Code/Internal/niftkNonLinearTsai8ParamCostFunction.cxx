@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai8ParamCostFunction.h"
-#include <niftkMatrixUtilities.h>
+#include "niftkCalibrationUtilities_p.h"
 
 namespace niftk
 {
@@ -45,30 +45,29 @@ NonLinearTsai8ParamCostFunction::InternalGetValue(const ParametersType& paramete
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
-  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
-  rvec.at<double>(0, 0) = parameters[0];
-  rvec.at<double>(0, 1) = parameters[1];
-  rvec.at<double>(0, 2) = parameters[2];
+  ParametersType internalParameters;
+  internalParameters.SetSize(4   // intrinsic
+                             + 5 // distortion
+                             + 6 // extrinsic
+                            );
 
-  cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
-  tvec.at<double>(0, 0) = parameters[3];
-  tvec.at<double>(0, 1) = parameters[4];
-  tvec.at<double>(0, 2) = parameters[5];
+  internalParameters[0] = parameters[6];  // f
+  internalParameters[1] = parameters[6];  // f
+  internalParameters[2] = (*m_Intrinsic).at<double>(0, 2);
+  internalParameters[3] = (*m_Intrinsic).at<double>(1, 2);
+  internalParameters[4] = parameters[7]; // k1
+  internalParameters[5] = 0;
+  internalParameters[6] = 0;
+  internalParameters[7] = 0;
+  internalParameters[8] = 0;
+  internalParameters[9]  = parameters[0]; // R1
+  internalParameters[10] = parameters[1]; // R2
+  internalParameters[11] = parameters[2]; // R3
+  internalParameters[12] = parameters[3]; // Tx
+  internalParameters[13] = parameters[4]; // Ty
+  internalParameters[14] = parameters[5]; // Tz
 
-  cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
-
-  cv::Mat intrinsic = m_Intrinsic->clone();
-  intrinsic.at<double>(0, 0) = parameters[6];
-  intrinsic.at<double>(1, 1) = parameters[6];
-
-  cv::Mat distortion = cvCreateMat(1, 4, CV_64FC1);
-  distortion.at<double>(0, 0) = parameters[7];
-  distortion.at<double>(0, 1) = 0;
-  distortion.at<double>(0, 2) = 0;
-  distortion.at<double>(0, 3) = 0;
-
-  this->ComputeErrorValues(*m_Model, *(m_Points->begin()), extrinsic, intrinsic, distortion, result);
-
+  niftk::ComputeMonoProjectionErrors(m_Model, m_Points, internalParameters, result);
   return result;
 }
 

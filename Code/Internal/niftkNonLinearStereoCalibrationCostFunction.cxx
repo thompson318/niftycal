@@ -100,10 +100,10 @@ NonLinearStereoCalibrationCostFunction::InternalGetValue(const ParametersType& p
   cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
 
-  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
   leftToRightTranslationVector.at<double>(0, 0) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 1) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 2) = parameters[counter++];
+  leftToRightTranslationVector.at<double>(1, 0) = parameters[counter++];
+  leftToRightTranslationVector.at<double>(2, 0) = parameters[counter++];
 
   int numberOfViews = 0;
   unsigned long int pointCounter = 0;

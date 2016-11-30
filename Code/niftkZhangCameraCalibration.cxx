@@ -315,9 +315,44 @@ cv::Matx21d ZhangStereoCameraCalibration(const Model3D& model,
                                      cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-10),
                                      cvFlags
                                     );
+/*
+  // Now optimise RMS reconstruction error via extrinsics.
+  niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
+      niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
+  Model3D* tmpModel = const_cast<Model3D*>(&model);
 
+  extrinsicsOptimiser->SetModelAndPoints(tmpModel,
+                                         &listOfLeftHandPointSets,
+                                         &listOfRightHandPointSets);
+
+  extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
+                                     &intrinsicRight
+                                    );
+
+  extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+
+  reconstructedRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
+                                                   tvecsLeft,
+                                                   leftToRightRotationMatrix,
+                                                   leftToRightTranslationVector
+                                                  );
+
+  // Recompute re-projection error, as it will now be different.
+  projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                    listOfLeftHandPointSets,
+                                                    listOfRightHandPointSets,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    rvecsLeft,
+                                                    tvecsLeft,
+                                                    intrinsicRight,
+                                                    distortionRight,
+                                                    leftToRightRotationMatrix,
+                                                    leftToRightTranslationVector
+                                                   );
+*/
   niftk::ComputeStereoExtrinsics(rvecsLeft,
-                                 tvecsRight,
+                                 tvecsLeft,
                                  leftToRightRotationMatrix,
                                  leftToRightTranslationVector,
                                  rvecsRight,

@@ -44,11 +44,11 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
   }
   intrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
 
-  if (distortion.rows != 1 || distortion.cols != 4)
+  if (distortion.rows != 1 || distortion.cols != 5)
   {
-    distortion = cvCreateMat(1, 4, CV_64FC1);
+    distortion = cvCreateMat(1, 5, CV_64FC1);
   }
-  distortion = cv::Mat::zeros(1, 4, CV_64FC1);
+  distortion = cv::Mat::zeros(1, 5, CV_64FC1);
 
   if (rvec.rows != 1 || rvec.cols != 3)
   {

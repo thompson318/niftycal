@@ -13,6 +13,9 @@
 =============================================================================*/
 
 #include "niftkCalibrationUtilities_p.h"
+#include <niftkPointUtilities.h>
+#include <niftkMatrixUtilities.h>
+#include <niftkNiftyCalExceptionMacro.h>
 
 namespace niftk
 {
@@ -76,6 +79,106 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
     tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3);
     tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
     tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeMonoProjectionErrors(const niftk::Model3D& model,
+                                 const niftk::PointSet& points,
+                                 const cv::Matx44d& extrinsic,
+                                 const cv::Mat& intrinsic,
+                                 const cv::Mat& distortion,
+                                 itk::MultipleValuedCostFunction::MeasureType& errorValues
+                                )
+{
+  std::vector<cv::Point2f> observed;
+  std::vector<cv::Point2f> projected;
+  std::vector<niftk::NiftyCalIdType> ids;
+
+  niftk::ProjectMatchingPoints(model,
+                               points,
+                               extrinsic,
+                               intrinsic,
+                               distortion,
+                               observed,
+                               projected,
+                               ids
+                              );
+
+  unsigned long int totalPointCounter = 0;
+  unsigned long int numberOfValues = observed.size() * 2;
+
+  errorValues.clear();
+  errorValues.SetSize(numberOfValues);
+
+  for (unsigned int i = 0; i < observed.size(); i++)
+  {
+    errorValues[totalPointCounter++] = (observed[i].x - projected[i].x);
+    errorValues[totalPointCounter++] = (observed[i].y - projected[i].y);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeMonoProjectionErrors(const Model3D* const model,
+                                 const std::list<PointSet>* const points,
+                                 const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                 itk::MultipleValuedCostFunction::MeasureType& errors
+                                )
+{
+  if (parameters.size() < 15)
+  {
+    niftkNiftyCalThrow() << "Too few parameters, must be at least 15";
+  }
+  if ((parameters.size() - 9) % 6 != 0)
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF), then 6N DOF.";
+  }
+  if ((parameters.size() - 9) / 6 != points->size())
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+  }
+
+  unsigned int parameterCounter = 0;
+
+  cv::Mat intrinsic = cv::Mat::eye(3, 3, CV_64FC1);
+  intrinsic.at<double>(0, 0) = parameters[parameterCounter++];
+  intrinsic.at<double>(1, 1) = parameters[parameterCounter++];
+  intrinsic.at<double>(0, 2) = parameters[parameterCounter++];
+  intrinsic.at<double>(1, 2) = parameters[parameterCounter++];
+
+  cv::Mat distortion = cvCreateMat(1, 5, CV_64FC1);
+  distortion.at<double>(0, 0) = parameters[parameterCounter++];
+  distortion.at<double>(0, 1) = parameters[parameterCounter++];
+  distortion.at<double>(0, 2) = parameters[parameterCounter++];
+  distortion.at<double>(0, 3) = parameters[parameterCounter++];
+  distortion.at<double>(0, 4) = parameters[parameterCounter++];
+
+  itk::MultipleValuedCostFunction::MeasureType errorsPerView;
+  unsigned long int valueCounter = 0;
+
+  std::list<PointSet>::const_iterator iter;
+  for (iter = points->begin(); iter != points->end(); iter++)
+  {
+    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    rvec.at<double>(0, 0) = parameters[parameterCounter++];
+    rvec.at<double>(0, 1) = parameters[parameterCounter++];
+    rvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    tvec.at<double>(0, 0) = parameters[parameterCounter++];
+    tvec.at<double>(0, 1) = parameters[parameterCounter++];
+    tvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+    niftk::ComputeMonoProjectionErrors(*model, *iter, extrinsic, intrinsic, distortion, errorsPerView);
+
+    for (unsigned long int i = 0; i < errorsPerView.size(); i++)
+    {
+      errors[valueCounter++] = errorsPerView[i];
+    }
   }
 }
 

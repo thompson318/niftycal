@@ -24,10 +24,7 @@ namespace niftk
 
 /**
 * \class NonLinearTsai10ParamOptimiser
-* \brief Optimises Rx, Ry, Rz, Tx, Ty, Tz, f, k, Cx and Cy using niftk::NonLinearTsai10ParamHandCostFunction.
-* \see Tsai 1987 paper "A Versatile Camera Calibration Techniaue for
-* High-Accuracy 3D Machine Vision Metrology Using Off-the-shelf TV Cameras and Lenses",
-* IEEE JOURNAL OF ROBOTICS AND AUTOMATION, VOL. RA-3, NO. 4, AUGUST 1987
+* \brief Optimises R1, R2, R3, Tx, Ty, Tz, f, k, Cx and Cy using niftk::NonLinearTsai10ParamHandCostFunction.
 */
 class NonLinearTsai10ParamOptimiser : public itk::Object
 {
