@@ -12,37 +12,37 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
-#define niftkNonLinearStereoIntrinsicsCalibrationCostFunction_h
+#ifndef niftkNonLinearStereoIntrinsicsCalibration3DCostFunction_h
+#define niftkNonLinearStereoIntrinsicsCalibration3DCostFunction_h
 
 #include <niftkNiftyCalTypes.h>
-#include "niftkNonLinearStereoCalibrationCostFunction.h"
+#include "niftkNonLinearStereo3DCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearStereoIntrinsicsCalibrationCostFunction
+* \class NonLinearStereoIntrinsicsCalibration3DCostFunction
 * \brief Computes cost as RMS reconstruction (3D) error
 * where the parameters array contains only intrinsic parameters.
 *
-* \see niftk::NonLinearStereoIntrinsicsCalibrationOptimiser
+* \see niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser
 */
-class NonLinearStereoIntrinsicsCalibrationCostFunction :
-    public niftk::NonLinearStereoCalibrationCostFunction
+class NonLinearStereoIntrinsicsCalibration3DCostFunction :
+    public NonLinearStereo3DCostFunction
 {
 
 public:
 
-  typedef NonLinearStereoIntrinsicsCalibrationCostFunction Self;
-  typedef niftk::NonLinearStereoCalibrationCostFunction    Superclass;
-  typedef itk::SmartPointer<Self>                          Pointer;
-  typedef itk::SmartPointer<const Self>                    ConstPointer;
+  typedef NonLinearStereoIntrinsicsCalibration3DCostFunction Self;
+  typedef NonLinearStereo3DCostFunction                      Superclass;
+  typedef itk::SmartPointer<Self>                            Pointer;
+  typedef itk::SmartPointer<const Self>                      ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType                       ParametersType;
-  typedef Superclass::DerivativeType                       DerivativeType;
-  typedef Superclass::MeasureType                          MeasureType;
+  typedef Superclass::ParametersType                         ParametersType;
+  typedef Superclass::DerivativeType                         DerivativeType;
+  typedef Superclass::MeasureType                            MeasureType;
 
   void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
                      std::vector<cv::Mat>* const tvecsLeft,
@@ -58,11 +58,11 @@ public:
 
 protected:
 
-  NonLinearStereoIntrinsicsCalibrationCostFunction();
-  virtual ~NonLinearStereoIntrinsicsCalibrationCostFunction();
+  NonLinearStereoIntrinsicsCalibration3DCostFunction();
+  virtual ~NonLinearStereoIntrinsicsCalibration3DCostFunction();
 
-  NonLinearStereoIntrinsicsCalibrationCostFunction(const NonLinearStereoIntrinsicsCalibrationCostFunction&);
-  NonLinearStereoIntrinsicsCalibrationCostFunction& operator=(const NonLinearStereoIntrinsicsCalibrationCostFunction&);
+  NonLinearStereoIntrinsicsCalibration3DCostFunction(const NonLinearStereoIntrinsicsCalibration3DCostFunction&);
+  NonLinearStereoIntrinsicsCalibration3DCostFunction& operator=(const NonLinearStereoIntrinsicsCalibration3DCostFunction&);
 
 private:
   std::vector<cv::Mat> *m_RvecsLeft;

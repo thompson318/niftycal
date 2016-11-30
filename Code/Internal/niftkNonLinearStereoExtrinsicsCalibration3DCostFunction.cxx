@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoExtrinsicsCalibrationCostFunction.h"
+#include "niftkNonLinearStereoExtrinsicsCalibration3DCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -21,7 +21,7 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::NonLinearStereoExtrinsicsCalibrationCostFunction()
+NonLinearStereoExtrinsicsCalibration3DCostFunction::NonLinearStereoExtrinsicsCalibration3DCostFunction()
 : m_LeftIntrinsic(nullptr)
 , m_LeftDistortion(nullptr)
 , m_RightIntrinsic(nullptr)
@@ -31,13 +31,13 @@ NonLinearStereoExtrinsicsCalibrationCostFunction::NonLinearStereoExtrinsicsCalib
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::~NonLinearStereoExtrinsicsCalibrationCostFunction()
+NonLinearStereoExtrinsicsCalibration3DCostFunction::~NonLinearStereoExtrinsicsCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationCostFunction::SetIntrinsics(cv::Mat* const leftIntrinsic,
+void NonLinearStereoExtrinsicsCalibration3DCostFunction::SetIntrinsics(cv::Mat* const leftIntrinsic,
                                                                      cv::Mat* const rightIntrinsic
                                                                     )
 {
@@ -60,7 +60,7 @@ void NonLinearStereoExtrinsicsCalibrationCostFunction::SetIntrinsics(cv::Mat* co
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
+void NonLinearStereoExtrinsicsCalibration3DCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                                cv::Mat* const rightDistortion
                                                                               )
 {
@@ -81,8 +81,8 @@ void NonLinearStereoExtrinsicsCalibrationCostFunction::SetDistortionParameters(c
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoExtrinsicsCalibrationCostFunction::MeasureType
-NonLinearStereoExtrinsicsCalibrationCostFunction::InternalGetValue(const ParametersType& parameters) const
+NonLinearStereoExtrinsicsCalibration3DCostFunction::MeasureType
+NonLinearStereoExtrinsicsCalibration3DCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
   if (m_Points->size() != m_RightHandPoints->size())
   {

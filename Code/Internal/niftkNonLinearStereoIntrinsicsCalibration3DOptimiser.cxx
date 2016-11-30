@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h"
-#include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
+#include "niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.h"
+#include "niftkNonLinearStereoIntrinsicsCalibration3DCostFunction.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -23,20 +23,20 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoIntrinsicsCalibrationOptimiser::NonLinearStereoIntrinsicsCalibrationOptimiser()
+NonLinearStereoIntrinsicsCalibration3DOptimiser::NonLinearStereoIntrinsicsCalibration3DOptimiser()
 {
-  m_CostFunction = niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::New();
+  m_CostFunction = niftk::NonLinearStereoIntrinsicsCalibration3DCostFunction::New();
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoIntrinsicsCalibrationOptimiser::~NonLinearStereoIntrinsicsCalibrationOptimiser()
+NonLinearStereoIntrinsicsCalibration3DOptimiser::~NonLinearStereoIntrinsicsCalibration3DOptimiser()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoIntrinsicsCalibrationOptimiser::SetModelAndPoints(const Model3D* const model,
+void NonLinearStereoIntrinsicsCalibration3DOptimiser::SetModelAndPoints(const Model3D* const model,
                                                                       const std::list<PointSet>* const leftPoints,
                                                                       const std::list<PointSet>* const rightPoints
                                                                      )
@@ -44,17 +44,12 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetModelAndPoints(const Mode
   m_CostFunction->SetModel(const_cast<Model3D* const>(model));
   m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
   m_CostFunction->SetRightHandPoints(const_cast<std::list<PointSet>* const>(rightPoints));
-
-  unsigned long int numberOfTriangulatablePoints
-    = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
-
-  //m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoIntrinsicsCalibrationOptimiser::SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
+void NonLinearStereoIntrinsicsCalibration3DOptimiser::SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
                                                                   std::vector<cv::Mat>* const tvecsLeft,
                                                                   cv::Mat* const leftToRightRotationMatrix,
                                                                   cv::Mat* const leftToRightTranslationVector
@@ -70,7 +65,7 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetExtrinsics(std::vector<cv
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoIntrinsicsCalibrationOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
+void NonLinearStereoIntrinsicsCalibration3DOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                             cv::Mat* const rightDistortion
                                                                            )
 {
@@ -82,7 +77,7 @@ void NonLinearStereoIntrinsicsCalibrationOptimiser::SetDistortionParameters(cv::
 
 
 //-----------------------------------------------------------------------------
-double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntrinsic,
+double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsic,
                                                                cv::Mat& rightIntrinsic
                                                               )
 {
@@ -98,7 +93,7 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
                          << rightIntrinsic.cols << ", " << rightIntrinsic.rows << ")";
   }
 
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::ParametersType initialParameters;
+  niftk::NonLinearStereoIntrinsicsCalibration3DCostFunction::ParametersType initialParameters;
   initialParameters.SetSize(  4  // left intrinsic
                             + 4  // right intrinsic
                            );
@@ -126,7 +121,7 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType initialValues =
+  niftk::NonLinearStereoIntrinsicsCalibration3DCostFunction::MeasureType initialValues =
     m_CostFunction->GetValue(initialParameters);
 
   double initialRMS = m_CostFunction->GetRMS(initialValues);
@@ -135,17 +130,17 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::ParametersType finalParameters
+  niftk::NonLinearStereoIntrinsicsCalibration3DCostFunction::ParametersType finalParameters
       = optimiser->GetCurrentPosition();
 
-  niftk::NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType finalValues
+  niftk::NonLinearStereoIntrinsicsCalibration3DCostFunction::MeasureType finalValues
       = m_CostFunction->GetValue(finalParameters);
 
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
   for (int i = 0; i < finalParameters.GetSize(); i++)
   {
-    std::cout << "NonLinearStereoIntrinsicsCalibrationOptimiser: final(" << i << ")=" << finalParameters[i]
+    std::cout << "NonLinearStereoIntrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
                  << ", initial=" << initialParameters[i]
                  << ", diff=" << finalParameters[i] - initialParameters[i]
                  << std::endl;
@@ -161,7 +156,7 @@ double NonLinearStereoIntrinsicsCalibrationOptimiser::Optimise(cv::Mat& leftIntr
   rightIntrinsic.at<double>(0, 2) = finalParameters[counter++];
   rightIntrinsic.at<double>(1, 2) = finalParameters[counter++];
 
-  std::cout << "NonLinearStereoIntrinsicsCalibrationOptimiser: initial rms=" << initialRMS
+  std::cout << "NonLinearStereoIntrinsicsCalibration3DOptimiser: initial rms=" << initialRMS
             << ", final rms=" << finalRMS
             << ", diff=" << finalRMS - initialRMS
             << std::endl;

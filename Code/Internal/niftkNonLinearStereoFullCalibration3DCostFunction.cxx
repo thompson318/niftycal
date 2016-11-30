@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoCalibrationCostFunction.h"
+#include "niftkNonLinearStereoFullCalibration3DCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -21,47 +21,21 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoCalibrationCostFunction::NonLinearStereoCalibrationCostFunction()
-: m_RightHandPoints(nullptr)
+NonLinearStereoFullCalibration3DCostFunction::NonLinearStereoFullCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoCalibrationCostFunction::~NonLinearStereoCalibrationCostFunction()
+NonLinearStereoFullCalibration3DCostFunction::~NonLinearStereoFullCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(std::list<PointSet>* const points)
+NonLinearStereoFullCalibration3DCostFunction::MeasureType
+NonLinearStereoFullCalibration3DCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
-  if (points == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null right hand points.";
-  }
-
-  m_RightHandPoints = const_cast<std::list<PointSet>*>(points);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-unsigned int NonLinearStereoCalibrationCostFunction::GetNumberOfValues(void) const
-{
-  return NonLinearCostFunction::GetNumberOfValues();
-}
-
-
-//-----------------------------------------------------------------------------
-NonLinearStereoCalibrationCostFunction::MeasureType
-NonLinearStereoCalibrationCostFunction::InternalGetValue(const ParametersType& parameters) const
-{
-  if (m_Points->size() != m_RightHandPoints->size())
-  {
-    niftkNiftyCalThrow() << "Different number of left and right point sets.";
-  }
-
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 

@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoIntrinsicsCalibrationCostFunction.h"
+#include "niftkNonLinearStereoIntrinsicsCalibration3DCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -21,7 +21,7 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoIntrinsicsCalibrationCostFunction::NonLinearStereoIntrinsicsCalibrationCostFunction()
+NonLinearStereoIntrinsicsCalibration3DCostFunction::NonLinearStereoIntrinsicsCalibration3DCostFunction()
 : m_RvecsLeft(nullptr)
 , m_TvecsLeft(nullptr)
 , m_LeftToRightRotationMatrix(nullptr)
@@ -33,17 +33,17 @@ NonLinearStereoIntrinsicsCalibrationCostFunction::NonLinearStereoIntrinsicsCalib
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoIntrinsicsCalibrationCostFunction::~NonLinearStereoIntrinsicsCalibrationCostFunction()
+NonLinearStereoIntrinsicsCalibration3DCostFunction::~NonLinearStereoIntrinsicsCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoIntrinsicsCalibrationCostFunction::SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
-                                                                     std::vector<cv::Mat>* const tvecsLeft,
-                                                                     cv::Mat* const leftToRightRotationMatrix,
-                                                                     cv::Mat* const leftToRightTranslationVector
-                                                                    )
+void NonLinearStereoIntrinsicsCalibration3DCostFunction::SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
+                                                                       std::vector<cv::Mat>* const tvecsLeft,
+                                                                       cv::Mat* const leftToRightRotationMatrix,
+                                                                       cv::Mat* const leftToRightTranslationVector
+                                                                      )
 {
   if (rvecsLeft == nullptr)
   {
@@ -92,7 +92,7 @@ void NonLinearStereoIntrinsicsCalibrationCostFunction::SetExtrinsics(std::vector
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoIntrinsicsCalibrationCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
+void NonLinearStereoIntrinsicsCalibration3DCostFunction::SetDistortionParameters(cv::Mat* const leftDistortion,
                                                                                cv::Mat* const rightDistortion
                                                                               )
 {
@@ -123,8 +123,8 @@ void NonLinearStereoIntrinsicsCalibrationCostFunction::SetDistortionParameters(c
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoIntrinsicsCalibrationCostFunction::MeasureType
-NonLinearStereoIntrinsicsCalibrationCostFunction::InternalGetValue(const ParametersType& parameters) const
+NonLinearStereoIntrinsicsCalibration3DCostFunction::MeasureType
+NonLinearStereoIntrinsicsCalibration3DCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
   if (m_Points->size() != m_RightHandPoints->size())
   {

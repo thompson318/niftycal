@@ -12,31 +12,31 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearStereoCalibrationOptimiser_h
-#define niftkNonLinearStereoCalibrationOptimiser_h
+#ifndef niftkNonLinearStereoFullCalibration3DOptimiser_h
+#define niftkNonLinearStereoFullCalibration3DOptimiser_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "niftkNonLinearStereoCalibrationCostFunction.h"
+#include "niftkNonLinearStereoFullCalibration3DCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearStereoCalibrationOptimiser
-* \brief Optimises standard OpenCV camera model by reconstructing the actual model position,
+* \class NonLinearStereoFullCalibration3DOptimiser
+* \brief Optimises camera model by reconstructing the actual model position,
 * optimising intrinsic, extrinsic and stereo parameters.
 *
-* \see niftk::NonLinearStereoCalibrationCostFunction
+* \see niftk::NonLinearStereoFullCalibration3DCostFunction
 */
-class NonLinearStereoCalibrationOptimiser : public itk::Object
+class NonLinearStereoFullCalibration3DOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearStereoCalibrationOptimiser Self;
-  typedef  itk::Object                         Superclass;
-  typedef  itk::SmartPointer<Self>             Pointer;
+  typedef  NonLinearStereoFullCalibration3DOptimiser Self;
+  typedef  itk::Object                               Superclass;
+  typedef  itk::SmartPointer<Self>                   Pointer;
   itkNewMacro(Self);
 
   void SetModelAndPoints(const Model3D* const model,
@@ -61,15 +61,15 @@ public:
 
 protected:
 
-  NonLinearStereoCalibrationOptimiser();
-  virtual ~NonLinearStereoCalibrationOptimiser();
+  NonLinearStereoFullCalibration3DOptimiser();
+  virtual ~NonLinearStereoFullCalibration3DOptimiser();
 
-  NonLinearStereoCalibrationOptimiser(const NonLinearStereoCalibrationOptimiser&);
-  NonLinearStereoCalibrationOptimiser& operator=(const NonLinearStereoCalibrationOptimiser&);
+  NonLinearStereoFullCalibration3DOptimiser(const NonLinearStereoFullCalibration3DOptimiser&);
+  NonLinearStereoFullCalibration3DOptimiser& operator=(const NonLinearStereoFullCalibration3DOptimiser&);
 
 private:
 
-  niftk::NonLinearStereoCalibrationCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearStereoFullCalibration3DCostFunction::Pointer m_CostFunction;
 
 };
 

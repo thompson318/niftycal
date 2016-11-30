@@ -22,11 +22,6 @@
 #include <highgui.h>
 #include <cstdlib>
 
-#ifdef NIFTYCAL_WITH_ITK
-#include <Internal/niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <Internal/niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
-#endif
-
 /**
 * \file niftkStereoChessboardCalibration.cxx
 * \brief Calibrate stereo camera, using standard chessboard and the Zhang 2000/OpenCV method.
