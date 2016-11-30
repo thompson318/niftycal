@@ -97,7 +97,7 @@ std::list<cv::Matx44d>* NonLinearCostFunction::GetHandMatrices() const
 //-----------------------------------------------------------------------------
 unsigned int NonLinearCostFunction::GetNumberOfValues(void) const
 {
-  return m_NumberOfValues * 2; // multiply by 2 for dx, dy.
+  return m_NumberOfValues;
 }
 
 

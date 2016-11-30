@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearTsai5ParamCostFunction_h
 #define niftkNonLinearTsai5ParamCostFunction_h
 
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearMonoCostFunction.h"
 
 namespace niftk
 {
@@ -25,13 +25,13 @@ namespace niftk
 * \brief Cost function, to optimise 2D projection error over Tz, f, k1, Cx and Cy.
 * \see niftk::NonLinearTsai5ParamOptimiser
 */
-class NonLinearTsai5ParamCostFunction : public niftk::NonLinearCostFunction
+class NonLinearTsai5ParamCostFunction : public niftk::NonLinearMonoCostFunction
 {
 
 public:
 
   typedef NonLinearTsai5ParamCostFunction Self;
-  typedef NonLinearCostFunction           Superclass;
+  typedef NonLinearMonoCostFunction       Superclass;
   typedef itk::SmartPointer<Self>         Pointer;
   typedef itk::SmartPointer<const Self>   ConstPointer;
   itkNewMacro(Self);
