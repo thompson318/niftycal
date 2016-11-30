@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearStereoHandEyeCostFunction_h
 #define niftkNonLinearStereoHandEyeCostFunction_h
 
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearStereo2DCostFunction.h"
 
 namespace niftk
 {
@@ -26,14 +26,13 @@ namespace niftk
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NonLinearStereoHandEyeCostFunction :
-    public niftk::NonLinearCostFunction
+class NonLinearStereoHandEyeCostFunction : public NonLinearStereo2DCostFunction
 {
 
 public:
 
   typedef NonLinearStereoHandEyeCostFunction Self;
-  typedef NonLinearCostFunction              Superclass;
+  typedef NonLinearStereo2DCostFunction      Superclass;
   typedef itk::SmartPointer<Self>            Pointer;
   typedef itk::SmartPointer<const Self>      ConstPointer;
   itkNewMacro(Self);
@@ -43,12 +42,11 @@ public:
   typedef Superclass::MeasureType            MeasureType;
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
+
   void SetLeftIntrinsic(const cv::Mat* const intrinsic);
   void SetLeftDistortion(const cv::Mat* const distortion);
   void SetRightIntrinsic(const cv::Mat* const intrinsic);
   void SetRightDistortion(const cv::Mat* const distortion);
-  void SetRightHandPoints(const std::list<PointSet>* const points);
-  virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
 
 protected:
 
@@ -72,8 +70,6 @@ private:
   cv::Mat             *m_LeftDistortion;
   cv::Mat             *m_RightIntrinsic;
   cv::Mat             *m_RightDistortion;
-  std::list<PointSet> *m_RightHandPoints;
-  unsigned int         m_NumberOfRightHandValues;
 };
 
 } // end namespace

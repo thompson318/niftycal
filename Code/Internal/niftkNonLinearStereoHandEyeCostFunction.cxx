@@ -26,8 +26,6 @@ NonLinearStereoHandEyeCostFunction::NonLinearStereoHandEyeCostFunction()
 , m_LeftDistortion(nullptr)
 , m_RightIntrinsic(nullptr)
 , m_RightDistortion(nullptr)
-, m_RightHandPoints(nullptr)
-, m_NumberOfRightHandValues(0)
 {
 }
 
@@ -90,38 +88,6 @@ void NonLinearStereoHandEyeCostFunction::SetRightDistortion(const cv::Mat* const
   m_RightDistortion = const_cast<cv::Mat*>(distortion);
   this->Modified();
 }
-
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(const std::list<PointSet>* const points)
-{
-  if (points == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null right hand points.";
-  }
-
-  unsigned int num = 0;
-  std::list<PointSet>::const_iterator iter;
-  for (iter = points->begin();
-       iter != points->end();
-       ++iter
-       )
-  {
-    num += (*iter).size();
-  }
-
-  m_NumberOfRightHandValues = num;
-  m_RightHandPoints = const_cast<std::list<PointSet>*>(points);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-unsigned int NonLinearStereoHandEyeCostFunction::GetNumberOfValues(void) const
-{
-  return (NonLinearCostFunction::GetNumberOfValues() + m_NumberOfRightHandValues) * 2;
-}
-
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,

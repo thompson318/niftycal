@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearMaltiHandEyeCostFunction_h
 #define niftkNonLinearMaltiHandEyeCostFunction_h
 
-#include "niftkNonLinearCostFunction.h"
+#include "niftkNonLinearMonoCostFunction.h"
 
 namespace niftk
 {
@@ -27,14 +27,13 @@ namespace niftk
 *
 * \see niftk::NonLinearMaltiHandEyeOptimiser
 */
-class NonLinearMaltiHandEyeCostFunction :
-    public niftk::NonLinearCostFunction
+class NonLinearMaltiHandEyeCostFunction : public NonLinearMonoCostFunction
 {
 
 public:
 
   typedef NonLinearMaltiHandEyeCostFunction Self;
-  typedef NonLinearCostFunction             Superclass;
+  typedef NonLinearMonoCostFunction         Superclass;
   typedef itk::SmartPointer<Self>           Pointer;
   typedef itk::SmartPointer<const Self>     ConstPointer;
   itkNewMacro(Self);
@@ -52,8 +51,6 @@ protected:
 
   NonLinearMaltiHandEyeCostFunction(const NonLinearMaltiHandEyeCostFunction&);
   NonLinearMaltiHandEyeCostFunction& operator=(const NonLinearMaltiHandEyeCostFunction&);
-
-private:
 
 };
 
