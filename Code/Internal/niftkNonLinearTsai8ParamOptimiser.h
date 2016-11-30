@@ -24,7 +24,7 @@ namespace niftk
 
 /**
 * \class NonLinearTsai8ParamOptimiser
-* \brief Optimises Rx, Ry, Rz, Tx, Ty, Tz, f and k using niftk::NonLinearTsai8ParamHandCostFunction.
+* \brief Optimises R1, R2, R3 (Rodrigues), Tx, Ty, Tz, f and k using niftk::NonLinearTsai8ParamHandCostFunction.
 */
 class NonLinearTsai8ParamOptimiser : public itk::Object
 {
