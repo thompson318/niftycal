@@ -77,12 +77,78 @@ void ComputeMonoProjectionErrors(const niftk::Model3D& model,
 *   p[13] = ty
 *   p[14] = tz
 * etc.
+*
+* \endverbatim
 */
 void ComputeMonoProjectionErrors(const Model3D* const model,
                                  const std::list<PointSet>* const points,
                                  const itk::MultipleValuedCostFunction::ParametersType& parameters,
                                  itk::MultipleValuedCostFunction::MeasureType& errors
                                 );
+
+
+/**
+* \brief Used in stereo CostFunctions to compute the projection error over a number of views.
+* \param parameters array of the format:
+*
+* \verbatim
+*   p[0] = left fx
+*   p[1] = left fy
+*   p[2] = left cx
+*   p[3] = left cy
+*   p[4] = left d1
+*   p[5] = left d2
+*   p[6] = left d3
+*   p[7] = left d4
+*   p[8] = left d5
+*   p[9] = right fx
+*   p[10] = right fy
+*   p[11] = right cx
+*   p[12] = right cy
+*   p[13] = right d1
+*   p[14] = right d2
+*   p[15] = right d3
+*   p[16] = right d4
+*   p[17] = right d5
+*
+* Then 6 DOF for left-to-right extrinsics
+*   p[18] = r1 (Rodrigues)
+*   p[19] = r2 (Rodrigues)
+*   p[20] = r3 (Rodrigues)
+*   p[21] = tx
+*   p[22] = ty
+*   p[23] = tz
+*
+*
+* Then sets of 6 DOF for left camera extrinsics.
+*   p[24] = r1 (Rodrigues)
+*   p[25] = r2 (Rodrigues)
+*   p[26] = r3 (Rodrigues)
+*   p[27] = tx
+*   p[28] = ty
+*   p[29] = tz
+* etc.
+*
+* \endverbatim
+*/
+void ComputeStereoProjectionErrors(const Model3D* const model,
+                                   const std::list<PointSet>* const leftPoints,
+                                   const std::list<PointSet>* const rightPoints,
+                                   const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                   itk::MultipleValuedCostFunction::MeasureType& errors
+                                  );
+
+
+/**
+* \brief Computes stereo reconstruction (triangulation) errors, using same
+* format input parameters as ComputeStereoProjectionErrors.
+*/
+void ComputeStereoReconstructionErrors(const Model3D* const model,
+                                       const std::list<PointSet>* const leftPoints,
+                                       const std::list<PointSet>* const rightPoints,
+                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                       itk::MultipleValuedCostFunction::MeasureType& errors
+                                      );
 
 } // end namespace
 

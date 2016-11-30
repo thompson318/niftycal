@@ -182,4 +182,28 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   }
 }
 
+
+//-----------------------------------------------------------------------------
+void ComputeStereoProjectionErrors(const Model3D* const model,
+                                   const std::list<PointSet>* const leftPoints,
+                                   const std::list<PointSet>* const rightPoints,
+                                   const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                   itk::MultipleValuedCostFunction::MeasureType& errors
+                                  )
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeStereoReconstructionErrors(const Model3D* const model,
+                                       const std::list<PointSet>* const leftPoints,
+                                       const std::list<PointSet>* const rightPoints,
+                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                       itk::MultipleValuedCostFunction::MeasureType& errors
+                                      )
+{
+
+}
+
 } // end namespace
