@@ -15,23 +15,23 @@
 #ifndef niftkNonLinearNoIntrinsicsHandEyeCostFunction_h
 #define niftkNonLinearNoIntrinsicsHandEyeCostFunction_h
 
-#include "niftkNonLinearHandEyeCostFunction.h"
+#include "niftkNonLinearCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearNoIntrinsicsHandEyeCostFunction
+* \class NonLinearNoIntrinsicsCostFunction
 * \brief Base class for hand-eye cost functions that don't optimise intrinsic parameters.
 */
 class NonLinearNoIntrinsicsHandEyeCostFunction :
-    public niftk::NonLinearHandEyeCostFunction
+    public niftk::NonLinearCostFunction
 {
 
 public:
 
   typedef NonLinearNoIntrinsicsHandEyeCostFunction Self;
-  typedef NonLinearHandEyeCostFunction             Superclass;
+  typedef NonLinearCostFunction                    Superclass;
   typedef itk::SmartPointer<Self>                  Pointer;
   typedef itk::SmartPointer<const Self>            ConstPointer;
 

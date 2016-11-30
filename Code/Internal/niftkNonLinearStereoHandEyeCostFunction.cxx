@@ -119,7 +119,7 @@ void NonLinearStereoHandEyeCostFunction::SetRightHandPoints(const std::list<Poin
 //-----------------------------------------------------------------------------
 unsigned int NonLinearStereoHandEyeCostFunction::GetNumberOfValues(void) const
 {
-  return (this->m_NumberOfValues + m_NumberOfRightHandValues) * 2;
+  return (NonLinearCostFunction::GetNumberOfValues() + m_NumberOfRightHandValues) * 2;
 }
 
 

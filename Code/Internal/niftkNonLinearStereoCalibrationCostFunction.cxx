@@ -49,7 +49,7 @@ void NonLinearStereoCalibrationCostFunction::SetRightHandPoints(std::list<PointS
 //-----------------------------------------------------------------------------
 unsigned int NonLinearStereoCalibrationCostFunction::GetNumberOfValues(void) const
 {
-  return this->m_NumberOfValues;
+  return NonLinearCostFunction::GetNumberOfValues();
 }
 
 

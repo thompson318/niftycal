@@ -44,7 +44,12 @@ public:
 
   void SetModel(const Model3D* const model);
   void SetPoints(const std::list<PointSet>* const points);
+  void SetHandMatrices(const std::list<cv::Matx44d>* const matrices);
+  std::list<cv::Matx44d>* GetHandMatrices() const;
+
   itkSetMacro(NumberOfParameters, unsigned int);
+  itkSetMacro(UseHandMatrices, bool);
+  itkGetMacro(UseHandMatrices, bool);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
   virtual unsigned int GetNumberOfParameters() const ITK_OVERRIDE;
@@ -62,10 +67,14 @@ protected:
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const = 0;
 
-  Model3D             *m_Model;
-  std::list<PointSet> *m_Points;
-  unsigned int         m_NumberOfParameters;
-  unsigned int         m_NumberOfValues;
+  Model3D                *m_Model;
+  std::list<PointSet>    *m_Points;
+  unsigned int            m_NumberOfParameters;
+  std::list<cv::Matx44d> *m_HandMatrices;
+
+private:
+  unsigned int            m_NumberOfValues;
+  bool                    m_UseHandMatrices;
 };
 
 } // end namespace

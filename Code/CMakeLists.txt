@@ -44,7 +44,6 @@ endif()
 
 if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearHandEyeCostFunction.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeOptimiser.cxx)

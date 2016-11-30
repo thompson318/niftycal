@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearMaltiHandEyeCostFunction_h
 #define niftkNonLinearMaltiHandEyeCostFunction_h
 
-#include "niftkNonLinearHandEyeCostFunction.h"
+#include "niftkNonLinearCostFunction.h"
 
 namespace niftk
 {
@@ -28,20 +28,20 @@ namespace niftk
 * \see niftk::NonLinearMaltiHandEyeOptimiser
 */
 class NonLinearMaltiHandEyeCostFunction :
-    public niftk::NonLinearHandEyeCostFunction
+    public niftk::NonLinearCostFunction
 {
 
 public:
 
-  typedef NonLinearMaltiHandEyeCostFunction     Self;
-  typedef NonLinearHandEyeCostFunction          Superclass;
-  typedef itk::SmartPointer<Self>               Pointer;
-  typedef itk::SmartPointer<const Self>         ConstPointer;
+  typedef NonLinearMaltiHandEyeCostFunction Self;
+  typedef NonLinearCostFunction             Superclass;
+  typedef itk::SmartPointer<Self>           Pointer;
+  typedef itk::SmartPointer<const Self>     ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType            ParametersType;
-  typedef Superclass::DerivativeType            DerivativeType;
-  typedef Superclass::MeasureType               MeasureType;
+  typedef Superclass::ParametersType        ParametersType;
+  typedef Superclass::DerivativeType        DerivativeType;
+  typedef Superclass::MeasureType           MeasureType;
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 

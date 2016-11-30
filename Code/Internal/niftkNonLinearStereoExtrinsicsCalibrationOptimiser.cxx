@@ -48,7 +48,7 @@ void NonLinearStereoExtrinsicsCalibrationOptimiser::SetModelAndPoints(const Mode
   unsigned long int numberOfTriangulatablePoints
     = niftk::GetNumberOfTriangulatablePoints(*model, *leftPoints, *rightPoints);
 
-  m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
+  //m_CostFunction->SetNumberOfValues(numberOfTriangulatablePoints * 3);
   this->Modified();
 }
 

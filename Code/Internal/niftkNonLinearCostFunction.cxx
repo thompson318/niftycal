@@ -26,6 +26,7 @@ NonLinearCostFunction::NonLinearCostFunction()
 , m_Points(nullptr)
 , m_NumberOfParameters(0)
 , m_NumberOfValues(0)
+, m_UseHandMatrices(false)
 {
 }
 
@@ -70,6 +71,26 @@ void NonLinearCostFunction::SetPoints(const std::list<PointSet>* const points)
   m_NumberOfValues = num;
   m_Points = const_cast<std::list<PointSet>*>(points);
   this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearCostFunction::SetHandMatrices(const std::list<cv::Matx44d>* const matrices)
+{
+  if (matrices == nullptr)
+  {
+    niftkNiftyCalThrow() << "Hand matrices are NULL.";
+  }
+
+  m_HandMatrices = const_cast<std::list<cv::Matx44d> *>(matrices);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+std::list<cv::Matx44d>* NonLinearCostFunction::GetHandMatrices() const
+{
+  return m_HandMatrices;
 }
 
 
@@ -128,6 +149,23 @@ NonLinearCostFunction::GetValue(const ParametersType& parameters ) const
   {
     niftkNiftyCalThrow() << "No extracted points.";
   }
+
+  if (m_UseHandMatrices)
+  {
+    if (m_HandMatrices == nullptr)
+    {
+      niftkNiftyCalThrow() << "Hand matrices are null.";
+    }
+    if (m_HandMatrices->empty())
+    {
+      niftkNiftyCalThrow() << "No tracking matrices.";
+    }
+    if (m_Points->size() != m_HandMatrices->size())
+    {
+      niftkNiftyCalThrow() << "Different number of point sets and hand matrices.";
+    }
+  }
+
   return this->InternalGetValue(parameters);
 }
 
