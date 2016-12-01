@@ -76,8 +76,8 @@ void NonLinearNDOFHandEyeOptimiser::SetDistortion(const cv::Mat* const distortio
 
 //-----------------------------------------------------------------------------
 double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
-                                                    cv::Matx44d& handEye
-                                                    )
+                                               cv::Matx44d& handEye
+                                              )
 {
   std::list<cv::Matx44d>* matrices = m_CostFunction->GetHandMatrices();
   if (matrices == nullptr)

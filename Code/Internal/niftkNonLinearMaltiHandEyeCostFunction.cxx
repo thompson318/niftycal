@@ -37,7 +37,7 @@ NonLinearMaltiHandEyeCostFunction::~NonLinearMaltiHandEyeCostFunction()
 NonLinearMaltiHandEyeCostFunction::MeasureType
 NonLinearMaltiHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
-  if (!this->GetUseHandMatrices())
+  if (!this->GetUseHandMatrices() && m_HandMatrices->size() != m_Points->size())
   {
     niftkNiftyCalThrow() << "NonLinearMaltiHandEyeCostFunction requires hand (tracking) matrices.";
   }
@@ -45,7 +45,8 @@ NonLinearMaltiHandEyeCostFunction::InternalGetValue(const ParametersType& parame
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
-  // Notice how we are extending a fixed length, 21DOF input into a 4+5+6N DOF array.
+  // Notice how we are extending a fixed length, 21DOF input into a 4+5+6N DOF array
+  // in order to call the common underlying function ComputeMonoProjectionErrors.
   ParametersType internalParameters;
   internalParameters.SetSize(  4 // intrinsic
                              + 5 // distortion
@@ -54,7 +55,7 @@ NonLinearMaltiHandEyeCostFunction::InternalGetValue(const ParametersType& parame
   internalParameters.Fill(0);
 
   // Copy first 9 parameters = 4 intrinsic, 5 distortion
-  for (int i = 0; i < 21; i++)
+  for (int i = 0; i < 9; i++)
   {
     internalParameters[i] = parameters[i];
   }

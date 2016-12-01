@@ -51,9 +51,10 @@ void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(const cv::Mat* const
 //-----------------------------------------------------------------------------
 void NonLinearNoIntrinsicsHandEyeCostFunction::SetDistortion(const cv::Mat* const distortion)
 {
-  if (distortion->rows != 1)
+  if (distortion->rows != 1 || distortion->cols != 5)
   {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
+    niftkNiftyCalThrow() << "Distortion vector should 1x5, and its ("
+                         << distortion->cols << ", " << distortion->rows << ")";
   }
 
   m_Distortion = const_cast<cv::Mat*>(distortion);

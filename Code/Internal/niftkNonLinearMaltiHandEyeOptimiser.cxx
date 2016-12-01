@@ -86,10 +86,10 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
   niftk::NonLinearMaltiHandEyeCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(  intrinsic.cols  // 4
-                            + distortion.cols // 5
-                            + 6               // hand eye
-                            + 6               // model to world
+  initialParameters.SetSize(  4 // intrinsic
+                            + 5 // distortion
+                            + 6 // hand eye
+                            + 6 // model to world
                            );
 
   // Set initial parameters.

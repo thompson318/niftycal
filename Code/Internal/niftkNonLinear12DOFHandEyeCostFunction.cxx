@@ -13,6 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinear12DOFHandEyeCostFunction.h"
+#include "niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -36,8 +37,33 @@ NonLinear12DOFHandEyeCostFunction::~NonLinear12DOFHandEyeCostFunction()
 NonLinear12DOFHandEyeCostFunction::MeasureType
 NonLinear12DOFHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
+  if (!this->GetUseHandMatrices() && m_HandMatrices->size() != m_Points->size())
+  {
+    niftkNiftyCalThrow() << "NonLinear12DOFHandEyeCostFunction requires hand (tracking) matrices.";
+  }
+
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
+
+  // Notice how we are changing a parameter variable of length 12DOF input into a 4+5+6N DOF array
+  // in order to call the common underlying function ComputeMonoProjectionErrors.
+  ParametersType internalParameters;
+  internalParameters.SetSize(  4 // intrinsic
+                             + 5 // distortion
+                             + (m_Points->size()*6)
+                            );
+  internalParameters.Fill(0);
+
+  // Intrinsic params are not in the input array, as they are constant.
+  internalParameters[0] = (*m_Intrinsic).at<double>(0, 0);
+  internalParameters[1] = (*m_Intrinsic).at<double>(1, 1);
+  internalParameters[2] = (*m_Intrinsic).at<double>(0, 2);
+  internalParameters[3] = (*m_Intrinsic).at<double>(1, 2);
+  internalParameters[4] = (*m_Distortion).at<double>(0, 0);
+  internalParameters[5] = (*m_Distortion).at<double>(0, 1);
+  internalParameters[6] = (*m_Distortion).at<double>(0, 2);
+  internalParameters[7] = (*m_Distortion).at<double>(0, 3);
+  internalParameters[8] = (*m_Distortion).at<double>(0, 4);
 
   cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
   handEyeRotationVector.at<double>(0, 0) = parameters[0];
@@ -62,44 +88,31 @@ NonLinear12DOFHandEyeCostFunction::InternalGetValue(const ParametersType& parame
   cv::Matx44d modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   cv::Matx44d handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 
-  unsigned int totalPointCounter = 0;
-
-  std::list<PointSet>::const_iterator viewIter;
   std::list<cv::Matx44d>::const_iterator matrixIter;
+  unsigned int internalParameterCounter = 9;
 
-  for (viewIter = m_Points->begin(),
-       matrixIter = m_HandMatrices->begin();
-       viewIter != m_Points->end()
-       && matrixIter != m_HandMatrices->end();
-       ++viewIter,
+  for (matrixIter = m_HandMatrices->begin();
+       matrixIter != m_HandMatrices->end();
        ++matrixIter
        )
   {
-    cv::Matx44d handToWorld = (*matrixIter);
+    cv::Matx44d handToWorld = *matrixIter;
     cv::Matx44d worldToHand = handToWorld.inv();
     cv::Matx44d cameraMatrix = handEye * worldToHand * modelToWorld;
 
-    std::vector<cv::Point2f> observed((*viewIter).size());
-    std::vector<cv::Point2f> projected((*viewIter).size());
-    std::vector<niftk::NiftyCalIdType> ids((*viewIter).size());
+    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    niftk::MatrixToRodrigues(cameraMatrix, rvec, tvec);
 
-    niftk::ProjectMatchingPoints(*m_Model,
-                                 *viewIter,
-                                 cameraMatrix,
-                                 *m_Intrinsic,
-                                 *m_Distortion,
-                                 observed,
-                                 projected,
-                                 ids
-                                );
-
-    for (unsigned int i = 0; i < observed.size(); i++)
-    {
-      result[totalPointCounter++] = (observed[i].x - projected[i].x);
-      result[totalPointCounter++] = (observed[i].y - projected[i].y);
-    }
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 1);
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 2);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 1);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 2);
   }
 
+  niftk::ComputeMonoProjectionErrors(m_Model, m_Points, internalParameters, result);
   return result;
 }
 
