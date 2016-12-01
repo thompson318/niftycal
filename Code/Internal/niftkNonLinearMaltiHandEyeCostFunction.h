@@ -51,7 +51,6 @@ protected:
 
   NonLinearMaltiHandEyeCostFunction(const NonLinearMaltiHandEyeCostFunction&);
   NonLinearMaltiHandEyeCostFunction& operator=(const NonLinearMaltiHandEyeCostFunction&);
-
 };
 
 } // end namespace

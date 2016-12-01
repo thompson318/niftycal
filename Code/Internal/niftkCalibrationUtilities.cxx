@@ -133,7 +133,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   }
   if ((parameters.size() - 9) % 6 != 0)
   {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF), then 6N DOF.";
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF), then Nx6DOF.";
   }
   if ((parameters.size() - 9) / 6 != points->size())
   {
@@ -156,7 +156,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   distortion.at<double>(0, 4) = parameters[parameterCounter++];
 
   itk::MultipleValuedCostFunction::MeasureType errorsPerView;
-  unsigned long int valueCounter = 0;
+  unsigned long int errorCounter = 0;
 
   std::list<PointSet>::const_iterator iter;
   for (iter = points->begin(); iter != points->end(); iter++)
@@ -177,8 +177,43 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
 
     for (unsigned long int i = 0; i < errorsPerView.size(); i++)
     {
-      errors[valueCounter++] = errorsPerView[i];
+      errors[errorCounter++] = errorsPerView[i];
     }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeStereoProjectionErrors(const Model3D& model,
+                                   const PointSet& leftPoints,
+                                   const PointSet& rightPoints,
+                                   const cv::Matx44d& leftExtrinsic,
+                                   const cv::Mat& leftIntrinsic,
+                                   const cv::Mat& leftDistortion,
+                                   const cv::Matx44d& rightExtrinsic,
+                                   const cv::Mat& rightIntrinsic,
+                                   const cv::Mat& rightDistortion,
+                                   itk::MultipleValuedCostFunction::MeasureType& errors
+                                  )
+{
+  itk::MultipleValuedCostFunction::MeasureType leftErrors;
+  ComputeMonoProjectionErrors(model, leftPoints, leftExtrinsic, leftIntrinsic, leftDistortion, leftErrors);
+
+  itk::MultipleValuedCostFunction::MeasureType rightErrors;
+  ComputeMonoProjectionErrors(model, rightPoints, rightExtrinsic, rightIntrinsic, rightDistortion, rightErrors);
+
+  errors.clear();
+  errors.SetSize(leftErrors.size() + rightErrors.size());
+
+  unsigned long int errorCounter = 0;
+  for (unsigned long int i = 0; i < leftErrors.size(); i++)
+  {
+    errors[errorCounter++] = leftErrors[i];
+  }
+
+  for (unsigned long int i = 0; i < rightErrors.size(); i++)
+  {
+    errors[errorCounter++] = rightErrors[i];
   }
 }
 
@@ -190,6 +225,110 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
                                    const itk::MultipleValuedCostFunction::ParametersType& parameters,
                                    itk::MultipleValuedCostFunction::MeasureType& errors
                                   )
+{
+  if (parameters.size() < 30)
+  {
+    niftkNiftyCalThrow() << "Too few parameters, must be at least 30";
+  }
+  if ((parameters.size() - 30) % 6 != 0)
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
+  }
+  if ((parameters.size() - 30) / 6 != leftPoints->size())
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+  }
+  if (leftPoints->size() != rightPoints->size())
+  {
+    niftkNiftyCalThrow() << "The number of left point sets:" << leftPoints->size()
+                         << ", doesn't match the number of right point sets:" << rightPoints->size();
+  }
+
+  unsigned int parameterCounter = 0;
+
+  cv::Mat leftIntrinsic = cv::Mat::eye(3, 3, CV_64FC1);
+  leftIntrinsic.at<double>(0, 0) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(1, 1) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
+
+  cv::Mat leftDistortion = cvCreateMat(1, 5, CV_64FC1);
+  leftDistortion.at<double>(0, 0) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 1) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 2) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 3) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 4) = parameters[parameterCounter++];
+
+  cv::Mat rightIntrinsic = cv::Mat::eye(3, 3, CV_64FC1);
+  rightIntrinsic.at<double>(0, 0) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(1, 1) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
+
+  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  rightDistortion.at<double>(0, 0) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 1) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 2) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 3) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 4) = parameters[parameterCounter++];
+
+  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  leftToRightRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
+  leftToRightRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
+  leftToRightRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
+
+  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  leftToRightTranslationVector.at<double>(0, 0) = parameters[parameterCounter++];
+  leftToRightTranslationVector.at<double>(0, 1) = parameters[parameterCounter++];
+  leftToRightTranslationVector.at<double>(0, 2) = parameters[parameterCounter++];
+
+  cv::Matx44d leftToRightExtrinsic = niftk::RodriguesToMatrix(leftToRightRotationVector, leftToRightTranslationVector);
+
+  itk::MultipleValuedCostFunction::MeasureType errorsPerView;
+  unsigned long int errorCounter = 0;
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+  for (leftIter = leftPoints->begin(), rightIter = rightPoints->begin();
+       leftIter != leftPoints->end();
+       leftIter++, rightIter++
+      )
+  {
+    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    rvec.at<double>(0, 0) = parameters[parameterCounter++];
+    rvec.at<double>(0, 1) = parameters[parameterCounter++];
+    rvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    tvec.at<double>(0, 0) = parameters[parameterCounter++];
+    tvec.at<double>(0, 1) = parameters[parameterCounter++];
+    tvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Matx44d leftExtrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+    cv::Matx44d rightExtrinsic = leftToRightExtrinsic * leftExtrinsic;
+
+    niftk::ComputeStereoProjectionErrors(*model, *leftIter, *rightIter, leftExtrinsic, leftIntrinsic, leftDistortion, rightExtrinsic, rightIntrinsic, rightDistortion, errorsPerView);
+    for (unsigned long int i = 0; i < errorsPerView.size(); i++)
+    {
+      errors[errorCounter++] = errorsPerView[i];
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeStereoReconstructionErrors(const Model3D& model,
+                                       const PointSet& leftPoints,
+                                       const PointSet& rightPoints,
+                                       const cv::Matx44d& leftExtrinsic,
+                                       const cv::Mat& leftIntrinsic,
+                                       const cv::Mat& leftDistortion,
+                                       const cv::Matx44d& rightExtrinsic,
+                                       const cv::Mat& rightIntrinsic,
+                                       const cv::Mat& rightDistortion,
+                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                       itk::MultipleValuedCostFunction::MeasureType& errors
+                                      )
 {
 
 }

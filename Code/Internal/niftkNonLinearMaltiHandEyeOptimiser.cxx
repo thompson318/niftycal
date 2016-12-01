@@ -69,11 +69,12 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   if (intrinsic.rows != 3 || intrinsic.cols != 3)
   {
     niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
-                         << intrinsic.cols << ", " << intrinsic.rows << ")";
+                         << intrinsic.rows << ", " << intrinsic.cols << ")";
   }
-  if (distortion.rows != 1)
+  if (distortion.rows != 1 || distortion.cols != 5)
   {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
+    niftkNiftyCalThrow() << "Distortion vector should be 1x5, and its ("
+                         << distortion.rows << ", " << distortion.cols << ")";
   }
 
   cv::Mat modelToWorldRotationVector = cvCreateMat(1, 3, CV_64FC1);
@@ -85,33 +86,35 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
   niftk::NonLinearMaltiHandEyeCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(  6               // hand eye
+  initialParameters.SetSize(  intrinsic.cols  // 4
+                            + distortion.cols // 5
+                            + 6               // hand eye
                             + 6               // model to world
-                            + intrinsic.cols  // normally 4
-                            + distortion.cols // could be 4..8
                            );
 
   // Set initial parameters.
-  initialParameters[0] = handEyeRotationVector.at<double>(0, 0);
-  initialParameters[1] = handEyeRotationVector.at<double>(0, 1);
-  initialParameters[2] = handEyeRotationVector.at<double>(0, 2);
-  initialParameters[3] = handEyeTranslationVector.at<double>(0, 0);
-  initialParameters[4] = handEyeTranslationVector.at<double>(0, 1);
-  initialParameters[5] = handEyeTranslationVector.at<double>(0, 2);
-  initialParameters[6] = modelToWorldRotationVector.at<double>(0, 0);
-  initialParameters[7] = modelToWorldRotationVector.at<double>(0, 1);
-  initialParameters[8] = modelToWorldRotationVector.at<double>(0, 2);
-  initialParameters[9] = modelToWorldTranslationVector.at<double>(0, 0);
-  initialParameters[10] = modelToWorldTranslationVector.at<double>(0, 1);
-  initialParameters[11] = modelToWorldTranslationVector.at<double>(0, 2);
-  initialParameters[12] = intrinsic.at<double>(0, 0);
-  initialParameters[13] = intrinsic.at<double>(1, 1);
-  initialParameters[14] = intrinsic.at<double>(0, 2);
-  initialParameters[15] = intrinsic.at<double>(1, 2);
-  for (int c = 0; c < distortion.cols; c++)
-  {
-    initialParameters[16+c] = distortion.at<double>(0, c);
-  }
+  initialParameters[0] = intrinsic.at<double>(0, 0);
+  initialParameters[1] = intrinsic.at<double>(1, 1);
+  initialParameters[2] = intrinsic.at<double>(0, 2);
+  initialParameters[3] = intrinsic.at<double>(1, 2);
+  initialParameters[4] = distortion.at<double>(0, 0);
+  initialParameters[5] = distortion.at<double>(0, 1);
+  initialParameters[6] = distortion.at<double>(0, 2);
+  initialParameters[7] = distortion.at<double>(0, 3);
+  initialParameters[8] = distortion.at<double>(0, 4);
+  initialParameters[9] = handEyeRotationVector.at<double>(0, 0);
+  initialParameters[10] = handEyeRotationVector.at<double>(0, 1);
+  initialParameters[11] = handEyeRotationVector.at<double>(0, 2);
+  initialParameters[12] = handEyeTranslationVector.at<double>(0, 0);
+  initialParameters[13] = handEyeTranslationVector.at<double>(0, 1);
+  initialParameters[14] = handEyeTranslationVector.at<double>(0, 2);
+  initialParameters[15] = modelToWorldRotationVector.at<double>(0, 0);
+  initialParameters[16] = modelToWorldRotationVector.at<double>(0, 1);
+  initialParameters[17] = modelToWorldRotationVector.at<double>(0, 2);
+  initialParameters[18] = modelToWorldTranslationVector.at<double>(0, 0);
+  initialParameters[19] = modelToWorldTranslationVector.at<double>(0, 1);
+  initialParameters[20] = modelToWorldTranslationVector.at<double>(0, 2);
+
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
   // Setup optimiser.
@@ -134,26 +137,28 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
 
   // Get final parameters.
   niftk::NonLinearMaltiHandEyeCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-  handEyeRotationVector.at<double>(0, 0) = finalParameters[0];
-  handEyeRotationVector.at<double>(0, 1) = finalParameters[1];
-  handEyeRotationVector.at<double>(0, 2) = finalParameters[2];
-  handEyeTranslationVector.at<double>(0, 0) = finalParameters[3];
-  handEyeTranslationVector.at<double>(0, 1) = finalParameters[4];
-  handEyeTranslationVector.at<double>(0, 2) = finalParameters[5];
-  modelToWorldRotationVector.at<double>(0, 0) = finalParameters[6];
-  modelToWorldRotationVector.at<double>(0, 1) = finalParameters[7];
-  modelToWorldRotationVector.at<double>(0, 2) = finalParameters[8];
-  modelToWorldTranslationVector.at<double>(0, 0) = finalParameters[9];
-  modelToWorldTranslationVector.at<double>(0, 1) = finalParameters[10];
-  modelToWorldTranslationVector.at<double>(0, 2) = finalParameters[11];
-  intrinsic.at<double>(0, 0) = finalParameters[12];
-  intrinsic.at<double>(1, 1) = finalParameters[13];
-  intrinsic.at<double>(0, 2) = finalParameters[14];
-  intrinsic.at<double>(1, 2) = finalParameters[15];
-  for (int c = 0; c < distortion.cols; c++)
-  {
-    distortion.at<double>(0, c) = finalParameters[16+c];
-  }
+  intrinsic.at<double>(0, 0) = finalParameters[0];
+  intrinsic.at<double>(1, 1) = finalParameters[1];
+  intrinsic.at<double>(0, 2) = finalParameters[2];
+  intrinsic.at<double>(1, 2) = finalParameters[3];
+  distortion.at<double>(0, 0) = finalParameters[4];
+  distortion.at<double>(0, 1) = finalParameters[5];
+  distortion.at<double>(0, 2) = finalParameters[6];
+  distortion.at<double>(0, 3) = finalParameters[7];
+  distortion.at<double>(0, 4) = finalParameters[8];
+  handEyeRotationVector.at<double>(0, 0) = finalParameters[9];
+  handEyeRotationVector.at<double>(0, 1) = finalParameters[10];
+  handEyeRotationVector.at<double>(0, 2) = finalParameters[11];
+  handEyeTranslationVector.at<double>(0, 0) = finalParameters[12];
+  handEyeTranslationVector.at<double>(0, 1) = finalParameters[13];
+  handEyeTranslationVector.at<double>(0, 2) = finalParameters[14];
+  modelToWorldRotationVector.at<double>(0, 0) = finalParameters[15];
+  modelToWorldRotationVector.at<double>(0, 1) = finalParameters[16];
+  modelToWorldRotationVector.at<double>(0, 2) = finalParameters[17];
+  modelToWorldTranslationVector.at<double>(0, 0) = finalParameters[18];
+  modelToWorldTranslationVector.at<double>(0, 1) = finalParameters[19];
+  modelToWorldTranslationVector.at<double>(0, 2) = finalParameters[20];
+
   modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
 

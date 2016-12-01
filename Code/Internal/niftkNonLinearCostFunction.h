@@ -49,7 +49,7 @@ public:
 
   itkSetMacro(NumberOfParameters, unsigned int);
   itkSetMacro(UseHandMatrices, bool);
-  itkGetMacro(UseHandMatrices, bool);
+  itkGetConstMacro(UseHandMatrices, bool);
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
   virtual unsigned int GetNumberOfParameters() const ITK_OVERRIDE;

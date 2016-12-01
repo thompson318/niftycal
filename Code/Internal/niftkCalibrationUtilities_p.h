@@ -43,7 +43,7 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
 
 
 /**
-* \brief For a single view, calculates reprojection errors.
+* \brief For a single view, calculates projection errors.
 */
 void ComputeMonoProjectionErrors(const niftk::Model3D& model,
                                  const niftk::PointSet& points,
@@ -69,7 +69,7 @@ void ComputeMonoProjectionErrors(const niftk::Model3D& model,
 *   p[7] = d4
 *   p[8] = d5
 *
-* Then sets of 6 DOF for each view
+* Then sets of 6 DOF for the extrinsic parameters of each view
 *   p[9]  = r1 (Rodrigues)
 *   p[10] = r2 (Rodrigues)
 *   p[11] = r3 (Rodrigues)
@@ -85,6 +85,22 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
                                  const itk::MultipleValuedCostFunction::ParametersType& parameters,
                                  itk::MultipleValuedCostFunction::MeasureType& errors
                                 );
+
+
+/**
+* \brief For a single pair of views, calculates projection error.
+*/
+void ComputeStereoProjectionErrors(const Model3D& model,
+                                   const PointSet& leftPoints,
+                                   const PointSet& rightPoints,
+                                   const cv::Matx44d& leftExtrinsic,
+                                   const cv::Mat& leftIntrinsic,
+                                   const cv::Mat& leftDistortion,
+                                   const cv::Matx44d& rightExtrinsic,
+                                   const cv::Mat& rightIntrinsic,
+                                   const cv::Mat& rightDistortion,
+                                   itk::MultipleValuedCostFunction::MeasureType& errors
+                                  );
 
 
 /**
@@ -111,7 +127,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
 *   p[16] = right d4
 *   p[17] = right d5
 *
-* Then 6 DOF for left-to-right extrinsics
+* Then 6 DOF for left-to-right extrinsics:
 *   p[18] = r1 (Rodrigues)
 *   p[19] = r2 (Rodrigues)
 *   p[20] = r3 (Rodrigues)
@@ -120,7 +136,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
 *   p[23] = tz
 *
 *
-* Then sets of 6 DOF for left camera extrinsics.
+* Then sets of 6 DOF for left camera extrinsics for each view:
 *   p[24] = r1 (Rodrigues)
 *   p[25] = r2 (Rodrigues)
 *   p[26] = r3 (Rodrigues)
@@ -140,7 +156,24 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
 
 
 /**
-* \brief Computes stereo reconstruction (triangulation) errors, using same
+* \brief For a single pair of views, calculates stereo reconstruction error.
+*/
+void ComputeStereoReconstructionErrors(const Model3D& model,
+                                       const PointSet& leftPoints,
+                                       const PointSet& rightPoints,
+                                       const cv::Matx44d& leftExtrinsic,
+                                       const cv::Mat& leftIntrinsic,
+                                       const cv::Mat& leftDistortion,
+                                       const cv::Matx44d& rightExtrinsic,
+                                       const cv::Mat& rightIntrinsic,
+                                       const cv::Mat& rightDistortion,
+                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
+                                       itk::MultipleValuedCostFunction::MeasureType& errors
+                                      );
+
+
+/**
+* \brief Computes stereo reconstruction errors, using the same
 * format input parameters as ComputeStereoProjectionErrors.
 */
 void ComputeStereoReconstructionErrors(const Model3D* const model,
