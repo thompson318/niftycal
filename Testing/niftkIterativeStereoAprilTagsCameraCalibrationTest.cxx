@@ -208,7 +208,7 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
                                                    );
   cv::imwrite("/tmp/matt.epi.png", rightImageWithLines);
 */
-  double tolerance = 0.5;
+  double tolerance = 0.01;
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);

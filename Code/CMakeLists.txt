@@ -76,6 +76,9 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DOptimiser.cxx)
 
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration2DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.cxx)
+
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo3DCostFunction.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration3DCostFunction.cxx)

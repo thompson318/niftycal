@@ -18,6 +18,7 @@
 #include <Internal/niftkCalibrationUtilities_p.h>
 
 #ifdef NIFTYCAL_WITH_ITK
+#include <Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.h>
 #include <Internal/niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.h>
 #include <Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.h>
 #endif
@@ -316,6 +317,24 @@ cv::Matx21d ZhangStereoCameraCalibration(const Model3D& model,
                                      cvFlags
                                     );
 
+  Model3D* tmpModel = const_cast<Model3D*>(&model);
+
+#ifdef NIFTYCAL_WITH_ITK
+
+  niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer full2DOptimiser
+      = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
+  full2DOptimiser->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
+  full2DOptimiser->Optimise(intrinsicLeft,
+                            distortionLeft,
+                            intrinsicRight,
+                            distortionRight,
+                            rvecsLeft,
+                            tvecsLeft,
+                            leftToRightRotationMatrix,
+                            leftToRightTranslationVector
+                           );
+#endif
+
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
                                  leftToRightRotationMatrix,
@@ -342,8 +361,6 @@ cv::Matx21d ZhangStereoCameraCalibration(const Model3D& model,
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
-    Model3D* tmpModel = const_cast<Model3D*>(&model);
-
     // Now optimise RMS reconstruction error via intrinsics.
     niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
         niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();

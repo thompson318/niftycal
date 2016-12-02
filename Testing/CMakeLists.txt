@@ -380,8 +380,8 @@ add_test(REG-CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeSte
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
   1 1                                                       # Simulation has proper scale factors
-  2.77247e-05 -0.0853894 2.02478e-05 # rvec
-  5.97596 0.000262982 0.519377 # tvec
+  4.15261e-05 -0.0856031 2.99086e-05 # rvec
+  5.97664 0.00101932 0.503954 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.png
   ${DATA_DIR}/SimulationAprilTags/Left2.png
   ${DATA_DIR}/SimulationAprilTags/Left3.png
