@@ -226,15 +226,15 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
                                    itk::MultipleValuedCostFunction::MeasureType& errors
                                   )
 {
-  if (parameters.size() < 30)
+  if (parameters.size() < 24)
   {
     niftkNiftyCalThrow() << "Too few parameters, must be at least 30";
   }
-  if ((parameters.size() - 30) % 6 != 0)
+  if ((parameters.size() - 24) % 6 != 0)
   {
     niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
   }
-  if ((parameters.size() - 30) / 6 != leftPoints->size())
+  if ((parameters.size() - 24) / 6 != leftPoints->size())
   {
     niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
   }

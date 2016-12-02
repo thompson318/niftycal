@@ -13,6 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoHandEyeCostFunction.h"
+#include "niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -53,9 +54,10 @@ void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(const cv::Mat* const i
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(const cv::Mat* const distortion)
 {
-  if (distortion->rows != 1)
+  if (distortion->rows != 1 || distortion->cols != 5)
   {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
+    niftkNiftyCalThrow() << "Distortion vector should be 1x5, and its ("
+                         << distortion->cols << ", " << distortion->rows << ")";
   }
 
   m_LeftDistortion = const_cast<cv::Mat*>(distortion);
@@ -80,43 +82,14 @@ void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(const cv::Mat* const 
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEyeCostFunction::SetRightDistortion(const cv::Mat* const distortion)
 {
-  if (distortion->rows != 1)
+  if (distortion->rows != 1 || distortion->cols != 5)
   {
-    niftkNiftyCalThrow() << "Distortion vector should be a row vector.";
+    niftkNiftyCalThrow() << "Distortion vector should be 1x5, and its ("
+                         << distortion->cols << ", " << distortion->rows << ")";
   }
 
   m_RightDistortion = const_cast<cv::Mat*>(distortion);
   this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,
-                                                       const cv::Matx44d& extrinsic,
-                                                       const cv::Mat& intrinsic,
-                                                       const cv::Mat& distortion,
-                                                       MeasureType& values,
-                                                       unsigned int& totalPointCounter
-                                                      ) const
-{
-  std::vector<cv::Point2f> observed(points.size());
-  std::vector<cv::Point2f> projected(points.size());
-  std::vector<niftk::NiftyCalIdType> ids(points.size());
-
-  niftk::ProjectMatchingPoints(*m_Model,
-                               points,
-                               extrinsic,
-                               intrinsic,
-                               distortion,
-                               observed,
-                               projected,
-                               ids
-                              );
-
-  for (unsigned int i = 0; i < observed.size(); i++)
-  {
-    values[totalPointCounter++] = (observed[i].x - projected[i].x);
-    values[totalPointCounter++] = (observed[i].y - projected[i].y);
-  }
 }
 
 
@@ -124,6 +97,11 @@ void NonLinearStereoHandEyeCostFunction::ProjectPoints(const PointSet& points,
 NonLinearStereoHandEyeCostFunction::MeasureType
 NonLinearStereoHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
+  if (!this->GetUseHandMatrices() && m_HandMatrices->size() != m_Points->size())
+  {
+    niftkNiftyCalThrow() << "NonLinearStereoHandEyeCostFunction requires hand (tracking) matrices.";
+  }
+
   if (m_Points->size() != m_RightHandPoints->size())
   {
     niftkNiftyCalThrow() << "Different number of left and right point sets.";
@@ -131,6 +109,44 @@ NonLinearStereoHandEyeCostFunction::InternalGetValue(const ParametersType& param
 
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
+
+  // Notice how we are changin a parameter variable of length 6+6+6+6NDOF input into a 4+5+4+5+6+6N DOF array
+  // in order to call the common underlying function ComputeStereoProjectionErrors.
+  ParametersType internalParameters;
+  internalParameters.SetSize(  4 // left intrinsic
+                             + 5 // left distortion
+                             + 4 // right intrinsic
+                             + 5 // right distortion
+                             + 6 // left to right
+                             + (m_Points->size()*6)
+                            );
+  internalParameters.Fill(0);
+
+  // Intrinsic params are not in the input array, as they are constant.
+  internalParameters[0] = (*m_LeftIntrinsic).at<double>(0, 0);
+  internalParameters[1] = (*m_LeftIntrinsic).at<double>(1, 1);
+  internalParameters[2] = (*m_LeftIntrinsic).at<double>(0, 2);
+  internalParameters[3] = (*m_LeftIntrinsic).at<double>(1, 2);
+  internalParameters[4] = (*m_LeftDistortion).at<double>(0, 0);
+  internalParameters[5] = (*m_LeftDistortion).at<double>(0, 1);
+  internalParameters[6] = (*m_LeftDistortion).at<double>(0, 2);
+  internalParameters[7] = (*m_LeftDistortion).at<double>(0, 3);
+  internalParameters[8] = (*m_LeftDistortion).at<double>(0, 4);
+  internalParameters[9] = (*m_RightIntrinsic).at<double>(0, 0);
+  internalParameters[10] = (*m_RightIntrinsic).at<double>(1, 1);
+  internalParameters[11] = (*m_RightIntrinsic).at<double>(0, 2);
+  internalParameters[12] = (*m_RightIntrinsic).at<double>(1, 2);
+  internalParameters[13] = (*m_RightDistortion).at<double>(0, 0);
+  internalParameters[14] = (*m_RightDistortion).at<double>(0, 1);
+  internalParameters[15] = (*m_RightDistortion).at<double>(0, 2);
+  internalParameters[16] = (*m_RightDistortion).at<double>(0, 3);
+  internalParameters[17] = (*m_RightDistortion).at<double>(0, 4);
+  internalParameters[18] = parameters[12];
+  internalParameters[19] = parameters[13];
+  internalParameters[20] = parameters[14];
+  internalParameters[21] = parameters[15];
+  internalParameters[22] = parameters[16];
+  internalParameters[23] = parameters[17];
 
   cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
   handEyeRotationVector.at<double>(0, 0) = parameters[0];
@@ -152,61 +168,46 @@ NonLinearStereoHandEyeCostFunction::InternalGetValue(const ParametersType& param
   modelToWorldTranslationVector.at<double>(0, 1) = parameters[10];
   modelToWorldTranslationVector.at<double>(0, 2) = parameters[11];
 
-  cv::Mat stereoExtrinsicsRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  stereoExtrinsicsRotationVector.at<double>(0, 0) = parameters[12];
-  stereoExtrinsicsRotationVector.at<double>(0, 1) = parameters[13];
-  stereoExtrinsicsRotationVector.at<double>(0, 2) = parameters[14];
-
-  cv::Mat stereoExtrinsicsTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  stereoExtrinsicsTranslationVector.at<double>(0, 0) = parameters[15];
-  stereoExtrinsicsTranslationVector.at<double>(0, 1) = parameters[16];
-  stereoExtrinsicsTranslationVector.at<double>(0, 2) = parameters[17];
-
   cv::Matx44d modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   cv::Matx44d handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
-  cv::Matx44d stereoExtrinsics = niftk::RodriguesToMatrix(stereoExtrinsicsRotationVector,
-                                                          stereoExtrinsicsTranslationVector);
 
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
+  std::list<cv::Matx44d>::const_iterator matrixIter;
+  unsigned int internalParameterCounter = 24;
+  unsigned int parameterCounter = 18;
 
-  unsigned int totalPointCounter = 0;
-  unsigned int matrixParametersCounter = 18;
-
-  for (leftViewIter = m_Points->begin(),
-       rightViewIter = m_RightHandPoints->begin();
-       leftViewIter != m_Points->end()
-       && rightViewIter != m_RightHandPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
+  for (matrixIter = m_HandMatrices->begin();
+       matrixIter != m_HandMatrices->end();
+       ++matrixIter
        )
   {
-
     cv::Mat trackingRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    trackingRotationVector.at<double>(0, 0) = parameters[matrixParametersCounter++];
-    trackingRotationVector.at<double>(0, 1) = parameters[matrixParametersCounter++];
-    trackingRotationVector.at<double>(0, 2) = parameters[matrixParametersCounter++];
+    trackingRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
+    trackingRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
+    trackingRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
 
     cv::Mat trackingTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-    trackingTranslationVector.at<double>(0, 0) = parameters[matrixParametersCounter++];
-    trackingTranslationVector.at<double>(0, 1) = parameters[matrixParametersCounter++];
-    trackingTranslationVector.at<double>(0, 2) = parameters[matrixParametersCounter++];
+    trackingTranslationVector.at<double>(0, 0) = parameters[parameterCounter++];
+    trackingTranslationVector.at<double>(0, 1) = parameters[parameterCounter++];
+    trackingTranslationVector.at<double>(0, 2) = parameters[parameterCounter++];
 
     cv::Matx44d handToWorld = niftk::RodriguesToMatrix(trackingRotationVector, trackingTranslationVector);
     cv::Matx44d worldToHand = handToWorld.inv();
 
     cv::Matx44d leftCameraMatrix = handEye * worldToHand * modelToWorld;
-    cv::Matx44d rightCameraMatrix = stereoExtrinsics * leftCameraMatrix;
 
-    this->ProjectPoints(*leftViewIter, leftCameraMatrix,
-                        *m_LeftIntrinsic, *m_LeftDistortion,
-                        result, totalPointCounter);
+    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    niftk::MatrixToRodrigues(leftCameraMatrix, rvec, tvec);
 
-    this->ProjectPoints(*rightViewIter, rightCameraMatrix,
-                        *m_RightIntrinsic, *m_RightDistortion,
-                        result, totalPointCounter);
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 1);
+    internalParameters[internalParameterCounter++] = rvec.at<double>(0, 2);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 1);
+    internalParameters[internalParameterCounter++] = tvec.at<double>(0, 2);
   }
 
+  niftk::ComputeStereoProjectionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
   return result;
 }
 

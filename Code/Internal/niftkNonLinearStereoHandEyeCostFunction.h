@@ -56,20 +56,12 @@ protected:
   NonLinearStereoHandEyeCostFunction(const NonLinearStereoHandEyeCostFunction&);
   NonLinearStereoHandEyeCostFunction& operator=(const NonLinearStereoHandEyeCostFunction&);
 
-  void ProjectPoints(const PointSet& points,
-                     const cv::Matx44d& extrinsic,
-                     const cv::Mat& intrinsic,
-                     const cv::Mat& distortion,
-                     MeasureType& values,
-                     unsigned int& totalPointCounter
-                    ) const;
-
 private:
 
-  cv::Mat             *m_LeftIntrinsic;
-  cv::Mat             *m_LeftDistortion;
-  cv::Mat             *m_RightIntrinsic;
-  cv::Mat             *m_RightDistortion;
+  cv::Mat *m_LeftIntrinsic;
+  cv::Mat *m_LeftDistortion;
+  cv::Mat *m_RightIntrinsic;
+  cv::Mat *m_RightDistortion;
 };
 
 } // end namespace
