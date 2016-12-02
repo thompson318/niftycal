@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoFullCalibration3DCostFunction.h"
+#include "niftkNonLinearStereoCameraCalibration3DCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -21,20 +21,20 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoFullCalibration3DCostFunction::NonLinearStereoFullCalibration3DCostFunction()
+NonLinearStereoCameraCalibration3DCostFunction::NonLinearStereoCameraCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoFullCalibration3DCostFunction::~NonLinearStereoFullCalibration3DCostFunction()
+NonLinearStereoCameraCalibration3DCostFunction::~NonLinearStereoCameraCalibration3DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoFullCalibration3DCostFunction::MeasureType
-NonLinearStereoFullCalibration3DCostFunction::InternalGetValue(const ParametersType& parameters) const
+NonLinearStereoCameraCalibration3DCostFunction::MeasureType
+NonLinearStereoCameraCalibration3DCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());

@@ -78,8 +78,8 @@ if(ITK_FOUND)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo3DCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoFullCalibration3DCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoFullCalibration3DOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration3DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration3DOptimiser.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.cxx)

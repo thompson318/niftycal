@@ -12,34 +12,34 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoFullCalibration3DOptimiser.h"
+#include "niftkNonLinearStereoCameraCalibration3DOptimiser.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
-#include "niftkNonLinearStereoFullCalibration3DCostFunction.h"
+#include "niftkNonLinearStereoCameraCalibration3DCostFunction.h"
 #include <itkLevenbergMarquardtOptimizer.h>
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoFullCalibration3DOptimiser::NonLinearStereoFullCalibration3DOptimiser()
+NonLinearStereoCameraCalibration3DOptimiser::NonLinearStereoCameraCalibration3DOptimiser()
 {
-  m_CostFunction = niftk::NonLinearStereoFullCalibration3DCostFunction::New();
+  m_CostFunction = niftk::NonLinearStereoCameraCalibration3DCostFunction::New();
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoFullCalibration3DOptimiser::~NonLinearStereoFullCalibration3DOptimiser()
+NonLinearStereoCameraCalibration3DOptimiser::~NonLinearStereoCameraCalibration3DOptimiser()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoFullCalibration3DOptimiser::SetModelAndPoints(const Model3D* const model,
-                                                            const std::list<PointSet>* const leftPoints,
-                                                            const std::list<PointSet>* const rightPoints
-                                                           )
+void NonLinearStereoCameraCalibration3DOptimiser::SetModelAndPoints(const Model3D* const model,
+                                                                    const std::list<PointSet>* const leftPoints,
+                                                                    const std::list<PointSet>* const rightPoints
+                                                                   )
 {
   m_CostFunction->SetModel(const_cast<Model3D* const>(model));
   m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
@@ -49,15 +49,15 @@ void NonLinearStereoFullCalibration3DOptimiser::SetModelAndPoints(const Model3D*
 
 
 //-----------------------------------------------------------------------------
-double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsic,
-                                                     cv::Mat& leftDistortion,
-                                                     cv::Mat& rightIntrinsic,
-                                                     cv::Mat& rightDistortion,
-                                                     std::vector<cv::Mat>& rvecsLeft,
-                                                     std::vector<cv::Mat>& tvecsLeft,
-                                                     cv::Mat& leftToRightRotationMatrix,
-                                                     cv::Mat& leftToRightTranslationVector
-                                                    )
+double NonLinearStereoCameraCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsic,
+                                                             cv::Mat& leftDistortion,
+                                                             cv::Mat& rightIntrinsic,
+                                                             cv::Mat& rightDistortion,
+                                                             std::vector<cv::Mat>& rvecsLeft,
+                                                             std::vector<cv::Mat>& tvecsLeft,
+                                                             cv::Mat& leftToRightRotationMatrix,
+                                                             cv::Mat& leftToRightTranslationVector
+                                                            )
 {
   if (leftIntrinsic.rows != 3 || leftIntrinsic.cols != 3)
   {
@@ -102,7 +102,7 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
   cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
-  niftk::NonLinearStereoFullCalibration3DCostFunction::ParametersType initialParameters;
+  niftk::NonLinearStereoCameraCalibration3DCostFunction::ParametersType initialParameters;
   initialParameters.SetSize(  4                    // left intrinsic
                             + 5                    // left distortion
                             + 4                    // right intrinsic
@@ -158,7 +158,7 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
-  niftk::NonLinearStereoFullCalibration3DCostFunction::MeasureType initialValues =
+  niftk::NonLinearStereoCameraCalibration3DCostFunction::MeasureType initialValues =
     m_CostFunction->GetValue(initialParameters);
 
   double initialRMS = m_CostFunction->GetRMS(initialValues);
@@ -166,30 +166,30 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
 /*
   for (int i = 0; i < startingPointOfExtrinsics; i++)
   {
-    std::cout << "NonLinearStereoFullCalibration3DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;;
+    std::cout << "NonLinearStereoCameraCalibration3DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;;
   }
   for (int i = startingPointOfExtrinsics; i < initialParameters.GetSize(); i++)
   {
-    std::cout << "NonLinearStereoFullCalibration3DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
+    std::cout << "NonLinearStereoCameraCalibration3DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
     if ((i - startingPointOfExtrinsics) % 6 == 5)
     {
       std::cout << std::endl;
     }
   }
 */
-  std::cout << "NonLinearStereoFullCalibration3DOptimiser: initial rms=" << initialRMS << std::endl;
+  std::cout << "NonLinearStereoCameraCalibration3DOptimiser: initial rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearStereoFullCalibration3DCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-  niftk::NonLinearStereoFullCalibration3DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearStereoCameraCalibration3DCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
+  niftk::NonLinearStereoCameraCalibration3DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
   for (int i = startingPointOfExtrinsics; i < finalParameters.GetSize(); i++)
   {
-    std::cout << "NonLinearStereoFullCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
+    std::cout << "NonLinearStereoCameraCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
                  << ", initial=" << initialParameters[i]
                  << ", diff=" << finalParameters[i] - initialParameters[i]
                  << std::endl;
@@ -236,20 +236,20 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
 
   for (int i = 0; i < startingPointOfExtrinsics; i++)
   {
-    std::cout << "NonLinearStereoFullCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
+    std::cout << "NonLinearStereoCameraCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
                  << ", initial=" << initialParameters[i]
                  << ", diff=" << finalParameters[i] - initialParameters[i]
                  << std::endl;
   }
 
-  std::cout << "NonLinearStereoFullCalibration3DOptimiser: stereo="
+  std::cout << "NonLinearStereoCameraCalibration3DOptimiser: stereo="
             << leftToRightRotationVector.at<double>(0, 0) << ", "
             << leftToRightRotationVector.at<double>(0, 1) << ", "
             << leftToRightRotationVector.at<double>(0, 2) << ", "
             << leftToRightTranslationVector.at<double>(0, 0) << ", "
             << leftToRightTranslationVector.at<double>(0, 1) << ", "
             << leftToRightTranslationVector.at<double>(0, 2) << std::endl;
-  std::cout << "NonLinearStereoFullCalibration3DOptimiser: left="
+  std::cout << "NonLinearStereoCameraCalibration3DOptimiser: left="
             << leftIntrinsic.at<double>(0, 0) << ", "
             << leftIntrinsic.at<double>(1, 1) << ", "
             << leftIntrinsic.at<double>(0, 2) << ", "
@@ -262,7 +262,7 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
       std::cout << std::endl;
     }
   }
-  std::cout << "NonLinearStereoFullCalibration3DOptimiser: right="
+  std::cout << "NonLinearStereoCameraCalibration3DOptimiser: right="
             << rightIntrinsic.at<double>(0, 0) << ", "
             << rightIntrinsic.at<double>(1, 1) << ", "
             << rightIntrinsic.at<double>(0, 2) << ", "
@@ -275,7 +275,7 @@ double NonLinearStereoFullCalibration3DOptimiser::Optimise(cv::Mat& leftIntrinsi
       std::cout << std::endl;
     }
   }
-  std::cout << "NonLinearStereoFullCalibration3DOptimiser: rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearStereoCameraCalibration3DOptimiser: rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }
