@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoHandEyeCostFunction.h"
+#include "niftkNonLinearStereoHandEye2DCostFunction.h"
 #include "niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
@@ -22,7 +22,7 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEyeCostFunction::NonLinearStereoHandEyeCostFunction()
+NonLinearStereoHandEye2DCostFunction::NonLinearStereoHandEye2DCostFunction()
 : m_LeftIntrinsic(nullptr)
 , m_LeftDistortion(nullptr)
 , m_RightIntrinsic(nullptr)
@@ -32,13 +32,13 @@ NonLinearStereoHandEyeCostFunction::NonLinearStereoHandEyeCostFunction()
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEyeCostFunction::~NonLinearStereoHandEyeCostFunction()
+NonLinearStereoHandEye2DCostFunction::~NonLinearStereoHandEye2DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(const cv::Mat* const intrinsic)
+void NonLinearStereoHandEye2DCostFunction::SetLeftIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -52,7 +52,7 @@ void NonLinearStereoHandEyeCostFunction::SetLeftIntrinsic(const cv::Mat* const i
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(const cv::Mat* const distortion)
+void NonLinearStereoHandEye2DCostFunction::SetLeftDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1 || distortion->cols != 5)
   {
@@ -66,7 +66,7 @@ void NonLinearStereoHandEyeCostFunction::SetLeftDistortion(const cv::Mat* const 
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(const cv::Mat* const intrinsic)
+void NonLinearStereoHandEye2DCostFunction::SetRightIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -80,7 +80,7 @@ void NonLinearStereoHandEyeCostFunction::SetRightIntrinsic(const cv::Mat* const 
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEyeCostFunction::SetRightDistortion(const cv::Mat* const distortion)
+void NonLinearStereoHandEye2DCostFunction::SetRightDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1 || distortion->cols != 5)
   {
@@ -94,12 +94,12 @@ void NonLinearStereoHandEyeCostFunction::SetRightDistortion(const cv::Mat* const
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEyeCostFunction::MeasureType
-NonLinearStereoHandEyeCostFunction::InternalGetValue(const ParametersType& parameters ) const
+NonLinearStereoHandEye2DCostFunction::MeasureType
+NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
   if (!this->GetUseHandMatrices() && m_HandMatrices->size() != m_Points->size())
   {
-    niftkNiftyCalThrow() << "NonLinearStereoHandEyeCostFunction requires hand (tracking) matrices.";
+    niftkNiftyCalThrow() << "NonLinearStereoHandEye2DCostFunction requires hand (tracking) matrices.";
   }
 
   if (m_Points->size() != m_RightHandPoints->size())

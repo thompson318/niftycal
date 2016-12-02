@@ -73,8 +73,8 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo2DCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DOptimiser.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo3DCostFunction.cxx)
 

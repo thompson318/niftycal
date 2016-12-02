@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearStereoHandEyeCostFunction_h
-#define niftkNonLinearStereoHandEyeCostFunction_h
+#ifndef niftkNonLinearStereoHandEye2DCostFunction_h
+#define niftkNonLinearStereoHandEye2DCostFunction_h
 
 #include "niftkNonLinearStereo2DCostFunction.h"
 
@@ -21,25 +21,25 @@ namespace niftk
 {
 
 /**
-* \class NonLinearStereoHandEyeCostFunction
+* \class NonLinearStereoHandEye2DCostFunction
 * \brief Computes cost as RMS re-projection error for stereo, extrinsic,
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NonLinearStereoHandEyeCostFunction : public NonLinearStereo2DCostFunction
+class NonLinearStereoHandEye2DCostFunction : public NonLinearStereo2DCostFunction
 {
 
 public:
 
-  typedef NonLinearStereoHandEyeCostFunction Self;
-  typedef NonLinearStereo2DCostFunction      Superclass;
-  typedef itk::SmartPointer<Self>            Pointer;
-  typedef itk::SmartPointer<const Self>      ConstPointer;
+  typedef NonLinearStereoHandEye2DCostFunction Self;
+  typedef NonLinearStereo2DCostFunction        Superclass;
+  typedef itk::SmartPointer<Self>              Pointer;
+  typedef itk::SmartPointer<const Self>        ConstPointer;
   itkNewMacro(Self);
 
-  typedef Superclass::ParametersType         ParametersType;
-  typedef Superclass::DerivativeType         DerivativeType;
-  typedef Superclass::MeasureType            MeasureType;
+  typedef Superclass::ParametersType           ParametersType;
+  typedef Superclass::DerivativeType           DerivativeType;
+  typedef Superclass::MeasureType              MeasureType;
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
@@ -50,11 +50,11 @@ public:
 
 protected:
 
-  NonLinearStereoHandEyeCostFunction();
-  virtual ~NonLinearStereoHandEyeCostFunction();
+  NonLinearStereoHandEye2DCostFunction();
+  virtual ~NonLinearStereoHandEye2DCostFunction();
 
-  NonLinearStereoHandEyeCostFunction(const NonLinearStereoHandEyeCostFunction&);
-  NonLinearStereoHandEyeCostFunction& operator=(const NonLinearStereoHandEyeCostFunction&);
+  NonLinearStereoHandEye2DCostFunction(const NonLinearStereoHandEye2DCostFunction&);
+  NonLinearStereoHandEye2DCostFunction& operator=(const NonLinearStereoHandEye2DCostFunction&);
 
 private:
 

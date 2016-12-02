@@ -18,7 +18,7 @@
 #ifdef NIFTYCAL_WITH_ITK
 #include <Internal/niftkNonLinearMaltiHandEyeOptimiser.h>
 #include <Internal/niftkNonLinearNDOFHandEyeOptimiser.h>
-#include <Internal/niftkNonLinearStereoHandEyeOptimiser.h>
+#include <Internal/niftkNonLinearStereoHandEye2DOptimiser.h>
 #endif
 
 namespace niftk {
@@ -410,7 +410,7 @@ cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
 
   cv::Matx44d finalHandEye = initialHandEye;
 
-  niftk::NonLinearStereoHandEyeOptimiser::Pointer optimiser = niftk::NonLinearStereoHandEyeOptimiser::New();
+  niftk::NonLinearStereoHandEye2DOptimiser::Pointer optimiser = niftk::NonLinearStereoHandEye2DOptimiser::New();
   optimiser->SetModel(&model3D);
   optimiser->SetPoints(&leftPointSets);
   optimiser->SetRightHandPoints(&rightPointSets);
