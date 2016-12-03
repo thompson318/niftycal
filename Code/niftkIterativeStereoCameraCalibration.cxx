@@ -272,12 +272,22 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << std::endl;
 
   unsigned int iterationCount = 0;
-  double projectedRMS = result(0, 0);
+  double currentRMS = 0;
+  cv::Matx21d currentResult;
+
+  if (optimise3D)
+  {
+    currentRMS = result(1, 0);
+  }
+  else
+  {
+    currentRMS = result(0, 0);
+  }
   double previousRMS = std::numeric_limits<double>::max();
 
-  while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
+  while (currentRMS < previousRMS && fabs(currentRMS - previousRMS) > 0.0005)
   {
-    previousRMS = projectedRMS;
+    previousRMS = currentRMS;
 
     niftk::ExtractAllDistortedControlPoints(
           referenceImageData,
@@ -310,7 +320,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     if (distortedPointsFromCanonicalImagesLeft.size() == 1)
     {
-      result = niftk::TsaiStereoCameraCalibration(
+      currentResult = niftk::TsaiStereoCameraCalibration(
         model,
         *(distortedPointsFromCanonicalImagesLeft.begin()),
         *(distortedPointsFromCanonicalImagesRight.begin()),
@@ -333,7 +343,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
     else
     {
-      result = niftk::ZhangStereoCameraCalibration(
+      currentResult = niftk::ZhangStereoCameraCalibration(
         model,
         distortedPointsFromCanonicalImagesLeft,
         distortedPointsFromCanonicalImagesRight,
@@ -355,15 +365,23 @@ cv::Matx21d IterativeStereoCameraCalibration(
        );
     }
 
-    projectedRMS = result(0, 0);
-
     std::cout << "Iterative calibration iter=" << iterationCount++
               << ", prms=" << previousRMS
-              << ", rms2D=" << projectedRMS
+              << ", crms=" << currentRMS
               << std::endl;
 
-    if (projectedRMS < previousRMS)
+    if (currentRMS < previousRMS)
     {
+      if (optimise3D)
+      {
+        currentRMS = result(1, 0);
+      }
+      else
+      {
+        currentRMS = result(0, 0);
+      }
+      result = currentResult;
+
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
@@ -378,26 +396,27 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
     else
     {
-      projectedRMS = previousRMS;
-
-      niftk::ComputeStereoExtrinsics(rvecsLeft,
-                                     tvecsLeft,
-                                     leftToRightRotationMatrix,
-                                     leftToRightTranslationVector,
-                                     rvecsRight,
-                                     tvecsRight
-                                    );
+      currentRMS = previousRMS;
     }
   } // end while
 
-  std::cout << "Iterative calibration finished, rms2D=" << result(0, 0)
-            << ", rms3D=" << result(1, 0)
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+  std::cout << "Iterative calibration finished, rms=" << currentRMS
             << ", over " << bestPointSetsSoFarLeft.size()
             << ", left PointSets and " << bestPointSetsSoFarRight.size()
             << ", right PointSets."
             << std::endl;
 
-  std::cout << "Final stereo calibration, rms2D=" << result(0, 0) << ", rms3D=" << result(1, 0) << std::endl;
+  std::cout << "Final stereo calibration, rms2D=" << result(0,0)
+            << ", rms3D=" << result(1,0)
+            << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Final Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Final Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
