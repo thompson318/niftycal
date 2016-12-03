@@ -27,10 +27,10 @@
 
 TEST_CASE( "Tsai mono", "[mono]" ) {
 
-  int expectedNumberOfArguments =  14;
+  int expectedNumberOfArguments =  15;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiMonoCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiMonoCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion rms" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -47,6 +47,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   float eCx = atof(niftk::argv[11]);
   float eCy = atof(niftk::argv[12]);
   float dist = atof(niftk::argv[13]);
+  float expectedRMS = atof(niftk::argv[14]);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -125,5 +126,5 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   REQUIRE( fabs(distortion.at<double>(0,1) - 0) < tol );
   REQUIRE( fabs(distortion.at<double>(0,2) - 0) < tol );
   REQUIRE( fabs(distortion.at<double>(0,3) - 0) < tol );
-
+  REQUIRE( fabs(rms - expectedRMS) < tol );
 }

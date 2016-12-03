@@ -36,6 +36,7 @@ set(TEST_CASES
   niftkMonoChessboardHandEyeCalibrationTest
   niftkIterativeTemplateMatchingCameraCalibrationTest
   niftkTsaiMonoCalibrationTest
+  niftkTsaiStereoCalibrationTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -584,12 +585,18 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1676.38 1676.38 902.522 521.537 -0.21888)
+         10 7 1920 540 1 2 1676.38 1676.38 902.522 521.537 -0.21888 0.996343)
 
 add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1660.45 1660.45 978.144 528.8 -0.260737)
+         10 7 1920 540 1 2 1660.45 1660.45 978.144 528.8 -0.260737 1.42299)
+
+add_test(REG-TsaiCPStereo ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1676.379966 1676.379966 902.521521 521.5369085 -0.2188804731 0.6778578087)
 
 add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_left.bmp

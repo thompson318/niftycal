@@ -41,6 +41,12 @@ public:
                          const std::list<PointSet>* const rightPoints
                         );
 
+  void SetIntrinsic(const cv::Mat* const intrinsic);
+  void SetDistortion(const cv::Mat* const distortion);
+
+  void SetRightIntrinsic(const cv::Mat* const intrinsic);
+  void SetRightDistortion(const cv::Mat* const distortion);
+
   /**
   * \brief Optimises all parameters, and returns the 2D RMS projection error.
   *
@@ -51,6 +57,17 @@ public:
                   cv::Mat& rightIntrinsic,
                   cv::Mat& rightDistortion,
                   std::vector<cv::Mat>& rvecsLeft,
+                  std::vector<cv::Mat>& tvecsLeft,
+                  cv::Mat& leftToRightRotationMatrix,
+                  cv::Mat& leftToRightTranslationVector
+                 );
+
+  /**
+  * \brief Optimises all parameters, and returns the 2D RMS projection error.
+  *
+  * Note: You probably need a very good calibration before calling this.
+  */
+  double Optimise(std::vector<cv::Mat>& rvecsLeft,
                   std::vector<cv::Mat>& tvecsLeft,
                   cv::Mat& leftToRightRotationMatrix,
                   cv::Mat& leftToRightTranslationVector

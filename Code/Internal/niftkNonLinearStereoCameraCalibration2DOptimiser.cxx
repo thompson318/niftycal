@@ -48,6 +48,114 @@ void NonLinearStereoCameraCalibration2DOptimiser::SetModelAndPoints(const Model3
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
+{
+  m_CostFunction->SetIntrinsic(intrinsic);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetDistortion(const cv::Mat* const distortion)
+{
+  m_CostFunction->SetDistortion(distortion);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetRightIntrinsic(const cv::Mat* const intrinsic)
+{
+  m_CostFunction->SetRightIntrinsic(intrinsic);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetRightDistortion(const cv::Mat* const distortion)
+{
+  m_CostFunction->SetRightDistortion(distortion);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+double NonLinearStereoCameraCalibration2DOptimiser::Optimise(std::vector<cv::Mat>& rvecsLeft,
+                                                             std::vector<cv::Mat>& tvecsLeft,
+                                                             cv::Mat& leftToRightRotationMatrix,
+                                                             cv::Mat& leftToRightTranslationVector
+                                                            )
+{
+  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+
+  niftk::NonLinearStereoCameraCalibration2DCostFunction::ParametersType initialParameters;
+  initialParameters.SetSize(  3                    // leftToRightRotationVector
+                            + 3                    // leftToRightTranslationVector
+                            + 6 * rvecsLeft.size() // extrinsics of each left hand camera
+                           );
+
+  int counter = 0;
+
+  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 0);
+  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 1);
+  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 2);
+  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0);
+  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 1);
+  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 2);
+  for (int i = 0; i < rvecsLeft.size(); i++)
+  {
+    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 0);
+    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 1);
+    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 2);
+    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 0);
+    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 1);
+    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
+  }
+
+  m_CostFunction->SetOptimiseIntrinsics(false);
+  m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
+
+  // Setup optimiser.
+  itk::LevenbergMarquardtOptimizer::Pointer optimiser = itk::LevenbergMarquardtOptimizer::New();
+  optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
+  optimiser->SetCostFunction(m_CostFunction);
+  optimiser->SetInitialPosition(initialParameters);
+  optimiser->SetNumberOfIterations(1000);
+  optimiser->SetGradientTolerance(0.0001);
+  optimiser->SetEpsilonFunction(0.0001);
+  optimiser->SetValueTolerance(0.0001);
+
+  optimiser->StartOptimization();
+
+  niftk::NonLinearStereoCameraCalibration2DCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
+  niftk::NonLinearStereoCameraCalibration2DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  double finalRMS = m_CostFunction->GetRMS(finalValues);
+
+  counter = 0;
+  leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
+  leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
+  leftToRightRotationVector.at<double>(0, 2) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
+  leftToRightTranslationVector.at<double>(0, 2) = finalParameters[counter++];
+  for (int i = 0; i < rvecsLeft.size(); i++)
+  {
+    rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+    rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+    rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+    tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+  }
+
+  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+
+  return finalRMS;
+}
+
+
+//-----------------------------------------------------------------------------
 double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrinsic,
                                                              cv::Mat& leftDistortion,
                                                              cv::Mat& rightIntrinsic,
@@ -111,7 +219,6 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
                             + 6 * rvecsLeft.size() // extrinsics of each left hand camera
                            );
 
-  // Set initial parameters.
   int counter = 0;
   initialParameters[counter++] = leftIntrinsic.at<double>(0, 0);
   initialParameters[counter++] = leftIntrinsic.at<double>(1, 1);
@@ -145,6 +252,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
   }
 
+  m_CostFunction->SetOptimiseIntrinsics(true);
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
   // Setup optimiser.

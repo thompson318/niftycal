@@ -12,30 +12,30 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearNoIntrinsicsHandEyeCostFunction.h"
+#include "niftkNonLinearNoIntrinsicsCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
-#include <niftkMatrixUtilities.h>
-#include <niftkPointUtilities.h>
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearNoIntrinsicsHandEyeCostFunction::NonLinearNoIntrinsicsHandEyeCostFunction()
+NonLinearNoIntrinsicsCostFunction::NonLinearNoIntrinsicsCostFunction()
 : m_Intrinsic(nullptr)
 , m_Distortion(nullptr)
+, m_RightIntrinsic(nullptr)
+, m_RightDistortion(nullptr)
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearNoIntrinsicsHandEyeCostFunction::~NonLinearNoIntrinsicsHandEyeCostFunction()
+NonLinearNoIntrinsicsCostFunction::~NonLinearNoIntrinsicsCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(const cv::Mat* const intrinsic)
+void NonLinearNoIntrinsicsCostFunction::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   if (intrinsic->rows != 3 || intrinsic->cols != 3)
   {
@@ -44,12 +44,11 @@ void NonLinearNoIntrinsicsHandEyeCostFunction::SetIntrinsic(const cv::Mat* const
   }
 
   m_Intrinsic = const_cast<cv::Mat*>(intrinsic);
-  this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearNoIntrinsicsHandEyeCostFunction::SetDistortion(const cv::Mat* const distortion)
+void NonLinearNoIntrinsicsCostFunction::SetDistortion(const cv::Mat* const distortion)
 {
   if (distortion->rows != 1 || distortion->cols != 5)
   {
@@ -58,7 +57,32 @@ void NonLinearNoIntrinsicsHandEyeCostFunction::SetDistortion(const cv::Mat* cons
   }
 
   m_Distortion = const_cast<cv::Mat*>(distortion);
-  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearNoIntrinsicsCostFunction::SetRightIntrinsic(const cv::Mat* const intrinsic)
+{
+  if (intrinsic->rows != 3 || intrinsic->cols != 3)
+  {
+    niftkNiftyCalThrow() << "Right Intrinsic matrix should be 3x3, and its ("
+                         << intrinsic->cols << ", " << intrinsic->rows << ")";
+  }
+
+  m_RightIntrinsic = const_cast<cv::Mat*>(intrinsic);
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearNoIntrinsicsCostFunction::SetRightDistortion(const cv::Mat* const distortion)
+{
+  if (distortion->rows != 1 || distortion->cols != 5)
+  {
+    niftkNiftyCalThrow() << "Distortion vector should 1x5, and its ("
+                         << distortion->cols << ", " << distortion->rows << ")";
+  }
+
+  m_RightDistortion = const_cast<cv::Mat*>(distortion);
 }
 
 } // end namespace

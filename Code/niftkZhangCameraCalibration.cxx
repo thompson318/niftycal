@@ -324,15 +324,32 @@ cv::Matx21d ZhangStereoCameraCalibration(const Model3D& model,
   niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer full2DOptimiser
       = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
   full2DOptimiser->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
-  full2DOptimiser->Optimise(intrinsicLeft,
-                            distortionLeft,
-                            intrinsicRight,
-                            distortionRight,
-                            rvecsLeft,
-                            tvecsLeft,
-                            leftToRightRotationMatrix,
-                            leftToRightTranslationVector
-                           );
+
+  if (listOfLeftHandPointSets.size() < 3)
+  {
+    full2DOptimiser->SetIntrinsic(&intrinsicLeft);
+    full2DOptimiser->SetDistortion(&distortionLeft);
+    full2DOptimiser->SetRightIntrinsic(&intrinsicRight);
+    full2DOptimiser->SetRightDistortion(&distortionRight);
+
+    full2DOptimiser->Optimise(rvecsLeft,
+                              tvecsLeft,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector
+                             );
+  }
+  else
+  {
+    full2DOptimiser->Optimise(intrinsicLeft,
+                              distortionLeft,
+                              intrinsicRight,
+                              distortionRight,
+                              rvecsLeft,
+                              tvecsLeft,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector
+                             );
+  }
 #endif
 
   niftk::ComputeStereoExtrinsics(rvecsLeft,

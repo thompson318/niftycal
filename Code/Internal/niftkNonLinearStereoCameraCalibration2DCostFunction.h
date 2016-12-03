@@ -16,6 +16,7 @@
 #define niftkNonLinearStereoCameraCalibration2DCostFunction_h
 
 #include "niftkNonLinearStereo2DCostFunction.h"
+#include "niftkNonLinearNoIntrinsicsCostFunction.h"
 
 namespace niftk
 {
@@ -25,7 +26,9 @@ namespace niftk
 * \brief Computes cost as RMS re-projection error for intrinsic, extrinsic
 * and stereo parameters, optimising projection error.
 */
-class NonLinearStereoCameraCalibration2DCostFunction : public NonLinearStereo2DCostFunction
+class NonLinearStereoCameraCalibration2DCostFunction
+    : public NonLinearStereo2DCostFunction,
+      public NonLinearNoIntrinsicsCostFunction
 {
 
 public:
@@ -40,6 +43,9 @@ public:
   typedef Superclass::DerivativeType                     DerivativeType;
   typedef Superclass::MeasureType                        MeasureType;
 
+  itkSetMacro(OptimiseIntrinsics, bool);
+  itkGetConstMacro(OptimiseIntrinsics, bool);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -51,6 +57,8 @@ protected:
   NonLinearStereoCameraCalibration2DCostFunction& operator=(const NonLinearStereoCameraCalibration2DCostFunction&);
 
 private:
+
+  bool m_OptimiseIntrinsics;
 
 };
 
