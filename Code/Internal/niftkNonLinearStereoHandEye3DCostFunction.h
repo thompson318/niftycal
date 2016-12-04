@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearStereoHandEye3DCostFunction_h
 #define niftkNonLinearStereoHandEye3DCostFunction_h
 
-#include "niftkNonLinearStereo2DCostFunction.h"
+#include "niftkNonLinearStereo3DCostFunction.h"
 #include "niftkNonLinearNoIntrinsicsCostFunction.h"
 
 namespace niftk
@@ -27,14 +27,14 @@ namespace niftk
 * hand-eye and model-to-world optimisation.
 */
 class NonLinearStereoHandEye3DCostFunction
-    : public NonLinearStereo2DCostFunction,
+    : public NonLinearStereo3DCostFunction,
       public NonLinearNoIntrinsicsCostFunction
 {
 
 public:
 
   typedef NonLinearStereoHandEye3DCostFunction Self;
-  typedef NonLinearStereo2DCostFunction        Superclass;
+  typedef NonLinearStereo3DCostFunction        Superclass;
   typedef itk::SmartPointer<Self>              Pointer;
   typedef itk::SmartPointer<const Self>        ConstPointer;
   itkNewMacro(Self);
