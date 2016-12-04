@@ -36,7 +36,7 @@ NonLinearStereoCostFunction::~NonLinearStereoCostFunction()
 //-----------------------------------------------------------------------------
 void NonLinearStereoCostFunction::SetRightHandPoints(const std::list<PointSet>* const points)
 {
-  if (this->GetNumberOfValues() == 0)
+  if (m_Points->size() == 0)
   {
     niftkNiftyCalThrow() << "No left hand points present. Please set them first.";
   }
@@ -56,8 +56,7 @@ void NonLinearStereoCostFunction::SetRightHandPoints(const std::list<PointSet>* 
   }
   m_NumberOfRightHandValues = num;
   m_RightHandPoints = const_cast<std::list<PointSet>*>(points);
-
-  niftk::GetNumberOfTriangulatablePoints(*m_Model, *m_Points, *m_RightHandPoints);
+  m_NumberOfTriangulatablePoints = niftk::GetNumberOfTriangulatablePoints(*m_Model, *m_Points, *m_RightHandPoints);
 
   this->Modified();
 }

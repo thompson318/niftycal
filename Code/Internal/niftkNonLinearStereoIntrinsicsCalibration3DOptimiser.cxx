@@ -138,6 +138,7 @@ double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIn
 
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
+  /*
   for (int i = 0; i < finalParameters.GetSize(); i++)
   {
     std::cout << "NonLinearStereoIntrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
@@ -145,6 +146,7 @@ double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIn
                  << ", diff=" << finalParameters[i] - initialParameters[i]
                  << std::endl;
   }
+  */
 
   counter = 0;
   leftIntrinsic.at<double>(0, 0) = finalParameters[counter++];
@@ -156,10 +158,12 @@ double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIn
   rightIntrinsic.at<double>(0, 2) = finalParameters[counter++];
   rightIntrinsic.at<double>(1, 2) = finalParameters[counter++];
 
+  /*
   std::cout << "NonLinearStereoIntrinsicsCalibration3DOptimiser: initial rms=" << initialRMS
             << ", final rms=" << finalRMS
             << ", diff=" << finalRMS - initialRMS
             << std::endl;
+  */
 
   return finalRMS;
 }

@@ -136,12 +136,14 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
   optimiser->SetEpsilonFunction(0.001);
   optimiser->SetValueTolerance(0.001);
 
+  /*
   niftk::NonLinearStereoExtrinsicsCalibration3DCostFunction::MeasureType initialValues =
     m_CostFunction->GetValue(initialParameters);
-
   double initialRMS = m_CostFunction->GetRMS(initialValues);
+
   int startingPointOfExtrinsics = 6;
   std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: initial rms=" << initialRMS << std::endl;
+  */
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -153,6 +155,7 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
       = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
+  /*
   for (int i = startingPointOfExtrinsics; i < finalParameters.GetSize(); i++)
   {
     std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
@@ -164,6 +167,7 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
       std::cout << std::endl;
     }
   }
+  */
 
   counter = 0;
   leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
@@ -184,6 +188,7 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
 
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
 
+  /*
   for (int i = 0; i < startingPointOfExtrinsics; i++)
   {
     std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
@@ -200,6 +205,7 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
             << leftToRightTranslationVector.at<double>(0, 1) << ", "
             << leftToRightTranslationVector.at<double>(0, 2) << std::endl;
   std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: rms=" << finalRMS << std::endl;
+  */
 
   return finalRMS;
 }

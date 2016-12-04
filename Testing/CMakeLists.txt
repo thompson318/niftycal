@@ -381,8 +381,8 @@ add_test(REG-CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeSte
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
   1 1                                                       # Simulation has proper scale factors
-  4.15261e-05 -0.0856031 2.99086e-05 # rvec
-  5.97664 0.00101932 0.503954 # tvec
+  -6.09634e-05 -0.0859876 3.18065e-05 # rvec
+  5.97673 4.50868e-05 0.533138 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.png
   ${DATA_DIR}/SimulationAprilTags/Left2.png
   ${DATA_DIR}/SimulationAprilTags/Left3.png
@@ -592,11 +592,17 @@ add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/model.txt
          10 7 1920 540 1 2 1660.45 1660.45 978.144 528.8 -0.260737 1.42299)
 
-add_test(REG-TsaiCPStereo ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+add_test(REG-TsaiCPStereo2D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1676.379966 1676.379966 902.521521 521.5369085 -0.2188804731 0.6778578087)
+         10 7 1920 540 1 2 1676.379966 1676.379966 902.521521 521.5369085 -0.2188804731 0.6778578087 0)
+
+add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1681.184038 1698.32892 903.7474783 517.6303319 -0.2188804731 0.2581457656 1)
 
 add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_left.bmp

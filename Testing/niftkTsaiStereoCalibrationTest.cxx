@@ -27,10 +27,10 @@
 
 TEST_CASE( "Tsai stereo", "[stereo]" ) {
 
-  int expectedNumberOfArguments =  16;
+  int expectedNumberOfArguments =  17;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageRß.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageR.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -49,6 +49,7 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
   float eCy = atof(niftk::argv[13]);
   float dist = atof(niftk::argv[14]);
   float expectedRMS = atof(niftk::argv[15]);
+  int optimise3D = atoi(niftk::argv[16]);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -161,7 +162,8 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
                                                   essentialMatrix,
                                                   fundamentalMatrix,
                                                   CV_CALIB_USE_INTRINSIC_GUESS
-                                                  | CV_CALIB_FIX_INTRINSIC
+                                                  | CV_CALIB_FIX_INTRINSIC,
+                                                  optimise3D
                                                   );
   std::cout << "Fx=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Fy=" << intrinsicLeft.at<double>(1,1) << std::endl;
