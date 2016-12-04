@@ -83,6 +83,9 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibration3DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.cxx)
 
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DOptimiser.cxx)
+
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
