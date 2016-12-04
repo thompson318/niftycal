@@ -17,6 +17,7 @@
 
 #include <niftkNiftyCalTypes.h>
 #include "niftkNonLinearStereo3DCostFunction.h"
+#include "niftkNonLinearNoIntrinsicsCostFunction.h"
 
 namespace niftk
 {
@@ -29,7 +30,8 @@ namespace niftk
 * \see niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser
 */
 class NonLinearStereoExtrinsicsCalibration3DCostFunction :
-    public NonLinearStereo3DCostFunction
+    public NonLinearStereo3DCostFunction,
+    public NonLinearNoIntrinsicsCostFunction
 {
 
 public:
@@ -44,9 +46,6 @@ public:
   typedef Superclass::DerivativeType                         DerivativeType;
   typedef Superclass::MeasureType                            MeasureType;
 
-  void SetDistortionParameters(cv::Mat* const leftDistortion, cv::Mat* const rightDistortion);
-  void SetIntrinsics(cv::Mat* const leftIntrinsic, cv::Mat* const rightIntrinsic);
-
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -57,11 +56,6 @@ protected:
   NonLinearStereoExtrinsicsCalibration3DCostFunction(const NonLinearStereoExtrinsicsCalibration3DCostFunction&);
   NonLinearStereoExtrinsicsCalibration3DCostFunction& operator=(const NonLinearStereoExtrinsicsCalibration3DCostFunction&);
 
-private:
-  cv::Mat *m_LeftIntrinsic;
-  cv::Mat *m_LeftDistortion;
-  cv::Mat *m_RightIntrinsic;
-  cv::Mat *m_RightDistortion;
 };
 
 } // end namespace

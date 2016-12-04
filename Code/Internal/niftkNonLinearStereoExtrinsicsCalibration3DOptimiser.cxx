@@ -53,7 +53,8 @@ void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetDistortionParameters(cv
                                                                               cv::Mat* const rightDistortion
                                                                              )
 {
-  m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
+  m_CostFunction->SetDistortion(leftDistortion);
+  m_CostFunction->SetRightDistortion(rightDistortion);
   this->Modified();
 }
 
@@ -63,7 +64,8 @@ void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetIntrinsics(cv::Mat* con
                                                                     cv::Mat* const rightIntrinsic
                                                                    )
 {
-  m_CostFunction->SetIntrinsics(leftIntrinsic, rightIntrinsic);
+  m_CostFunction->SetIntrinsic(leftIntrinsic);
+  m_CostFunction->SetRightIntrinsic(rightIntrinsic);
   this->Modified();
 }
 
