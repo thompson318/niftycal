@@ -37,9 +37,9 @@ NonLinearStereoExtrinsicsCalibration3DOptimiser::~NonLinearStereoExtrinsicsCalib
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetModelAndPoints(const Model3D* const model,
-                                                                      const std::list<PointSet>* const leftPoints,
-                                                                      const std::list<PointSet>* const rightPoints
-                                                                     )
+                                                                        const std::list<PointSet>* const leftPoints,
+                                                                        const std::list<PointSet>* const rightPoints
+                                                                       )
 {
   m_CostFunction->SetModel(const_cast<Model3D* const>(model));
   m_CostFunction->SetPoints(const_cast<std::list<PointSet>* const>(leftPoints));
@@ -50,24 +50,20 @@ void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetModelAndPoints(const Mo
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetDistortionParameters(cv::Mat* const leftDistortion,
-                                                                            cv::Mat* const rightDistortion
-                                                                           )
+                                                                              cv::Mat* const rightDistortion
+                                                                             )
 {
-  m_CostFunction->SetDistortionParameters(leftDistortion,
-                                          rightDistortion
-                                         );
+  m_CostFunction->SetDistortionParameters(leftDistortion, rightDistortion);
   this->Modified();
 }
 
 
 //-----------------------------------------------------------------------------
 void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetIntrinsics(cv::Mat* const leftIntrinsic,
-                                                                  cv::Mat* const rightIntrinsic
-                                                                 )
+                                                                    cv::Mat* const rightIntrinsic
+                                                                   )
 {
-  m_CostFunction->SetIntrinsics(leftIntrinsic,
-                                rightIntrinsic
-                               );
+  m_CostFunction->SetIntrinsics(leftIntrinsic, rightIntrinsic);
   this->Modified();
 }
 

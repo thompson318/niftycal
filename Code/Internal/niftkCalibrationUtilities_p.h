@@ -146,6 +146,7 @@ void ComputeStereoProjectionErrors(const Model3D& model,
 * etc.
 *
 * \endverbatim
+* \param errors which must be the right size when it is passed in
 */
 void ComputeStereoProjectionErrors(const Model3D* const model,
                                    const std::list<PointSet>* const leftPoints,
@@ -164,10 +165,10 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
                                        const cv::Matx44d& leftExtrinsic,
                                        const cv::Mat& leftIntrinsic,
                                        const cv::Mat& leftDistortion,
-                                       const cv::Matx44d& rightExtrinsic,
+                                       const cv::Mat& leftToRightRotationMatrix,
+                                       const cv::Mat& leftToRightTranslationVector,
                                        const cv::Mat& rightIntrinsic,
                                        const cv::Mat& rightDistortion,
-                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
                                        itk::MultipleValuedCostFunction::MeasureType& errors
                                       );
 
@@ -175,6 +176,7 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
 /**
 * \brief Computes stereo reconstruction errors, using the same
 * format input parameters as ComputeStereoProjectionErrors.
+* \param errors which must be the right size when it is passed in
 */
 void ComputeStereoReconstructionErrors(const Model3D* const model,
                                        const std::list<PointSet>* const leftPoints,

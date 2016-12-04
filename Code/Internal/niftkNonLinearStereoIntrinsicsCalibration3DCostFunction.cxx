@@ -13,6 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoIntrinsicsCalibration3DCostFunction.h"
+#include "niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -134,76 +135,57 @@ NonLinearStereoIntrinsicsCalibration3DCostFunction::InternalGetValue(const Param
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
-  int counter = 0;
-  cv::Mat leftIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
-  leftIntrinsic.at<double>(0, 0) = parameters[counter++];
-  leftIntrinsic.at<double>(1, 1) = parameters[counter++];
-  leftIntrinsic.at<double>(0, 2) = parameters[counter++];
-  leftIntrinsic.at<double>(1, 2) = parameters[counter++];
-  leftIntrinsic.at<double>(2, 2) = 1;
+  ParametersType internalParameters;
+  internalParameters.SetSize(  4                    // left intrinsic
+                             + 5                    // left distortion
+                             + 4                    // right intrinsic
+                             + 5                    // right distortion
+                             + 6                    // left to right 6 DOF
+                             + 6 * m_Points->size() // 6DOF per view
+                            );
 
-  cv::Mat rightIntrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
-  rightIntrinsic.at<double>(0, 0) = parameters[counter++];
-  rightIntrinsic.at<double>(1, 1) = parameters[counter++];
-  rightIntrinsic.at<double>(0, 2) = parameters[counter++];
-  rightIntrinsic.at<double>(1, 2) = parameters[counter++];
-  rightIntrinsic.at<double>(2, 2) = 1;
+  internalParameters[0] = parameters[0];
+  internalParameters[1] = parameters[1];
+  internalParameters[2] = parameters[2];
+  internalParameters[3] = parameters[3];
+  internalParameters[4] = m_LeftDistortion->at<double>(0, 0);
+  internalParameters[5] = m_LeftDistortion->at<double>(0, 1);
+  internalParameters[6] = m_LeftDistortion->at<double>(0, 2);
+  internalParameters[7] = m_LeftDistortion->at<double>(0, 3);
+  internalParameters[8] = m_LeftDistortion->at<double>(0, 4);
+  internalParameters[9]  = parameters[4];
+  internalParameters[10] = parameters[5];
+  internalParameters[11] = parameters[6];
+  internalParameters[12] = parameters[7];
+  internalParameters[13] = m_RightDistortion->at<double>(0, 0);
+  internalParameters[14] = m_RightDistortion->at<double>(0, 1);
+  internalParameters[15] = m_RightDistortion->at<double>(0, 2);
+  internalParameters[16] = m_RightDistortion->at<double>(0, 3);
+  internalParameters[17] = m_RightDistortion->at<double>(0, 4);
 
-  int numberOfViews = 0;
-  unsigned long int pointCounter = 0;
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Rodrigues(*m_LeftToRightRotationMatrix, leftToRightRotationVector);
 
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
+  internalParameters[18] = leftToRightRotationVector.at<double>(0, 0);
+  internalParameters[19] = leftToRightRotationVector.at<double>(0, 1);
+  internalParameters[20] = leftToRightRotationVector.at<double>(0, 2);
 
-  for (leftViewIter = m_Points->begin(),
-       rightViewIter = m_RightHandPoints->begin();
-       leftViewIter != m_Points->end() && rightViewIter != m_RightHandPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
-       )
+  internalParameters[21] = m_LeftToRightTranslationVector->at<double>(0, 0);
+  internalParameters[22] = m_LeftToRightTranslationVector->at<double>(1, 0);
+  internalParameters[23] = m_LeftToRightTranslationVector->at<double>(2, 0);
+
+  unsigned int parameterCounter = 24;
+  for (unsigned int i = 0; i < m_Points->size(); i++)
   {
-    niftk::Model3D triangulatedModelInLeftCameraSpace;
-
-    niftk::TriangulatePointPairs(
-      *leftViewIter,
-      *rightViewIter,
-      leftIntrinsic,
-      *m_LeftDistortion,
-      (*m_RvecsLeft)[numberOfViews],
-      (*m_TvecsLeft)[numberOfViews],
-      *m_LeftToRightRotationMatrix,
-      *m_LeftToRightTranslationVector,
-      rightIntrinsic,
-      *m_RightDistortion,
-      triangulatedModelInLeftCameraSpace
-    );
-
-    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix((*m_RvecsLeft)[numberOfViews], (*m_TvecsLeft)[numberOfViews]);
-    cv::Matx44d cameraToModel = modelToCamera.inv(cv::DECOMP_SVD);
-
-    niftk::Model3D triangulatedModelInModelSpace = niftk::TransformModel(triangulatedModelInLeftCameraSpace,
-                                                                         cameraToModel);
-
-    niftk::Model3D::const_iterator modelIter;
-    for (modelIter = triangulatedModelInModelSpace.begin();
-         modelIter != triangulatedModelInModelSpace.end();
-         ++modelIter
-         )
-    {
-      niftk::NiftyCalIdType id = (*modelIter).first;
-      Model3D::const_iterator goldIter = m_Model->find(id);
-      if (goldIter == m_Model->end())
-      {
-        niftkNiftyCalThrow() << "Failed to find point " << id << " in gold standard model.";
-      }
-      niftk::Point3D triangulatedPoint = (*modelIter).second;
-      niftk::Point3D goldStandardPoint = (*goldIter).second;
-      result[pointCounter++] = triangulatedPoint.point.x - goldStandardPoint.point.x;
-      result[pointCounter++] = triangulatedPoint.point.y - goldStandardPoint.point.y;
-      result[pointCounter++] = triangulatedPoint.point.z - goldStandardPoint.point.z;
-    }
-    numberOfViews++;
+    internalParameters[parameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 0);
+    internalParameters[parameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 1);
+    internalParameters[parameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 2);
+    internalParameters[parameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 0);
+    internalParameters[parameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 1);
+    internalParameters[parameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 2);
   }
+
+  niftk::ComputeStereoReconstructionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
   return result;
 }
 

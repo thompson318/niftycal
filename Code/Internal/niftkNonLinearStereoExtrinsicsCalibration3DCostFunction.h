@@ -44,13 +44,8 @@ public:
   typedef Superclass::DerivativeType                         DerivativeType;
   typedef Superclass::MeasureType                            MeasureType;
 
-  void SetDistortionParameters(cv::Mat* const leftDistortion,
-                               cv::Mat* const rightDistortion
-                              );
-
-  void SetIntrinsics(cv::Mat* const leftIntrinsic,
-                     cv::Mat* const rightIntrinsic
-                    );
+  void SetDistortionParameters(cv::Mat* const leftDistortion, cv::Mat* const rightDistortion);
+  void SetIntrinsics(cv::Mat* const leftIntrinsic, cv::Mat* const rightIntrinsic);
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 

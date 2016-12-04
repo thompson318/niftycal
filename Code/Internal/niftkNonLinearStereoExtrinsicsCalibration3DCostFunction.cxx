@@ -13,6 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoExtrinsicsCalibration3DCostFunction.h"
+#include "niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -92,85 +93,55 @@ NonLinearStereoExtrinsicsCalibration3DCostFunction::InternalGetValue(const Param
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
-  int counter = 0;
-  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
-  leftToRightRotationVector.at<double>(0, 0) = parameters[counter++];
-  leftToRightRotationVector.at<double>(0, 1) = parameters[counter++];
-  leftToRightRotationVector.at<double>(0, 2) = parameters[counter++];
+  ParametersType internalParameters;
+  internalParameters.SetSize(  4                    // left intrinsic
+                             + 5                    // left distortion
+                             + 4                    // right intrinsic
+                             + 5                    // right distortion
+                             + 6                    // left to right 6 DOF
+                             + 6 * m_Points->size() // 6DOF per view
+                            );
 
-  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
-  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+  internalParameters[0] = m_LeftIntrinsic->at<double>(0, 0);
+  internalParameters[1] = m_LeftIntrinsic->at<double>(1, 1);
+  internalParameters[2] = m_LeftIntrinsic->at<double>(0, 2);
+  internalParameters[3] = m_LeftIntrinsic->at<double>(1, 2);
+  internalParameters[4] = m_LeftDistortion->at<double>(0, 0);
+  internalParameters[5] = m_LeftDistortion->at<double>(0, 1);
+  internalParameters[6] = m_LeftDistortion->at<double>(0, 2);
+  internalParameters[7] = m_LeftDistortion->at<double>(0, 3);
+  internalParameters[8] = m_LeftDistortion->at<double>(0, 4);
+  internalParameters[9]  = m_RightIntrinsic->at<double>(0, 0);
+  internalParameters[10] = m_RightIntrinsic->at<double>(1, 1);
+  internalParameters[11] = m_RightIntrinsic->at<double>(0, 2);
+  internalParameters[12] = m_RightIntrinsic->at<double>(1, 2);
+  internalParameters[13] = m_RightDistortion->at<double>(0, 0);
+  internalParameters[14] = m_RightDistortion->at<double>(0, 1);
+  internalParameters[15] = m_RightDistortion->at<double>(0, 2);
+  internalParameters[16] = m_RightDistortion->at<double>(0, 3);
+  internalParameters[17] = m_RightDistortion->at<double>(0, 4);
 
-  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
-  leftToRightTranslationVector.at<double>(0, 0) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(1, 0) = parameters[counter++];
-  leftToRightTranslationVector.at<double>(2, 0) = parameters[counter++];
+  internalParameters[18] = parameters[0];
+  internalParameters[19] = parameters[1];
+  internalParameters[20] = parameters[2];
 
-  int numberOfViews = 0;
-  unsigned long int pointCounter = 0;
+  internalParameters[21] = parameters[3];
+  internalParameters[22] = parameters[4];
+  internalParameters[23] = parameters[5];
 
-  std::list<PointSet>::const_iterator leftViewIter;
-  std::list<PointSet>::const_iterator rightViewIter;
-
-  for (leftViewIter = m_Points->begin(),
-       rightViewIter = m_RightHandPoints->begin();
-       leftViewIter != m_Points->end() && rightViewIter != m_RightHandPoints->end();
-       ++leftViewIter,
-       ++rightViewIter
-       )
+  unsigned int internalParameterCounter = 24;
+  unsigned int parametersCounter = 6;
+  for (unsigned int i = 0; i < m_Points->size(); i++)
   {
-    cv::Mat leftCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    leftCameraRotationVector.at<double>(0, 0) = parameters[counter++];
-    leftCameraRotationVector.at<double>(0, 1) = parameters[counter++];
-    leftCameraRotationVector.at<double>(0, 2) = parameters[counter++];
-
-    cv::Mat leftCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-    leftCameraTranslationVector.at<double>(0, 0) = parameters[counter++];
-    leftCameraTranslationVector.at<double>(0, 1) = parameters[counter++];
-    leftCameraTranslationVector.at<double>(0, 2) = parameters[counter++];
-
-    niftk::Model3D triangulatedModelInLeftCameraSpace;
-
-    niftk::TriangulatePointPairs(
-      *leftViewIter,
-      *rightViewIter,
-      *m_LeftIntrinsic,
-      *m_LeftDistortion,
-      leftCameraRotationVector,
-      leftCameraTranslationVector,
-      leftToRightRotationMatrix,
-      leftToRightTranslationVector,
-      *m_RightIntrinsic,
-      *m_RightDistortion,
-      triangulatedModelInLeftCameraSpace
-    );
-
-    cv::Matx44d modelToCamera = niftk::RodriguesToMatrix(leftCameraRotationVector, leftCameraTranslationVector);
-    cv::Matx44d cameraToModel = modelToCamera.inv(cv::DECOMP_SVD);
-
-    niftk::Model3D triangulatedModelInModelSpace = niftk::TransformModel(triangulatedModelInLeftCameraSpace,
-                                                                         cameraToModel);
-
-    niftk::Model3D::const_iterator modelIter;
-    for (modelIter = triangulatedModelInModelSpace.begin();
-         modelIter != triangulatedModelInModelSpace.end();
-         ++modelIter
-         )
-    {
-      niftk::NiftyCalIdType id = (*modelIter).first;
-      Model3D::const_iterator goldIter = m_Model->find(id);
-      if (goldIter == m_Model->end())
-      {
-        niftkNiftyCalThrow() << "Failed to find point " << id << " in gold standard model.";
-      }
-      niftk::Point3D triangulatedPoint = (*modelIter).second;
-      niftk::Point3D goldStandardPoint = (*goldIter).second;
-      result[pointCounter++] = triangulatedPoint.point.x - goldStandardPoint.point.x;
-      result[pointCounter++] = triangulatedPoint.point.y - goldStandardPoint.point.y;
-      result[pointCounter++] = triangulatedPoint.point.z - goldStandardPoint.point.z;
-    }
-    numberOfViews++;
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
   }
+
+  niftk::ComputeStereoReconstructionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
   return result;
 }
 

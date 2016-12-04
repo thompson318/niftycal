@@ -226,11 +226,11 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
                                    itk::MultipleValuedCostFunction::MeasureType& errors
                                   )
 {
-  if (parameters.size() < 24)
+  if (parameters.size() < 30)
   {
     niftkNiftyCalThrow() << "Too few parameters, must be at least 30";
   }
-  if ((parameters.size() - 24) % 6 != 0)
+  if ((parameters.size() - 30) % 6 != 0)
   {
     niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
   }
@@ -323,14 +323,69 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
                                        const cv::Matx44d& leftExtrinsic,
                                        const cv::Mat& leftIntrinsic,
                                        const cv::Mat& leftDistortion,
-                                       const cv::Matx44d& rightExtrinsic,
+                                       const cv::Mat& leftToRightRotationMatrix,
+                                       const cv::Mat& leftToRightTranslationVector,
                                        const cv::Mat& rightIntrinsic,
                                        const cv::Mat& rightDistortion,
-                                       const itk::MultipleValuedCostFunction::ParametersType& parameters,
-                                       itk::MultipleValuedCostFunction::MeasureType& errors
+                                       itk::MultipleValuedCostFunction::MeasureType& errorValues
                                       )
 {
+  niftk::Model3D triangulatedModelInLeftCameraSpace;
 
+  cv::Mat rvecLeft = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat tvecLeft = cvCreateMat(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(leftExtrinsic, rvecLeft, tvecLeft);
+
+  niftk::TriangulatePointPairs(
+    leftPoints,
+    rightPoints,
+    leftIntrinsic,
+    leftDistortion,
+    rvecLeft,
+    tvecLeft,
+    leftToRightRotationMatrix,
+    leftToRightTranslationVector,
+    rightIntrinsic,
+    rightDistortion,
+    triangulatedModelInLeftCameraSpace
+  );
+
+  cv::Matx44d modelToCamera = leftExtrinsic;
+  cv::Matx44d cameraToModel = modelToCamera.inv(cv::DECOMP_SVD);
+
+  niftk::Model3D triangulatedModelInModelSpace = niftk::TransformModel(triangulatedModelInLeftCameraSpace,
+                                                                       cameraToModel);
+
+  std::list<niftk::PointSet> lp;
+  lp.push_back(leftPoints);
+
+  std::list<niftk::PointSet> rp;
+  rp.push_back(rightPoints);
+
+  unsigned long int totalPointCounter = 0;
+  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)) * 3;
+
+  errorValues.clear();
+  errorValues.SetSize(numberOfValues);
+
+  niftk::Model3D::const_iterator modelIter;
+  for (modelIter = triangulatedModelInModelSpace.begin();
+       modelIter != triangulatedModelInModelSpace.end();
+       ++modelIter
+       )
+  {
+    niftk::NiftyCalIdType id = (*modelIter).first;
+    Model3D::const_iterator goldIter = model.find(id);
+    if (goldIter == model.end())
+    {
+      niftkNiftyCalThrow() << "Failed to find point " << id << " in gold standard model.";
+    }
+    niftk::Point3D triangulatedPoint = (*modelIter).second;
+    niftk::Point3D goldStandardPoint = (*goldIter).second;
+    errorValues[totalPointCounter++] = triangulatedPoint.point.x - goldStandardPoint.point.x;
+    errorValues[totalPointCounter++] = triangulatedPoint.point.y - goldStandardPoint.point.y;
+    errorValues[totalPointCounter++] = triangulatedPoint.point.z - goldStandardPoint.point.z;
+  }
 }
 
 
@@ -342,7 +397,105 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
                                        itk::MultipleValuedCostFunction::MeasureType& errors
                                       )
 {
+  if (parameters.size() < 30)
+  {
+    niftkNiftyCalThrow() << "Too few parameters, must be at least 30";
+  }
+  if ((parameters.size() - 30) % 6 != 0)
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
+  }
+  if ((parameters.size() - 24) / 6 != leftPoints->size())
+  {
+    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+  }
+  if (leftPoints->size() != rightPoints->size())
+  {
+    niftkNiftyCalThrow() << "The number of left point sets:" << leftPoints->size()
+                         << ", doesn't match the number of right point sets:" << rightPoints->size();
+  }
 
+  unsigned int parameterCounter = 0;
+
+  cv::Mat leftIntrinsic = cv::Mat::eye(3, 3, CV_64FC1);
+  leftIntrinsic.at<double>(0, 0) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(1, 1) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
+  leftIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
+
+  cv::Mat leftDistortion = cvCreateMat(1, 5, CV_64FC1);
+  leftDistortion.at<double>(0, 0) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 1) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 2) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 3) = parameters[parameterCounter++];
+  leftDistortion.at<double>(0, 4) = parameters[parameterCounter++];
+
+  cv::Mat rightIntrinsic = cv::Mat::eye(3, 3, CV_64FC1);
+  rightIntrinsic.at<double>(0, 0) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(1, 1) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
+  rightIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
+
+  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  rightDistortion.at<double>(0, 0) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 1) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 2) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 3) = parameters[parameterCounter++];
+  rightDistortion.at<double>(0, 4) = parameters[parameterCounter++];
+
+  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  leftToRightRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
+  leftToRightRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
+  leftToRightRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
+
+  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+  leftToRightTranslationVector.at<double>(0, 0) = parameters[parameterCounter++];
+  leftToRightTranslationVector.at<double>(1, 0) = parameters[parameterCounter++];
+  leftToRightTranslationVector.at<double>(2, 0) = parameters[parameterCounter++];
+
+  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+
+  itk::MultipleValuedCostFunction::MeasureType errorsPerView;
+  unsigned long int errorCounter = 0;
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+  for (leftIter = leftPoints->begin(), rightIter = rightPoints->begin();
+       leftIter != leftPoints->end();
+       leftIter++, rightIter++
+      )
+  {
+    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    rvec.at<double>(0, 0) = parameters[parameterCounter++];
+    rvec.at<double>(0, 1) = parameters[parameterCounter++];
+    rvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    tvec.at<double>(0, 0) = parameters[parameterCounter++];
+    tvec.at<double>(0, 1) = parameters[parameterCounter++];
+    tvec.at<double>(0, 2) = parameters[parameterCounter++];
+
+    cv::Matx44d leftExtrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+    niftk::ComputeStereoReconstructionErrors(*model,
+                                             *leftIter,
+                                             *rightIter,
+                                             leftExtrinsic,
+                                             leftIntrinsic,
+                                             leftDistortion,
+                                             leftToRightRotationMatrix,
+                                             leftToRightTranslationVector,
+                                             rightIntrinsic,
+                                             rightDistortion,
+                                             errorsPerView
+                                             );
+
+    for (unsigned long int i = 0; i < errorsPerView.size(); i++)
+    {
+      errors[errorCounter++] = errorsPerView[i];
+    }
+  }
 }
 
 } // end namespace
