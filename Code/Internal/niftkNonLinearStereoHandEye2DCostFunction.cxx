@@ -23,10 +23,6 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearStereoHandEye2DCostFunction::NonLinearStereoHandEye2DCostFunction()
-: m_LeftIntrinsic(nullptr)
-, m_LeftDistortion(nullptr)
-, m_RightIntrinsic(nullptr)
-, m_RightDistortion(nullptr)
 {
 }
 
@@ -34,62 +30,6 @@ NonLinearStereoHandEye2DCostFunction::NonLinearStereoHandEye2DCostFunction()
 //-----------------------------------------------------------------------------
 NonLinearStereoHandEye2DCostFunction::~NonLinearStereoHandEye2DCostFunction()
 {
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEye2DCostFunction::SetLeftIntrinsic(const cv::Mat* const intrinsic)
-{
-  if (intrinsic->rows != 3 || intrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
-                         << intrinsic->cols << ", " << intrinsic->rows << ")";
-  }
-
-  m_LeftIntrinsic = const_cast<cv::Mat*>(intrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEye2DCostFunction::SetLeftDistortion(const cv::Mat* const distortion)
-{
-  if (distortion->rows != 1 || distortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Distortion vector should be 1x5, and its ("
-                         << distortion->cols << ", " << distortion->rows << ")";
-  }
-
-  m_LeftDistortion = const_cast<cv::Mat*>(distortion);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEye2DCostFunction::SetRightIntrinsic(const cv::Mat* const intrinsic)
-{
-  if (intrinsic->rows != 3 || intrinsic->cols != 3)
-  {
-    niftkNiftyCalThrow() << "Intrinsic matrix should be 3x3, and its ("
-                         << intrinsic->cols << ", " << intrinsic->rows << ")";
-  }
-
-  m_RightIntrinsic = const_cast<cv::Mat*>(intrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearStereoHandEye2DCostFunction::SetRightDistortion(const cv::Mat* const distortion)
-{
-  if (distortion->rows != 1 || distortion->cols != 5)
-  {
-    niftkNiftyCalThrow() << "Distortion vector should be 1x5, and its ("
-                         << distortion->cols << ", " << distortion->rows << ")";
-  }
-
-  m_RightDistortion = const_cast<cv::Mat*>(distortion);
-  this->Modified();
 }
 
 
@@ -123,15 +63,15 @@ NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& par
   internalParameters.Fill(0);
 
   // Intrinsic params are not in the input array, as they are constant.
-  internalParameters[0] = (*m_LeftIntrinsic).at<double>(0, 0);
-  internalParameters[1] = (*m_LeftIntrinsic).at<double>(1, 1);
-  internalParameters[2] = (*m_LeftIntrinsic).at<double>(0, 2);
-  internalParameters[3] = (*m_LeftIntrinsic).at<double>(1, 2);
-  internalParameters[4] = (*m_LeftDistortion).at<double>(0, 0);
-  internalParameters[5] = (*m_LeftDistortion).at<double>(0, 1);
-  internalParameters[6] = (*m_LeftDistortion).at<double>(0, 2);
-  internalParameters[7] = (*m_LeftDistortion).at<double>(0, 3);
-  internalParameters[8] = (*m_LeftDistortion).at<double>(0, 4);
+  internalParameters[0] = (*m_Intrinsic).at<double>(0, 0);
+  internalParameters[1] = (*m_Intrinsic).at<double>(1, 1);
+  internalParameters[2] = (*m_Intrinsic).at<double>(0, 2);
+  internalParameters[3] = (*m_Intrinsic).at<double>(1, 2);
+  internalParameters[4] = (*m_Distortion).at<double>(0, 0);
+  internalParameters[5] = (*m_Distortion).at<double>(0, 1);
+  internalParameters[6] = (*m_Distortion).at<double>(0, 2);
+  internalParameters[7] = (*m_Distortion).at<double>(0, 3);
+  internalParameters[8] = (*m_Distortion).at<double>(0, 4);
   internalParameters[9] = (*m_RightIntrinsic).at<double>(0, 0);
   internalParameters[10] = (*m_RightIntrinsic).at<double>(1, 1);
   internalParameters[11] = (*m_RightIntrinsic).at<double>(0, 2);

@@ -69,7 +69,7 @@ void NonLinearStereoHandEye2DOptimiser::SetHandMatrices(const std::list<cv::Matx
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEye2DOptimiser::SetLeftIntrinsic(const cv::Mat* const intrinsic)
 {
-  m_CostFunction->SetLeftIntrinsic(intrinsic);
+  m_CostFunction->SetIntrinsic(intrinsic);
   this->Modified();
 }
 
@@ -77,7 +77,7 @@ void NonLinearStereoHandEye2DOptimiser::SetLeftIntrinsic(const cv::Mat* const in
 //-----------------------------------------------------------------------------
 void NonLinearStereoHandEye2DOptimiser::SetLeftDistortion(const cv::Mat* const distortion)
 {
-  m_CostFunction->SetLeftDistortion(distortion);
+  m_CostFunction->SetDistortion(distortion);
   this->Modified();
 }
 

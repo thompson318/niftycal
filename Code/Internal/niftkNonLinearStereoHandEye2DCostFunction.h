@@ -16,6 +16,7 @@
 #define niftkNonLinearStereoHandEye2DCostFunction_h
 
 #include "niftkNonLinearStereo2DCostFunction.h"
+#include "niftkNonLinearNoIntrinsicsCostFunction.h"
 
 namespace niftk
 {
@@ -26,7 +27,9 @@ namespace niftk
 * hand-eye and model-to-world optimisation, as an extension of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NonLinearStereoHandEye2DCostFunction : public NonLinearStereo2DCostFunction
+class NonLinearStereoHandEye2DCostFunction
+    : public NonLinearStereo2DCostFunction,
+      public NonLinearNoIntrinsicsCostFunction
 {
 
 public:
@@ -43,11 +46,6 @@ public:
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
-  void SetLeftIntrinsic(const cv::Mat* const intrinsic);
-  void SetLeftDistortion(const cv::Mat* const distortion);
-  void SetRightIntrinsic(const cv::Mat* const intrinsic);
-  void SetRightDistortion(const cv::Mat* const distortion);
-
 protected:
 
   NonLinearStereoHandEye2DCostFunction();
@@ -56,12 +54,6 @@ protected:
   NonLinearStereoHandEye2DCostFunction(const NonLinearStereoHandEye2DCostFunction&);
   NonLinearStereoHandEye2DCostFunction& operator=(const NonLinearStereoHandEye2DCostFunction&);
 
-private:
-
-  cv::Mat *m_LeftIntrinsic;
-  cv::Mat *m_LeftDistortion;
-  cv::Mat *m_RightIntrinsic;
-  cv::Mat *m_RightDistortion;
 };
 
 } // end namespace
