@@ -51,9 +51,6 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeOptimiser.cxx)
 
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinear12DOFHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinear12DOFHandEyeOptimiser.cxx)
-
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNDOFHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNDOFHandEyeOptimiser.cxx)
 
@@ -79,9 +76,6 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo3DCostFunction.cxx)
-
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration3DCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration3DOptimiser.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.cxx)
