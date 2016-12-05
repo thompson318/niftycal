@@ -187,7 +187,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
 
   // Here, Im just testing that the stereo code runs to completion, as we only have mono data.
   cv::Matx44d stereoExtrinsics = cv::Matx44d::eye();
-  handEye = niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, cameraMatrices, stereoExtrinsics, reprojectionRMS);
+  handEye = niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, cameraMatrices, false, stereoExtrinsics, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endStereo= std::chrono::system_clock::now();
   elapsed_seconds = endStereo - endTsai;

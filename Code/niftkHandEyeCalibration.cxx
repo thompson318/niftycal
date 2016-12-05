@@ -19,6 +19,7 @@
 #include <Internal/niftkNonLinearMaltiHandEyeOptimiser.h>
 #include <Internal/niftkNonLinearNDOFHandEyeOptimiser.h>
 #include <Internal/niftkNonLinearStereoHandEye2DOptimiser.h>
+#include <Internal/niftkNonLinearStereoHandEye3DOptimiser.h>
 #endif
 
 namespace niftk {
@@ -400,6 +401,7 @@ cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     const cv::Mat&                rightDistortion,
     const std::list<cv::Matx44d>& handMatrices,
     const std::list<cv::Matx44d>& eyeMatrices,
+    const bool&                   optimise3D,
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
     )
@@ -410,17 +412,32 @@ cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
 
   cv::Matx44d finalHandEye = initialHandEye;
 
-  niftk::NonLinearStereoHandEye2DOptimiser::Pointer optimiser = niftk::NonLinearStereoHandEye2DOptimiser::New();
-  optimiser->SetModel(&model3D);
-  optimiser->SetPoints(&leftPointSets);
-  optimiser->SetRightHandPoints(&rightPointSets);
-  optimiser->SetHandMatrices(&handMatrices);
-  optimiser->SetLeftIntrinsic(&leftIntrinsic);
-  optimiser->SetLeftDistortion(&leftDistortion);
-  optimiser->SetRightIntrinsic(&rightIntrinsic);
-  optimiser->SetRightDistortion(&rightDistortion);
+  niftk::NonLinearStereoHandEye2DOptimiser::Pointer optimiser2D = niftk::NonLinearStereoHandEye2DOptimiser::New();
+  optimiser2D->SetModel(&model3D);
+  optimiser2D->SetPoints(&leftPointSets);
+  optimiser2D->SetRightHandPoints(&rightPointSets);
+  optimiser2D->SetHandMatrices(&handMatrices);
+  optimiser2D->SetLeftIntrinsic(&leftIntrinsic);
+  optimiser2D->SetLeftDistortion(&leftDistortion);
+  optimiser2D->SetRightIntrinsic(&rightIntrinsic);
+  optimiser2D->SetRightDistortion(&rightDistortion);
 
-  residual = optimiser->Optimise(initialModelToWorld, finalHandEye, stereoExtrinsics);
+  residual = optimiser2D->Optimise(initialModelToWorld, finalHandEye, stereoExtrinsics);
+
+  if (optimise3D)
+  {
+    niftk::NonLinearStereoHandEye3DOptimiser::Pointer optimiser3D = niftk::NonLinearStereoHandEye3DOptimiser::New();
+    optimiser3D->SetModel(&model3D);
+    optimiser3D->SetPoints(&leftPointSets);
+    optimiser3D->SetRightHandPoints(&rightPointSets);
+    optimiser3D->SetHandMatrices(&handMatrices);
+    optimiser3D->SetLeftIntrinsic(&leftIntrinsic);
+    optimiser3D->SetLeftDistortion(&leftDistortion);
+    optimiser3D->SetRightIntrinsic(&rightIntrinsic);
+    optimiser3D->SetRightDistortion(&rightDistortion);
+
+    residual = optimiser3D->Optimise(initialModelToWorld, finalHandEye, stereoExtrinsics);
+  }
 
   return finalHandEye;
 }

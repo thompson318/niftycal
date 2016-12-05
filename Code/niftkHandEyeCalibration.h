@@ -121,6 +121,7 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     const cv::Mat&                rightDistortion,
     const std::list<cv::Matx44d>& handMatrices,
     const std::list<cv::Matx44d>& eyeMatrices,
+    const bool&                   optimise3D,
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
     );
