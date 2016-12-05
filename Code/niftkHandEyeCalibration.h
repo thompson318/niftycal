@@ -106,7 +106,8 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
 
 /**
 * \brief Calculates Hand-Eye by optimising extrinsic (tracker matrices), model-to-world, hand-eye matrices and stereo left-to-right matrices.
-* \param residuals returns 2D rms reprojection error and 3D rms reconstruction error.
+* \param residuals returns 2D rms reprojection error if optimise3D is false
+* or 3D rms reconstruction error if optimise3D is true.
 *
 * This does an initial hand-eye using Tsai's 1989 linear approximation, followed by
 * optimisation of the extrinsic (6N DOF), model-to-world (6DOF), hand-eye (6DOF) and left-to-right (6DOF).
