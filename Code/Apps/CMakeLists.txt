@@ -20,6 +20,7 @@ set(NIFTYCAL_APPS
   niftkStereoIterativeRingsCalibration
   niftkStereoChessboardCalibration
   niftkTimingCalibrationFromPoints
+  niftkPoseFromPoints
 )
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)

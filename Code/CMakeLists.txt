@@ -38,6 +38,7 @@ set(NIFTYCAL_SRCS
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx
   niftkTimingCalibration.cxx
+  niftkPoseFromPoints.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
