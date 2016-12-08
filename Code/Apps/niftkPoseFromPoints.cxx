@@ -65,10 +65,16 @@ int main(int argc, char ** argv)
                             tvecs
                           );
 
-    std::cout << "niftkPoseFromPoints:"
-              << rvecs[0] 
-              << tvecs[0]
+    for ( unsigned int i = 0 ; i < rvecs.size() ; ++ i )
+    {
+      std::cout << rvecs[i].at<double>(0,0) * 180.0 / CV_PI << " , "
+              << rvecs[i].at<double>(0,1) * 180.0 / CV_PI << " , "
+              << rvecs[i].at<double>(0,2) * 180.0 / CV_PI << " , "
+              << tvecs[i].at<double>(0,0) << " , "
+              << tvecs[i].at<double>(0,1) << " , "
+              << tvecs[i].at<double>(0,2)
               << std::endl;
+    }
   }
   catch (niftk::NiftyCalException& e)
   {
