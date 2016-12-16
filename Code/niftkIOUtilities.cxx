@@ -570,4 +570,75 @@ void Save4x4Matrix(const cv::Matx44d& matrix,
   ofs.close();
 }
 
+
+//-----------------------------------------------------------------------------
+TimeSamples2D LoadTimeSamples2D(const std::string& fileName)
+{
+  TimeSamples2D result;
+
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  std::ifstream ifs;
+  ifs.open (fileName, std::ofstream::in);
+  if (!ifs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
+  }
+
+  while (!ifs.eof())
+  {
+    TimingSample2D tmp;
+    ifs >> tmp.time;
+    ifs >> tmp.sample.x;
+    ifs >> tmp.sample.y;
+    if (!ifs.bad() && !ifs.fail())
+    {
+      result.push_back(tmp);
+    }
+  }
+
+  ifs.close();
+
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
+TimeSamples3D LoadTimeSamples3D(const std::string& fileName)
+{
+  TimeSamples3D result;
+
+  if (fileName.size() == 0)
+  {
+    niftkNiftyCalThrow() << "Empty filename.";
+  }
+
+  std::ifstream ifs;
+  ifs.open (fileName, std::ofstream::in);
+  if (!ifs.is_open())
+  {
+    niftkNiftyCalThrow() << "Failed to open file:" << fileName << " for reading.";
+  }
+
+  while (!ifs.eof())
+  {
+    TimingSample3D tmp;
+    ifs >> tmp.time;
+    ifs >> tmp.sample.x;
+    ifs >> tmp.sample.y;
+    ifs >> tmp.sample.z;
+    if (!ifs.bad() && !ifs.fail())
+    {
+      result.push_back(tmp);
+    }
+  }
+
+  ifs.close();
+
+  return result;
+}
+
 } // end namespace

@@ -49,6 +49,10 @@ NIFTYCAL_WINEXPORT void LoadPoints(const std::string& fileName,
                                    const std::list<PointSet>& p
                                    );
 
+NIFTYCAL_WINEXPORT TimeSamples2D LoadTimeSamples2D(const std::string& fileName);
+
+NIFTYCAL_WINEXPORT TimeSamples3D LoadTimeSamples3D(const std::string& fileName);
+
 /**
 * \brief Saves NifTK format intrinsics file.
 *

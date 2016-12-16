@@ -36,6 +36,7 @@ set(NIFTYCAL_SRCS
   niftkHandEyeCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx
+  niftkTimingCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
