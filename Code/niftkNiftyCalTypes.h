@@ -18,6 +18,7 @@
 #include "niftkWin32ExportHeader.h"
 #include <cv.h>
 #include <map>
+#include <vector>
 
 /**
 * \defgroup internal internal
@@ -60,6 +61,10 @@ namespace niftk
 {
 
 typedef unsigned int NiftyCalIdType;
+
+/**
+* \brief Clock time in nano-seconds since epoch.
+*/
 typedef unsigned long long NiftyCalTimeType;
 
 /**
@@ -82,10 +87,32 @@ struct NIFTYCAL_WINEXPORT Point3D
   cv::Point3d    point;
 };
 
-typedef std::map <NiftyCalIdType, Point2D> PointSet;
-typedef std::pair<NiftyCalIdType, Point2D> IdPoint2D;
-typedef std::map <NiftyCalIdType, Point3D> Model3D;
-typedef std::pair<NiftyCalIdType, Point3D> IdPoint3D;
+struct NIFTYCAL_WINEXPORT TimingSample1D
+{
+  NiftyCalTimeType time;
+  double           sample;
+};
+
+struct NIFTYCAL_WINEXPORT TimingSample2D
+{
+  NiftyCalTimeType time;
+  cv::Point2d      sample;
+};
+
+struct NIFTYCAL_WINEXPORT TimingSample3D
+{
+  NiftyCalTimeType time;
+  cv::Point3d      sample;
+};
+
+typedef std::map <NiftyCalIdType, Point2D>   PointSet;
+typedef std::pair<NiftyCalIdType, Point2D>   IdPoint2D;
+typedef std::map <NiftyCalIdType, Point3D>   Model3D;
+typedef std::pair<NiftyCalIdType, Point3D>   IdPoint3D;
+typedef std::vector<TimingSample1D>          TimeSamples1D;
+typedef std::vector<TimingSample2D>          TimeSamples2D;
+typedef std::vector<TimingSample3D>          TimeSamples3D;
+typedef std::map<NiftyCalTimeType, double>   TimeMappedSamples1D;
 
 } // end namespace
 
