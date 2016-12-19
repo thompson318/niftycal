@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearTsai5ParamCostFunction_h
-#define niftkNonLinearTsai5ParamCostFunction_h
+#ifndef niftkNonLinearTsai2ParamCostFunction_h
+#define niftkNonLinearTsai2ParamCostFunction_h
 
 #include "niftkNonLinearTsaiCostFunction.h"
 
@@ -21,16 +21,16 @@ namespace niftk
 {
 
 /**
-* \class NonLinearTsai5ParamCostFunction
-* \brief Cost function, to optimise 2D projection error over Tz, f, k1, Cx and Cy.
-* \see niftk::NonLinearTsai5ParamOptimiser
+* \class NonLinearTsai2ParamCostFunction
+* \brief Cost function, to optimise 2D projection error over Cx and Cy.
+* \see niftk::NonLinearTsai2ParamOptimiser
 */
-class NonLinearTsai5ParamCostFunction : public niftk::NonLinearTsaiCostFunction
+class NonLinearTsai2ParamCostFunction : public niftk::NonLinearTsaiCostFunction
 {
 
 public:
 
-  typedef NonLinearTsai5ParamCostFunction Self;
+  typedef NonLinearTsai2ParamCostFunction Self;
   typedef NonLinearTsaiCostFunction       Superclass;
   typedef itk::SmartPointer<Self>         Pointer;
   typedef itk::SmartPointer<const Self>   ConstPointer;
@@ -44,11 +44,12 @@ public:
 
 protected:
 
-  NonLinearTsai5ParamCostFunction(); // deliberately protected.
-  virtual ~NonLinearTsai5ParamCostFunction(); // deliberately protected.
+  NonLinearTsai2ParamCostFunction(); // deliberately protected.
+  virtual ~NonLinearTsai2ParamCostFunction(); // deliberately protected.
 
-  NonLinearTsai5ParamCostFunction(const NonLinearTsai5ParamCostFunction&); // deliberately not implemented
-  NonLinearTsai5ParamCostFunction& operator=(const NonLinearTsai5ParamCostFunction&); // deliberately not implemented
+  NonLinearTsai2ParamCostFunction(const NonLinearTsai2ParamCostFunction&); // deliberately not implemented
+  NonLinearTsai2ParamCostFunction& operator=(const NonLinearTsai2ParamCostFunction&); // deliberately not implemented
+
 };
 
 } // end namespace

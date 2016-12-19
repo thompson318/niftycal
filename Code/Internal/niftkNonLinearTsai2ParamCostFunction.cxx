@@ -12,29 +12,28 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearTsai5ParamCostFunction.h"
+#include "niftkNonLinearTsai2ParamCostFunction.h"
 #include "niftkCalibrationUtilities_p.h"
-#include "niftkTsaiUtilities_p.h"
 #include <niftkMatrixUtilities.h>
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearTsai5ParamCostFunction::NonLinearTsai5ParamCostFunction()
+NonLinearTsai2ParamCostFunction::NonLinearTsai2ParamCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearTsai5ParamCostFunction::~NonLinearTsai5ParamCostFunction()
+NonLinearTsai2ParamCostFunction::~NonLinearTsai2ParamCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearTsai5ParamCostFunction::MeasureType
-NonLinearTsai5ParamCostFunction::InternalGetValue(const ParametersType& parameters ) const
+NonLinearTsai2ParamCostFunction::MeasureType
+NonLinearTsai2ParamCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
@@ -43,17 +42,21 @@ NonLinearTsai5ParamCostFunction::InternalGetValue(const ParametersType& paramete
   cv::Mat tvec = cvCreateMat ( 1, 3, CV_64FC1 );
   niftk::MatrixToRodrigues(*m_Extrinsic, rvec, tvec);
 
+  cv::Point2d imageCentre;
+  imageCentre.x = parameters[0];  // Cx
+  imageCentre.y = parameters[1];  // Cy
+
   ParametersType internalParameters;
   internalParameters.SetSize(  4 // intrinsic
                              + 5 // distortion
                              + 6 // extrinsic
                             );
 
-  internalParameters[0] = parameters[1] * m_Sx;  // f * sx
-  internalParameters[1] = parameters[1];         // f
-  internalParameters[2] = parameters[3];         // Cx
-  internalParameters[3] = parameters[4];         // Cy
-  internalParameters[4] = parameters[2];         // k1
+  internalParameters[0] = (*m_Intrinsic).at<double>(0, 0) * m_Sx;
+  internalParameters[1] = (*m_Intrinsic).at<double>(1, 1);
+  internalParameters[2] = parameters[0];  // Cx
+  internalParameters[3] = parameters[1];  // Cy
+  internalParameters[4] = m_K1;
   internalParameters[5] = 0;
   internalParameters[6] = 0;
   internalParameters[7] = 0;
@@ -63,7 +66,7 @@ NonLinearTsai5ParamCostFunction::InternalGetValue(const ParametersType& paramete
   internalParameters[11] = rvec.at<double>(0, 2); // R3
   internalParameters[12] = tvec.at<double>(0, 0); // T1
   internalParameters[13] = tvec.at<double>(0, 1); // T2
-  internalParameters[14] = parameters[0]; // Tz
+  internalParameters[14] = tvec.at<double>(0, 2); // T3
 
   niftk::ComputeMonoProjectionErrors(m_Model, m_Points, internalParameters, result);
   return result;

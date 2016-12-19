@@ -53,6 +53,22 @@ void NonLinearTsai3ParamOptimiser::SetPoints(const std::list<PointSet>* const po
 
 
 //-----------------------------------------------------------------------------
+void NonLinearTsai3ParamOptimiser::SetSx(const double& sx)
+{
+  m_CostFunction->SetSx(sx);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai3ParamOptimiser::SetK1(const double& k1)
+{
+  m_CostFunction->SetK1(k1);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 void NonLinearTsai3ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
 {
   m_CostFunction->SetExtrinsic(extrinsic);
@@ -91,12 +107,6 @@ double NonLinearTsai3ParamOptimiser::Optimise(double& Tz, double& f, double& k1)
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
-  /*
-  niftk::NonLinearTsai3ParamCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
-  double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearTsai3ParamOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
-  */
-
   // Do optimisation.
   optimiser->StartOptimization();
 
@@ -108,8 +118,6 @@ double NonLinearTsai3ParamOptimiser::Optimise(double& Tz, double& f, double& k1)
 
   niftk::NonLinearTsai3ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-
-  //std::cout << "NonLinearTsai3ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

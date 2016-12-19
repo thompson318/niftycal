@@ -46,8 +46,8 @@ endif()
 if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNoIntrinsicsCostFunction.cxx)
-
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMonoCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsaiCostFunction.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeOptimiser.cxx)
@@ -58,6 +58,9 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamCostFunction.cxx)
 
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai2ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai2ParamCostFunction.cxx)
+
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai5ParamOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai5ParamCostFunction.cxx)
 
@@ -66,6 +69,9 @@ if(ITK_FOUND)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamOptimiser.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamCostFunction.cxx)
 
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo2DCostFunction.cxx)

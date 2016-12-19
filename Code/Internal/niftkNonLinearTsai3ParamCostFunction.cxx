@@ -32,22 +32,6 @@ NonLinearTsai3ParamCostFunction::~NonLinearTsai3ParamCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai3ParamCostFunction::SetExtrinsic(const cv::Matx44d* extrinsic)
-{
-  m_Extrinsic = const_cast<cv::Matx44d*>(extrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
-void NonLinearTsai3ParamCostFunction::SetIntrinsic(const cv::Mat* const intrinsic)
-{
-  m_Intrinsic = const_cast<cv::Mat*>(intrinsic);
-  this->Modified();
-}
-
-
-//-----------------------------------------------------------------------------
 NonLinearTsai3ParamCostFunction::MeasureType
 NonLinearTsai3ParamCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
@@ -59,16 +43,16 @@ NonLinearTsai3ParamCostFunction::InternalGetValue(const ParametersType& paramete
   niftk::MatrixToRodrigues(*m_Extrinsic, rvec, tvec);
 
   ParametersType internalParameters;
-  internalParameters.SetSize(4   // intrinsic
+  internalParameters.SetSize(  4 // intrinsic
                              + 5 // distortion
                              + 6 // extrinsic
                             );
 
-  internalParameters[0] = parameters[1];  // f
-  internalParameters[1] = parameters[1];  // f
+  internalParameters[0] = parameters[1] * m_Sx;            // f * sx
+  internalParameters[1] = parameters[1];                   // f
   internalParameters[2] = (*m_Intrinsic).at<double>(0, 2);
   internalParameters[3] = (*m_Intrinsic).at<double>(1, 2);
-  internalParameters[4] = parameters[2]; // k1
+  internalParameters[4] = parameters[2];                   // k1
   internalParameters[5] = 0;
   internalParameters[6] = 0;
   internalParameters[7] = 0;
@@ -78,7 +62,7 @@ NonLinearTsai3ParamCostFunction::InternalGetValue(const ParametersType& paramete
   internalParameters[11] = rvec.at<double>(0, 2);
   internalParameters[12] = tvec.at<double>(0, 0);
   internalParameters[13] = tvec.at<double>(0, 1);
-  internalParameters[14] = parameters[0]; // Tz
+  internalParameters[14] = parameters[0];                  // Tz
 
   niftk::ComputeMonoProjectionErrors(m_Model, m_Points, internalParameters, result);
   return result;

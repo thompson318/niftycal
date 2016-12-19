@@ -19,9 +19,11 @@
 #include "niftkPointUtilities.h"
 #include <Internal/niftkTsaiUtilities_p.h>
 #include <Internal/niftkNonLinearTsai3ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai2ParamOptimiser.h>
 #include <Internal/niftkNonLinearTsai5ParamOptimiser.h>
 #include <Internal/niftkNonLinearTsai8ParamOptimiser.h>
 #include <Internal/niftkNonLinearTsai10ParamOptimiser.h>
+#include <Internal/niftkNonLinearTsai11ParamOptimiser.h>
 #include <vector>
 
 namespace niftk
@@ -30,8 +32,6 @@ namespace niftk
 //-----------------------------------------------------------------------------
 void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
                                    const niftk::PointSet& imagePoints2D,
-                                   const double& dxPrime,
-                                   const cv::Point2d& sensorDimensions,
                                    double& sx,
                                    double& Tz,
                                    double& f,
@@ -41,10 +41,13 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
                                    cv::Mat& distortion,
                                    cv::Mat& rvec,
                                    cv::Mat& tvec,
+                                   const bool& extendedOptimisation,
                                    const bool& fullOptimisation
                                   )
 {
 #ifdef NIFTYCAL_WITH_ITK
+
+  double rms = 0;
 
   cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
@@ -55,54 +58,127 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
   niftk::NonLinearTsai3ParamOptimiser::Pointer tsai3Param = niftk::NonLinearTsai3ParamOptimiser::New();
   tsai3Param->SetModel(&model3D);
   tsai3Param->SetPoints(&listOfPoints);
+  tsai3Param->SetSx(sx);
   tsai3Param->SetIntrinsic(&intrinsic);
   tsai3Param->SetExtrinsic(&extrinsic);
-  tsai3Param->Optimise(Tz, f, k1);
+  rms = tsai3Param->Optimise(Tz, f, k1);
   tvec.at<double>(0, 2) = Tz;
   intrinsic.at<double>(0, 0) = f * sx;
   intrinsic.at<double>(1, 1) = f;
   distortion.at<double>(0, 0) = k1;
 
-  if (fullOptimisation)
+  std::cout << "TsaiMonoNonLinearOptimisation, 3DOF=" << rms << std::endl;
+
+  if (extendedOptimisation || fullOptimisation)
   {
-    // (e): Non-linear optimisation of f, Tz, K1, Cx and Cy.
-    niftk::NonLinearTsai5ParamOptimiser::Pointer tsai5Param = niftk::NonLinearTsai5ParamOptimiser::New();
-    tsai5Param->SetModel(&model3D);
-    tsai5Param->SetPoints(&listOfPoints);
-    tsai5Param->SetCameraConstants(dxPrime, sensorDimensions, sx);
-    tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
-    tvec.at<double>(0, 2) = Tz;
-    intrinsic.at<double>(0, 0) = f * sx;
-    intrinsic.at<double>(1, 1) = f;
+    extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+    // (e): Non-linear optimisation of Cx and Cy.
+    niftk::NonLinearTsai2ParamOptimiser::Pointer tsai2Param = niftk::NonLinearTsai2ParamOptimiser::New();
+    tsai2Param->SetModel(&model3D);
+    tsai2Param->SetPoints(&listOfPoints);
+    tsai2Param->SetSx(sx);
+    tsai2Param->SetK1(k1);
+    tsai2Param->SetIntrinsic(&intrinsic);
+    tsai2Param->SetExtrinsic(&extrinsic);
+    rms = tsai2Param->Optimise(imageCentre.x, imageCentre.y);
     intrinsic.at<double>(0, 2) = imageCentre.x;
     intrinsic.at<double>(1, 2) = imageCentre.y;
-    distortion.at<double>(0, 0) = k1;
 
-    // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f and k1.
-    niftk::NonLinearTsai8ParamOptimiser::Pointer tsai8Param = niftk::NonLinearTsai8ParamOptimiser::New();
-    tsai8Param->SetModel(&model3D);
-    tsai8Param->SetPoints(&listOfPoints);
-    tsai8Param->SetIntrinsic(&intrinsic);
-    tsai8Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
-                         tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
-                         f, k1);
-    distortion.at<double>(0, 0) = k1;
-    intrinsic.at<double>(0, 0) = f * sx;
-    intrinsic.at<double>(1, 1) = f;
+    std::cout << "TsaiMonoNonLinearOptimisation, 2DOF=" << rms << std::endl;
 
-    // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx and Cy.
-    niftk::NonLinearTsai10ParamOptimiser::Pointer tsai10Param = niftk::NonLinearTsai10ParamOptimiser::New();
-    tsai10Param->SetModel(&model3D);
-    tsai10Param->SetPoints(&listOfPoints);
-    tsai10Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
-                          tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
-                          f,
-                          intrinsic.at<double>(0, 2), intrinsic.at<double>(1, 2),
-                          distortion.at<double>(0, 0));
-    intrinsic.at<double>(0, 0) = f * sx;
-    intrinsic.at<double>(1, 1) = f;
+    for (int i = 0; i < 1; i++)
+    {
+      // (e): Non-linear optimisation of f, Tz, K1, Cx and Cy.
+      niftk::NonLinearTsai5ParamOptimiser::Pointer tsai5Param = niftk::NonLinearTsai5ParamOptimiser::New();
+      tsai5Param->SetModel(&model3D);
+      tsai5Param->SetPoints(&listOfPoints);
+      tsai5Param->SetSx(sx);
+      tsai5Param->SetK1(k1);
+      tsai5Param->SetIntrinsic(&intrinsic);
+      tsai5Param->SetExtrinsic(&extrinsic);
+      rms = tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
+      tvec.at<double>(0, 2) = Tz;
+      intrinsic.at<double>(0, 0) = f * sx;
+      intrinsic.at<double>(1, 1) = f;
+      intrinsic.at<double>(0, 2) = imageCentre.x;
+      intrinsic.at<double>(1, 2) = imageCentre.y;
+      distortion.at<double>(0, 0) = k1;
+
+      extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+      std::cout << "TsaiMonoNonLinearOptimisation, 5DOF=" << rms << std::endl;
+
+      // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f and k1.
+      niftk::NonLinearTsai8ParamOptimiser::Pointer tsai8Param = niftk::NonLinearTsai8ParamOptimiser::New();
+      tsai8Param->SetModel(&model3D);
+      tsai8Param->SetPoints(&listOfPoints);
+      tsai8Param->SetSx(sx);
+      tsai8Param->SetK1(k1);
+      tsai8Param->SetIntrinsic(&intrinsic);
+      tsai8Param->SetExtrinsic(&extrinsic);
+      rms = tsai8Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                                 tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                                 f, k1);
+      intrinsic.at<double>(0, 0) = f * sx;
+      intrinsic.at<double>(1, 1) = f;
+      distortion.at<double>(0, 0) = k1;
+
+      extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+      std::cout << "TsaiMonoNonLinearOptimisation, 8DOF=" << rms << std::endl;
+
+      // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx and Cy.
+      niftk::NonLinearTsai10ParamOptimiser::Pointer tsai10Param = niftk::NonLinearTsai10ParamOptimiser::New();
+      tsai10Param->SetModel(&model3D);
+      tsai10Param->SetPoints(&listOfPoints);
+      tsai10Param->SetSx(sx);
+      tsai10Param->SetK1(k1);
+      tsai10Param->SetIntrinsic(&intrinsic);
+      tsai10Param->SetExtrinsic(&extrinsic);
+      rms = tsai10Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                                  tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                                  f,
+                                  imageCentre.x, imageCentre.y,
+                                  k1);
+      intrinsic.at<double>(0, 0) = f * sx;
+      intrinsic.at<double>(1, 1) = f;
+      intrinsic.at<double>(0, 2) = imageCentre.x;
+      intrinsic.at<double>(1, 2) = imageCentre.y;
+      distortion.at<double>(0, 0) = k1;
+
+      extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+      std::cout << "TsaiMonoNonLinearOptimisation, 10DOF=" << rms << std::endl;
+
+      if (fullOptimisation)
+      {
+        // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx, Cy and sx
+
+        niftk::NonLinearTsai11ParamOptimiser::Pointer tsai11Param = niftk::NonLinearTsai11ParamOptimiser::New();
+        tsai11Param->SetModel(&model3D);
+        tsai11Param->SetPoints(&listOfPoints);
+        tsai11Param->SetSx(sx);
+        tsai11Param->SetK1(k1);
+        tsai11Param->SetIntrinsic(&intrinsic);
+        tsai11Param->SetExtrinsic(&extrinsic);
+        rms = tsai11Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                                    tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                                    f,
+                                    imageCentre.x, imageCentre.y,
+                                    k1, sx);
+        intrinsic.at<double>(0, 0) = f * sx;
+        intrinsic.at<double>(1, 1) = f;
+        intrinsic.at<double>(0, 2) = imageCentre.x;
+        intrinsic.at<double>(1, 2) = imageCentre.y;
+        distortion.at<double>(0, 0) = k1;
+
+        extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
+
+        std::cout << "TsaiMonoNonLinearOptimisation, 11DOF=" << rms << std::endl;
+      }
+    }
   }
-
 #endif
 }
 
@@ -206,7 +282,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
-  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, false);
+  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation, true);
 
   double rmsNonLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
@@ -306,7 +382,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
-  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
+  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation, false);
 
   double rmsNonLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 

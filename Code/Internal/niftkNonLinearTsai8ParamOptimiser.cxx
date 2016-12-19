@@ -53,6 +53,30 @@ void NonLinearTsai8ParamOptimiser::SetPoints(const std::list<PointSet>* const po
 
 
 //-----------------------------------------------------------------------------
+void NonLinearTsai8ParamOptimiser::SetSx(const double& sx)
+{
+  m_CostFunction->SetSx(sx);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai8ParamOptimiser::SetK1(const double& k1)
+{
+  m_CostFunction->SetK1(k1);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai8ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
+{
+  m_CostFunction->SetExtrinsic(extrinsic);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 void NonLinearTsai8ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   m_CostFunction->SetIntrinsic(intrinsic);
@@ -90,12 +114,6 @@ double NonLinearTsai8ParamOptimiser::Optimise(double& Rx, double& Ry, double& Rz
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
-  /*
-  niftk::NonLinearTsai8ParamCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
-  double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearTsai8ParamOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
-  */
-
   // Do optimisation.
   optimiser->StartOptimization();
 
@@ -112,8 +130,6 @@ double NonLinearTsai8ParamOptimiser::Optimise(double& Rx, double& Ry, double& Rz
 
   niftk::NonLinearTsai8ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-
-  //std::cout << "NonLinearTsai8ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

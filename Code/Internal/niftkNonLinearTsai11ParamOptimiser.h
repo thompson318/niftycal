@@ -12,26 +12,26 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearTsai10ParamOptimiser_h
-#define niftkNonLinearTsai10ParamOptimiser_h
+#ifndef niftkNonLinearTsai11ParamOptimiser_h
+#define niftkNonLinearTsai11ParamOptimiser_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "niftkNonLinearTsai10ParamCostFunction.h"
+#include "niftkNonLinearTsai11ParamCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearTsai10ParamOptimiser
-* \brief Optimises R1, R2, R3 (Rodrigues), Tx, Ty, Tz, f, k, Cx and Cy using niftk::NonLinearTsai10ParamHandCostFunction.
+* \class NonLinearTsai11ParamOptimiser
+* \brief Optimises R1, R2, R3 (Rodrigues), Tx, Ty, Tz, f, k, Cx, Cy and sx using niftk::NonLinearTsai11ParamHandCostFunction.
 */
-class NonLinearTsai10ParamOptimiser : public itk::Object
+class NonLinearTsai11ParamOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearTsai10ParamOptimiser Self;
+  typedef  NonLinearTsai11ParamOptimiser Self;
   typedef  itk::Object                   Superclass;
   typedef  itk::SmartPointer<Self>       Pointer;
   itkNewMacro(Self);
@@ -46,19 +46,19 @@ public:
                   double& Tx, double& Ty, double& Tz,
                   double& f,
                   double& Cx, double& Cy,
-                  double& k1
+                  double& k1, double& sx
                   );
 
 protected:
 
-  NonLinearTsai10ParamOptimiser(); // deliberately protected.
-  virtual ~NonLinearTsai10ParamOptimiser(); // deliberately protected.
+  NonLinearTsai11ParamOptimiser(); // deliberately protected.
+  virtual ~NonLinearTsai11ParamOptimiser(); // deliberately protected.
 
-  NonLinearTsai10ParamOptimiser(const NonLinearTsai10ParamOptimiser&); // deliberately not implemented
-  NonLinearTsai10ParamOptimiser& operator=(const NonLinearTsai10ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai11ParamOptimiser(const NonLinearTsai11ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai11ParamOptimiser& operator=(const NonLinearTsai11ParamOptimiser&); // deliberately not implemented
 
 private:
-  niftk::NonLinearTsai10ParamCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearTsai11ParamCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

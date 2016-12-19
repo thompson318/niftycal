@@ -12,26 +12,26 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearTsai3ParamOptimiser_h
-#define niftkNonLinearTsai3ParamOptimiser_h
+#ifndef niftkNonLinearTsai2ParamOptimiser_h
+#define niftkNonLinearTsai2ParamOptimiser_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include "niftkNonLinearTsai3ParamCostFunction.h"
+#include "niftkNonLinearTsai2ParamCostFunction.h"
 
 namespace niftk
 {
 
 /**
-* \class NonLinearTsai3ParamOptimiser
-* \brief Optimises Tz, f and k using niftk::NonLinearTsai3ParamHandCostFunction.
+* \class NonLinearTsai2ParamOptimiser
+* \brief Optimises Cx and Cy using niftk::NonLinearTsai2ParamHandCostFunction.
 */
-class NonLinearTsai3ParamOptimiser : public itk::Object
+class NonLinearTsai2ParamOptimiser : public itk::Object
 {
 
 public:
 
-  typedef  NonLinearTsai3ParamOptimiser Self;
+  typedef  NonLinearTsai2ParamOptimiser Self;
   typedef  itk::Object                  Superclass;
   typedef  itk::SmartPointer<Self>      Pointer;
   itkNewMacro(Self);
@@ -42,18 +42,18 @@ public:
   void SetK1(const double& k1);
   void SetExtrinsic(const cv::Matx44d* extrinsic);
   void SetIntrinsic(const cv::Mat* const intrinsic);
-  double Optimise(double& Tz, double& f, double &k1);
+  double Optimise(double& Cx, double& Cy);
 
 protected:
 
-  NonLinearTsai3ParamOptimiser(); // deliberately protected.
-  virtual ~NonLinearTsai3ParamOptimiser(); // deliberately protected.
+  NonLinearTsai2ParamOptimiser(); // deliberately protected.
+  virtual ~NonLinearTsai2ParamOptimiser(); // deliberately protected.
 
-  NonLinearTsai3ParamOptimiser(const NonLinearTsai3ParamOptimiser&); // deliberately not implemented
-  NonLinearTsai3ParamOptimiser& operator=(const NonLinearTsai3ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai2ParamOptimiser(const NonLinearTsai2ParamOptimiser&); // deliberately not implemented
+  NonLinearTsai2ParamOptimiser& operator=(const NonLinearTsai2ParamOptimiser&); // deliberately not implemented
 
 private:
-  niftk::NonLinearTsai3ParamCostFunction::Pointer m_CostFunction;
+  niftk::NonLinearTsai2ParamCostFunction::Pointer m_CostFunction;
 };
 
 } // end namespace

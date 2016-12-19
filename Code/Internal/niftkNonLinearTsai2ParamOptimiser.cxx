@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearTsai5ParamOptimiser.h"
+#include "niftkNonLinearTsai2ParamOptimiser.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 
@@ -20,20 +20,20 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearTsai5ParamOptimiser::NonLinearTsai5ParamOptimiser()
+NonLinearTsai2ParamOptimiser::NonLinearTsai2ParamOptimiser()
 {
-  m_CostFunction = niftk::NonLinearTsai5ParamCostFunction::New();
+  m_CostFunction = niftk::NonLinearTsai2ParamCostFunction::New();
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearTsai5ParamOptimiser::~NonLinearTsai5ParamOptimiser()
+NonLinearTsai2ParamOptimiser::~NonLinearTsai2ParamOptimiser()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetModel(const Model3D* const model)
+void NonLinearTsai2ParamOptimiser::SetModel(const Model3D* const model)
 {
   m_CostFunction->SetModel(model);
   this->Modified();
@@ -41,7 +41,7 @@ void NonLinearTsai5ParamOptimiser::SetModel(const Model3D* const model)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetPoints(const std::list<PointSet>* const points)
+void NonLinearTsai2ParamOptimiser::SetPoints(const std::list<PointSet>* const points)
 {
   if (points->size() != 1)
   {
@@ -52,9 +52,8 @@ void NonLinearTsai5ParamOptimiser::SetPoints(const std::list<PointSet>* const po
 }
 
 
-
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetSx(const double& sx)
+void NonLinearTsai2ParamOptimiser::SetSx(const double& sx)
 {
   m_CostFunction->SetSx(sx);
   this->Modified();
@@ -62,7 +61,7 @@ void NonLinearTsai5ParamOptimiser::SetSx(const double& sx)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetK1(const double& k1)
+void NonLinearTsai2ParamOptimiser::SetK1(const double& k1)
 {
   m_CostFunction->SetK1(k1);
   this->Modified();
@@ -70,7 +69,7 @@ void NonLinearTsai5ParamOptimiser::SetK1(const double& k1)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
+void NonLinearTsai2ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
 {
   m_CostFunction->SetExtrinsic(extrinsic);
   this->Modified();
@@ -78,7 +77,7 @@ void NonLinearTsai5ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
 
 
 //-----------------------------------------------------------------------------
-void NonLinearTsai5ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
+void NonLinearTsai2ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
 {
   m_CostFunction->SetIntrinsic(intrinsic);
   this->Modified();
@@ -86,17 +85,14 @@ void NonLinearTsai5ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
 
 
 //-----------------------------------------------------------------------------
-double NonLinearTsai5ParamOptimiser::Optimise(double& Tz, double& f, double& k1, double& Cx, double& Cy)
+double NonLinearTsai2ParamOptimiser::Optimise(double& Cx, double& Cy)
 {
-  niftk::NonLinearTsai5ParamCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(5);
+  niftk::NonLinearTsai2ParamCostFunction::ParametersType initialParameters;
+  initialParameters.SetSize(2);
 
   // Set initial parameters.
-  initialParameters[0] = Tz;
-  initialParameters[1] = f;
-  initialParameters[2] = k1;
-  initialParameters[3] = Cx;
-  initialParameters[4] = Cy;
+  initialParameters[0] = Cx;
+  initialParameters[1] = Cy;
 
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
 
@@ -114,14 +110,11 @@ double NonLinearTsai5ParamOptimiser::Optimise(double& Tz, double& f, double& k1,
   optimiser->StartOptimization();
 
   // Get final parameters.
-  niftk::NonLinearTsai5ParamCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
-  Tz = finalParameters[0];
-  f = finalParameters[1];
-  k1 = finalParameters[2];
-  Cx = finalParameters[3];
-  Cy = finalParameters[4];
+  niftk::NonLinearTsai2ParamCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
+  Cx = finalParameters[0];
+  Cy = finalParameters[1];
 
-  niftk::NonLinearTsai5ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
+  niftk::NonLinearTsai2ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
   return finalRMS;

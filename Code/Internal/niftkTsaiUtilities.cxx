@@ -202,20 +202,48 @@ void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
   Ty = sqrt(TySquared); // (c)(ii) - let Ty be positive.
 
   // (c)(iii) - calculate x, y.
-  Tx = X.at<double>(2, 0)*Ty;
-  double  x = X.at<double>(0, 0)*Ty*points3D[bestIndexSoFar].x
-            + X.at<double>(1, 0)*Ty*points3D[bestIndexSoFar].y
-            + Tx;
-  double  y = X.at<double>(3, 0)*Ty*points3D[bestIndexSoFar].x
-            + X.at<double>(4, 0)*Ty*points3D[bestIndexSoFar].y
-            + Ty;
+  double x = 0;
+  double y = 0;
+  if (X.rows == 5) // coplanar
+  {
+    Tx = X.at<double>(2, 0)*Ty;
+    x = X.at<double>(0, 0)*Ty*points3D[bestIndexSoFar].x
+      + X.at<double>(1, 0)*Ty*points3D[bestIndexSoFar].y
+      + Tx;
+    y = X.at<double>(3, 0)*Ty*points3D[bestIndexSoFar].x
+      + X.at<double>(4, 0)*Ty*points3D[bestIndexSoFar].y
+      + Ty;
+  }
+  else if (X.rows == 7) // non-coplanar
+  {
+    Tx = X.at<double>(3, 0)*Ty;
+    x = X.at<double>(0, 0)*Ty*points3D[bestIndexSoFar].x
+      + X.at<double>(1, 0)*Ty*points3D[bestIndexSoFar].y
+      + X.at<double>(2, 0)*Ty*points3D[bestIndexSoFar].z
+      + Tx;
+    y = X.at<double>(4, 0)*Ty*points3D[bestIndexSoFar].x
+      + X.at<double>(5, 0)*Ty*points3D[bestIndexSoFar].y
+      + X.at<double>(6, 0)*Ty*points3D[bestIndexSoFar].z
+      + Ty;
+  }
+  else
+  {
+    niftkNiftyCalThrow() << "X has the wrong number of rows";
+  }
 
   // (c)(iv) - set the sign of Ty.
   if (   signum(x) != signum(points2D[bestIndexSoFar].x)
       || signum(y) != signum(points2D[bestIndexSoFar].y))
   {
     Ty = -1.0 * Ty;
-    Tx = X.at<double>(2, 0)*Ty;
+    if (X.rows == 5) // coplanar
+    {
+      Tx = X.at<double>(2, 0)*Ty;
+    }
+    else if (X.rows == 7) // non-coplanar
+    {
+      Tx = X.at<double>(3, 0)*Ty;
+    }
   }
 }
 

@@ -38,7 +38,10 @@ public:
 
   void SetModel(const Model3D* const model);
   void SetPoints(const std::list<PointSet>* const points); // Must be a list of length 1.
-  void SetCameraConstants(const double& dxPrime, const cv::Point2d& sensorDimensions, const double& sx);
+  void SetSx(const double& sx);
+  void SetK1(const double& k1);
+  void SetExtrinsic(const cv::Matx44d* extrinsic);
+  void SetIntrinsic(const cv::Mat* const intrinsic);
   double Optimise(double& Tz, double& f, double& k1, double& Cx, double& Cy);
 
 protected:

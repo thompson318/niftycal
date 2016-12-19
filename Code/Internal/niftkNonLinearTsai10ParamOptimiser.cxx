@@ -53,6 +53,38 @@ void NonLinearTsai10ParamOptimiser::SetPoints(const std::list<PointSet>* const p
 
 
 //-----------------------------------------------------------------------------
+void NonLinearTsai10ParamOptimiser::SetSx(const double& sx)
+{
+  m_CostFunction->SetSx(sx);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai10ParamOptimiser::SetK1(const double& k1)
+{
+  m_CostFunction->SetK1(k1);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai10ParamOptimiser::SetExtrinsic(const cv::Matx44d* extrinsic)
+{
+  m_CostFunction->SetExtrinsic(extrinsic);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearTsai10ParamOptimiser::SetIntrinsic(const cv::Mat* const intrinsic)
+{
+  m_CostFunction->SetIntrinsic(intrinsic);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 double NonLinearTsai10ParamOptimiser::Optimise(double& Rx, double& Ry, double& Rz,
                                                double& Tx, double& Ty, double& Tz,
                                                double& f,
@@ -87,12 +119,6 @@ double NonLinearTsai10ParamOptimiser::Optimise(double& Rx, double& Ry, double& R
   optimiser->SetEpsilonFunction(0.0001);
   optimiser->SetValueTolerance(0.0001);
 
-  /*
-  niftk::NonLinearTsai10ParamCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
-  double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << "NonLinearTsai10ParamOptimiser: initial=" << initialParameters << ", rms=" << initialRMS << std::endl;
-  */
-
   // Do optimisation.
   optimiser->StartOptimization();
 
@@ -112,8 +138,6 @@ double NonLinearTsai10ParamOptimiser::Optimise(double& Rx, double& Ry, double& R
 
   niftk::NonLinearTsai10ParamCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-
-//  std::cout << "NonLinearTsai10ParamOptimiser: final=" << finalParameters << ", rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }
