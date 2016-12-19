@@ -179,7 +179,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double f = 0;
   double Tz = 0;
   cv::Mat R = cvCreateMat ( 3, 3, CV_64FC1 );
-  niftk::CalculateRForNonCoplanar(X, sx, Ty, R, Tx);
+  niftk::CalculateRAndTxForNonCoplanar(X, sx, Ty, R, Tx);
   niftk::CalculateRWithFAndTz(points3D, points2D, sensorDimensions, Ty, R, Tz, f);
 
   // Initial guess.
@@ -206,7 +206,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
 
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
-  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, fullOptimisation);
+  niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, dxPrime, sensorDimensions, sx, Tz, f, k1, imageCentre, intrinsic, distortion, rvec, tvec, false);
 
   double rmsNonLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 

@@ -30,7 +30,7 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
   int expectedNumberOfArguments =  17;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageR.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion" << std::endl;
+    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageR.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion expectedRMS optimise3D" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 

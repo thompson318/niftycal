@@ -235,9 +235,9 @@ void CalculateApproximateFAndTz(const cv::Mat& R,
 
   for (int i = 0; i < numberOfPoints; i++)
   {
-    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + Ty;
+    A.at<double>(i, 0) = R.at<double>(1,0)*points3D[i].x + R.at<double>(1,1)*points3D[i].y + R.at<double>(1,2)*points3D[i].z + Ty;
     A.at<double>(i, 1) = -1.0*sensorDy*points2D[i].y;
-    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y)*sensorDy*points2D[i].y;
+    B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y + R.at<double>(2,2)*points3D[i].z)*sensorDy*points2D[i].y;
   }
 
   cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
@@ -246,6 +246,41 @@ void CalculateApproximateFAndTz(const cv::Mat& R,
 
   f = X.at<double>(0, 0);
   Tz = X.at<double>(1, 0);
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateMoreOrthonormalR(cv::Mat& R)
+{
+  double r1 = R.at<double>(0, 0);
+  double r2 = R.at<double>(0, 1);
+  double r3 = R.at<double>(0, 2);
+  double r4 = R.at<double>(1, 0);
+  double r5 = R.at<double>(1, 1);
+  double r6 = R.at<double>(1, 2);
+  double r7 = R.at<double>(2, 0);
+
+  double gamma = atan2 (r4, r1);
+  double sg = sin(gamma);
+  double cg = cos(gamma);
+
+  double beta = atan2 (-r7, r1 * cg + r4 * sg);
+  double sb = sin(beta);
+  double cb = cos(beta);
+
+  double alpha = atan2 (r3 * sg - r6 * cg, r5 * cg - r2 * sg);
+  double sa = sin(alpha);
+  double ca = cos(alpha);
+
+  R.at<double>(0, 0) = cb * cg;
+  R.at<double>(0, 1) = cg * sa * sb - ca * sg;
+  R.at<double>(0, 2) = sa * sg + ca * cg * sb;
+  R.at<double>(1, 0) = cb * sg;
+  R.at<double>(1, 1) = sa * sb * sg + ca * cg;
+  R.at<double>(1, 2) = ca * sb * sg - cg * sa;
+  R.at<double>(2, 0) = -sb;
+  R.at<double>(2, 1) = cb * sa;
+  R.at<double>(2, 2) = ca * cb;
 }
 
 
@@ -275,6 +310,8 @@ void CalculateRForCoplanar(const cv::Mat& X,
   R.at<double>(2, 0) = r7;
   R.at<double>(2, 1) = r8;
   R.at<double>(2, 2) = r9;
+
+  CalculateMoreOrthonormalR(R);
 }
 
 
@@ -338,10 +375,11 @@ cv::Mat CalculateEquation16(const std::vector<cv::Point3d>& points3D,
 //-----------------------------------------------------------------------------
 double CalculateAbsTyForNonCoplanar(const cv::Mat& X)
 {
-  double ty = sqrt(  (X.at<double>(4, 0) * X.at<double>(4, 0))
-                   + (X.at<double>(5, 0) * X.at<double>(5, 0))
-                   + (X.at<double>(6, 0) * X.at<double>(6, 0))
-                  );
+  double ty = 1.0/(sqrt(  (X.at<double>(4, 0) * X.at<double>(4, 0))
+                        + (X.at<double>(5, 0) * X.at<double>(5, 0))
+                        + (X.at<double>(6, 0) * X.at<double>(6, 0))
+                       )
+                   );
   return ty;
 }
 
@@ -358,12 +396,12 @@ double CalculateSxForNonConplanar(const cv::Mat& X, const double& absTy)
 
 
 //-----------------------------------------------------------------------------
-void CalculateRForNonCoplanar(const cv::Mat& X,  const double& sx, const double& Ty, cv::Mat& R, double& Tx)
+void CalculateRAndTxForNonCoplanar(const cv::Mat& X,  const double& sx, const double& Ty, cv::Mat& R, double& Tx)
 {
   double r1 = X.at<double>(0, 0) * Ty / sx;
   double r2 = X.at<double>(1, 0) * Ty / sx;
   double r3 = X.at<double>(2, 0) * Ty / sx;
-  Tx        = X.at<double>(3, 0) * Ty;
+  Tx = X.at<double>(3, 0) * Ty;
   double r4 = X.at<double>(4, 0) * Ty;
   double r5 = X.at<double>(5, 0) * Ty;
   double r6 = X.at<double>(6, 0) * Ty;
@@ -380,6 +418,8 @@ void CalculateRForNonCoplanar(const cv::Mat& X,  const double& sx, const double&
   R.at<double>(2, 0) = r7;
   R.at<double>(2, 1) = r8;
   R.at<double>(2, 2) = r9;
+
+  CalculateMoreOrthonormalR(R);
 }
 
 } // end namespace

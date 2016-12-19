@@ -134,7 +134,12 @@ double CalculateSxForNonConplanar(const cv::Mat& X, const double& absTy);
 /**
 * \brief Implements Stage 1, part (c), section (4) of non-coplanar case.
 */
-void CalculateRForNonCoplanar(const cv::Mat& X, const double& sx, const double& Ty, cv::Mat& R, double& Tx);
+void CalculateRAndTxForNonCoplanar(const cv::Mat& X, const double& sx, const double& Ty, cv::Mat& R, double& Tx);
+
+/**
+* \brief Calculates a more orthonormal R from Euler angles.
+*/
+void CalculateMoreOrthonormalR(cv::Mat& R);
 
 } // end namespace
 
