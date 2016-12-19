@@ -87,18 +87,30 @@ struct NIFTYCAL_WINEXPORT Point3D
   cv::Point3d    point;
 };
 
+/**
+* \class TimingSample1D
+* \brief Placeholder for a scalar value and its associated timestamp.
+*/
 struct NIFTYCAL_WINEXPORT TimingSample1D
 {
   NiftyCalTimeType time;
   double           sample;
 };
 
+/**
+* \class TimingSample2D
+* \brief Placeholder for a 2 component (x,y) value and its associated timestamp.
+*/
 struct NIFTYCAL_WINEXPORT TimingSample2D
 {
   NiftyCalTimeType time;
   cv::Point2d      sample;
 };
 
+/**
+* \class TimingSample3D
+* \brief Placeholder for a 3 component (x,y,z) value and its associated timestamp.
+*/
 struct NIFTYCAL_WINEXPORT TimingSample3D
 {
   NiftyCalTimeType time;
