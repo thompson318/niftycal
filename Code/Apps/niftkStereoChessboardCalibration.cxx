@@ -14,6 +14,7 @@
 
 #include <niftkIOUtilities.h>
 #include <niftkZhangCameraCalibration.h>
+#include <niftkStereoCameraCalibration.h>
 #include <niftkChessboardPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -185,25 +186,25 @@ int main(int argc, char ** argv)
                                       flags
                                      );
 
-    cv::Matx21d result = niftk::ZhangStereoCameraCalibration(model,
-                                                             listOfPointsLeft,
-                                                             listOfPointsRight,
-                                                             imageSize,
-                                                             intrinsicLeft,
-                                                             distortionLeft,
-                                                             rvecsLeft,
-                                                             tvecsLeft,
-                                                             intrinsicRight,
-                                                             distortionRight,
-                                                             rvecsRight,
-                                                             tvecsRight,
-                                                             leftToRightRotationMatrix,
-                                                             leftToRightTranslationVector,
-                                                             essentialMatrix,
-                                                             fundamentalMatrix,
-                                                             flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                             optimise3D
-                                                            );
+    cv::Matx21d result = niftk::StereoCameraCalibration(model,
+                                                        listOfPointsLeft,
+                                                        listOfPointsRight,
+                                                        imageSize,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        rvecsRight,
+                                                        tvecsRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslationVector,
+                                                        essentialMatrix,
+                                                        fundamentalMatrix,
+                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                        optimise3D
+                                                       );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 

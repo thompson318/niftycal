@@ -33,6 +33,7 @@ set(NIFTYCAL_SRCS
   niftkTemplateMatching.cxx
   niftkZhangCameraCalibration.cxx
   niftkTsaiCameraCalibration.cxx
+  niftkStereoCameraCalibration.cxx
   niftkHandEyeCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx

@@ -15,6 +15,7 @@
 #include "niftkIterativeStereoCameraCalibration.h"
 #include "niftkZhangCameraCalibration.h"
 #include "niftkTsaiCameraCalibration.h"
+#include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
@@ -214,7 +215,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
   }
   else
   {
-    result = niftk::ZhangStereoCameraCalibration(
+    result = niftk::StereoCameraCalibration(
       model,
       pointsFromOriginalImagesLeft,
       pointsFromOriginalImagesRight,
@@ -343,7 +344,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
     else
     {
-      currentResult = niftk::ZhangStereoCameraCalibration(
+      currentResult = niftk::StereoCameraCalibration(
         model,
         distortedPointsFromCanonicalImagesLeft,
         distortedPointsFromCanonicalImagesRight,

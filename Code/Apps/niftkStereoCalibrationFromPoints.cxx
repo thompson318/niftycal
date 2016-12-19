@@ -15,6 +15,7 @@
 #include <niftkIOUtilities.h>
 #include <niftkZhangCameraCalibration.h>
 #include <niftkTsaiCameraCalibration.h>
+#include <niftkStereoCameraCalibration.h>
 #include <niftkPointUtilities.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
@@ -195,25 +196,25 @@ int main(int argc, char ** argv)
                                         tvecsRight
                                        );
 
-      result = niftk::ZhangStereoCameraCalibration(model,
-                                                   leftPoints,
-                                                   rightPoints,
-                                                   imageSize,
-                                                   intrinsicLeft,
-                                                   distortionLeft,
-                                                   rvecsLeft,
-                                                   tvecsLeft,
-                                                   intrinsicRight,
-                                                   distortionRight,
-                                                   rvecsRight,
-                                                   tvecsRight,
-                                                   leftToRightRotationMatrix,
-                                                   leftToRightTranslation,
-                                                   essentialMatrix,
-                                                   fundamentalMatrix,
-                                                   CV_CALIB_USE_INTRINSIC_GUESS,
-                                                   false // optimise3D, could be command line arg.
-                                                  );
+      result = niftk::StereoCameraCalibration(model,
+                                              leftPoints,
+                                              rightPoints,
+                                              imageSize,
+                                              intrinsicLeft,
+                                              distortionLeft,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              intrinsicRight,
+                                              distortionRight,
+                                              rvecsRight,
+                                              tvecsRight,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslation,
+                                              essentialMatrix,
+                                              fundamentalMatrix,
+                                              CV_CALIB_USE_INTRINSIC_GUESS,
+                                              false // optimise3D, could be command line arg.
+                                             );
     }
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
