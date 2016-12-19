@@ -28,6 +28,7 @@ method, that works with a single view of a either a coplanar or non-coplanar mod
 <a href="http://dx.doi.org/10.1109/70.34770">Tsai 1989</a>.
 \li Hand-eye calibration using non-linear minimisation as in
 <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
+\li Timing calibration, that correlates two series of timestamped samples, both representing the same physical movment.
 \li Performance enhancements using OpenMP.
 \li Performance enhancements using CUDA for NVIDIA GPUs (coming soon).
 
