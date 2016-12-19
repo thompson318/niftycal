@@ -153,7 +153,6 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   cv::Mat leftToRightTranslationVector;
 
   cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
-        false,
         model,
         referenceImageData,
         originalImagesLeft,
@@ -173,7 +172,8 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
         leftToRightTranslationVector,
         essentialMatrix,
         fundamentalMatrix,
-        flags
+        flags,
+        false
         );
 
 
@@ -208,7 +208,7 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
                                                    );
   cv::imwrite("/tmp/matt.epi.png", rightImageWithLines);
 */
-  double tolerance = 0.5;
+  double tolerance = 0.01;
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);

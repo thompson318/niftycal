@@ -15,56 +15,84 @@
 set(NIFTYCAL_SRCS
   Internal/niftkIterativeCalibrationUtilities.cxx
   Internal/niftkTriangulationUtilities.cxx
+  Internal/niftkCalibrationUtilities.cxx
+  Internal/niftkTsaiUtilities.cxx
+  Detectors/niftkPointDetector.cxx
+  Detectors/niftkChessboardPointDetector.cxx
+  Detectors/niftkCirclesPointDetector.cxx
+  Detectors/niftkTemplateMatchingPointDetector.cxx
+  Detectors/niftkRingsPointDetector.cxx
+  Detectors/niftkCirclesIterativePointDetector.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
   niftkHomographyUtilities.cxx
   niftkMatrixUtilities.cxx
   niftkIOUtilities.cxx
-  niftkTemplateMatching.cxx
   niftkIPoint2DDetector.cxx
-  niftkPointDetector.cxx
-  niftkChessboardPointDetector.cxx
-  niftkCirclesPointDetector.cxx
-  niftkTemplateMatchingPointDetector.cxx
-  niftkRingsPointDetector.cxx
-  niftkCirclesIterativePointDetector.cxx
-  niftkMonoCameraCalibration.cxx
+  niftkTemplateMatching.cxx
+  niftkZhangCameraCalibration.cxx
+  niftkTsaiCameraCalibration.cxx
   niftkStereoCameraCalibration.cxx
+  niftkHandEyeCalibration.cxx
   niftkIterativeMonoCameraCalibration.cxx
   niftkIterativeStereoCameraCalibration.cxx
-  niftkMaxERE.cxx
-  niftkCalibrateTimingLag.cxx
+  niftkTimingCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
-  list(APPEND NIFTYCAL_SRCS niftkAprilTagsPointDetector.cxx)
+  list(APPEND NIFTYCAL_SRCS Detectors/niftkAprilTagsPointDetector.cxx)
 endif()
 
 if(ITK_FOUND)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNoIntrinsicsCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMonoCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsaiCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearMaltiHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMaltiHandEyeOptimiser.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearNoIntrinsicsHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinear12DOFHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinear12DOFHandEyeOptimiser.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearNDOFHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearNDOFHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNDOFHandEyeCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearNDOFHandEyeOptimiser.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoHandEyeCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoHandEyeOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai3ParamCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoCalibrationOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai2ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai2ParamCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoExtrinsicsCalibrationOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai5ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai5ParamCostFunction.cxx)
 
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoIntrinsicsCalibrationCostFunction.cxx)  
-  list(APPEND NIFTYCAL_SRCS niftkNonLinearStereoIntrinsicsCalibrationOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai8ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai8ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai10ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearTsai11ParamCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo2DCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye2DOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration2DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereo3DCostFunction.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibration3DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.cxx)
+
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DOptimiser.cxx)
 
 endif()
 

@@ -24,6 +24,8 @@
 * \brief Utilities to read/write points/models/matrices as plain text files.
 *
 * If PointSet/Model3D has zero points, we read/write an empty file. Its not an error.
+*
+* \ingroup utilities
 */
 namespace niftk
 {
@@ -46,6 +48,10 @@ NIFTYCAL_WINEXPORT void LoadPoints(const std::string& fileName,
                                    const Model3D& m,
                                    const std::list<PointSet>& p
                                    );
+
+NIFTYCAL_WINEXPORT TimeSamples2D LoadTimeSamples2D(const std::string& fileName);
+
+NIFTYCAL_WINEXPORT TimeSamples3D LoadTimeSamples3D(const std::string& fileName);
 
 /**
 * \brief Saves NifTK format intrinsics file.
@@ -75,13 +81,16 @@ NIFTYCAL_WINEXPORT void LoadNifTKStereoExtrinsics(const std::string& fileName,
                                                   );
 
 /**
-* \brief Does Rodrigues decomposition, and saves 6 parameters to file.
+* \brief Does Rodrigues decomposition, and saves 6 parameters to file as single line.
 */
 NIFTYCAL_WINEXPORT void SaveRigidParams(const cv::Matx44d& matrix,
                                         const std::string& fileName
                                         );
 
 
+/**
+* \brief Saves 6 parameters to file as single line.
+*/
 NIFTYCAL_WINEXPORT void SaveRigidParams(const cv::Mat& rotationVector,
                                         const cv::Mat& translationVector,
                                         const std::string& fileName

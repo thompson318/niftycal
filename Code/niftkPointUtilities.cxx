@@ -24,6 +24,34 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
+void DumpPoints(std::ostream& s, const PointSet& p)
+{
+  PointSet::const_iterator iter;
+  for (iter = p.begin(); iter != p.end(); iter++)
+  {
+    s << (*iter).second.id << " "
+      << (*iter).second.point.x << " "
+      << (*iter).second.point.y << std::endl;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void DumpPoints(std::ostream& s, const Model3D& p)
+{
+  Model3D::const_iterator iter;
+  for (iter = p.begin(); iter != p.end(); iter++)
+  {
+    s << (*iter).second.id << " "
+      << (*iter).second.point.x << " "
+      << (*iter).second.point.y << " "
+      << (*iter).second.point.z << " "
+      << std::endl;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 double DistanceBetween(const cv::Point3d& a, const cv::Point3d& b)
 {
   return sqrt(  (a.x - b.x) * (a.x - b.x)
@@ -205,6 +233,56 @@ void ExtractCommonPoints(const Model3D& inputA,
       b.x = (*iterB).second.point.x;
       b.y = (*iterB).second.point.y;
       b.z = (*iterB).second.point.z;
+      outputB.push_back(b);
+
+      commonIds.push_back((*iterA).first);
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+bool ModelIsPlanar(const Model3D& model)
+{
+  bool result = true;
+
+   Model3D::const_iterator iter;
+   for (iter = model.begin(); iter != model.end(); ++iter)
+   {
+     if ((*iter).second.point.z != 0)
+     {
+       result = false;
+     }
+   }
+   return result;
+}
+
+
+//-----------------------------------------------------------------------------
+void ExtractCommonPoints(const Model3D& inputA,
+                         const PointSet& inputB,
+                         std::vector<cv::Point3d>& outputA,
+                         std::vector<cv::Point2d>& outputB,
+                         std::vector<niftk::NiftyCalIdType>& commonIds
+                        )
+{
+  Model3D::const_iterator iterA;
+  PointSet::const_iterator iterB;
+
+  for (iterB = inputB.begin(); iterB != inputB.end(); iterB++)
+  {
+    iterA = inputA.find(iterB->second.id);
+    if (iterA != inputA.end())
+    {
+      cv::Point3d a;
+      a.x = (*iterA).second.point.x;
+      a.y = (*iterA).second.point.y;
+      a.z = (*iterA).second.point.z;
+      outputA.push_back(a);
+
+      cv::Point2d b;
+      b.x = (*iterB).second.point.x;
+      b.y = (*iterB).second.point.y;
       outputB.push_back(b);
 
       commonIds.push_back((*iterA).first);
@@ -1166,6 +1244,43 @@ unsigned long int GetNumberOfTriangulatablePoints(const Model3D& model,
     }
   }
   return numberOfTriangulatablePoints;
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeRMSReprojectionError(const Model3D& model,
+                                   const PointSet& imagePoints,
+                                   const cv::Mat& intrinsic,
+                                   const cv::Mat& distortion,
+                                   const cv::Mat& rvec,
+                                   const cv::Mat& tvec
+                                  )
+{
+  cv::Mat t = cvCreateMat(3, 1, CV_64FC1);
+  t.at<double>(0, 0) = tvec.at<double>(0, 0);
+  t.at<double>(1, 0) = tvec.at<double>(0, 1);
+  t.at<double>(2, 0) = tvec.at<double>(0, 2);
+
+  cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, t);
+
+  std::vector<cv::Point2f> observed;
+  std::vector<cv::Point2f> projected;
+  std::vector<niftk::NiftyCalIdType> ids;
+  niftk::ProjectMatchingPoints(model, imagePoints, extrinsic, intrinsic, distortion, observed, projected, ids);
+
+  double rms = 0;
+  for (unsigned int i = 0; i < observed.size(); i++)
+  {
+    rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x)
+           + (observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+  }
+  if (observed.size() > 0)
+  {
+    rms /= static_cast<double>(observed.size());
+  }
+  rms = sqrt(rms);
+
+  return rms;
 }
 
 } // end namespace

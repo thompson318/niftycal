@@ -25,9 +25,14 @@ namespace niftk
 
 /**
 * \file niftkStereoCameraCalibration.h
-* \brief Performs a stereo camera calibration using the standard OpenCV approach.
+* \brief Stereo calibration routine.
+* \ingroup calibration
+*/
+
+/**
+* \brief Performs a stereo camera calibration.
 * \param optimise3D if true and ITK is compiled in, will additionally optimise all
-* camera parameters by minimise the RMS reconstruction error, reconstructing the target points in 3D.
+* camera parameters by minimising the RMS reconstruction error, reconstructing the target points in 3D.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
 * \return rms re-projection and 3D reconstruction error
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
@@ -39,8 +44,7 @@ namespace niftk
 * separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
 * or even CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC. etc.
 */
-NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const bool& optimise3D, // only if ITK is compiled in.
-                                                       const Model3D& model,
+NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        const std::list<PointSet>& listOfLeftHandPointSets,
                                                        const std::list<PointSet>& listOfRightHandPointSets,
                                                        const cv::Size2i& imageSize,
@@ -56,25 +60,9 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const bool& optimise3D, /
                                                        cv::Mat& leftToRightTranslationVector,
                                                        cv::Mat& essentialMatrix,
                                                        cv::Mat& fundamentalMatrix,
-                                                       const int& cvFlags = 0
+                                                       const int& cvFlags = 0,
+                                                       const bool& optimise3D = false // only if true AND ITK is compiled in.
                                                       );
-
-/**
-* \brief Computes a consistent set of left and right extrinsics.
-* \return rms re-projection error for left camera as internally we run another mono calibration
-*/
-NIFTYCAL_WINEXPORT double ComputeStereoExtrinsics(const Model3D& model,
-                                                  const std::list<PointSet>& listOfLeftHandPointSets,
-                                                  const cv::Size2i& imageSize,
-                                                  const cv::Mat& intrinsicLeft,
-                                                  const cv::Mat& distortionLeft,
-                                                  const cv::Mat& leftToRightRotationMatrix,
-                                                  const cv::Mat& leftToRightTranslationVector,
-                                                  std::vector<cv::Mat>& rvecsLeft,
-                                                  std::vector<cv::Mat>& tvecsLeft,
-                                                  std::vector<cv::Mat>& rvecsRight,
-                                                  std::vector<cv::Mat>& tvecsRight
-                                                 );
 
 } // end namespace
 

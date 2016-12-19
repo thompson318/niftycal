@@ -12,111 +12,22 @@
 
 =============================================================================*/
 
-#include "niftkStereoCameraCalibration.h"
+#include "niftkZhangCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
-#include "niftkMonoCameraCalibration.h"
 #include "niftkPointUtilities.h"
+#include <Internal/niftkCalibrationUtilities_p.h>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
+#include <Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.h>
+#include <Internal/niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.h>
+#include <Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.h>
 #endif
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double ComputeStereoExtrinsics(const Model3D& model,
-                               const std::list<PointSet>& listOfLeftHandPointSets,
-                               const cv::Size2i& imageSize,
-                               const cv::Mat& intrinsicLeft,
-                               const cv::Mat& distortionLeft,
-                               const cv::Mat& leftToRightRotationMatrix,
-                               const cv::Mat& leftToRightTranslationVector,
-                               std::vector<cv::Mat>& rvecsLeft,
-                               std::vector<cv::Mat>& tvecsLeft,
-                               std::vector<cv::Mat>& rvecsRight,
-                               std::vector<cv::Mat>& tvecsRight
-                              )
-{
-  // We do mono calib, but turn off intrinsic optimisation,
-  // which internally falls back to calling solvePnP.
-
-  cv::Mat tmpIntrinsicLeft = intrinsicLeft.clone(); // to get round const issues.
-  cv::Mat tmpDistortionLeft = distortionLeft.clone(); // to get round const issues.
-
-  double rms = niftk::MonoCameraCalibration(model,
-                                            listOfLeftHandPointSets,
-                                            imageSize,
-                                            tmpIntrinsicLeft,
-                                            tmpDistortionLeft,
-                                            rvecsLeft,
-                                            tvecsLeft,
-                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC
-                                            );
-
-  // First make sure we have the right number of rvecsRight and rvecsLeft allocated.
-  rvecsRight.clear();
-  tvecsRight.clear();
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-    tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-  }
-
-  // Additionally make sure rvecs and tvecs are consistent left and right.
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    cv::Mat leftRot;
-    cv::Rodrigues(rvecsLeft[i], leftRot);
-
-    cv::Matx44d leftExtrinsic;
-    cv::Matx44d leftToRight;
-
-    leftExtrinsic = leftExtrinsic.eye();
-    leftToRight = leftToRight.eye();
-
-    for (int r = 0; r < 3; r++)
-    {
-      for (int c = 0; c < 3; c++)
-      {
-        leftExtrinsic(r, c) = leftRot.at<double>(r,c);
-        leftToRight(r, c) = leftToRightRotationMatrix.at<double>(r, c);
-      }
-      leftExtrinsic(r, 3) = tvecsLeft[i].at<double>(0, r);
-      leftToRight(r, 3) = leftToRightTranslationVector.at<double>(0, r);
-    }
-
-    cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
-    cv::Matx33d rightRotation;
-
-    for (int r = 0; r < 3; r++)
-    {
-      for (int c = 0; c < 3; c++)
-      {
-        rightRotation(r, c) = rightExtrinsic(r,c);
-      }
-    }
-
-    cv::Mat rightRotationVec;
-    cv::Rodrigues(rightRotation, rightRotationVec);
-
-    rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);
-    rvecsRight[i].at<double>(0, 1) = rightRotationVec.at<double>(0,1);
-    rvecsRight[i].at<double>(0, 2) = rightRotationVec.at<double>(0,2);
-
-    tvecsRight[i].at<double>(0, 0) = rightExtrinsic(0,3);
-    tvecsRight[i].at<double>(0, 1) = rightExtrinsic(1,3);
-    tvecsRight[i].at<double>(0, 2) = rightExtrinsic(2,3);
-  }
-
-  return rms;
-}
-
-
-//-----------------------------------------------------------------------------
-cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
-                                    const Model3D& model,
+cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                     const std::list<PointSet>& listOfLeftHandPointSets,
                                     const std::list<PointSet>& listOfRightHandPointSets,
                                     const cv::Size2i& imageSize,
@@ -132,7 +43,8 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
                                     cv::Mat& leftToRightTranslationVector,
                                     cv::Mat& essentialMatrix,
                                     cv::Mat& fundamentalMatrix,
-                                    const int& cvFlags
+                                    const int& cvFlags,
+                                    const bool& optimise3D
                                    )
 {
   cv::Matx21d result;
@@ -146,13 +58,13 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (listOfLeftHandPointSets.size() < 2)
+  if (listOfLeftHandPointSets.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for left camera.";
+    niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for left camera.";
   }
-  if (listOfRightHandPointSets.size() < 2)
+  if (listOfRightHandPointSets.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 views of calibration points for right camera.";
+    niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for right camera.";
   }
   if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
   {
@@ -273,19 +185,49 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
                                      leftToRightTranslationVector,
                                      essentialMatrix,
                                      fundamentalMatrix,
-                                     cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 30, 1e-6),
+                                     cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-10),
                                      cvFlags
                                     );
 
-  niftk::ComputeStereoExtrinsics(model,
-                                 listOfLeftHandPointSets,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
+  Model3D* tmpModel = const_cast<Model3D*>(&model);
+
+#ifdef NIFTYCAL_WITH_ITK
+
+  niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer full2DOptimiser
+      = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
+  full2DOptimiser->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
+
+  if (listOfLeftHandPointSets.size() < 3)
+  {
+    full2DOptimiser->SetIntrinsic(&intrinsicLeft);
+    full2DOptimiser->SetDistortion(&distortionLeft);
+    full2DOptimiser->SetRightIntrinsic(&intrinsicRight);
+    full2DOptimiser->SetRightDistortion(&distortionRight);
+
+    full2DOptimiser->Optimise(rvecsLeft,
+                              tvecsLeft,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector
+                             );
+  }
+  else
+  {
+    full2DOptimiser->Optimise(intrinsicLeft,
+                              distortionLeft,
+                              intrinsicRight,
+                              distortionRight,
+                              rvecsLeft,
+                              tvecsLeft,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector
+                             );
+  }
+#endif
+
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
                                  leftToRightRotationMatrix,
                                  leftToRightTranslationVector,
-                                 rvecsLeft,
-                                 tvecsLeft,
                                  rvecsRight,
                                  tvecsRight
                                 );
@@ -308,11 +250,9 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
-    Model3D* tmpModel = const_cast<Model3D*>(&model);
-
     // Now optimise RMS reconstruction error via intrinsics.
-    niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::Pointer intrinsicsOptimiser =
-        niftk::NonLinearStereoIntrinsicsCalibrationOptimiser::New();
+    niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
+        niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();
 
     intrinsicsOptimiser->SetModelAndPoints(tmpModel,
                                            &listOfLeftHandPointSets,
@@ -331,8 +271,8 @@ cv::Matx21d StereoCameraCalibration(const bool& optimise3D,
                                  );
 
     // Now optimise RMS reconstruction error via extrinsics.
-    niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::Pointer extrinsicsOptimiser =
-        niftk::NonLinearStereoExtrinsicsCalibrationOptimiser::New();
+    niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
+        niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::New();
 
     extrinsicsOptimiser->SetModelAndPoints(tmpModel,
                                            &listOfLeftHandPointSets,

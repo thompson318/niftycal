@@ -13,26 +13,22 @@
 =============================================================================*/
 
 #include "niftkIterativeStereoCameraCalibration.h"
-#include "niftkMonoCameraCalibration.h"
+#include "niftkZhangCameraCalibration.h"
+#include "niftkTsaiCameraCalibration.h"
 #include "niftkStereoCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
 #include <Internal/niftkTriangulationUtilities_p.h>
 #include <Internal/niftkIterativeCalibrationUtilities_p.h>
+#include <Internal/niftkCalibrationUtilities_p.h>
 #include <highgui.h>
-
-#ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
-#endif
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
 cv::Matx21d IterativeStereoCameraCalibration(
-    const bool& optimise3D,
     const Model3D& model,
     const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
     const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& detectorAndOriginalImagesLeft,
@@ -52,24 +48,28 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat& leftToRightTranslationVector,
     cv::Mat& essentialMatrix,
     cv::Mat& fundamentalMatrix,
-    const int& cvFlags
+    const int& cvFlags,
+    const bool& optimise3D
     )
 {
   cv::Matx21d result;
   result(0, 0) = 0;
   result(1, 0) = 0;
 
+  cv::Point2d sensorDimensions(1,1);
+  double sx = 1.0;
+
   if (model.empty())
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (detectorAndOriginalImagesLeft.size() < 2)
+  if (detectorAndOriginalImagesLeft.size() < 1)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 left-hand views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 1 left-hand view of calibration points.";
   }
   if (detectorAndOriginalImagesRight.size() < 2)
   {
-    niftkNiftyCalThrow() << "Should have at least 2 right-hand views of calibration points.";
+    niftkNiftyCalThrow() << "Should have at least 1 right-hand view of calibration points.";
   }
   if (detectorAndOriginalImagesLeft.size() != detectorAndOriginalImagesRight.size())
   {
@@ -123,55 +123,119 @@ cv::Matx21d IterativeStereoCameraCalibration(
   {
     #pragma omp section
     {
-      niftk::MonoCameraCalibration(
-        model,
-        pointsFromOriginalImagesLeft,
-        imageSize,
-        intrinsicLeft,
-        distortionLeft,
-        rvecsLeft,
-        tvecsLeft,
-        cvFlags
-        );
+      if (pointsFromOriginalImagesLeft.size() == 1)
+      {
+        niftk::TsaiMonoCameraCalibration(
+          model,
+          *(pointsFromOriginalImagesLeft.begin()),
+          imageSize,
+          sensorDimensions,
+          imageSize.width,
+          sx,
+          intrinsicLeft,
+          distortionLeft,
+          rvecsLeft[0],
+          tvecsLeft[0],
+          true
+          );
+      }
+      else
+      {
+        niftk::ZhangMonoCameraCalibration(
+          model,
+          pointsFromOriginalImagesLeft,
+          imageSize,
+          intrinsicLeft,
+          distortionLeft,
+          rvecsLeft,
+          tvecsLeft,
+          cvFlags
+          );
+      }
     }
      
     #pragma omp section
     {
-      niftk::MonoCameraCalibration(
-        model,
-        pointsFromOriginalImagesRight,
-        imageSize,
-        intrinsicRight,
-        distortionRight,
-        rvecsRight,
-        tvecsRight,
-        cvFlags
-        );
+      if (pointsFromOriginalImagesRight.size() == 1)
+      {
+        niftk::TsaiMonoCameraCalibration(
+          model,
+          *(pointsFromOriginalImagesRight.begin()),
+          imageSize,
+          sensorDimensions,
+          imageSize.width,
+          sx,
+          intrinsicRight,
+          distortionRight,
+          rvecsRight[0],
+          tvecsRight[0],
+          true
+          );
+      }
+      else
+      {
+        niftk::ZhangMonoCameraCalibration(
+          model,
+          pointsFromOriginalImagesRight,
+          imageSize,
+          intrinsicRight,
+          distortionRight,
+          rvecsRight,
+          tvecsRight,
+          cvFlags
+          );
+      }
     }
   }
 
   int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
 
-  result = niftk::StereoCameraCalibration(
-    optimise3D,
-    model,
-    pointsFromOriginalImagesLeft,
-    pointsFromOriginalImagesRight,
-    imageSize,
-    intrinsicLeft,
-    distortionLeft,
-    rvecsLeft,
-    tvecsLeft,
-    intrinsicRight,
-    distortionRight,
-    rvecsRight,
-    tvecsRight,
-    leftToRightRotationMatrix,
-    leftToRightTranslationVector,
-    essentialMatrix,
-    fundamentalMatrix,
-    iterativeCvFlags
-    );
+  if (pointsFromOriginalImagesLeft.size() == 1)
+  {
+    result = niftk::TsaiStereoCameraCalibration(
+      model,
+      *(pointsFromOriginalImagesLeft.begin()),
+      *(pointsFromOriginalImagesRight.begin()),
+      imageSize,
+      intrinsicLeft,
+      distortionLeft,
+      rvecsLeft[0],
+      tvecsLeft[0],
+      intrinsicRight,
+      distortionRight,
+      rvecsRight[0],
+      tvecsRight[0],
+      leftToRightRotationMatrix,
+      leftToRightTranslationVector,
+      essentialMatrix,
+      fundamentalMatrix,
+      iterativeCvFlags,
+      optimise3D
+      );
+  }
+  else
+  {
+    result = niftk::StereoCameraCalibration(
+      model,
+      pointsFromOriginalImagesLeft,
+      pointsFromOriginalImagesRight,
+      imageSize,
+      intrinsicLeft,
+      distortionLeft,
+      rvecsLeft,
+      tvecsLeft,
+      intrinsicRight,
+      distortionRight,
+      rvecsRight,
+      tvecsRight,
+      leftToRightRotationMatrix,
+      leftToRightTranslationVector,
+      essentialMatrix,
+      fundamentalMatrix,
+      iterativeCvFlags,
+      optimise3D
+      );
+  }
 
   bestPointSetsSoFarLeft = pointsFromOriginalImagesLeft;
   bestPointSetsSoFarRight = pointsFromOriginalImagesRight;
@@ -209,12 +273,22 @@ cv::Matx21d IterativeStereoCameraCalibration(
   std::cout << std::endl;
 
   unsigned int iterationCount = 0;
-  double projectedRMS = result(0, 0);
+  double currentRMS = 0;
+  cv::Matx21d currentResult;
+
+  if (optimise3D)
+  {
+    currentRMS = result(1, 0);
+  }
+  else
+  {
+    currentRMS = result(0, 0);
+  }
   double previousRMS = std::numeric_limits<double>::max();
 
-  while (projectedRMS < previousRMS && fabs(projectedRMS - previousRMS) > 0.0005)
+  while (currentRMS < previousRMS && fabs(currentRMS - previousRMS) > 0.0005)
   {
-    previousRMS = projectedRMS;
+    previousRMS = currentRMS;
 
     niftk::ExtractAllDistortedControlPoints(
           referenceImageData,
@@ -245,35 +319,70 @@ cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat tmpEssentialMatrix = essentialMatrix.clone();
     cv::Mat tmpFundamentalMatrix = fundamentalMatrix.clone();
 
-    result = niftk::StereoCameraCalibration(
-      optimise3D,
-      model,
-      distortedPointsFromCanonicalImagesLeft,
-      distortedPointsFromCanonicalImagesRight,
-      imageSize,
-      tmpIntrinsicLeft,
-      tmpDistortionLeft,
-      rvecsLeft,
-      tvecsLeft,
-      tmpIntrinsicRight,
-      tmpDistortionRight,
-      rvecsRight,
-      tvecsRight,
-      tmpLeftToRightRotationMatrix,
-      tmpLeftToRightTranslationVector,
-      tmpEssentialMatrix,
-      tmpFundamentalMatrix,
-      iterativeCvFlags
-     );
-    projectedRMS = result(0, 0);
+    if (distortedPointsFromCanonicalImagesLeft.size() == 1)
+    {
+      currentResult = niftk::TsaiStereoCameraCalibration(
+        model,
+        *(distortedPointsFromCanonicalImagesLeft.begin()),
+        *(distortedPointsFromCanonicalImagesRight.begin()),
+        imageSize,
+        tmpIntrinsicLeft,
+        tmpDistortionLeft,
+        rvecsLeft[0],
+        tvecsLeft[0],
+        tmpIntrinsicRight,
+        tmpDistortionRight,
+        rvecsRight[0],
+        tvecsRight[0],
+        tmpLeftToRightRotationMatrix,
+        tmpLeftToRightTranslationVector,
+        tmpEssentialMatrix,
+        tmpFundamentalMatrix,
+        iterativeCvFlags,
+        optimise3D
+       );
+    }
+    else
+    {
+      currentResult = niftk::StereoCameraCalibration(
+        model,
+        distortedPointsFromCanonicalImagesLeft,
+        distortedPointsFromCanonicalImagesRight,
+        imageSize,
+        tmpIntrinsicLeft,
+        tmpDistortionLeft,
+        rvecsLeft,
+        tvecsLeft,
+        tmpIntrinsicRight,
+        tmpDistortionRight,
+        rvecsRight,
+        tvecsRight,
+        tmpLeftToRightRotationMatrix,
+        tmpLeftToRightTranslationVector,
+        tmpEssentialMatrix,
+        tmpFundamentalMatrix,
+        iterativeCvFlags,
+        optimise3D
+       );
+    }
 
     std::cout << "Iterative calibration iter=" << iterationCount++
               << ", prms=" << previousRMS
-              << ", rms2D=" << projectedRMS
+              << ", crms=" << currentRMS
               << std::endl;
 
-    if (projectedRMS < previousRMS)
+    if (currentRMS < previousRMS)
     {
+      if (optimise3D)
+      {
+        currentRMS = result(1, 0);
+      }
+      else
+      {
+        currentRMS = result(0, 0);
+      }
+      result = currentResult;
+
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
       tmpDistortionLeft.copyTo(distortionLeft);
       tmpIntrinsicRight.copyTo(intrinsicRight);
@@ -288,31 +397,27 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
     else
     {
-      projectedRMS = previousRMS;
-
-      niftk::ComputeStereoExtrinsics(model,
-                                     bestPointSetsSoFarLeft,
-                                     imageSize,
-                                     intrinsicLeft,
-                                     distortionLeft,
-                                     leftToRightRotationMatrix,
-                                     leftToRightTranslationVector,
-                                     rvecsLeft,
-                                     tvecsLeft,
-                                     rvecsRight,
-                                     tvecsRight
-                                    );
+      currentRMS = previousRMS;
     }
   } // end while
 
-  std::cout << "Iterative calibration finished, rms2D=" << result(0, 0)
-            << ", rms3D=" << result(1, 0)
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+  std::cout << "Iterative calibration finished, rms=" << currentRMS
             << ", over " << bestPointSetsSoFarLeft.size()
             << ", left PointSets and " << bestPointSetsSoFarRight.size()
             << ", right PointSets."
             << std::endl;
 
-  std::cout << "Final stereo calibration, rms2D=" << result(0, 0) << ", rms3D=" << result(1, 0) << std::endl;
+  std::cout << "Final stereo calibration, rms2D=" << result(0,0)
+            << ", rms3D=" << result(1,0)
+            << std::endl;
   std::cout << "Final Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
   std::cout << "Final Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
   std::cout << "Final Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;

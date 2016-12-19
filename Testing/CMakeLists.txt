@@ -35,6 +35,11 @@ set(TEST_CASES
   niftkIterativeMonoAprilTagsCameraCalibrationTest
   niftkMonoChessboardHandEyeCalibrationTest
   niftkIterativeTemplateMatchingCameraCalibrationTest
+  niftkTsaiMonoCalibrationTest
+  niftkTsaiStereoCalibrationTest
+  niftkTsaiReferenceNonCoplanerCalibrationTest
+  niftkTimingCalibrationUtilitiesTest
+  niftkTimingCalibrationTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -68,6 +73,11 @@ add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPoints
 add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
 add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
+add_test(UNIT-TimingUtils ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationUtilitiesTest )
+add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-1.txt  0)
+add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)
+add_test(UNIT-Timing3 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-3.txt -3)
+add_test(UNIT-Timing4 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-4.txt 45)
 
 # Chess
 add_test(REQ-2002-CSD-0001-001-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612 14 10   0 0)
@@ -232,8 +242,8 @@ add_test(REG-CalibIterStereoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoC
   14 10                                                 # internal corners
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.txt # 2D points for reference image
   1                                                     # zero distortion (1==true)
-  -3.36426e-05 -0.0856378 -8.14416e-05 # rvec
-  5.98069 0.00132401 0.519151 # tvec
+  -3.117e-05 -0.0868195 -7.8506e-05 # rvec
+  5.98009 0.00138975 0.527912 # tvec
   ${DATA_DIR}/Simulation2/Left1.png
   ${DATA_DIR}/Simulation2/Left2.png
   ${DATA_DIR}/Simulation2/Left3.png
@@ -379,8 +389,8 @@ add_test(REG-CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeSte
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
   1 1                                                       # Simulation has proper scale factors
-  2.77247e-05 -0.0853894 2.02478e-05 # rvec
-  5.97596 0.000262982 0.519377 # tvec
+  -6.09634e-05 -0.0859876 3.18065e-05 # rvec
+  5.97673 4.50868e-05 0.533138 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.png
   ${DATA_DIR}/SimulationAprilTags/Left2.png
   ${DATA_DIR}/SimulationAprilTags/Left3.png
@@ -408,8 +418,8 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Simulation has proper scale factors
-  0.00367244 -0.03346 -0.00269221 # rvec
-  -2.73359 0.0348689 -0.0495921 # tvec
+  -0.0023911 -0.0385178 -0.00236075 # rvec
+  -2.75812 0.0665165 -0.0918503 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
@@ -579,3 +589,39 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/31.txt
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
 )
+
+add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1676.02 1676.02 903.128 521.947 -0.219052 0.996367)
+
+add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1660.29 1660.29 979.617 528.893 -0.260747 1.42307)
+
+add_test(REG-TsaiCPStereo2D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1676.020778 1676.020778 903.1279753 521.9467757 -0.219052053 0.6767414659 0)
+
+add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+         ${DATA_DIR}/Tsai/Coplanar/model.txt
+         10 7 1920 540 1 2 1680.902938 1697.838245 904.3534964 518.0770595 -0.219052053 0.2584777885 1)
+
+#
+# Commented out until OpenCV bug is fixed, (duplicates from findCircles)
+# or we have other test data.
+#
+#add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+#         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_left.bmp
+#         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt
+#         10 7 1920 540 1 2 1444.38 1370.71 860.179 610.077 -0.0140713 8.66708)
+
+add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
+         ${DATA_DIR}/Tsai/NonCoplanar/data.txt
+         576 576 0.02300000 0.02300000 3037.97 3037.45 262.339 212.411 3.07076 0.0894958
+        )

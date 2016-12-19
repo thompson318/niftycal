@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include <niftkIOUtilities.h>
-#include <niftkMonoCameraCalibration.h>
+#include <niftkZhangCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
 #include <niftkChessboardPointDetector.h>
 #include <niftkNiftyCalException.h>
@@ -23,18 +23,14 @@
 #include <highgui.h>
 #include <cstdlib>
 
-#ifdef NIFTYCAL_WITH_ITK
-#include <niftkNonLinearStereoIntrinsicsCalibrationOptimiser.h>
-#include <niftkNonLinearStereoExtrinsicsCalibrationOptimiser.h>
-#endif
-
 /**
 * \file niftkStereoChessboardCalibration.cxx
-* \brief Calibrate stereo camera, using standard chessboard and OpenCV.
+* \brief Calibrate stereo camera, using standard chessboard and the Zhang 2000/OpenCV method.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 14)
+  if (argc < 10)
   {
     std::cerr << "Usage: niftkStereoChessboardCalibration modelFileName cornersInX cornersInY rescaleX rescaleY zeroDistortion optimise3D "
               << "leftImage1.png leftImage2.png ... leftImageN.txt "
@@ -170,28 +166,27 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslationVector;
 
-    niftk::MonoCameraCalibration(model,
-                                 listOfPointsLeft,
-                                 imageSize,
-                                 intrinsicLeft,
-                                 distortionLeft,
-                                 rvecsLeft,
-                                 tvecsLeft,
-                                 flags
-                                );
+    niftk::ZhangMonoCameraCalibration(model,
+                                      listOfPointsLeft,
+                                      imageSize,
+                                      intrinsicLeft,
+                                      distortionLeft,
+                                      rvecsLeft,
+                                      tvecsLeft,
+                                      flags
+                                     );
 
-    niftk::MonoCameraCalibration(model,
-                                 listOfPointsRight,
-                                 imageSize,
-                                 intrinsicRight,
-                                 distortionRight,
-                                 rvecsRight,
-                                 tvecsRight,
-                                 flags
-                                );
+    niftk::ZhangMonoCameraCalibration(model,
+                                      listOfPointsRight,
+                                      imageSize,
+                                      intrinsicRight,
+                                      distortionRight,
+                                      rvecsRight,
+                                      tvecsRight,
+                                      flags
+                                     );
 
-    cv::Matx21d result = niftk::StereoCameraCalibration(false, // could be command line arg.
-                                                        model,
+    cv::Matx21d result = niftk::StereoCameraCalibration(model,
                                                         listOfPointsLeft,
                                                         listOfPointsRight,
                                                         imageSize,
@@ -207,7 +202,8 @@ int main(int argc, char ** argv)
                                                         leftToRightTranslationVector,
                                                         essentialMatrix,
                                                         fundamentalMatrix,
-                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS
+                                                        flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                                        optimise3D
                                                        );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
@@ -236,8 +232,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslationVector.at<double>(0,0) << " "
-              << leftToRightTranslationVector.at<double>(0,1) << " "
-              << leftToRightTranslationVector.at<double>(0,2) << " "
+              << leftToRightTranslationVector.at<double>(1,0) << " "
+              << leftToRightTranslationVector.at<double>(2,0) << " "
               << result(0, 0) << " "
               << result(1, 0) << " "
               << std::endl;

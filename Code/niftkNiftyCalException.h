@@ -25,6 +25,7 @@ namespace niftk {
 /**
 * \class NiftyCalException
 * \brief Base exception class.
+* \ingroup types
 */
 class NIFTYCAL_WINEXPORT NiftyCalException : public std::exception
 {

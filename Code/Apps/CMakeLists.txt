@@ -12,12 +12,14 @@
 #
 #============================================================================*/
 set(NIFTYCAL_APPS
+  niftkStereoSimulationWithNoise
+  niftkStereoSimulationByParameter
   niftkMonoCalibrationFromPoints
   niftkStereoCalibrationFromPoints
-  niftkStereoSimulationFromPoints
   niftkStereoIterativeAprilTagsCalibration
   niftkStereoIterativeRingsCalibration
   niftkStereoChessboardCalibration
+  niftkTimingCalibrationFromPoints
 )
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)

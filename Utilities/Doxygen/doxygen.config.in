@@ -88,7 +88,7 @@ HIDE_UNDOC_CLASSES    = NO
 # the file and class documentation (similar to JavaDoc). 
 # Set to NO to disable this. 
 
-BRIEF_MEMBER_DESC     = YES
+BRIEF_MEMBER_DESC     = YES 
 
 # If the REPEAT_BRIEF tag is set to YES (the default) Doxygen will prepend 
 # the brief description of a member or function before the detailed description. 
@@ -101,7 +101,7 @@ REPEAT_BRIEF          = YES
 # Doxygen will generate a detailed section even if there is only a brief 
 # description. 
 
-ALWAYS_DETAILED_SEC   = NO
+ALWAYS_DETAILED_SEC   = YES
 
 # If the FULL_PATH_NAMES tag is set to YES then Doxygen will prepend the full 
 # path before files name in the file list and in the header files. If set 
@@ -163,7 +163,7 @@ HIDE_SCOPE_NAMES      = NO
 # will generate a verbatim copy of the header file for each class for 
 # which an include is specified. Set to NO to disable this. 
 
-VERBATIM_HEADERS      = YES
+VERBATIM_HEADERS      = NO
 
 # If the SHOW_INCLUDE_FILES tag is set to YES (the default) then Doxygen 
 # will put list of the files that are included by a file in the documentation 
@@ -274,7 +274,7 @@ RECURSIVE             = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag. 
 
-EXCLUDE               =   
+EXCLUDE               =
               
 # If the value of the INPUT tag contains directories, you can use the 
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 

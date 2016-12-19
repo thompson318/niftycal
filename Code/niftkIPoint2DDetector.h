@@ -30,6 +30,8 @@ namespace niftk
 * the points. There is no conversion to millimetres, no camera
 * calibration, nothing but point detection. The points can be
 * chessboard corners, centres of circles, SIFT points etc.
+*
+* \ingroup detectors
 */
 class NIFTYCAL_WINEXPORT IPoint2DDetector
 {

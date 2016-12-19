@@ -26,10 +26,11 @@
 * \file niftkStereoIterativeAprilTagsCalibration.cxx
 * \brief Calibrate stereo camera, using AprilTag features, and
 * the <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Datta 2009</a> iterative optimisation.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 15)
+  if (argc < 11)
   {
     std::cerr << "Usage: niftkStereoIterativeAprilTagsCalibration modelPoints.txt "
               << " referenceImage.png referencePoints tagFamily rescaleX rescaleY zeroDistortion optimise3D "
@@ -185,7 +186,6 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslationVector;
 
     cv::Matx21d rms = niftk::IterativeStereoCameraCalibration(
-          optimise3D,
           model,
           referenceImageData,
           originalImagesLeft,
@@ -205,7 +205,8 @@ int main(int argc, char ** argv)
           leftToRightTranslationVector,
           essentialMatrix,
           fundamentalMatrix,
-          flags
+          flags,
+          optimise3D
           );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
@@ -234,8 +235,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslationVector.at<double>(0,0) << " "
-              << leftToRightTranslationVector.at<double>(0,1) << " "
-              << leftToRightTranslationVector.at<double>(0,2) << " "
+              << leftToRightTranslationVector.at<double>(1,0) << " "
+              << leftToRightTranslationVector.at<double>(2,0) << " "
               << rms(0, 0) << " "
               << rms(1, 0)
               << std::endl;
