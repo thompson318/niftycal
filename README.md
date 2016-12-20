@@ -4,17 +4,7 @@ NiftyCal
 NiftyCal is a software library to perform
 video camera calibration, and is largely based on OpenCV.
 
-NiftyCal provides:
- - 2D and 3D structures that store each point along with its identifier.
- - A simple IPoint2DDetector interface that all point detectors implement.
- - A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids, AprilTags,
-   and template matching of [dots and rings][Datta].
- - Camera calibration using iterative refinement of control points, as in [Datta 2009][Datta].
- - Hand-eye calibration using a direct matrix multiplication method as in [Shahidi 2002][Shahidi].
- - Hand-eye calibration using linear least-squares as in [Tsai 1989][Tsai].
- - Hand-eye calibration using non-linear minimisation as in [Malti 2013][Malti].
- - Performance enhancements using OpenMP.
- - Performance enhancements using CUDA for NVIDIA GPUs (coming soon).
+A full feature list is available by running doxygen.
 
 NiftyCal was developed by the [Centre for Medical Image Computing][cmic] at [University College London (UCL)][ucl].
 
@@ -91,5 +81,6 @@ Branching Workflow
 [April]: http://github.com/NifTK/apriltags
 [Datta]: http://dx.doi.org/10.1109/ICCVW.2009.5457474
 [Shahidi]: http://dx.doi.org/10.1109/TMI.2002.806597
-[Tsai]: http://dx.doi.org/10.1109/70.34770
+[Tsai89]: http://dx.doi.org/10.1109/70.34770
 [Malti]: http://dx.doi.org/10.1002/rcs.1478
+[Tsai87]: http://ieeexplore.ieee.org/document/1087109
