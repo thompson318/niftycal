@@ -28,7 +28,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 5)
+  if (argc < 5) // Tsai's method only requires 1 image point set.
   {
     std::cerr << "Usage: niftkMonoCalibrationFromPoints imageSizeX imageSizeY modelPoints.txt "
               << "imagePoints1.txt imagePoints2.txt ... imagePointsN.txt" << std::endl;
