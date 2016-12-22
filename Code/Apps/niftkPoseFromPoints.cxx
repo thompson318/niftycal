@@ -14,6 +14,7 @@
 
 #include <niftkIOUtilities.h>
 #include <niftkPoseFromPoints.h>
+#include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <cv.h>
@@ -67,9 +68,12 @@ int main(int argc, char ** argv)
 
     for ( unsigned int i = 0 ; i < rvecs.size() ; ++ i )
     {
-      std::cout << rvecs[i].at<double>(0,0) * 180.0 / CV_PI << " , "
-                << rvecs[i].at<double>(0,1) * 180.0 / CV_PI << " , "
-                << rvecs[i].at<double>(0,2) * 180.0 / CV_PI << " , "
+      // Convert rvec in Rodrigues notation to pitch, yaw, roll
+      cv::Mat eulerAngles = niftk::RodriguesToEulerAngles ( rvecs[i] );
+
+      std::cout << eulerAngles.at<double>(0,0) * 180.0 / CV_PI << " , "
+                << eulerAngles.at<double>(1,0) * 180.0 / CV_PI << " , "
+                << eulerAngles.at<double>(2,0) * 180.0 / CV_PI << " , "
                 << tvecs[i].at<double>(0,0) << " , "
                 << tvecs[i].at<double>(0,1) << " , "
                 << tvecs[i].at<double>(0,2)
