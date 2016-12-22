@@ -30,7 +30,7 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc < 6)
+  if (argc < 6) // Tsai's method only requires 1 image point set for left and right.
   {
     std::cerr << "Usage: niftkStereoCalibrationFromPoints imageSizeX imageSizeY modelPoints.txt "
               << "leftImagePoints1.txt leftImagePoints2.txt ... leftImagePointsN.txt "
