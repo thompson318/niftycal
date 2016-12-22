@@ -90,6 +90,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
 
       imagePoints = detector.GetPoints();
       REQUIRE( imagePoints.size() == dotsInX*dotsInY );
+      niftk::DumpPoints(std::cout, imagePoints);
     }
     else
     {
@@ -136,7 +137,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
         imagePoints.insert(niftk::IdPoint2D(id + numberOfLeftHandPoints, p));
       }
       REQUIRE( imagePoints.size() == 2*dotsInX*dotsInY );
-      //niftk::DumpPoints(std::cout, imagePoints);
+      niftk::DumpPoints(std::cout, imagePoints);
     }
   }
 

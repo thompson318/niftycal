@@ -33,9 +33,9 @@
  */
 int main(int argc, char ** argv)
 {
-  if (argc < 8) // Tsai's method only requires 1 view per channel.
+  if (argc < 9) // Tsai's method only requires 1 view per channel.
   {
-    std::cerr << "Usage: niftkStereoSimulationWithNoise sigma iters imageSizeX imageSizeY modelPoints.txt "
+    std::cerr << "Usage: niftkStereoSimulationWithNoise sigma iters optimise3D imageSizeX imageSizeY modelPoints.txt "
               << "leftImagePoints1.txt leftImagePoints2.txt ... leftImagePointsN.txt "
               << "rightImagePoints1.txt rightImagePoints2.txt ... rightImagePointsN.txt " << std::endl;
 
@@ -44,7 +44,7 @@ int main(int argc, char ** argv)
 
   try
   {
-    int numberOfArgumentsBeforeImages = 6;
+    int numberOfArgumentsBeforeImages = 7;
     int numberOfImagesPerSide = (argc-numberOfArgumentsBeforeImages)/2;
 
     if ((argc - numberOfArgumentsBeforeImages)%2 != 0)
@@ -55,9 +55,16 @@ int main(int argc, char ** argv)
 
     float sigma = atof(argv[1]);
     int iterations = atoi(argv[2]);
-    int sizeX = atoi(argv[3]);
-    int sizeY = atoi(argv[4]);
-    std::string modelFile = argv[5];
+    int optimise = atoi(argv[3]);
+    int sizeX = atoi(argv[4]);
+    int sizeY = atoi(argv[5]);
+    std::string modelFile = argv[6];
+
+    bool optimise3D = false;
+    if (optimise == 1)
+    {
+      optimise3D = true;
+    }
 
     cv::Size2i imageSize(sizeX, sizeY);
     niftk::Model3D model = niftk::LoadModel3D(modelFile);
@@ -165,8 +172,12 @@ int main(int argc, char ** argv)
                                                   essentialMatrix,
                                                   fundamentalMatrix,
                                                   CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                  false // optimise3D, could be command line arg.
-                                                 );
+                                                  false // optimise 3D, not needed here.
+                                                 );      
+      rvecsLeft.push_back(rvecLeft);
+      tvecsLeft.push_back(tvecLeft);
+      rvecsRight.push_back(rvecRight);
+      tvecsRight.push_back(tvecRight);
     }
     else
     {
@@ -205,7 +216,7 @@ int main(int argc, char ** argv)
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS,
-                                              false // could be command line arg.
+                                              false // optimise 3D, not needed here.
                                              );
     }
 
@@ -346,8 +357,19 @@ int main(int argc, char ** argv)
                                                   essentialMatrix,
                                                   fundamentalMatrix,
                                                   CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                  false // optimise3D, could be command line arg.
+                                                  false // optimise 3D, not needed here.
                                                  );
+
+      rvecsLeft.clear();
+      tvecsLeft.clear();
+      rvecsRight.clear();
+      tvecsRight.clear();
+
+      rvecsLeft.push_back(rvecLeft);
+      tvecsLeft.push_back(tvecLeft);
+      rvecsRight.push_back(rvecRight);
+      tvecsRight.push_back(tvecRight);
+
     }
     else
     {
@@ -386,7 +408,7 @@ int main(int argc, char ** argv)
                                               essentialMatrix,
                                               fundamentalMatrix,
                                               CV_CALIB_USE_INTRINSIC_GUESS,
-                                              false // could be command line arg.
+                                              false // optimise 3D, not needed here.
                                              );
     }
 
@@ -451,7 +473,7 @@ int main(int argc, char ** argv)
       if (leftPoints.size() == 1 && rightPoints.size() == 1)
       {
         niftk::TsaiMonoCameraCalibration(model,
-                                         *(leftGoldStandardPoints.begin()),
+                                         *(leftNoisyPoints.begin()),
                                          imageSize,
                                          sensorDimensions,
                                          imageSize.width,
@@ -464,7 +486,7 @@ int main(int argc, char ** argv)
                                         );
 
         niftk::TsaiMonoCameraCalibration(model,
-                                         *(rightGoldStandardPoints.begin()),
+                                         *(rightNoisyPoints.begin()),
                                          imageSize,
                                          sensorDimensions,
                                          imageSize.width,
@@ -477,8 +499,8 @@ int main(int argc, char ** argv)
                                         );
 
         result = niftk::TsaiStereoCameraCalibration(model,
-                                                    *(leftGoldStandardPoints.begin()),
-                                                    *(rightGoldStandardPoints.begin()),
+                                                    *(leftNoisyPoints.begin()),
+                                                    *(rightNoisyPoints.begin()),
                                                     imageSize,
                                                     intrinsicLeft,
                                                     distortionLeft,
@@ -493,8 +515,19 @@ int main(int argc, char ** argv)
                                                     essentialMatrix,
                                                     fundamentalMatrix,
                                                     CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                    false // optimise3D, could be command line arg.
+                                                    optimise3D
                                                    );
+
+        rvecsLeft.clear();
+        tvecsLeft.clear();
+        rvecsRight.clear();
+        tvecsRight.clear();
+
+        rvecsLeft.push_back(rvecLeft);
+        tvecsLeft.push_back(tvecLeft);
+        rvecsRight.push_back(rvecRight);
+        tvecsRight.push_back(tvecRight);
+
       }
       else
       {
@@ -533,7 +566,7 @@ int main(int argc, char ** argv)
                                                 essentialMatrix,
                                                 fundamentalMatrix,
                                                 CV_CALIB_USE_INTRINSIC_GUESS,
-                                                false // could be command line arg.
+                                                optimise3D
                                                );
       }
 
@@ -576,6 +609,7 @@ int main(int argc, char ** argv)
 
       std::cout << "niftkStereoSimulationFromPoints " << imageSize.width << " " << imageSize.height <<  " "
                 << leftPoints.size() << " "
+                << optimise3D << " "
                 << result(0, 0) << " "
                 << result(1, 0)
                 << std::endl;

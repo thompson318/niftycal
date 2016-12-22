@@ -164,6 +164,10 @@ int main(int argc, char ** argv)
                                                   CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                                   false // optimise3D, could be command line arg.
                                                  );
+      rvecsLeft.push_back(rvecLeft);
+      tvecsLeft.push_back(tvecLeft);
+      rvecsRight.push_back(rvecRight);
+      tvecsRight.push_back(tvecRight);
     }
     else
     {
@@ -345,6 +349,17 @@ int main(int argc, char ** argv)
                                                   CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                                   false // optimise3D, could be command line arg.
                                                  );
+
+      rvecsLeft.clear();
+      tvecsLeft.clear();
+      rvecsRight.clear();
+      tvecsRight.clear();
+
+      rvecsLeft.push_back(rvecLeft);
+      tvecsLeft.push_back(tvecLeft);
+      rvecsRight.push_back(rvecRight);
+      tvecsRight.push_back(tvecRight);
+
     }
     else
     {
