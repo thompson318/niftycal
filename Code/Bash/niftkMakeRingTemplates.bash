@@ -4,12 +4,15 @@
 COLUMNS=14
 ROWS=10
 
+COLUMNS=1
+ROWS=1
+
 SPACING=3.0
 OUTERDIAMETER=2.0
 INNERDIAMETER=1.0
 BORDER=3.0
 
-PIXELSPERMM=12 
+PIXELSPERMM=250 
 
 
 SPACING_PIX=$(echo ${SPACING}*${PIXELSPERMM} | bc -l)
@@ -42,5 +45,5 @@ do
 done
 
 convert -size ${IMAGEWIDTH_PIX}x${IMAGEHEIGHT_PIX} xc:white  \
-	-draw "${drawString}" rings.bmp
+	-draw "${drawString}" -gaussian-blur 0x0 ringsTemplateImage.bmp
 	

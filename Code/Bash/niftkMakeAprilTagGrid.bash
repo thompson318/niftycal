@@ -1,12 +1,12 @@
 #! /bin/bash
 #we only need 24 tags for a chessboard equivalent grid, but we need more. if we're going to 
 #extend the grid beyond the image
-GRIDFILE=/home/thompson/build/NifTK-qt4.8.7/AprilTags/src/tags/tag25h7.ps
-#GRIDFILE=/home/thompson/work/build/NifTK-dbg/AprilTags/src/tags/tag25h7.ps
+#GRIDFILE=/home/thompson/build/NifTK-qt4.8.7/AprilTags/src/tags/tag25h7.ps
+GRIDFILE=/home/thompson/work/build/NifTK-dbg/AprilTags/src/tags/tag25h7.ps
 OUTDIR=/dev/shm/AprilGridTemp
 mkdir -p $OUTDIR
 
-#we'll use imagemagick's convert
+#we'll use imagemagick's convert and montage applications
 
 if [ $GRIDFILE -nt $OUTDIR/000.bmp ]
 then
@@ -17,21 +17,37 @@ files=$(ls $OUTDIR/???.bmp)
 
 for file in $files 
 do
-	if [ $OUTDIR/${file} -nt ${OUTDIR}/${file%.*}_cropped.bmp ]
+	if [ ${file} -nt ${file%.*}_cropped.bmp ]
 	then
-		convert ${OUTDIR}/$file -crop 612x612+0+90 ${OUTDIR}/${file%.*}_cropped.bmp
+		convert $file -crop 612x612+0+90 ${file%.*}_cropped.bmp
 	fi
 done
 
 #6x4 grid.
-files24=$(ls ${OUTDIR}/???_cropped.bmp | head -n 24)
 
-echo $files24
+if [ ${OUTDIR}/000_cropped.bmp -nt montage24.bmp ]
+then
+	files24=$(ls ${OUTDIR}/???_cropped.bmp | head -n 24)
 
-montage $files24 -geometry 612x612+0+0 -tile 6x4 montage24.bmp
+	montage $files24 -geometry 612x612+0+23 -tile 6x4 montage24.bmp
 
-#make it bigger, 18 x 12 = 216
+	#make it bigger, 18 x 12 = 216
 
-files216=$(ls ${OUTDIR}/???_cropped.bmp | head -n 216)
+	files216=$(ls ${OUTDIR}/???_cropped.bmp | head -n 216)
 
-montage $files216 -geometry 612x612+0+0 -tile 18x12 montage216.bmp
+	montage $files216 -geometry 612x612+0+23 -tile 18x12 montage216.bmp
+fi
+
+#otherwise lets just work out image sizes.
+#each square is 612x612 and the tag is starts at pixel 68.
+#so tag size is 612 - (68 * 2) = 476 pixels
+#tag corner to corner width = 612 * 6 - 68-2 = 3536 pixels. We want this equal 39 mm, same as chessboard,
+#pixTOmm=39  / 3536
+#image width in mm = 612*6 * 39/3536 = 40.50 mm
+#need to fiddle the montage setting to get 2 more mm into vertical size 
+#1 * 3536 / 39 = 90 pixels 
+#136/4 = 34 pixel per patch
+
+#13.02 percent scaling
+
+
