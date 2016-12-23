@@ -200,7 +200,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
   // Give up if all 3D points have a z component equal to zero.
   bool foundNonZero = false;
   niftk::Model3D::const_iterator iter;
-  for (iter = model3D.begin(); iter != model3D.end(); iter++)
+  for (iter = model3D.begin(); iter != model3D.end(); ++iter)
   {
     if (iter->second.point.z != 0)
     {
@@ -310,7 +310,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
 {
   // Give up if all 3D points do not have a z component equal to zero.
   niftk::Model3D::const_iterator iter;
-  for (iter = model3D.begin(); iter != model3D.end(); iter++)
+  for (iter = model3D.begin(); iter != model3D.end(); ++iter)
   {
     if (iter->second.point.z != 0)
     {

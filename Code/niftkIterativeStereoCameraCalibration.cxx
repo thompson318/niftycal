@@ -56,14 +56,11 @@ cv::Matx21d IterativeStereoCameraCalibration(
   result(0, 0) = 0;
   result(1, 0) = 0;
 
-  cv::Point2d sensorDimensions(1,1);
-  double sx = 1.0;
-
   if (model.empty())
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (detectorAndOriginalImagesLeft.size() < 1)
+  if (detectorAndOriginalImagesLeft.empty())
   {
     niftkNiftyCalThrow() << "Should have at least 1 left-hand view of calibration points.";
   }
@@ -125,6 +122,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
     {
       if (pointsFromOriginalImagesLeft.size() == 1)
       {
+        cv::Point2d sensorDimensions(1,1);
+        double sx = 1.0;
+
         niftk::TsaiMonoCameraCalibration(
           model,
           *(pointsFromOriginalImagesLeft.begin()),
@@ -158,6 +158,9 @@ cv::Matx21d IterativeStereoCameraCalibration(
     {
       if (pointsFromOriginalImagesRight.size() == 1)
       {
+        cv::Point2d sensorDimensions(1,1);
+        double sx = 1.0;
+
         niftk::TsaiMonoCameraCalibration(
           model,
           *(pointsFromOriginalImagesRight.begin()),

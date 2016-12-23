@@ -27,7 +27,7 @@ namespace niftk {
 void DumpPoints(std::ostream& s, const PointSet& p)
 {
   PointSet::const_iterator iter;
-  for (iter = p.begin(); iter != p.end(); iter++)
+  for (iter = p.begin(); iter != p.end(); ++iter)
   {
     s << (*iter).second.id << " "
       << (*iter).second.point.x << " "
@@ -40,7 +40,7 @@ void DumpPoints(std::ostream& s, const PointSet& p)
 void DumpPoints(std::ostream& s, const Model3D& p)
 {
   Model3D::const_iterator iter;
-  for (iter = p.begin(); iter != p.end(); iter++)
+  for (iter = p.begin(); iter != p.end(); ++iter)
   {
     s << (*iter).second.id << " "
       << (*iter).second.point.x << " "
@@ -269,7 +269,7 @@ void ExtractCommonPoints(const Model3D& inputA,
   Model3D::const_iterator iterA;
   PointSet::const_iterator iterB;
 
-  for (iterB = inputB.begin(); iterB != inputB.end(); iterB++)
+  for (iterB = inputB.begin(); iterB != inputB.end(); ++iterB)
   {
     iterA = inputA.find(iterB->second.id);
     if (iterA != inputA.end())

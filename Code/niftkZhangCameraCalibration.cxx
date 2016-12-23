@@ -41,7 +41,7 @@ double ZhangMonoCameraCalibration(const Model3D& model,
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (listOfPointSets.size() < 1)
+  if (listOfPointSets.empty())
   {
     niftkNiftyCalThrow() << "Should have at least 1 views of calibration points.";
   }
