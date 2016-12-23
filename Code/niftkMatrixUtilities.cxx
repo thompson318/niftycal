@@ -76,7 +76,7 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
 
 
 //-----------------------------------------------------------------------------
-NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
+cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
 {
   cv::Matx14d axisAngle = cv::Matx14d::zeros();
   double norm = cv::norm(rotationVector1x3);
@@ -88,13 +88,14 @@ NIFTYCAL_WINEXPORT cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVecto
   return axisAngle;
 }
 
+
 //-----------------------------------------------------------------------------
-NIFTYCAL_WINEXPORT cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
+cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
 {
   cv::Mat eulerAngles = cvCreateMat(3,1,CV_64FC1);
 
-  //This is not a straight forward conversion, let's try
-  //let's go Rodrigues->AxisAngle->Quaternion->Euler Angles
+  // This is not a straight forward conversion,
+  // let's go Rodrigues->AxisAngle->Quaternion->Euler Angles
   cv::Matx14d axisAngle = niftk::RodriguesToAxisAngle(rotationVector1x3);
 
   double halfTheta = axisAngle (0,3) / 2;
@@ -103,17 +104,18 @@ NIFTYCAL_WINEXPORT cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1
   double q_k = axisAngle(0,2) * sin ( halfTheta );
   double q_r = cos ( halfTheta );
 
-  //roll
+  // Roll
   eulerAngles.at<double>(0,0) = atan2 ( 2 * ( q_r * q_i + q_j * q_k ) ,
         1 - 2 * ( q_i * q_i + q_j * q_j ));
-  //pitch
+  // Pitch
   eulerAngles.at<double>(1,0) = asin ( 2 * ( q_r * q_j - q_k * q_i ) );
 
-  //yaw
+  // Yaw
   eulerAngles.at<double>(2,0) = atan2 ( 2 * ( q_r * q_k + q_i * q_j ) ,
         1 - 2 * ( q_j * q_j + q_k * q_k ));
   return eulerAngles;
 }
+
 
 //-----------------------------------------------------------------------------
 cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
