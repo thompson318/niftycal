@@ -61,7 +61,7 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        cv::Mat& essentialMatrix,
                                                        cv::Mat& fundamentalMatrix,
                                                        const int& cvFlags = 0,
-                                                       const bool& optimise3D = false // only if true AND ITK is compiled in.
+                                                       const bool& optimise3D = false
                                                       );
 
 } // end namespace

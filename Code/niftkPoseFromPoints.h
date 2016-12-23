@@ -25,17 +25,17 @@ namespace niftk
 
 /**
 * \file niftkPoseFromPoints.h
-* \brief Estimates the camera pose given a camera calibration and 
-* \brief the image and model points
+* \brief Estimates the camera pose given a camera calibration and
+* the image and model points
 * \return rms re-projection error.
 */
-NIFTYCAL_WINEXPORT void PoseFromPoints (const Model3D& model,
-                                            const std::list<PointSet>& listOfPointSets,
-                                            cv::Mat& intrinsic,
-                                            cv::Mat& distortion,
-                                            std::vector<cv::Mat>& rvecs,
-                                            std::vector<cv::Mat>& tvecs
-                                          );
+NIFTYCAL_WINEXPORT void PoseFromPoints(const Model3D& model,
+                                       const std::list<PointSet>& listOfPointSets,
+                                       cv::Mat& intrinsic,
+                                       cv::Mat& distortion,
+                                       std::vector<cv::Mat>& rvecs,
+                                       std::vector<cv::Mat>& tvecs
+                                      );
 
 } // end namespace
 

@@ -19,13 +19,13 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-void PoseFromPoints ( const Model3D& model,
-                        const std::list<PointSet>& listOfPointSets,
-                        cv::Mat& intrinsic,
-                        cv::Mat& distortion,
-                        std::vector<cv::Mat>& rvecs,
-                        std::vector<cv::Mat>& tvecs
-                     )
+void PoseFromPoints(const Model3D& model,
+                    const std::list<PointSet>& listOfPointSets,
+                    cv::Mat& intrinsic,
+                    cv::Mat& distortion,
+                    std::vector<cv::Mat>& rvecs,
+                    std::vector<cv::Mat>& tvecs
+                   )
 {
   if (model.empty())
   {
@@ -65,13 +65,13 @@ void PoseFromPoints ( const Model3D& model,
     {
       cv::Mat rvec;
       cv::Mat tvec;
-      cv::solvePnP( vectors3D,
-                    vectors2D,
-                    intrinsic,
-                    distortion,
-                    rvec,
-                    tvec
-                   );
+      cv::solvePnP(vectors3D,
+                   vectors2D,
+                   intrinsic,
+                   distortion,
+                   rvec,
+                   tvec
+                  );
 
       rvecs.push_back(rvec);
       tvecs.push_back(tvec);
@@ -90,7 +90,7 @@ void PoseFromPoints ( const Model3D& model,
     niftkNiftyCalThrow() << "No poses found";
   }
 
- return; 
+ return;
 }
 
 } // end namespace
