@@ -62,7 +62,6 @@ double IterativeMonoCameraCalibration(
   }
 
   cv::Point2d sensorDimensions(1,1);
-  double sx = 1.0;
 
   double projectedRMS = 0;
 
@@ -85,8 +84,6 @@ double IterativeMonoCameraCalibration(
           *(pointsFromOriginalImages.begin()),
           imageSize,
           sensorDimensions,
-          imageSize.width,
-          sx,
           intrinsic,
           distortion,
           rvecs[0],
@@ -147,8 +144,6 @@ double IterativeMonoCameraCalibration(
             *(distortedPointsFromCanonicalImages.begin()),
             imageSize,
             sensorDimensions,
-            imageSize.width,
-            sx,
             tmpIntrinsic,
             tmpDistortion,
             rvecs[0],

@@ -177,8 +177,6 @@ int main(int argc, char ** argv)
       cv::Mat rvecRight;
       cv::Mat tvecRight;
 
-      double sensorScaleInX = 1;
-
       cv::Point2d sensorDimensions;
       sensorDimensions.x = 1;
       sensorDimensions.y = 1;
@@ -187,8 +185,6 @@ int main(int argc, char ** argv)
                                        *(listOfPointsLeft.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicLeft,
                                        distortionLeft,
                                        rvecLeft,
@@ -200,8 +196,6 @@ int main(int argc, char ** argv)
                                        *(listOfPointsRight.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicRight,
                                        distortionRight,
                                        rvecRight,

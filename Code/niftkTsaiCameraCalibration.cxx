@@ -284,7 +284,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
   niftk::TsaiMonoNonLinearOptimisation(model3D, imagePoints2D, sx, Tz, f, k1, imageCentre,
-                                       intrinsic, distortion, rvec, tvec, fullOptimisation, true);
+                                       intrinsic, distortion, rvec, tvec, fullOptimisation, false);
 
   double rmsNonLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
@@ -401,8 +401,6 @@ double TsaiMonoCameraCalibration(const niftk::Model3D& model3D,
                                  const niftk::PointSet& imagePoints2D,
                                  const cv::Size2i& imageSize,
                                  const cv::Point2d& sensorDimensions,
-                                 const int& numberSensorElementsInX,
-                                 double& sx,
                                  cv::Mat& intrinsic,
                                  cv::Mat& distortion,
                                  cv::Mat& rvec,
@@ -410,6 +408,9 @@ double TsaiMonoCameraCalibration(const niftk::Model3D& model3D,
                                  const bool& fullOptimisation
                                 )
 {
+  int numberSensorElementsInX = imageSize.width;
+  double sx = 1.0;
+
   if (niftk::ModelIsPlanar(model3D))
   {
     return TsaiMonoCoplanarCameraCalibration(model3D,

@@ -42,7 +42,7 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
   {
     intrinsic = cvCreateMat(3, 3, CV_64FC1);
   }
-  intrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
+  intrinsic = cv::Mat::eye(3, 3, CV_64FC1);
 
   if (distortion.rows != 1 || distortion.cols != 5)
   {
