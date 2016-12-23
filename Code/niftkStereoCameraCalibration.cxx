@@ -193,34 +193,32 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
 
-  niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer full2DOptimiser
+  niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer optimiser2D
       = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
-  full2DOptimiser->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
+  optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
+  optimiser2D->SetDistortion(&distortionLeft);
+  optimiser2D->SetRightDistortion(&distortionRight);
 
-  if (listOfLeftHandPointSets.size() < 3)
+  if (cvFlags & CV_CALIB_FIX_INTRINSIC)
   {
-    full2DOptimiser->SetIntrinsic(&intrinsicLeft);
-    full2DOptimiser->SetDistortion(&distortionLeft);
-    full2DOptimiser->SetRightIntrinsic(&intrinsicRight);
-    full2DOptimiser->SetRightDistortion(&distortionRight);
+    optimiser2D->SetIntrinsic(&intrinsicLeft);
+    optimiser2D->SetRightIntrinsic(&intrinsicRight);
 
-    full2DOptimiser->Optimise(rvecsLeft,
-                              tvecsLeft,
-                              leftToRightRotationMatrix,
-                              leftToRightTranslationVector
-                             );
+    optimiser2D->Optimise(rvecsLeft,
+                          tvecsLeft,
+                          leftToRightRotationMatrix,
+                          leftToRightTranslationVector
+                         );
   }
   else
   {
-    full2DOptimiser->Optimise(intrinsicLeft,
-                              distortionLeft,
-                              intrinsicRight,
-                              distortionRight,
-                              rvecsLeft,
-                              tvecsLeft,
-                              leftToRightRotationMatrix,
-                              leftToRightTranslationVector
-                             );
+    optimiser2D->Optimise(intrinsicLeft,
+                          intrinsicRight,
+                          rvecsLeft,
+                          tvecsLeft,
+                          leftToRightRotationMatrix,
+                          leftToRightTranslationVector
+                         );
   }
 #endif
 

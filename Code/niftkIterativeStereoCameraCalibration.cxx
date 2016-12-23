@@ -123,15 +123,12 @@ cv::Matx21d IterativeStereoCameraCalibration(
       if (pointsFromOriginalImagesLeft.size() == 1)
       {
         cv::Point2d sensorDimensions(1,1);
-        double sx = 1.0;
 
         niftk::TsaiMonoCameraCalibration(
           model,
           *(pointsFromOriginalImagesLeft.begin()),
           imageSize,
           sensorDimensions,
-          imageSize.width,
-          sx,
           intrinsicLeft,
           distortionLeft,
           rvecsLeft[0],
@@ -159,15 +156,12 @@ cv::Matx21d IterativeStereoCameraCalibration(
       if (pointsFromOriginalImagesRight.size() == 1)
       {
         cv::Point2d sensorDimensions(1,1);
-        double sx = 1.0;
 
         niftk::TsaiMonoCameraCalibration(
           model,
           *(pointsFromOriginalImagesRight.begin()),
           imageSize,
           sensorDimensions,
-          imageSize.width,
-          sx,
           intrinsicRight,
           distortionRight,
           rvecsRight[0],

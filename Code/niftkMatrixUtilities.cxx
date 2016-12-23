@@ -92,7 +92,7 @@ cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
 //-----------------------------------------------------------------------------
 cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
 {
-  cv::Mat eulerAngles = cvCreateMat(3,1,CV_64FC1);
+  cv::Mat eulerAngles = cvCreateMat(1, 3,CV_64FC1);
 
   // This is not a straight forward conversion,
   // let's go Rodrigues->AxisAngle->Quaternion->Euler Angles

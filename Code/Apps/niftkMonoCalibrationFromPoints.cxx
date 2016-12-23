@@ -77,7 +77,6 @@ int main(int argc, char ** argv)
       // Can try Tsai 1987 calibration.
 
       cv::Point2d sensorDimensions(1,1);
-      double sensorScaleInX = 1;
       cv::Mat rvec;
       cv::Mat tvec;
 
@@ -85,8 +84,6 @@ int main(int argc, char ** argv)
                                              *(points.begin()),
                                              imageSize,
                                              sensorDimensions,
-                                             imageSize.width,
-                                             sensorScaleInX,
                                              intrinsic,
                                              distortion,
                                              rvec,
@@ -96,7 +93,6 @@ int main(int argc, char ** argv)
 
       std::cout << "niftkMonoCalibrationFromPoints:(" << imageSize.width << "," << imageSize.height <<  ") "
                 << points.size() << " "
-                << sensorScaleInX << " "
                 << intrinsic.at<double>(0,0) << " "
                 << intrinsic.at<double>(1,1) << " "
                 << intrinsic.at<double>(0,2) << " "

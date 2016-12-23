@@ -24,6 +24,7 @@ namespace niftk
 //-----------------------------------------------------------------------------
 NonLinearStereoCameraCalibration2DCostFunction::NonLinearStereoCameraCalibration2DCostFunction()
 : m_OptimiseIntrinsics(true)
+, m_Optimise2DOFStereo(false)
 {
 }
 
@@ -48,12 +49,47 @@ NonLinearStereoCameraCalibration2DCostFunction::InternalGetValue(const Parameter
 
   if (m_OptimiseIntrinsics)
   {
-    niftk::ComputeStereoProjectionErrors(m_Model, m_Points, m_RightHandPoints, parameters, result);
+    // (still need to add distortion parameters)
+
+    ParametersType internalParameters;
+    internalParameters.SetSize(parameters.GetSize()
+                               + 5 // left distortion
+                               + 5 // right distortion
+                              );
+
+    unsigned int parameterCounter = 0;
+    internalParameters[parameterCounter++] = parameters[0];
+    internalParameters[parameterCounter++] = parameters[1];
+    internalParameters[parameterCounter++] = parameters[2];
+    internalParameters[parameterCounter++] = parameters[3];
+    internalParameters[parameterCounter++] = m_Distortion->at<double>(0, 0);
+    internalParameters[parameterCounter++] = m_Distortion->at<double>(0, 1);
+    internalParameters[parameterCounter++] = m_Distortion->at<double>(0, 2);
+    internalParameters[parameterCounter++] = m_Distortion->at<double>(0, 3);
+    internalParameters[parameterCounter++] = m_Distortion->at<double>(0, 4);
+    internalParameters[parameterCounter++] = parameters[4];
+    internalParameters[parameterCounter++] = parameters[5];
+    internalParameters[parameterCounter++] = parameters[6];
+    internalParameters[parameterCounter++] = parameters[7];
+    internalParameters[parameterCounter++] = m_RightDistortion->at<double>(0, 0);
+    internalParameters[parameterCounter++] = m_RightDistortion->at<double>(0, 1);
+    internalParameters[parameterCounter++] = m_RightDistortion->at<double>(0, 2);
+    internalParameters[parameterCounter++] = m_RightDistortion->at<double>(0, 3);
+    internalParameters[parameterCounter++] = m_RightDistortion->at<double>(0, 4);
+    for (unsigned int i = 8; i < parameters.GetSize(); i++)
+    {
+      internalParameters[parameterCounter++] = parameters[i];
+    }
+
+    niftk::ComputeStereoProjectionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
   }
   else
   {
     ParametersType internalParameters;
-    internalParameters.SetSize(parameters.GetSize() + 9 + 9);
+    internalParameters.SetSize(parameters.GetSize()
+                               + 9 // left intrinsic and distortion
+                               + 9 // right intrinsic and distortion
+                              );
 
     unsigned int parameterCounter = 0;
     internalParameters[parameterCounter++] = m_Intrinsic->at<double>(0, 0);

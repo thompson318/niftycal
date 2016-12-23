@@ -115,8 +115,6 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
     }
   }
 
-  double sensorScaleInX = 1;
-
   cv::Point2d sensorDimensions;
   sensorDimensions.x = 1;
   sensorDimensions.y = 1;
@@ -127,8 +125,6 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
                                                     leftImagePoints,
                                                     scaledSize,
                                                     sensorDimensions,
-                                                    nx,
-                                                    sensorScaleInX,
                                                     intrinsicLeft,
                                                     distortionLeft,
                                                     rvecLeft,
@@ -139,8 +135,6 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
                                                      rightImagePoints,
                                                      scaledSize,
                                                      sensorDimensions,
-                                                     nx,
-                                                     sensorScaleInX,
                                                      intrinsicRight,
                                                      distortionRight,
                                                      rvecRight,

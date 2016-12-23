@@ -46,6 +46,9 @@ public:
   itkSetMacro(OptimiseIntrinsics, bool);
   itkGetConstMacro(OptimiseIntrinsics, bool);
 
+  itkSetMacro(Optimise2DOFStereo, bool);
+  itkGetConstMacro(Optimise2DOFStereo, bool);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -59,7 +62,7 @@ protected:
 private:
 
   bool m_OptimiseIntrinsics;
-
+  bool m_Optimise2DOFStereo;
 };
 
 } // end namespace

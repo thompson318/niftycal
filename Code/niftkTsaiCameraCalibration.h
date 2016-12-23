@@ -38,10 +38,8 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
                                                     const niftk::PointSet& imagePoints2D,
                                                     const cv::Size2i& imageSize,
                                                     const cv::Point2d& sensorDimensions,
-                                                    const int& numberSensorElementsInX,
-                                                    double& sx,
                                                     cv::Mat& intrinsic3x3,
-                                                    cv::Mat& distortion1x4,
+                                                    cv::Mat& distortion1x5,
                                                     cv::Mat& rvec1x3,
                                                     cv::Mat& tvec1x3,
                                                     const bool& fullOptimisation = true

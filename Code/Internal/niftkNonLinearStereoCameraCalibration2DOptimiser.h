@@ -36,6 +36,8 @@ public:
   typedef  itk::SmartPointer<Self>                     Pointer;
   itkNewMacro(Self);
 
+  void SetOptimise2DOFStereo(const bool& optimise);
+
   void SetModelAndPoints(const Model3D* const model,
                          const std::list<PointSet>* const leftPoints,
                          const std::list<PointSet>* const rightPoints
@@ -48,14 +50,12 @@ public:
   void SetRightDistortion(const cv::Mat* const distortion);
 
   /**
-  * \brief Optimises all parameters, and returns the 2D RMS projection error.
+  * \brief Optimises all but distortion parameters, and returns the 2D RMS projection error.
   *
   * Note: You probably need a very good calibration before calling this.
   */
   double Optimise(cv::Mat& leftIntrinsic,
-                  cv::Mat& leftDistortion,
                   cv::Mat& rightIntrinsic,
-                  cv::Mat& rightDistortion,
                   std::vector<cv::Mat>& rvecsLeft,
                   std::vector<cv::Mat>& tvecsLeft,
                   cv::Mat& leftToRightRotationMatrix,
@@ -63,7 +63,7 @@ public:
                  );
 
   /**
-  * \brief Optimises all parameters, and returns the 2D RMS projection error.
+  * \brief Optimises just extrinsic parameters, and returns the 2D RMS projection error.
   *
   * Note: You probably need a very good calibration before calling this.
   */

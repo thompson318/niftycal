@@ -111,8 +111,6 @@ int main(int argc, char ** argv)
     cv::Mat rvecRight;
     cv::Mat tvecRight;
 
-    double sensorScaleInX = 1;
-
     cv::Point2d sensorDimensions;
     sensorDimensions.x = 1;
     sensorDimensions.y = 1;
@@ -123,8 +121,6 @@ int main(int argc, char ** argv)
                                        *(leftPoints.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicLeft,
                                        distortionLeft,
                                        rvecLeft,
@@ -136,8 +132,6 @@ int main(int argc, char ** argv)
                                        *(rightPoints.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicRight,
                                        distortionRight,
                                        rvecRight,
@@ -308,8 +302,6 @@ int main(int argc, char ** argv)
                                        *(leftGoldStandardPoints.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicLeft,
                                        distortionLeft,
                                        rvecLeft,
@@ -321,8 +313,6 @@ int main(int argc, char ** argv)
                                        *(rightGoldStandardPoints.begin()),
                                        imageSize,
                                        sensorDimensions,
-                                       imageSize.width,
-                                       sensorScaleInX,
                                        intrinsicRight,
                                        distortionRight,
                                        rvecRight,
@@ -397,7 +387,7 @@ int main(int argc, char ** argv)
                                               leftToRightTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
+                                              CV_CALIB_USE_INTRINSIC_GUESS,
                                               false // could be command line arg.
                                              );
     }

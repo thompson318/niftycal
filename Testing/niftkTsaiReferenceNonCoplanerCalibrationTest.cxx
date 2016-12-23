@@ -87,18 +87,15 @@ TEST_CASE( "Tsai mono, reference case", "[mono]" ) {
 
   cv::Size imageSize(nx, ny);
 
-  double sensorScaleInX = 1;
-
   cv::Point2d sensorDimensions;
   sensorDimensions.x = dx;
   sensorDimensions.y = dy;
 
-  double rms = niftk::TsaiMonoCameraCalibration(model, points, imageSize, sensorDimensions, nx, sensorScaleInX, intrinsic, distortion, rvec, tvec, true);
+  double rms = niftk::TsaiMonoCameraCalibration(model, points, imageSize, sensorDimensions, intrinsic, distortion, rvec, tvec, true);
 
   std::cout << "RMS=" << rms << std::endl;
   std::cout << "Fx=" << intrinsic.at<double>(0,0) << std::endl;
   std::cout << "Fy=" << intrinsic.at<double>(1,1) << std::endl;
-  std::cout << "Sx=" << sensorScaleInX << std::endl;
   std::cout << "Cx=" << intrinsic.at<double>(0,2) << std::endl;
   std::cout << "Cy=" << intrinsic.at<double>(1,2) << std::endl;
   std::cout << "d1=" << distortion.at<double>(0,0) << std::endl;

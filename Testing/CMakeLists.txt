@@ -619,13 +619,13 @@ add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibration
 #add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
 #         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_left.bmp
 #         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt
-#         10 7 1920 540 1 2 1444.38 1370.71 860.179 610.077 -0.0140713 8.66708)
+#         10 7 1920 540 1 2 1507.9 1456.72 819.128 583.707 -0.0755172 9.10026)
 #add_test(REG-TsaiNCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
 #         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_right.bmp
 #         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt
-#         10 7 1920 540 1 2 1459.25 1385.4 925.826 616.761 -0.0177509 9.24102)
+#         10 7 1920 540 1 2 1512.35 1459.68 878.344 592.101 -0.0672333 9.57499)
 
 add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
          ${DATA_DIR}/Tsai/NonCoplanar/data.txt
-         576 576 0.02300000 0.02300000 3037.97 3037.45 262.339 212.411 3.07076 0.0894958
+         576 576 0.02300000 0.02300000 3041.15 3040 262.302 212.689 3.07898 0.0898487
         )
