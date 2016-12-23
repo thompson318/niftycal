@@ -21,14 +21,14 @@
 #include <cstdlib>
 
 /**
-* \file niftkMonoCalibrationFromPoints.cxx
-* \brief Calibrate mono camera from pre-extracted points.
+* \file niftkPoseFromPoints.cxx
+* \brief Calculates Camera Pose from pre-extracted points.
 */
 int main(int argc, char ** argv)
 {
   if (argc < 5)
   {
-    std::cerr << "Usage: niftkMonoCalibrationFromPoints modelPoints.txt intrinsic.txt distortion"
+    std::cerr << "Usage: niftkPoseFromPoints modelPoints.txt intrinsic.txt distortion"
               << "imagePoints1.txt imagePoints2.txt ... imagePointsN.txt" << std::endl;
     return EXIT_FAILURE;
   }
@@ -68,12 +68,12 @@ int main(int argc, char ** argv)
     for ( unsigned int i = 0 ; i < rvecs.size() ; ++ i )
     {
       std::cout << rvecs[i].at<double>(0,0) * 180.0 / CV_PI << " , "
-              << rvecs[i].at<double>(0,1) * 180.0 / CV_PI << " , "
-              << rvecs[i].at<double>(0,2) * 180.0 / CV_PI << " , "
-              << tvecs[i].at<double>(0,0) << " , "
-              << tvecs[i].at<double>(0,1) << " , "
-              << tvecs[i].at<double>(0,2)
-              << std::endl;
+                << rvecs[i].at<double>(0,1) * 180.0 / CV_PI << " , "
+                << rvecs[i].at<double>(0,2) * 180.0 / CV_PI << " , "
+                << tvecs[i].at<double>(0,0) << " , "
+                << tvecs[i].at<double>(0,1) << " , "
+                << tvecs[i].at<double>(0,2)
+                << std::endl;
     }
   }
   catch (niftk::NiftyCalException& e)
