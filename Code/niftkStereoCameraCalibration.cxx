@@ -58,11 +58,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (listOfLeftHandPointSets.size() < 1)
+  if (listOfLeftHandPointSets.empty())
   {
     niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for left camera.";
   }
-  if (listOfRightHandPointSets.size() < 1)
+  if (listOfRightHandPointSets.empty())
   {
     niftkNiftyCalThrow() << "Should have at least 1 view of calibration points for right camera.";
   }
@@ -189,9 +189,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cvFlags
                                     );
 
-  Model3D* tmpModel = const_cast<Model3D*>(&model);
-
 #ifdef NIFTYCAL_WITH_ITK
+
+  Model3D* tmpModel = const_cast<Model3D*>(&model);
 
   niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer full2DOptimiser
       = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();

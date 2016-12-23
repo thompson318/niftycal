@@ -44,7 +44,7 @@ double IterativeMonoCameraCalibration(
   {
     niftkNiftyCalThrow() << "Model is empty.";
   }
-  if (detectorAndOriginalImages.size() < 1)
+  if (detectorAndOriginalImages.empty())
   {
     niftkNiftyCalThrow() << "Should have at least 1 view of calibration points.";
   }

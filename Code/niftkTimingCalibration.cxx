@@ -92,20 +92,16 @@ TimeMappedSamples1D ResampleTimeStampsToMilliseconds(const TimeSamples1D& a)
   TimingSample1D previous;
   TimingSample1D newSample;
 
-  NiftyCalTimeType roundedCurrentTime;
-  NiftyCalTimeType roundedPreviousTime;
   NiftyCalTimeType nanosToMillis = 1000000;
   NiftyCalTimeType t;
-  NiftyCalTimeType timeGap;
-  double           sampleGap;
 
   for (size_t i = 1; i < a.size(); i++)
   {
     current  = a[i];
     previous = a[i-1];
 
-    roundedCurrentTime = (current.time / nanosToMillis) * nanosToMillis;
-    roundedPreviousTime = (previous.time / nanosToMillis) * nanosToMillis;
+    NiftyCalTimeType roundedCurrentTime = (current.time / nanosToMillis) * nanosToMillis;
+    NiftyCalTimeType roundedPreviousTime = (previous.time / nanosToMillis) * nanosToMillis;
 
     if (roundedPreviousTime == roundedCurrentTime)
     {
@@ -116,8 +112,8 @@ TimeMappedSamples1D ResampleTimeStampsToMilliseconds(const TimeSamples1D& a)
       niftkNiftyCalThrow() << "Timestamps are incorrectly ordered.";
     }
 
-    timeGap   = roundedCurrentTime - roundedPreviousTime;
-    sampleGap =     current.sample - previous.sample;
+    NiftyCalTimeType timeGap = roundedCurrentTime - roundedPreviousTime;
+    double sampleGap = current.sample - previous.sample;
 
     for (t = roundedPreviousTime; t <= roundedCurrentTime; t += nanosToMillis)
     {

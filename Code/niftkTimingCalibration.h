@@ -80,7 +80,9 @@ NIFTYCAL_WINEXPORT TimeMappedSamples1D ResampleTimeStampsToMilliseconds(const Ti
 *
 * Assumes a and b are ordered, valid timestamps and do not have fractions of milliseconds.
 */
-NIFTYCAL_WINEXPORT double ComputeNCC(const TimeMappedSamples1D& a, const TimeMappedSamples1D& b, const int& offsetInMilliseconds);
+NIFTYCAL_WINEXPORT double ComputeNCC(const TimeMappedSamples1D& a,
+                                     const TimeMappedSamples1D& b,
+                                     const int& offsetInMilliseconds);
 
 } // end namespace
 

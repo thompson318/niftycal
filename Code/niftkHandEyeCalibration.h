@@ -69,7 +69,8 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 #ifdef NIFTYCAL_WITH_ITK
 
 /**
-* \brief Calculates Hand-Eye based on something akin to <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
+* \brief Calculates Hand-Eye based on something akin to
+* <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
 * \param residual returns 2D rms reprojection error.
 *
 * This does an initial hand-eye using Tsai's 1989 linear approximation, followed by
@@ -105,7 +106,8 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
 
 
 /**
-* \brief Calculates Hand-Eye by optimising extrinsic (tracker matrices), model-to-world, hand-eye matrices and stereo left-to-right matrices.
+* \brief Calculates Hand-Eye by optimising extrinsic (tracker matrices), model-to-world,
+* hand-eye matrices and stereo left-to-right matrices.
 * \param residuals returns 2D rms reprojection error if optimise3D is false
 * or 3D rms reconstruction error if optimise3D is true.
 *

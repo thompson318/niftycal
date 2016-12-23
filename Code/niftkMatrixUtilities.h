@@ -61,6 +61,12 @@ NIFTYCAL_WINEXPORT cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle);
 
 
 /**
+* \brief Converts an angle in Rodrigues notation to Euler angles, lets say roll, pitch, yaw
+*/
+NIFTYCAL_WINEXPORT cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3);
+
+
+/**
 * \brief Converts a list of 4x4 matrices to a vector, in order, enabling you to set a limit to how many you convert.
 */
 NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<cv::Matx44d>& matrices,
