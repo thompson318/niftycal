@@ -72,8 +72,8 @@ int main(int argc, char ** argv)
       cv::Mat eulerAngles = niftk::RodriguesToEulerAngles ( rvecs[i] );
 
       std::cout << eulerAngles.at<double>(0,0) * 180.0 / CV_PI << " , "
-                << eulerAngles.at<double>(1,0) * 180.0 / CV_PI << " , "
-                << eulerAngles.at<double>(2,0) * 180.0 / CV_PI << " , "
+                << eulerAngles.at<double>(0,1) * 180.0 / CV_PI << " , "
+                << eulerAngles.at<double>(0,2) * 180.0 / CV_PI << " , "
                 << tvecs[i].at<double>(0,0) << " , "
                 << tvecs[i].at<double>(0,1) << " , "
                 << tvecs[i].at<double>(0,2)
