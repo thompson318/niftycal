@@ -199,7 +199,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   optimiser2D->SetDistortion(&distortionLeft);
   optimiser2D->SetRightDistortion(&distortionRight);
 
-  if (listOfLeftHandPointSets.size() == 10)
+  if (cvFlags & CV_CALIB_FIX_INTRINSIC)
   {
     optimiser2D->SetIntrinsic(&intrinsicLeft);
     optimiser2D->SetRightIntrinsic(&intrinsicRight);
@@ -248,8 +248,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
-    std::cerr << "Matt, optimise3D on" << std::endl;
-
     // Now optimise RMS reconstruction error via intrinsics.
     niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
         niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();
