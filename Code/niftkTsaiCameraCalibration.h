@@ -49,7 +49,7 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 * \brief Performs a stereo camera calibration using Tsai 1987 method.
 * If ITK is not compiled in, you just have the initial linear bit.
 * Will check for planarity and then switch to either the coplanar or the non-coplanar method.
-* This method computes Tsai 1987 for left and right camera, and then optimises
+* This method assumes the left and right camera have already been optimised, and then optimises
 * the extrinsic (2 x 6 DOF) parameters using the combined left and right re-projection error.
 * \see niftk::StereoCameraCalibration
 * \return rms re-projection error.
