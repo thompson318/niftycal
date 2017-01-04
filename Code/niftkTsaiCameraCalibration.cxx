@@ -67,7 +67,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
   intrinsic.at<double>(1, 1) = f;
   distortion.at<double>(0, 0) = k1;
 
-  std::cout << "TsaiMonoNonLinearOptimisation, 3DOF=" << rms << std::endl;
+  //std::cout << "TsaiMonoNonLinearOptimisation, 3DOF=" << rms << std::endl;
 
   if (extendedOptimisation || fullOptimisation)
   {
@@ -85,7 +85,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
     intrinsic.at<double>(0, 2) = imageCentre.x;
     intrinsic.at<double>(1, 2) = imageCentre.y;
 
-    std::cout << "TsaiMonoNonLinearOptimisation, 2DOF=" << rms << std::endl;
+    //std::cout << "TsaiMonoNonLinearOptimisation, 2DOF=" << rms << std::endl;
 
     for (int i = 0; i < 1; i++)
     {
@@ -107,7 +107,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
-      std::cout << "TsaiMonoNonLinearOptimisation, 5DOF=" << rms << std::endl;
+      //std::cout << "TsaiMonoNonLinearOptimisation, 5DOF=" << rms << std::endl;
 
       // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f and k1.
       niftk::NonLinearTsai8ParamOptimiser::Pointer tsai8Param = niftk::NonLinearTsai8ParamOptimiser::New();
@@ -126,7 +126,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
-      std::cout << "TsaiMonoNonLinearOptimisation, 8DOF=" << rms << std::endl;
+      //std::cout << "TsaiMonoNonLinearOptimisation, 8DOF=" << rms << std::endl;
 
       // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx and Cy.
       niftk::NonLinearTsai10ParamOptimiser::Pointer tsai10Param = niftk::NonLinearTsai10ParamOptimiser::New();
@@ -149,7 +149,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
-      std::cout << "TsaiMonoNonLinearOptimisation, 10DOF=" << rms << std::endl;
+      //std::cout << "TsaiMonoNonLinearOptimisation, 10DOF=" << rms << std::endl;
 
       if (fullOptimisation)
       {
@@ -175,7 +175,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 
         extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
-        std::cout << "TsaiMonoNonLinearOptimisation, 11DOF=" << rms << std::endl;
+        //std::cout << "TsaiMonoNonLinearOptimisation, 11DOF=" << rms << std::endl;
       }
     }
   }
