@@ -12,28 +12,29 @@
 
 =============================================================================*/
 
-#include "niftkCirclesIterativePointDetector.h"
+#include "niftkTemplateCirclesPointDetector.h"
 #include <cv.h>
 
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-CirclesIterativePointDetector::CirclesIterativePointDetector(cv::Size2i patternSize,
-                                                             cv::Size2i offsetForTemplate
-                                                            )
-: TemplateMatchingPointDetector(patternSize, offsetForTemplate)
+TemplateCirclesPointDetector::TemplateCirclesPointDetector(cv::Size2i patternSize,
+                                                           cv::Size2i offsetForTemplate,
+                                                           int flags
+                                                          )
+: TemplateMatchingPointDetector(patternSize, offsetForTemplate, flags)
 {
 }
 
 
 //-----------------------------------------------------------------------------
-CirclesIterativePointDetector::~CirclesIterativePointDetector()
+TemplateCirclesPointDetector::~TemplateCirclesPointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-PointSet CirclesIterativePointDetector::GetPointsUsingContours(const cv::Mat& image)
+PointSet TemplateCirclesPointDetector::GetPointsUsingContours(const cv::Mat& image)
 {
   PointSet result;
   unsigned int numberOfDots = m_PatternSize.width * m_PatternSize.height;
@@ -45,8 +46,7 @@ PointSet CirclesIterativePointDetector::GetPointsUsingContours(const cv::Mat& im
   std::vector<cv::Point2f> centres;
   bool found = cv::findCirclesGrid(
     image, m_PatternSize, centres,
-    cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
-    , blobDetector
+    this->GetFlags(), blobDetector
     );
 
   if (!found)

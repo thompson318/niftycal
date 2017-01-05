@@ -35,8 +35,9 @@ class NIFTYCAL_WINEXPORT TemplateMatchingPointDetector : public PointDetector
 
 public:
 
-  TemplateMatchingPointDetector(cv::Size2i patternSize,      // how many rings/dots in x,y.
-                                cv::Size2i offsetForTemplate // how many pixels to search in x,y.
+  TemplateMatchingPointDetector(cv::Size2i patternSize,       // how many rings/dots in x,y.
+                                cv::Size2i offsetForTemplate, // how many pixels to search in x,y.
+                                int flags // e.g. = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
                                );
   virtual ~TemplateMatchingPointDetector();
 
@@ -66,7 +67,10 @@ protected:
   */
   virtual PointSet GetPointsUsingContours(const cv::Mat& image) = 0;
 
+  int GetFlags();
+
   cv::Size2i        m_PatternSize;
+  int               m_Flags;
   cv::Size2i        m_OffsetForTemplate;
   unsigned long int m_MaxAreaInPixels;
   bool              m_UseContours;

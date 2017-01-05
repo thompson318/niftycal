@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkRingsPointDetector.h"
+#include "niftkTemplateRingsPointDetector.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkHomographyUtilities.h>
 #include <niftkMatrixUtilities.h>
@@ -23,10 +23,11 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
-RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
-                                       cv::Size2i offsetForTemplate
-                                      )
-: TemplateMatchingPointDetector(patternSize, offsetForTemplate)
+TemplateRingsPointDetector::TemplateRingsPointDetector(cv::Size2i patternSize,
+                                                       cv::Size2i offsetForTemplate,
+                                                       int flags
+                                                      )
+: TemplateMatchingPointDetector(patternSize, offsetForTemplate, flags)
 , m_UseOuterContour(true)
 , m_ThresholdValue(50)
 , m_AdaptiveThreshold(20)
@@ -35,24 +36,25 @@ RingsPointDetector::RingsPointDetector(cv::Size2i patternSize,
 
 
 //-----------------------------------------------------------------------------
-RingsPointDetector::~RingsPointDetector()
+TemplateRingsPointDetector::~TemplateRingsPointDetector()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void RingsPointDetector::SetUseOuterContour(const bool& useIt)
+void TemplateRingsPointDetector::SetUseOuterContour(const bool& useIt)
 {
   m_UseOuterContour = useIt;
 }
 
 
 //-----------------------------------------------------------------------------
-void RingsPointDetector::ExtractIndexes(const cv::Mat& image,
-                                        std::vector<cv::Vec4i>& hierarchy,
-                                        std::vector<std::vector<cv::Point> >& contours,
-                                        std::vector<unsigned int>& innerRingIndexes,
-                                        std::vector<unsigned int>& outerRingIndexes)
+void TemplateRingsPointDetector::ExtractIndexes(const cv::Mat& image,
+                                                std::vector<cv::Vec4i>& hierarchy,
+                                                std::vector<std::vector<cv::Point> >& contours,
+                                                std::vector<unsigned int>& innerRingIndexes,
+                                                std::vector<unsigned int>& outerRingIndexes
+                                               )
 {
   innerRingIndexes.clear();
   outerRingIndexes.clear();
@@ -87,10 +89,10 @@ void RingsPointDetector::ExtractIndexes(const cv::Mat& image,
 
 
 //-----------------------------------------------------------------------------
-void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
-                                            cv::Mat& bigBlobs,
-                                            cv::Mat& littleBlobs
-                                           )
+void TemplateRingsPointDetector::ExtractBlobs(const cv::Mat& image,
+                                              cv::Mat& bigBlobs,
+                                              cv::Mat& littleBlobs
+                                             )
 {
 
   cv::Mat thresholdedImage;
@@ -140,7 +142,7 @@ void RingsPointDetector::ExtractBlobs(const cv::Mat& image,
 
 
 //-----------------------------------------------------------------------------
-PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
+PointSet TemplateRingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
 {
   PointSet result;
   unsigned int numberOfRings= m_PatternSize.width * m_PatternSize.height;
@@ -156,15 +158,13 @@ PointSet RingsPointDetector::GetPointsUsingContours(const cv::Mat& image)
   std::vector<cv::Point2f> bigCentres;
   bool foundBig = cv::findCirclesGrid(
     bigBlobs, m_PatternSize, bigCentres,
-    cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
-    , blobDetector
+    this->GetFlags(), blobDetector
     );
 
   std::vector<cv::Point2f> littleCentres;
   bool foundLittle = cv::findCirclesGrid(
     littleBlobs, m_PatternSize, littleCentres,
-    cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
-    , blobDetector
+    this->GetFlags(), blobDetector
     );
 
   if (!foundBig && !foundLittle)

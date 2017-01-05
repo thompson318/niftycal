@@ -90,12 +90,12 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
 
     if (i-13 < (niftk::argc-13)/2)
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::CirclesPointDetector(patternSize));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       originalImagesLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
       dynamic_cast<niftk::CirclesPointDetector*>(originalImagesLeft.back().first.get())->SetImage(&(originalImagesLeft.back().second));
 
       cv::Mat greyImageClone = greyImage.clone();
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::CirclesPointDetector(patternSize));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       imagesForWarpingLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
       dynamic_cast<niftk::CirclesPointDetector*>(imagesForWarpingLeft.back().first.get())->SetImage(&(imagesForWarpingLeft.back().second));
 
@@ -103,12 +103,12 @@ TEST_CASE( "Iterative Stereo Circles", "[StereoCalibration]" ) {
     }
     else
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::CirclesPointDetector(patternSize));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       originalImagesRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
       dynamic_cast<niftk::CirclesPointDetector*>(originalImagesRight.back().first.get())->SetImage(&(originalImagesRight.back().second));
 
       cv::Mat greyImageClone = greyImage.clone();
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::CirclesPointDetector(patternSize));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       imagesForWarpingRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
       dynamic_cast<niftk::CirclesPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
 

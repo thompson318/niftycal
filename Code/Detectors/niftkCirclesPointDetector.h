@@ -35,7 +35,8 @@ class NIFTYCAL_WINEXPORT CirclesPointDetector : public PointDetector
 public:
 
   CirclesPointDetector(cv::Size2i patternSize,
-                       int flags = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+                       int flags // e.g.  = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
+                      );
 
   virtual ~CirclesPointDetector();
 

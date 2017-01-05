@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#ifndef niftkRingsPointDetector_h
-#define niftkRingsPointDetector_h
+#ifndef niftkTemplateRingsPointDetector_h
+#define niftkTemplateRingsPointDetector_h
 
 #include <niftkWin32ExportHeader.h>
 #include <niftkTemplateMatchingPointDetector.h>
@@ -22,8 +22,8 @@ namespace niftk
 {
 
 /**
-* \class RingsPointDetector
-* \brief Detects rings pattern, as seen in
+* \class TemplateRingsPointDetector
+* \brief Detects rings pattern using Template Matching, as seen in
 * <a href="http://dx.doi.org/10.1109/ICCVW.2009.5457474">Datta 2009</a>.
 *
 * Our method for finding blobs is:
@@ -47,15 +47,16 @@ namespace niftk
 *
 * \ingroup detectors
 */
-class NIFTYCAL_WINEXPORT RingsPointDetector : public TemplateMatchingPointDetector
+class NIFTYCAL_WINEXPORT TemplateRingsPointDetector : public TemplateMatchingPointDetector
 {
 
 public:
 
-  RingsPointDetector(cv::Size2i patternSize,      // how many rings in x,y.
-                     cv::Size2i offsetForTemplate // how many pixels to search in x,y.
-                    );
-  virtual ~RingsPointDetector();
+  TemplateRingsPointDetector(cv::Size2i patternSize,       // how many rings in x,y.
+                             cv::Size2i offsetForTemplate, // how many pixels to search in x,y.
+                             int flags // e.g. = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING
+                            );
+  virtual ~TemplateRingsPointDetector();
   void SetUseOuterContour(const bool& useIt);     // Default to true.
   void SetThreshold(const unsigned char& thresholdValue); // Default to 50.
   void SetAdaptiveThreshold(const unsigned char& thresholdValue); // Default to 20;

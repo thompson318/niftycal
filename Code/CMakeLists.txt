@@ -21,8 +21,8 @@ set(NIFTYCAL_SRCS
   Detectors/niftkChessboardPointDetector.cxx
   Detectors/niftkCirclesPointDetector.cxx
   Detectors/niftkTemplateMatchingPointDetector.cxx
-  Detectors/niftkRingsPointDetector.cxx
-  Detectors/niftkCirclesIterativePointDetector.cxx
+  Detectors/niftkTemplateRingsPointDetector.cxx
+  Detectors/niftkTemplateCirclesPointDetector.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
