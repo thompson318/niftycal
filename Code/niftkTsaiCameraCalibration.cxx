@@ -47,8 +47,6 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 {
 #ifdef NIFTYCAL_WITH_ITK
 
-  double rms = 0;
-
   cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
   std::list<niftk::PointSet> listOfPoints;
@@ -61,13 +59,11 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
   tsai3Param->SetSx(sx);
   tsai3Param->SetIntrinsic(&intrinsic);
   tsai3Param->SetExtrinsic(&extrinsic);
-  rms = tsai3Param->Optimise(Tz, f, k1);
+  tsai3Param->Optimise(Tz, f, k1);
   tvec.at<double>(0, 2) = Tz;
   intrinsic.at<double>(0, 0) = f * sx;
   intrinsic.at<double>(1, 1) = f;
   distortion.at<double>(0, 0) = k1;
-
-  //std::cout << "TsaiMonoNonLinearOptimisation, 3DOF=" << rms << std::endl;
 
   if (extendedOptimisation || fullOptimisation)
   {
@@ -81,11 +77,9 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
     tsai2Param->SetK1(k1);
     tsai2Param->SetIntrinsic(&intrinsic);
     tsai2Param->SetExtrinsic(&extrinsic);
-    rms = tsai2Param->Optimise(imageCentre.x, imageCentre.y);
+    tsai2Param->Optimise(imageCentre.x, imageCentre.y);
     intrinsic.at<double>(0, 2) = imageCentre.x;
     intrinsic.at<double>(1, 2) = imageCentre.y;
-
-    //std::cout << "TsaiMonoNonLinearOptimisation, 2DOF=" << rms << std::endl;
 
     for (int i = 0; i < 1; i++)
     {
@@ -97,7 +91,7 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
       tsai5Param->SetK1(k1);
       tsai5Param->SetIntrinsic(&intrinsic);
       tsai5Param->SetExtrinsic(&extrinsic);
-      rms = tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
+      tsai5Param->Optimise(Tz, f, k1, imageCentre.x, imageCentre.y);
       tvec.at<double>(0, 2) = Tz;
       intrinsic.at<double>(0, 0) = f * sx;
       intrinsic.at<double>(1, 1) = f;
@@ -107,8 +101,6 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
-      //std::cout << "TsaiMonoNonLinearOptimisation, 5DOF=" << rms << std::endl;
-
       // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f and k1.
       niftk::NonLinearTsai8ParamOptimiser::Pointer tsai8Param = niftk::NonLinearTsai8ParamOptimiser::New();
       tsai8Param->SetModel(&model3D);
@@ -117,16 +109,14 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
       tsai8Param->SetK1(k1);
       tsai8Param->SetIntrinsic(&intrinsic);
       tsai8Param->SetExtrinsic(&extrinsic);
-      rms = tsai8Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
-                                 tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
-                                 f, k1);
+      tsai8Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                           tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                           f, k1);
       intrinsic.at<double>(0, 0) = f * sx;
       intrinsic.at<double>(1, 1) = f;
       distortion.at<double>(0, 0) = k1;
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
-
-      //std::cout << "TsaiMonoNonLinearOptimisation, 8DOF=" << rms << std::endl;
 
       // (e): Non-linear optimisation of Rx, Ry, Rz, Tx, Ty, Tz, f, k1, Cx and Cy.
       niftk::NonLinearTsai10ParamOptimiser::Pointer tsai10Param = niftk::NonLinearTsai10ParamOptimiser::New();
@@ -136,11 +126,12 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
       tsai10Param->SetK1(k1);
       tsai10Param->SetIntrinsic(&intrinsic);
       tsai10Param->SetExtrinsic(&extrinsic);
-      rms = tsai10Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
-                                  tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
-                                  f,
-                                  imageCentre.x, imageCentre.y,
-                                  k1);
+      tsai10Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                            tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                            f,
+                            imageCentre.x, imageCentre.y,
+                            k1
+                           );
       intrinsic.at<double>(0, 0) = f * sx;
       intrinsic.at<double>(1, 1) = f;
       intrinsic.at<double>(0, 2) = imageCentre.x;
@@ -148,8 +139,6 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
       distortion.at<double>(0, 0) = k1;
 
       extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
-
-      //std::cout << "TsaiMonoNonLinearOptimisation, 10DOF=" << rms << std::endl;
 
       if (fullOptimisation)
       {
@@ -162,11 +151,12 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
         tsai11Param->SetK1(k1);
         tsai11Param->SetIntrinsic(&intrinsic);
         tsai11Param->SetExtrinsic(&extrinsic);
-        rms = tsai11Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
-                                    tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
-                                    f,
-                                    imageCentre.x, imageCentre.y,
-                                    k1, sx);
+        tsai11Param->Optimise(rvec.at<double>(0, 0), rvec.at<double>(0, 1), rvec.at<double>(0, 2),
+                              tvec.at<double>(0, 0), tvec.at<double>(0, 1), tvec.at<double>(0, 2),
+                              f,
+                              imageCentre.x, imageCentre.y,
+                              k1, sx
+                             );
         intrinsic.at<double>(0, 0) = f * sx;
         intrinsic.at<double>(1, 1) = f;
         intrinsic.at<double>(0, 2) = imageCentre.x;
@@ -174,8 +164,6 @@ void TsaiMonoNonLinearOptimisation(const niftk::Model3D& model3D,
         distortion.at<double>(0, 0) = k1;
 
         extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
-
-        //std::cout << "TsaiMonoNonLinearOptimisation, 11DOF=" << rms << std::endl;
       }
     }
   }
