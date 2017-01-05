@@ -387,7 +387,7 @@ int main(int argc, char ** argv)
                                               leftToRightTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS,
+                                              CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                               false // could be command line arg.
                                              );
     }

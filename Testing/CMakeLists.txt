@@ -242,8 +242,8 @@ add_test(REG-CalibIterStereoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoC
   14 10                                                 # internal corners
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.txt # 2D points for reference image
   1                                                     # zero distortion (1==true)
-  -3.117e-05 -0.0868195 -7.8506e-05 # rvec
-  5.98009 0.00138975 0.527912 # tvec
+  4.85642e-05 -0.0858263 -8.79148e-05 # rvec
+  5.9781 0.00022072 0.514868 # tvec
   ${DATA_DIR}/Simulation2/Left1.png
   ${DATA_DIR}/Simulation2/Left2.png
   ${DATA_DIR}/Simulation2/Left3.png
@@ -290,8 +290,8 @@ add_test(REG-CalibIterLapStereo ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeStereoCh
   14 10                                                 # internal corners
   ${DATA_DIR}/Simulation2/reference_750_550_14_10.txt   # 2D points for reference image
   0                                                     # zero distortion (1==true)
-  -0.0198931 0.0402461 0.000409826 # rvec               # c.f. none iterative: 0.99919 -0.000809931 0.0402285
-  -4.64005 0.26403 0.297868 # tvec                      # c.f. none iterative: -4.64005 0.26403 0.297868
+  -0.0214663 0.0282256 -0.000394161 # rvec              # c.f. none iterative: 0.99919 -0.000809931 0.0402285
+  -4.62868 0.265681 1.2335 # tvec                       # c.f. none iterative: -4.64005 0.26403 0.297868
   ${DATA_DIR}/Laparoscope/Left/left-1095.png
   ${DATA_DIR}/Laparoscope/Left/left-1338.png
   ${DATA_DIR}/Laparoscope/Left/left-1884.png
@@ -389,8 +389,8 @@ add_test(REG-CalibIterStereoAprilSim ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeSte
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   1                                                         # zero distortion (1==true)
   1 1                                                       # Simulation has proper scale factors
-  -6.09634e-05 -0.0859876 3.18065e-05 # rvec
-  5.97673 4.50868e-05 0.533138 # tvec
+  -9.47177e-05 -0.0851061 4.46241e-05 # rvec
+  5.98075 0.0046706 0.497847 # tvec
   ${DATA_DIR}/SimulationAprilTags/Left1.png
   ${DATA_DIR}/SimulationAprilTags/Left2.png
   ${DATA_DIR}/SimulationAprilTags/Left3.png
@@ -418,8 +418,8 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Simulation has proper scale factors
-  -0.0023911 -0.0385178 -0.00236075 # rvec
-  -2.75812 0.0665165 -0.0918503 # tvec
+  0.00870366 -0.0224016 -0.00259507 # rvec
+  -2.77744 0.0814374 -0.523483 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp

@@ -185,7 +185,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
     }
   }
 
-  int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS;
+  int iterativeCvFlags = cvFlags | cv::CALIB_USE_INTRINSIC_GUESS | cv::CALIB_FIX_INTRINSIC;
 
   if (pointsFromOriginalImagesLeft.size() == 1)
   {
