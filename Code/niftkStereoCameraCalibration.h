@@ -34,6 +34,7 @@ namespace niftk
 * \param optimise3D if true and ITK is compiled in, will additionally optimise all
 * camera parameters by minimising the RMS reconstruction error, reconstructing the target points in 3D.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
+* \param optimise3D if true will use Levenberg-Marquart to optimise the 3D reconstruction error (not recommended).
 * \return rms re-projection and 3D reconstruction error
 * \throw Requires that listOfLeftHandPointSets.size() == listOfRightHandPointSets.size(),
 * and that each corresponding pair of point set has at least 4 corresponding points, meaning
@@ -42,7 +43,7 @@ namespace niftk
 * This method, ONLY does the stereo calibration. Also, OpenCV notes that this
 * can be unstable, so you are advised to calibrate both left and right cameras
 * separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
-* or even CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC. etc.
+* or CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC (better).
 */
 NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        const std::list<PointSet>& listOfLeftHandPointSets,

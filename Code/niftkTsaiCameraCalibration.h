@@ -51,8 +51,10 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 * Will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * This method assumes the left and right camera have already been optimised, and then optimises
 * the extrinsic (2 x 6 DOF) parameters using the combined left and right re-projection error.
+* \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
+* \param optimise3D if true will use Levenberg-Marquart to optimise the 3D reconstruction error (not recommended).
 * \see niftk::StereoCameraCalibration
-* \return rms re-projection error.
+* \return rms re-projection and 3D reconstruction error
 */
 NIFTYCAL_WINEXPORT cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                            const niftk::PointSet& points2DLeft,

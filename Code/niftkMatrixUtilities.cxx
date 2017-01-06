@@ -341,4 +341,26 @@ void InterpolateMaximumOfQuadraticSurface(
   outputPoint.y = dyy;
 }
 
+
+//-----------------------------------------------------------------------------
+int GetMajorAxisIndex(const cv::Vec3d& v)
+{
+  double maxAbsVal = std::numeric_limits<double>::min();
+  int maxIndex = -1;
+  for (int i = 0; i < 3; i++)
+  {
+    double absVal = std::fabs(v[i]);
+    if (absVal > maxAbsVal)
+    {
+      maxAbsVal = absVal;
+      maxIndex = i;
+    }
+  }
+  if (maxIndex == -1)
+  {
+    niftkNiftyCalThrow() << "Failed to find major axis.";
+  }
+  return maxIndex;
+}
+
 } // end namespace

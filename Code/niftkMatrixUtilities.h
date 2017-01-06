@@ -77,7 +77,7 @@ NIFTYCAL_WINEXPORT std::vector<cv::Matx44d> MatrixListToVector(const std::list<c
 * \brief Averages a list of rigid body matrices.
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
-* in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
+* in NifTK, but converted to use cv::Matx44d for NiftyCal.
 */
 NIFTYCAL_WINEXPORT cv::Matx44d AverageMatricesUsingEigenValues(const std::list<cv::Matx44d >&);
 
@@ -104,6 +104,12 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateAverageModelToWorld(
 NIFTYCAL_WINEXPORT void InterpolateMaximumOfQuadraticSurface(const cv::Matx33d& matrix,
                                                              cv::Point2d& outputPoint
                                                             );
+
+
+/**
+* \brief Simply returns [0|1|2] to indicate which axes has the biggest absolute value.
+*/
+NIFTYCAL_WINEXPORT int GetMajorAxisIndex(const cv::Vec3d& v);
 
 } // end namespace
 

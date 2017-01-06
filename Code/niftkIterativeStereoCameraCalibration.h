@@ -55,7 +55,7 @@ NIFTYCAL_WINEXPORT cv::Matx21d IterativeStereoCameraCalibration(
     cv::Mat& essentialMatrix,
     cv::Mat& fundamentalMatrix,
     const int& cvFlags = 0,
-    const bool& optimise3D = false // only if true AND ITK is compiled in.
+    const bool& optimise3D = false
     );
 
 } // end namespace
