@@ -198,28 +198,30 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
   optimiser2D->SetDistortion(&distortionLeft);
   optimiser2D->SetRightDistortion(&distortionRight);
+  optimiser2D->SetIntrinsic(&intrinsicLeft);
+  optimiser2D->SetRightIntrinsic(&intrinsicRight);
 
-  if (false)//cvFlags & CV_CALIB_FIX_INTRINSIC)
+  if (cvFlags & CV_CALIB_FIX_INTRINSIC)
   {
-    optimiser2D->SetIntrinsic(&intrinsicLeft);
-    optimiser2D->SetRightIntrinsic(&intrinsicRight);
-
-    optimiser2D->Optimise(rvecsLeft,
-                          tvecsLeft,
-                          leftToRightRotationMatrix,
-                          leftToRightTranslationVector
-                         );
+    optimiser2D->SetOptimiseIntrinsics(false);
   }
   else
   {
-    optimiser2D->Optimise(intrinsicLeft,
-                          intrinsicRight,
-                          rvecsLeft,
-                          tvecsLeft,
-                          leftToRightRotationMatrix,
-                          leftToRightTranslationVector
-                         );
+    optimiser2D->SetOptimiseIntrinsics(true);
   }
+
+  optimiser2D->SetOptimiseIntrinsics(true);
+  optimiser2D->SetOptimise2DOFStereo(true);
+  optimiser2D->SetForceUnitVectorAxes(true);
+
+  optimiser2D->Optimise(intrinsicLeft,
+                        intrinsicRight,
+                        rvecsLeft,
+                        tvecsLeft,
+                        leftToRightRotationMatrix,
+                        leftToRightTranslationVector
+                       );
+
 #endif
 
   niftk::ComputeStereoExtrinsics(rvecsLeft,

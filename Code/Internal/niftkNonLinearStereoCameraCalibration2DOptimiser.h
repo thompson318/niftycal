@@ -36,6 +36,9 @@ public:
   typedef  itk::SmartPointer<Self>                     Pointer;
   itkNewMacro(Self);
 
+  void SetOptimiseIntrinsics(const bool& optimise);
+  itkGetConstMacro(OptimiseIntrinsics, bool);
+
   itkSetMacro(ForceUnitVectorAxes, bool);
   itkGetConstMacro(ForceUnitVectorAxes, bool);
 
@@ -52,19 +55,6 @@ public:
 
   void SetRightIntrinsic(const cv::Mat* const intrinsic);
   void SetRightDistortion(const cv::Mat* const distortion);
-
-  /**
-  * \brief Optimises all but distortion parameters, and returns the 2D RMS projection error.
-  *
-  * Note: You probably need a very good calibration before calling this.
-  */
-  double Optimise(cv::Mat& leftIntrinsic,
-                  cv::Mat& rightIntrinsic,
-                  std::vector<cv::Mat>& rvecsLeft,
-                  std::vector<cv::Mat>& tvecsLeft,
-                  cv::Mat& leftToRightRotationMatrix,
-                  cv::Mat& leftToRightTranslationVector
-                 );
 
   /**
   * \brief Optimises just extrinsic parameters, and returns the 2D RMS projection error.
@@ -86,7 +76,9 @@ public:
   *
   * Note: You probably need a very good calibration before calling this.
   */
-  double Optimise(std::vector<cv::Mat>& rvecsLeft,
+  double Optimise(cv::Mat& leftIntrinsic,
+                  cv::Mat& rightIntrinsic,
+                  std::vector<cv::Mat>& rvecsLeft,
                   std::vector<cv::Mat>& tvecsLeft,
                   cv::Mat& leftToRightRotationMatrix,
                   cv::Mat& leftToRightTranslationVector
@@ -102,6 +94,7 @@ protected:
 
 private:
   niftk::NonLinearStereoCameraCalibration2DCostFunction::Pointer m_CostFunction;
+  bool                                                           m_OptimiseIntrinsics;
   bool                                                           m_Optimise2DOFStereo;
   bool                                                           m_ForceUnitVectorAxes;
 };
