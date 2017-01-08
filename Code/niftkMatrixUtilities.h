@@ -111,6 +111,24 @@ NIFTYCAL_WINEXPORT void InterpolateMaximumOfQuadraticSurface(const cv::Matx33d& 
 */
 NIFTYCAL_WINEXPORT int GetMajorAxisIndex(const cv::Vec3d& v);
 
+
+/**
+* \brief Calculates the left-to-right matrix.
+*/
+NIFTYCAL_WINEXPORT cv::Matx44d GetLeftToRightMatrix(const cv::Matx44d& leftExtrinsics,
+                                                    const cv::Matx44d& rightExtrinsics);
+
+
+/**
+* \brief Calculates the left-to-right matrix.
+*/
+NIFTYCAL_WINEXPORT void GetLeftToRightMatrix(const cv::Mat& leftRVec1x3,
+                                             const cv::Mat& leftTVec1x3,
+                                             const cv::Mat& rightRVec1x3,
+                                             const cv::Mat& rightTVec1x3,
+                                             cv::Mat& leftToRightMatrix3x3,
+                                             cv::Mat& leftToRightTVec3x1
+                                             );
 } // end namespace
 
 #endif
