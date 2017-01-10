@@ -210,9 +210,10 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     optimiser2D->SetOptimiseIntrinsics(true);
   }
 
-  optimiser2D->SetOptimiseIntrinsics(true);
-  optimiser2D->SetOptimise2DOFStereo(true);
-  optimiser2D->SetForceUnitVectorAxes(true);
+  // Can't really find much evidence that these are better.
+  // optimiser2D->SetOptimiseIntrinsics(true);
+  // optimiser2D->SetOptimise2DOFStereo(true);
+  // optimiser2D->SetForceUnitVectorAxes(false);
 
   optimiser2D->Optimise(intrinsicLeft,
                         intrinsicRight,
