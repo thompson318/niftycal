@@ -65,6 +65,28 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        const bool& optimise3D = false
                                                       );
 
+/**
+* \brief As above, but does mono and stereo, Tsai 1987 or Zhang 2000.
+*/
+NIFTYCAL_WINEXPORT cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
+                                                           const std::list<PointSet>& listOfLeftHandPointSets,
+                                                           const std::list<PointSet>& listOfRightHandPointSets,
+                                                           const cv::Size2i& imageSize,
+                                                           cv::Mat& intrinsicLeft,
+                                                           cv::Mat& distortionLeft,
+                                                           std::vector<cv::Mat>& rvecsLeft,
+                                                           std::vector<cv::Mat>& tvecsLeft,
+                                                           cv::Mat& intrinsicRight,
+                                                           cv::Mat& distortionRight,
+                                                           std::vector<cv::Mat>& rvecsRight,
+                                                           std::vector<cv::Mat>& tvecsRight,
+                                                           cv::Mat& leftToRightRotationMatrix,
+                                                           cv::Mat& leftToRightTranslationVector,
+                                                           cv::Mat& essentialMatrix,
+                                                           cv::Mat& fundamentalMatrix,
+                                                           const bool& optimise3D = false
+                                                          );
+
 } // end namespace
 
 #endif

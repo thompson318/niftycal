@@ -13,8 +13,6 @@
 =============================================================================*/
 
 #include <niftkIOUtilities.h>
-#include <niftkZhangCameraCalibration.h>
-#include <niftkTsaiCameraCalibration.h>
 #include <niftkStereoCameraCalibration.h>
 #include <niftkPointUtilities.h>
 #include <niftkMatrixUtilities.h>
@@ -131,105 +129,27 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightRotationMatrix;
     cv::Mat leftToRightRotationVector;
     cv::Mat leftToRightTranslation;
+
     cv::Matx21d result;
 
-    cv::Mat rvecLeft;
-    cv::Mat tvecLeft;
-    cv::Mat rvecRight;
-    cv::Mat tvecRight;
-
-    cv::Point2d sensorDimensions;
-    sensorDimensions.x = 1;
-    sensorDimensions.y = 1;
-
-    if (leftPoints.size() < 3 && rightPoints.size() < 3)
-    {
-      niftk::TsaiMonoCameraCalibration(firstModel,
-                                       *(leftPoints.begin()),
-                                       imageSize,
-                                       sensorDimensions,
-                                       intrinsicLeft,
-                                       distortionLeft,
-                                       rvecLeft,
-                                       tvecLeft,
-                                       true // full optimisation.
-                                      );
-
-      niftk::TsaiMonoCameraCalibration(firstModel,
-                                       *(rightPoints.begin()),
-                                       imageSize,
-                                       sensorDimensions,
-                                       intrinsicRight,
-                                       distortionRight,
-                                       rvecRight,
-                                       tvecRight,
-                                       true // full optimisation.
-                                      );
-
-      result = niftk::TsaiStereoCameraCalibration(firstModel,
-                                                  *(leftPoints.begin()),
-                                                  *(rightPoints.begin()),
-                                                  imageSize,
-                                                  intrinsicLeft,
-                                                  distortionLeft,
-                                                  rvecLeft,
-                                                  tvecLeft,
-                                                  intrinsicRight,
-                                                  distortionRight,
-                                                  rvecRight,
-                                                  tvecRight,
-                                                  leftToRightRotationMatrix,
-                                                  leftToRightTranslation,
-                                                  essentialMatrix,
-                                                  fundamentalMatrix,
-                                                  CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                  false // optimise 3D, not needed here.
-                                                 );      
-      rvecsLeft.push_back(rvecLeft);
-      tvecsLeft.push_back(tvecLeft);
-      rvecsRight.push_back(rvecRight);
-      tvecsRight.push_back(tvecRight);
-    }
-    else
-    {
-      niftk::ZhangMonoCameraCalibration(firstModel,
-                                        leftPoints,
-                                        imageSize,
-                                        intrinsicLeft,
-                                        distortionLeft,
-                                        rvecsLeft,
-                                        tvecsLeft
-                                       );
-
-      niftk::ZhangMonoCameraCalibration(firstModel,
-                                        rightPoints,
-                                        imageSize,
-                                        intrinsicRight,
-                                        distortionRight,
-                                        rvecsRight,
-                                        tvecsRight
-                                       );
-
-      result = niftk::StereoCameraCalibration(firstModel,
-                                              leftPoints,
-                                              rightPoints,
-                                              imageSize,
-                                              intrinsicLeft,
-                                              distortionLeft,
-                                              rvecsLeft,
-                                              tvecsLeft,
-                                              intrinsicRight,
-                                              distortionRight,
-                                              rvecsRight,
-                                              tvecsRight,
-                                              leftToRightRotationMatrix,
-                                              leftToRightTranslation,
-                                              essentialMatrix,
-                                              fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                              false // optimise 3D, not needed here.
-                                             );
-    }
+    result = niftk::FullStereoCameraCalibration(firstModel,
+                                                leftPoints,
+                                                rightPoints,
+                                                imageSize,
+                                                intrinsicLeft,
+                                                distortionLeft,
+                                                rvecsLeft,
+                                                tvecsLeft,
+                                                intrinsicRight,
+                                                distortionRight,
+                                                rvecsRight,
+                                                tvecsRight,
+                                                leftToRightRotationMatrix,
+                                                leftToRightTranslation,
+                                                essentialMatrix,
+                                                fundamentalMatrix,
+                                                false // optimise 3D, not needed here.
+                                               );
 
     cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
     cv::Matx14d leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -349,102 +269,24 @@ int main(int argc, char ** argv)
       }
 
       // Sanity check. Do calibration with pseudo gold-standard, RMS should be close to zero.
-
-      if (leftGoldStandardPoints.size() == 1 && rightGoldStandardPoints.size() == 1)
-      {
-        niftk::TsaiMonoCameraCalibration(secondModel,
-                                         *(leftGoldStandardPoints.begin()),
-                                         imageSize,
-                                         sensorDimensions,
-                                         intrinsicLeft,
-                                         distortionLeft,
-                                         rvecLeft,
-                                         tvecLeft,
-                                         true // full optimisation.
-                                        );
-
-        niftk::TsaiMonoCameraCalibration(secondModel,
-                                         *(rightGoldStandardPoints.begin()),
-                                         imageSize,
-                                         sensorDimensions,
-                                         intrinsicRight,
-                                         distortionRight,
-                                         rvecRight,
-                                         tvecRight,
-                                         true // full optimisation.
-                                        );
-
-        result = niftk::TsaiStereoCameraCalibration(secondModel,
-                                                    *(leftGoldStandardPoints.begin()),
-                                                    *(rightGoldStandardPoints.begin()),
-                                                    imageSize,
-                                                    intrinsicLeft,
-                                                    distortionLeft,
-                                                    rvecLeft,
-                                                    tvecLeft,
-                                                    intrinsicRight,
-                                                    distortionRight,
-                                                    rvecRight,
-                                                    tvecRight,
-                                                    leftToRightRotationMatrix,
-                                                    leftToRightTranslation,
-                                                    essentialMatrix,
-                                                    fundamentalMatrix,
-                                                    CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                    optimise3D
-                                                   );
-
-        rvecsLeft.clear();
-        tvecsLeft.clear();
-        rvecsRight.clear();
-        tvecsRight.clear();
-
-        rvecsLeft.push_back(rvecLeft);
-        tvecsLeft.push_back(tvecLeft);
-        rvecsRight.push_back(rvecRight);
-        tvecsRight.push_back(tvecRight);
-
-      }
-      else
-      {
-        niftk::ZhangMonoCameraCalibration(secondModel,
-                                          leftGoldStandardPoints,
-                                          imageSize,
-                                          intrinsicLeft,
-                                          distortionLeft,
-                                          rvecsLeft,
-                                          tvecsLeft
-                                         );
-
-        niftk::ZhangMonoCameraCalibration(secondModel,
-                                          rightGoldStandardPoints,
-                                          imageSize,
-                                          intrinsicRight,
-                                          distortionRight,
-                                          rvecsRight,
-                                          tvecsRight
-                                         );
-
-        result = niftk::StereoCameraCalibration(secondModel,
-                                                leftGoldStandardPoints,
-                                                rightGoldStandardPoints,
-                                                imageSize,
-                                                intrinsicLeft,
-                                                distortionLeft,
-                                                rvecsLeft,
-                                                tvecsLeft,
-                                                intrinsicRight,
-                                                distortionRight,
-                                                rvecsRight,
-                                                tvecsRight,
-                                                leftToRightRotationMatrix,
-                                                leftToRightTranslation,
-                                                essentialMatrix,
-                                                fundamentalMatrix,
-                                                CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                optimise3D
-                                               );
-      }
+      result = niftk::FullStereoCameraCalibration(secondModel,
+                                                  leftGoldStandardPoints,
+                                                  rightGoldStandardPoints,
+                                                  imageSize,
+                                                  intrinsicLeft,
+                                                  distortionLeft,
+                                                  rvecsLeft,
+                                                  tvecsLeft,
+                                                  intrinsicRight,
+                                                  distortionRight,
+                                                  rvecsRight,
+                                                  tvecsRight,
+                                                  leftToRightRotationMatrix,
+                                                  leftToRightTranslation,
+                                                  essentialMatrix,
+                                                  fundamentalMatrix,
+                                                  optimise3D
+                                                 );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
       leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
@@ -504,102 +346,24 @@ int main(int argc, char ** argv)
       }
 
       // Now re-run calibration.
-
-      if (leftGoldStandardPoints.size() == 1 && rightGoldStandardPoints.size() == 1)
-      {
-        niftk::TsaiMonoCameraCalibration(secondModel,
-                                         *(leftNoisyPoints.begin()),
-                                         imageSize,
-                                         sensorDimensions,
-                                         intrinsicLeft,
-                                         distortionLeft,
-                                         rvecLeft,
-                                         tvecLeft,
-                                         true // full optimisation.
-                                        );
-
-        niftk::TsaiMonoCameraCalibration(secondModel,
-                                         *(rightNoisyPoints.begin()),
-                                         imageSize,
-                                         sensorDimensions,
-                                         intrinsicRight,
-                                         distortionRight,
-                                         rvecRight,
-                                         tvecRight,
-                                         true // full optimisation.
-                                        );
-
-        result = niftk::TsaiStereoCameraCalibration(secondModel,
-                                                    *(leftNoisyPoints.begin()),
-                                                    *(rightNoisyPoints.begin()),
-                                                    imageSize,
-                                                    intrinsicLeft,
-                                                    distortionLeft,
-                                                    rvecLeft,
-                                                    tvecLeft,
-                                                    intrinsicRight,
-                                                    distortionRight,
-                                                    rvecRight,
-                                                    tvecRight,
-                                                    leftToRightRotationMatrix,
-                                                    leftToRightTranslation,
-                                                    essentialMatrix,
-                                                    fundamentalMatrix,
-                                                    CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                    optimise3D
-                                                   );
-
-        rvecsLeft.clear();
-        tvecsLeft.clear();
-        rvecsRight.clear();
-        tvecsRight.clear();
-
-        rvecsLeft.push_back(rvecLeft);
-        tvecsLeft.push_back(tvecLeft);
-        rvecsRight.push_back(rvecRight);
-        tvecsRight.push_back(tvecRight);
-
-      }
-      else
-      {
-        niftk::ZhangMonoCameraCalibration(secondModel,
-                                          leftNoisyPoints,
-                                          imageSize,
-                                          intrinsicLeft,
-                                          distortionLeft,
-                                          rvecsLeft,
-                                          tvecsLeft
-                                         );
-
-        niftk::ZhangMonoCameraCalibration(secondModel,
-                                          rightNoisyPoints,
-                                          imageSize,
-                                          intrinsicRight,
-                                          distortionRight,
-                                          rvecsRight,
-                                          tvecsRight
-                                         );
-
-        result = niftk::StereoCameraCalibration(secondModel,
-                                                leftNoisyPoints,
-                                                rightNoisyPoints,
-                                                imageSize,
-                                                intrinsicLeft,
-                                                distortionLeft,
-                                                rvecsLeft,
-                                                tvecsLeft,
-                                                intrinsicRight,
-                                                distortionRight,
-                                                rvecsRight,
-                                                tvecsRight,
-                                                leftToRightRotationMatrix,
-                                                leftToRightTranslation,
-                                                essentialMatrix,
-                                                fundamentalMatrix,
-                                                CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                optimise3D
-                                               );
-      }
+      result = niftk::FullStereoCameraCalibration(secondModel,
+                                                  leftNoisyPoints,
+                                                  rightNoisyPoints,
+                                                  imageSize,
+                                                  intrinsicLeft,
+                                                  distortionLeft,
+                                                  rvecsLeft,
+                                                  tvecsLeft,
+                                                  intrinsicRight,
+                                                  distortionRight,
+                                                  rvecsRight,
+                                                  tvecsRight,
+                                                  leftToRightRotationMatrix,
+                                                  leftToRightTranslation,
+                                                  essentialMatrix,
+                                                  fundamentalMatrix,
+                                                  optimise3D
+                                                 );
 
       cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
       leftToRightAxisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
