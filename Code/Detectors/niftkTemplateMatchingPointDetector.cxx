@@ -24,10 +24,12 @@ namespace niftk {
 
 //-----------------------------------------------------------------------------
 TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternSize,
-                                                             cv::Size2i offsetForTemplate
+                                                             cv::Size2i offsetForTemplate,
+                                                             int flags
                                                             )
 : m_PatternSize(patternSize)
 , m_OffsetForTemplate(offsetForTemplate)
+, m_Flags(flags)
 , m_MaxAreaInPixels(10000)
 , m_UseContours(true)
 , m_UseInternalResampling(true)
@@ -57,6 +59,13 @@ TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternS
 //-----------------------------------------------------------------------------
 TemplateMatchingPointDetector::~TemplateMatchingPointDetector()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+int TemplateMatchingPointDetector::GetFlags()
+{
+  return m_Flags;
 }
 
 

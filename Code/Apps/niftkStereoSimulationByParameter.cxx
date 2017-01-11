@@ -387,7 +387,7 @@ int main(int argc, char ** argv)
                                               leftToRightTranslation,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              CV_CALIB_USE_INTRINSIC_GUESS,
+                                              CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                               false // could be command line arg.
                                              );
     }
@@ -419,8 +419,8 @@ int main(int argc, char ** argv)
               << leftToRightRotationVector.at<double>(0,1) << " "
               << leftToRightRotationVector.at<double>(0,2) << " "
               << leftToRightTranslation.at<double>(0,0) << " "
-              << leftToRightTranslation.at<double>(1,0) << " "
-              << leftToRightTranslation.at<double>(2,0) << " "
+              << leftToRightTranslation.at<double>(0,1) << " "
+              << leftToRightTranslation.at<double>(0,2) << " "
               << leftToRightAxisAngle(0, 0) << " "
               << leftToRightAxisAngle(0, 1) << " "
               << leftToRightAxisAngle(0, 2) << " "

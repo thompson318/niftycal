@@ -49,6 +49,12 @@ public:
   itkSetMacro(Optimise2DOFStereo, bool);
   itkGetConstMacro(Optimise2DOFStereo, bool);
 
+  itkSetMacro(AxisOfRotation, cv::Vec3d);
+  itkGetConstMacro(AxisOfRotation, cv::Vec3d);
+
+  itkSetMacro(TranslationVector, cv::Vec3d);
+  itkGetConstMacro(TranslationVector, cv::Vec3d);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -61,8 +67,10 @@ protected:
 
 private:
 
-  bool m_OptimiseIntrinsics;
-  bool m_Optimise2DOFStereo;
+  bool      m_OptimiseIntrinsics;
+  bool      m_Optimise2DOFStereo;
+  cv::Vec3d m_AxisOfRotation;
+  cv::Vec3d m_TranslationVector;
 };
 
 } // end namespace

@@ -198,28 +198,31 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
   optimiser2D->SetDistortion(&distortionLeft);
   optimiser2D->SetRightDistortion(&distortionRight);
+  optimiser2D->SetIntrinsic(&intrinsicLeft);
+  optimiser2D->SetRightIntrinsic(&intrinsicRight);
 
   if (cvFlags & CV_CALIB_FIX_INTRINSIC)
   {
-    optimiser2D->SetIntrinsic(&intrinsicLeft);
-    optimiser2D->SetRightIntrinsic(&intrinsicRight);
-
-    optimiser2D->Optimise(rvecsLeft,
-                          tvecsLeft,
-                          leftToRightRotationMatrix,
-                          leftToRightTranslationVector
-                         );
+    optimiser2D->SetOptimiseIntrinsics(false);
   }
   else
   {
-    optimiser2D->Optimise(intrinsicLeft,
-                          intrinsicRight,
-                          rvecsLeft,
-                          tvecsLeft,
-                          leftToRightRotationMatrix,
-                          leftToRightTranslationVector
-                         );
+    optimiser2D->SetOptimiseIntrinsics(true);
   }
+
+  // Can't really find much evidence that these are better.
+  // optimiser2D->SetOptimiseIntrinsics(true);
+  // optimiser2D->SetOptimise2DOFStereo(true);
+  // optimiser2D->SetForceUnitVectorAxes(false);
+
+  optimiser2D->Optimise(intrinsicLeft,
+                        intrinsicRight,
+                        rvecsLeft,
+                        tvecsLeft,
+                        leftToRightRotationMatrix,
+                        leftToRightTranslationVector
+                       );
+
 #endif
 
   niftk::ComputeStereoExtrinsics(rvecsLeft,

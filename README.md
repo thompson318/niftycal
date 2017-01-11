@@ -1,8 +1,7 @@
 NiftyCal
 ---------
 
-NiftyCal is a software library to perform
-video camera calibration, and is largely based on OpenCV.
+NiftyCal is a software library to perform video camera calibration.
 
 A full feature list is available by running doxygen.
 

@@ -264,7 +264,7 @@ int main(int argc, char ** argv)
                                               leftToRightTranslationVector,
                                               essentialMatrix,
                                               fundamentalMatrix,
-                                              flags | CV_CALIB_USE_INTRINSIC_GUESS,
+                                              flags | CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                               optimise3D
                                              );
 

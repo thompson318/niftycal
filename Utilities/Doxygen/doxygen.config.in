@@ -163,13 +163,13 @@ HIDE_SCOPE_NAMES      = NO
 # will generate a verbatim copy of the header file for each class for 
 # which an include is specified. Set to NO to disable this. 
 
-VERBATIM_HEADERS      = NO
+VERBATIM_HEADERS      = YES
 
 # If the SHOW_INCLUDE_FILES tag is set to YES (the default) then Doxygen 
 # will put list of the files that are included by a file in the documentation 
 # of that file. 
 
-SHOW_INCLUDE_FILES    = NO
+SHOW_INCLUDE_FILES    = YES
 
 # If the JAVADOC_AUTOBRIEF tag is set to YES (the default) then Doxygen 
 # will interpret the first line (until the first dot) of a JavaDoc-style 

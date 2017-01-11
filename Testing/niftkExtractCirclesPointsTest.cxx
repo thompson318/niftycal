@@ -46,7 +46,7 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
   cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
-  niftk::CirclesPointDetector detector(patternSize);
+  niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
   detector.SetImage(&greyImage);
 
   niftk::PointSet points;

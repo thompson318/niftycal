@@ -14,7 +14,7 @@
 
 #include <niftkIOUtilities.h>
 #include <niftkIterativeStereoCameraCalibration.h>
-#include <niftkRingsPointDetector.h>
+#include <niftkTemplateRingsPointDetector.h>
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <cv.h>
@@ -146,7 +146,12 @@ int main(int argc, char ** argv)
 
       unsigned long int maxArea = 10000;
 
-      niftk::RingsPointDetector* detector1 = new niftk::RingsPointDetector(dots, offset);
+      niftk::TemplateRingsPointDetector* detector1 =
+          new niftk::TemplateRingsPointDetector(dots, offset,
+                                                cv::CALIB_CB_SYMMETRIC_GRID
+                                                | cv::CALIB_CB_CLUSTERING
+                                               );
+
       detector1->SetImage(&greyImage);
       detector1->SetImageScaleFactor(originalScaleFactors);
       detector1->SetTemplateImage(&templateImageGreyScale);
@@ -165,7 +170,12 @@ int main(int argc, char ** argv)
 
       maxArea = templateImageGreyScale.cols * templateImageGreyScale.rows;
 
-      niftk::RingsPointDetector* detector2 = new niftk::RingsPointDetector(dots, offset);
+      niftk::TemplateRingsPointDetector* detector2 =
+          new niftk::TemplateRingsPointDetector(dots, offset,
+                                                cv::CALIB_CB_SYMMETRIC_GRID
+                                                | cv::CALIB_CB_CLUSTERING
+                                               );
+
       detector2->SetImageScaleFactor(warpedImageScaleFactors);
       detector2->SetTemplateImage(&templateImageGreyScale);
       detector2->SetReferenceImage(&referenceImageGreyScale);
@@ -179,21 +189,26 @@ int main(int argc, char ** argv)
       {
         std::shared_ptr<niftk::IPoint2DDetector> originalDetector(detector1);
         originalImagesLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
-        dynamic_cast<niftk::RingsPointDetector*>(originalImagesLeft.back().first.get())->SetImage(&(originalImagesLeft.back().second));
+
+        dynamic_cast<niftk::TemplateRingsPointDetector*>(originalImagesLeft.back().first.get())
+            ->SetImage(&(originalImagesLeft.back().second));
 
         std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(detector2);
         imagesForWarpingLeft.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
-        dynamic_cast<niftk::RingsPointDetector*>(imagesForWarpingLeft.back().first.get())->SetImage(&(imagesForWarpingLeft.back().second));
+        dynamic_cast<niftk::TemplateRingsPointDetector*>(imagesForWarpingLeft.back().first.get())
+            ->SetImage(&(imagesForWarpingLeft.back().second));
       }
       else
       {
         std::shared_ptr<niftk::IPoint2DDetector> originalDetector(detector1);
         originalImagesRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
-        dynamic_cast<niftk::RingsPointDetector*>(originalImagesRight.back().first.get())->SetImage(&(originalImagesRight.back().second));
+        dynamic_cast<niftk::TemplateRingsPointDetector*>(originalImagesRight.back().first.get())
+            ->SetImage(&(originalImagesRight.back().second));
 
         std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(detector2);
         imagesForWarpingRight.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
-        dynamic_cast<niftk::RingsPointDetector*>(imagesForWarpingRight.back().first.get())->SetImage(&(imagesForWarpingRight.back().second));
+        dynamic_cast<niftk::TemplateRingsPointDetector*>(imagesForWarpingRight.back().first.get())
+            ->SetImage(&(imagesForWarpingRight.back().second));
       }
     }
 

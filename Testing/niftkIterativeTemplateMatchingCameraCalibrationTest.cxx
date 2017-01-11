@@ -16,8 +16,8 @@
 #include "niftkCatchMain.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIPoint2DDetector.h>
-#include <niftkRingsPointDetector.h>
-#include <niftkCirclesIterativePointDetector.h>
+#include <niftkTemplateRingsPointDetector.h>
+#include <niftkTemplateCirclesPointDetector.h>
 #include <niftkIterativeMonoCameraCalibration.h>
 #include <niftkIOUtilities.h>
 
@@ -110,18 +110,18 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
 
     if (calibrationMethod == 0)
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::RingsPointDetector(rings, offset));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::TemplateRingsPointDetector(rings, offset, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       originalImages.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
 
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::RingsPointDetector(rings, offset));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::TemplateRingsPointDetector(rings, offset, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       imagesForWarping.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
     }
     else if (calibrationMethod == 1)
     {
-      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::CirclesIterativePointDetector(rings, offset));
+      std::shared_ptr<niftk::IPoint2DDetector> originalDetector(new niftk::TemplateCirclesPointDetector(rings, offset, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       originalImages.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(originalDetector, greyImage));
 
-      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::CirclesIterativePointDetector(rings, offset));
+      std::shared_ptr<niftk::IPoint2DDetector> warpedDetector(new niftk::TemplateCirclesPointDetector(rings, offset, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
       imagesForWarping.push_back(std::pair<std::shared_ptr<niftk::IPoint2DDetector>, cv::Mat>(warpedDetector, greyImageClone));
     }
     else

@@ -13,24 +13,11 @@
 =============================================================================*/
 
 #include "niftkTsaiUtilities_p.h"
-#include "niftkNiftyCalExceptionMacro.h"
+#include "niftkCalibrationUtilities_p.h"
+#include <niftkNiftyCalExceptionMacro.h>
 
 namespace niftk
 {
-
-//-----------------------------------------------------------------------------
-int signum(const double& x)
-{
-  if (x < 0)
-  {
-    return -1;
-  }
-  else
-  {
-    return 1;
-  }
-}
-
 
 //-----------------------------------------------------------------------------
 void AllocateTsaiMatrices(cv::Mat& intrinsic,
@@ -232,8 +219,8 @@ void CalculateTxAndTy(const std::vector<cv::Point3d>& points3D,
   }
 
   // (c)(iv) - set the sign of Ty.
-  if (   signum(x) != signum(points2D[bestIndexSoFar].x)
-      || signum(y) != signum(points2D[bestIndexSoFar].y))
+  if (   Signum(x) != Signum(points2D[bestIndexSoFar].x)
+      || Signum(y) != Signum(points2D[bestIndexSoFar].y))
   {
     Ty = -1.0 * Ty;
     if (X.rows == 5) // coplanar
@@ -323,7 +310,7 @@ void CalculateRForCoplanar(const cv::Mat& X,
   double r3 = sqrt(1.0 - r1*r1 - r2*r2);
   double r4 = X.at<double>(3, 0) * Ty;
   double r5 = X.at<double>(4, 0) * Ty;
-  double s = -1.0 * signum(r1*r4 + r2*r5);
+  double s = -1.0 * Signum(r1*r4 + r2*r5);
   double r6 = s * sqrt(1.0 - r4*r4 - r5*r5);
   double r7 = r2*r6 - r5*r3;
   double r8 = -1.0*(r1*r6 - r4*r3);

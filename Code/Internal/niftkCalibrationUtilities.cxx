@@ -21,6 +21,20 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
+int Signum(const double& x)
+{
+  if (x < 0)
+  {
+    return -1;
+  }
+  else
+  {
+    return 1;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
                              const std::vector<cv::Mat>& tvecsLeft,
                              const cv::Mat& leftToRightRotationMatrix,

@@ -26,13 +26,6 @@ namespace niftk
 * to implement Tsai's 1987 paper on Camera Calibration.
 */
 
-
-/**
-* \brief Returns -1 if x < 0 and +1 otherwise.
-*/
-int signum(const double& x);
-
-
 /**
 * \brief Ensures matrices are the right size.
 * \param intrinsic 3x3 matrix

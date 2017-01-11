@@ -90,6 +90,17 @@ cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
 
 
 //-----------------------------------------------------------------------------
+cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
+{
+  cv::Mat rodrigues = cvCreateMat(1, 3, CV_64FC1);
+  rodrigues.at<double>(0, 0) = axisAngle(0, 0) * axisAngle(0, 3);
+  rodrigues.at<double>(0, 1) = axisAngle(0, 1) * axisAngle(0, 3);
+  rodrigues.at<double>(0, 2) = axisAngle(0, 2) * axisAngle(0, 3);
+  return rodrigues;
+}
+
+
+//-----------------------------------------------------------------------------
 cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
 {
   cv::Mat eulerAngles = cvCreateMat(1, 3,CV_64FC1);
@@ -114,17 +125,6 @@ cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
   eulerAngles.at<double>(2,0) = atan2 ( 2 * ( q_r * q_k + q_i * q_j ) ,
         1 - 2 * ( q_j * q_j + q_k * q_k ));
   return eulerAngles;
-}
-
-
-//-----------------------------------------------------------------------------
-cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
-{
-  cv::Mat rodrigues = cvCreateMat(1, 3, CV_64FC1);
-  rodrigues.at<double>(0, 0) = axisAngle(0, 0) * axisAngle(0, 3);
-  rodrigues.at<double>(0, 1) = axisAngle(0, 1) * axisAngle(0, 3);
-  rodrigues.at<double>(0, 2) = axisAngle(0, 2) * axisAngle(0, 3);
-  return rodrigues;
 }
 
 
@@ -339,6 +339,59 @@ void InterpolateMaximumOfQuadraticSurface(
 
   outputPoint.x = dxx;
   outputPoint.y = dyy;
+}
+
+
+//-----------------------------------------------------------------------------
+int GetMajorAxisIndex(const cv::Vec3d& v)
+{
+  double maxAbsVal = std::numeric_limits<double>::min();
+  int maxIndex = -1;
+  for (int i = 0; i < 3; i++)
+  {
+    double absVal = std::fabs(v[i]);
+    if (absVal > maxAbsVal)
+    {
+      maxAbsVal = absVal;
+      maxIndex = i;
+    }
+  }
+  if (maxIndex == -1)
+  {
+    niftkNiftyCalThrow() << "Failed to find major axis.";
+  }
+  return maxIndex;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Matx44d GetLeftToRightMatrix(const cv::Matx44d& leftExtrinsics,
+                                 const cv::Matx44d& rightExtrinsics)
+{
+  return rightExtrinsics * leftExtrinsics.inv();
+}
+
+
+//-----------------------------------------------------------------------------
+void GetLeftToRightMatrix(const cv::Mat& leftRVec,
+                          const cv::Mat& leftTVec,
+                          const cv::Mat& rightRVec,
+                          const cv::Mat& rightTVec,
+                          cv::Mat& leftToRightMatrix,
+                          cv::Mat& leftToRightTVec
+                          )
+{
+  cv::Matx44d leftExtrinsics = niftk::RodriguesToMatrix(leftRVec, leftTVec);
+  cv::Matx44d rightExtrinsics = niftk::RodriguesToMatrix(rightRVec, rightTVec);
+  cv::Matx44d leftToRight = niftk::GetLeftToRightMatrix(leftExtrinsics, rightExtrinsics);
+
+  cv::Mat tmpRot = cvCreateMat (1, 3, CV_64FC1 );
+  cv::Mat tmpTrans = cvCreateMat (1, 3, CV_64FC1 );
+  niftk::MatrixToRodrigues(leftToRight, tmpRot, tmpTrans);
+  cv::Rodrigues(tmpRot, leftToRightMatrix);
+  leftToRightTVec.at<double>(0, 0) = tmpTrans.at<double>(0, 0);
+  leftToRightTVec.at<double>(1, 0) = tmpTrans.at<double>(0, 1);
+  leftToRightTVec.at<double>(2, 0) = tmpTrans.at<double>(0, 2);
 }
 
 } // end namespace

@@ -49,21 +49,23 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 * \brief Performs a stereo camera calibration using Tsai 1987 method.
 * If ITK is not compiled in, you just have the initial linear bit.
 * Will check for planarity and then switch to either the coplanar or the non-coplanar method.
-* This method computes Tsai 1987 for left and right camera, and then optimises
+* This method assumes the left and right camera have already been optimised, and then optimises
 * the extrinsic (2 x 6 DOF) parameters using the combined left and right re-projection error.
+* \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
+* \param optimise3D if true will use Levenberg-Marquart to optimise the 3D reconstruction error (not recommended).
 * \see niftk::StereoCameraCalibration
-* \return rms re-projection error.
+* \return rms re-projection and 3D reconstruction error
 */
 NIFTYCAL_WINEXPORT cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                            const niftk::PointSet& points2DLeft,
                                                            const niftk::PointSet& points2DRight,
                                                            const cv::Size2i& imageSize,
                                                            cv::Mat& intrinsic3x3Left,
-                                                           cv::Mat& distortion1x4Left,
+                                                           cv::Mat& distortion1x5Left,
                                                            cv::Mat& rvec1x3Left,
                                                            cv::Mat& tvec1x3Left,
                                                            cv::Mat& intrinsic3x3Right,
-                                                           cv::Mat& distortion1x4Right,
+                                                           cv::Mat& distortion1x5Right,
                                                            cv::Mat& rvec1x3Right,
                                                            cv::Mat& tvec1x3Right,
                                                            cv::Mat& leftToRightRotationMatrix3x3,

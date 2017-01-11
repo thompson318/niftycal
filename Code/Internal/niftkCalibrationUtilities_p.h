@@ -24,6 +24,11 @@ namespace niftk
 {
 
 /**
+* \brief Returns -1 if x < 0 and +1 otherwise.
+*/
+int Signum(const double& x);
+
+/**
 * \file niftkCalibrationUtilities_p.h
 * \brief Private (as in 'deliberately not exported') utility functions.
 */
