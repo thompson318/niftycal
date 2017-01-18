@@ -1,5 +1,10 @@
 #! /bin/bash
 
+if [ ! $(which convert 2> /dev/null) ]
+then
+	echo "ImageMagick not found on your path, please check installation"
+	exit
+fi
 
 COLUMNS=14
 ROWS=10
@@ -9,7 +14,7 @@ OUTERDIAMETER=2.0
 INNERDIAMETER=1.0
 BORDER=3.0
 
-PIXELSPERMM=240 
+PIXELSPERMM=240
 
 SPACING_PIX=$(echo ${SPACING}*${PIXELSPERMM} | bc -l)
 OUTERDIAMETER_PIX=$(echo ${OUTERDIAMETER}*${PIXELSPERMM} | bc -l)
