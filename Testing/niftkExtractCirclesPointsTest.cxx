@@ -59,7 +59,10 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
     points = detector.GetPoints();
     REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
   }
-  REQUIRE( points.size() == expectedNumberOfCircles );
+  if (expectedNumberOfCircles >= 0)
+  {
+    REQUIRE( points.size() == expectedNumberOfCircles );
+  }
 
   if (points.size() > 0)
   {

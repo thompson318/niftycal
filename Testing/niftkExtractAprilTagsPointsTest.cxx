@@ -61,7 +61,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
 
   niftk::PointSet points;
 
-  if (expectedNumberOfTags == 0)
+  if (expectedNumberOfTags < 0)
   {
     REQUIRE_NOTHROW(points = detector.GetPoints());
   }

@@ -70,7 +70,7 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
 
   niftk::PointSet points;
 
-  if (expectedNumberOfCorners == 0)
+  if (expectedNumberOfCorners < 0)
   {
     REQUIRE_NOTHROW(points = detector.GetPoints());
   }
@@ -79,7 +79,10 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
     points = detector.GetPoints();
     REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
   }
-  REQUIRE( points.size() == expectedNumberOfCorners );
+  if (expectedNumberOfCorners >= 0)
+  {
+    REQUIRE( points.size() == expectedNumberOfCorners );
+  }
 
   std::chrono::time_point<std::chrono::system_clock> endFirstGrab = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = endFirstGrab - start;

@@ -101,7 +101,10 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     points = detector.GetPoints();
     REQUIRE( points.size() == ringsInX * ringsInY );
   }
-  REQUIRE( points.size() == expectedNumberOfRings );
+  if (expectedNumberOfRings >= 0)
+  {
+    REQUIRE( points.size() == expectedNumberOfRings );
+  }
 
   if (niftk::argc >= 16 && points.size() > 0)
   {
