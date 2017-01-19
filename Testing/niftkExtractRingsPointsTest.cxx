@@ -99,10 +99,6 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   else
   {
     points = detector.GetPoints();
-    REQUIRE( points.size() == ringsInX * ringsInY );
-  }
-  if (expectedNumberOfRings >= 0)
-  {
     REQUIRE( points.size() == expectedNumberOfRings );
   }
 

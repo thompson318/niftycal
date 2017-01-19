@@ -50,17 +50,13 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   detector.SetImage(&greyImage);
 
   niftk::PointSet points;
-  if (expectedNumberOfCircles == 0)
+  if (expectedNumberOfCircles < 0)
   {
     REQUIRE_NOTHROW(points = detector.GetPoints());
   }
   else
   {
     points = detector.GetPoints();
-    REQUIRE( points.size() == expectedCirclesPerColumn * expectedColumns );
-  }
-  if (expectedNumberOfCircles >= 0)
-  {
     REQUIRE( points.size() == expectedNumberOfCircles );
   }
 
