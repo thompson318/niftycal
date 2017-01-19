@@ -17,6 +17,7 @@ set(NIFTYCAL_APPS
   niftkMonoCalibrationFromPoints
   niftkStereoCalibrationFromPoints
   niftkStereoIterativeAprilTagsCalibration
+  niftkStereoIterativeCirclesCalibration
   niftkStereoIterativeRingsCalibration
   niftkStereoChessboardCalibration
   niftkTimingCalibrationFromPoints

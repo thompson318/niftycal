@@ -77,10 +77,6 @@ TEST_CASE( "Extract chessboard points", "[chessboard]" ) {
   else
   {
     points = detector.GetPoints();
-    REQUIRE( points.size() == expectedInternalCornersX * expectedInternalCornersY );
-  }
-  if (expectedNumberOfCorners >= 0)
-  {
     REQUIRE( points.size() == expectedNumberOfCorners );
   }
 
