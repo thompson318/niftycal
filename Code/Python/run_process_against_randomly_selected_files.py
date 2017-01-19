@@ -6,7 +6,7 @@ import niftk_file_utils as niftk
 from random import sample
 
 if len(sys.argv) < 6:
-    print 'Usage: run_process_against_randomly_selected_files.py dirName endsWith minimumNumberLinesInFile numberOfSamples command'
+    print ('Usage: run_process_against_randomly_selected_files.py dirName endsWith minimumNumberLinesInFile numberOfSamples command')
     exit()
 
 # Get all files in the specified path.

@@ -6,7 +6,7 @@ import niftk_file_utils as niftk
 from random import sample
 
 if len(sys.argv) < 7:
-    print 'Usage: run_stereo_calibration_with_random_frames.py dirName numberOfPrefixCharacters leftEndsWith rightEndsWith numberOfSamples command'
+    print ('Usage: run_stereo_calibration_with_random_frames.py dirName numberOfPrefixCharacters leftEndsWith rightEndsWith numberOfSamples command')
     exit()
 
 # Get all files in the specified path.
