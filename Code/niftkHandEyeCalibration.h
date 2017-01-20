@@ -66,8 +66,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     );
 
 
-#ifdef NIFTYCAL_WITH_ITK
-
 /**
 * \brief Calculates Hand-Eye based on something akin to
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
@@ -128,8 +126,6 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
     );
-
-#endif // NIFTYCAL_WITH_ITK
 
 } // end namespace
 

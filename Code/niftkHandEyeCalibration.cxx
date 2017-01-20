@@ -326,7 +326,6 @@ cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
   return finalHandEye;
 }
 
-#ifdef NIFTYCAL_WITH_ITK
 
 //-----------------------------------------------------------------------------
 cv::Matx44d CalculateHandEyeUsingMaltisMethod(
@@ -343,7 +342,11 @@ cv::Matx44d CalculateHandEyeUsingMaltisMethod(
   cv::Matx44d initialHandEye = niftk::CalculateHandEyeUsingTsaisMethod(handMatrices, eyeMatrices, residuals);
   cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
 
+  residual = residuals(1, 0);
+
   cv::Matx44d finalHandEye = initialHandEye;
+
+#ifdef NIFTYCAL_WITH_ITK
 
   niftk::NonLinearMaltiHandEyeOptimiser::Pointer optimiser = niftk::NonLinearMaltiHandEyeOptimiser::New();
   optimiser->SetModel(&model3D);
@@ -355,6 +358,7 @@ cv::Matx44d CalculateHandEyeUsingMaltisMethod(
                                  intrinsic,
                                  distortion
                                 );
+#endif // NIFTYCAL_WITH_ITK
 
   return finalHandEye;
 }
@@ -375,7 +379,11 @@ cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
   cv::Matx44d initialHandEye = niftk::CalculateHandEyeUsingTsaisMethod(handMatrices, eyeMatrices, residuals);
   cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
 
+  residual = residuals(1, 0);
+
   cv::Matx44d finalHandEye = initialHandEye;
+
+#ifdef NIFTYCAL_WITH_ITK
 
   niftk::NonLinearNDOFHandEyeOptimiser::Pointer optimiser = niftk::NonLinearNDOFHandEyeOptimiser::New();
   optimiser->SetModel(&model3D);
@@ -385,6 +393,8 @@ cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
   optimiser->SetHandMatrices(&handMatrices);
 
   residual = optimiser->Optimise(initialModelToWorld, finalHandEye);
+
+#endif // NIFTYCAL_WITH_ITK
 
   return finalHandEye;
 }
@@ -411,6 +421,8 @@ cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
   cv::Matx44d initialModelToWorld = niftk::CalculateAverageModelToWorld(initialHandEye, handMatrices, eyeMatrices);
 
   cv::Matx44d finalHandEye = initialHandEye;
+
+#ifdef NIFTYCAL_WITH_ITK
 
   niftk::NonLinearStereoHandEye2DOptimiser::Pointer optimiser2D = niftk::NonLinearStereoHandEye2DOptimiser::New();
   optimiser2D->SetModel(&model3D);
@@ -439,9 +451,9 @@ cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     residual = optimiser3D->Optimise(initialModelToWorld, finalHandEye, stereoExtrinsics);
   }
 
+#endif // NIFTYCAL_WITH_ITK
+
   return finalHandEye;
 }
-
-#endif // NIFTYCAL_WITH_ITK
 
 } // end namespace
