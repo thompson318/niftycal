@@ -11,7 +11,7 @@
   See LICENSE.txt in the top level directory for details.
 
 =============================================================================*/
-
+#include "niftkStereoCameraCalibration.h"
 #include "niftkZhangCameraCalibration.h"
 #include "niftkTsaiCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
