@@ -22,6 +22,7 @@ namespace niftk
 SideBySideDetector::SideBySideDetector(std::unique_ptr<niftk::PointDetector>& left,
                                        std::unique_ptr<niftk::PointDetector>& right
                                       )
+: m_SequentialNumbering(true)
 {
   m_LeftDetector = std::move(left);
   m_RightDetector = std::move(right);
