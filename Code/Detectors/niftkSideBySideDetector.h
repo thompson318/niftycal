@@ -40,6 +40,9 @@ public:
                      );
   virtual ~SideBySideDetector();
 
+  void SetSequentialNumbering(const bool& b) { m_SequentialNumbering = b; }
+  bool GetSequentialNumbering() const { return m_SequentialNumbering; }
+
 protected:
 
   /**
@@ -51,6 +54,7 @@ private:
 
   std::unique_ptr<niftk::PointDetector> m_LeftDetector;
   std::unique_ptr<niftk::PointDetector> m_RightDetector;
+  bool                                  m_SequentialNumbering;
 };
 
 } // end namespace
