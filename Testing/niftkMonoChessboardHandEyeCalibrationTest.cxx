@@ -181,8 +181,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
     }
   }
 
-  cv::Matx44d worldToModel = (*(trackingMatrices.begin())) * eyeHand * (*(cameraMatrices.begin()));
-  cv::Matx44d modelToWorld = worldToModel.inv(cv::DECOMP_SVD);
+  cv::Matx44d modelToWorld = (*(trackingMatrices.begin())) * eyeHand * (*(cameraMatrices.begin()));
 
   double reprojectionRMS = 0;
 
