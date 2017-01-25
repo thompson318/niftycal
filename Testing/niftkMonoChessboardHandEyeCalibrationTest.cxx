@@ -181,29 +181,28 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
     }
   }
 
-  double reprojectionRMS = 0;
+  cv::Matx44d worldToModel = (*(trackingMatrices.begin())) * eyeHand * (*(cameraMatrices.begin()));
+  cv::Matx44d modelToWorld = worldToModel.inv(cv::DECOMP_SVD);
 
-#ifdef NIFTYCAL_WITH_ITK
+  double reprojectionRMS = 0;
 
   // Here, Im just testing that the stereo code runs to completion, as we only have mono data.
   cv::Matx44d stereoExtrinsics = cv::Matx44d::eye();
-  handEye = niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, cameraMatrices, false, stereoExtrinsics, reprojectionRMS);
+  niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, false, handEye, modelToWorld, stereoExtrinsics, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endStereo= std::chrono::system_clock::now();
   elapsed_seconds = endStereo - endTsai;
   std::cout << "TIME:STEREO=" << elapsed_seconds.count() << std::endl;
 
-  handEye = niftk::CalculateHandEyeByOptimisingAllExtrinsic(model, listOfPoints, trackingMatrices, cameraMatrices, intrinsic, distortion, reprojectionRMS);
+  niftk::CalculateHandEyeByOptimisingAllExtrinsic(model, listOfPoints, trackingMatrices, intrinsic, distortion, handEye, modelToWorld, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endNDOF= std::chrono::system_clock::now();
   elapsed_seconds = endNDOF - endStereo;
   std::cout << "TIME:NDOF=" << elapsed_seconds.count() << std::endl;
 
-  handEye = niftk::CalculateHandEyeUsingMaltisMethod(model, listOfPoints, trackingMatrices, cameraMatrices, intrinsic, distortion, reprojectionRMS);
+  niftk::CalculateHandEyeUsingMaltisMethod(model, listOfPoints, trackingMatrices, intrinsic, distortion, handEye, modelToWorld, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endMalti= std::chrono::system_clock::now();
   elapsed_seconds = endMalti - endNDOF;
   std::cout << "TIME:Malti=" << elapsed_seconds.count() << std::endl;
-
-#endif
 }
