@@ -100,9 +100,9 @@ void NonLinearStereoHandEye3DOptimiser::SetRightDistortion(const cv::Mat* const 
 
 //-----------------------------------------------------------------------------
 double NonLinearStereoHandEye3DOptimiser::Optimise(cv::Matx44d& modelToWorld,
-                                                 cv::Matx44d& handEye,
-                                                 cv::Matx44d& stereoExtrinsics
-                                                )
+                                                   cv::Matx44d& handEye,
+                                                   cv::Matx44d& stereoExtrinsics
+                                                  )
 {
   std::list<cv::Matx44d>* matrices = m_CostFunction->GetHandMatrices();
   if (matrices == nullptr)
