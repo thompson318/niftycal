@@ -25,11 +25,11 @@
 
 TEST_CASE( "Extract symetric rings points", "[rings]" ) {
 
-  if (niftk::argc != 15 && niftk::argc != 16 && niftk::argc != 17)
+  if (niftk::argc != 16 && niftk::argc != 17 && niftk::argc != 18)
   {
-    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberPoints maxArea method tolerance [expectedPoints] [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 15);
-    REQUIRE( niftk::argc <= 17);
+    std::cerr << "Usage: niftkExtractRingsPointsTest image referenceImage referencePoints templateImage scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberPoints maxArea method asymmetric tolerance [expectedPoints] [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 16);
+    REQUIRE( niftk::argc <= 18);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -45,7 +45,8 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   int expectedNumberOfRings = atoi(niftk::argv[11]);
   unsigned long int maxArea = atoi(niftk::argv[12]);
   int method = atoi(niftk::argv[13]);
-  double tolerance = atof(niftk::argv[14]);
+  int asymmetric = atoi(niftk::argv[14]);
+  double tolerance = atof(niftk::argv[15]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -69,7 +70,13 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   cv::Size2i patternSize(ringsInY, ringsInX);
   cv::Size2i offsetSize(10, 10);
 
-  niftk::TemplateRingsPointDetector detector(patternSize, offsetSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+  int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  if (asymmetric == 1)
+  {
+    flags = cv::CALIB_CB_ASYMMETRIC_GRID;
+  }
+
+  niftk::TemplateRingsPointDetector detector(patternSize, offsetSize, flags);
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
   detector.SetTemplateImage(&greyTemplate);
@@ -102,10 +109,11 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     REQUIRE( points.size() == expectedNumberOfRings );
   }
 
-  if (niftk::argc >= 16 && points.size() > 0)
+  if (niftk::argc >= 17 && points.size() > 0)
   {
-    std::string expectedPointsFileName = niftk::argv[15];
+    std::string expectedPointsFileName = niftk::argv[16];
 
+    niftk::DumpPoints(std::cerr, points);
     if (expectedPointsFileName != "dummy")
     {
       niftk::PointSet expectedPoints = niftk::LoadPointSet(expectedPointsFileName);
@@ -114,9 +122,9 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
     }
   }
 
-  if (niftk::argc >= 17 && points.size() > 0)
+  if (niftk::argc >= 18 && points.size() > 0)
   {
-    std::string outputFile = niftk::argv[16];
+    std::string outputFile = niftk::argv[17];
     niftk::SavePointSet(points, outputFile);
   }
 }
