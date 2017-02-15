@@ -23,6 +23,7 @@ set(NIFTYCAL_SRCS
   Detectors/niftkTemplateMatchingPointDetector.cxx
   Detectors/niftkTemplateRingsPointDetector.cxx
   Detectors/niftkTemplateCirclesPointDetector.cxx
+  Detectors/niftkSideBySideDetector.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx

@@ -57,7 +57,7 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByDirectMatrixMultiplication(
 * \param residuals returns residual rotation and residual translation.
 *
 * Originally implemented by Steve Thompson (s.thompson@ucl.ac.uk)
-* in NifTK, but converted to use lists and cv::Matx44d for NiftyCal.
+* in NifTK, but converted to cv::Matx44d for NiftyCal.
 */
 NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d>& handMatrices,
@@ -67,52 +67,53 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 
 
 /**
-* \brief Calculates Hand-Eye based on something akin to
+* \brief Calculates Hand-Eye by doing non-linear part of
 * <a href="http://dx.doi.org/10.1002/rcs.1478">Malti's 2013 method</a>.
 * \param residual returns 2D rms reprojection error.
 *
-* This does an initial hand-eye using Tsai's 1989 linear approximation, followed by
-* optimisation of the intrinsic (4DOF), distortion (5DOF), model-to-world (6DOF) and hand-eye (6DOF).
+* Optimises intrinsic (4DOF), distortion (5DOF), model-to-world (6DOF) and hand-eye (6DOF).
+* If ITK is not compiled in, this just sets residual to zero.
 */
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingMaltisMethod(
+NIFTYCAL_WINEXPORT void CalculateHandEyeUsingMaltisMethod(
     const niftk::Model3D&         model3D,
     const std::list<PointSet>&    listOfPointSets,
     const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
     cv::Mat&                      intrinsic,
     cv::Mat&                      distortion,
+    cv::Matx44d&                  handEye,
+    cv::Matx44d&                  modelToWorld,
     double&                       residual
     );
 
 
 /**
-* \brief Calculates Hand-Eye by optimising extrinsic (tracker matrices), model-to-world and hand-eye matrices.
+* \brief Calculates Hand-Eye by non-linearly optimising extrinsic (tracker matrices),
+* model-to-world and hand-eye matrices.
 * \param residual returns 2D rms reprojection error.
 *
-* This does an initial hand-eye using Tsai's 1989 linear approximation, followed by
-* optimisation of the extrinsic (6N DOF), model-to-world (6DOF) and hand-eye (6DOF).
+* If ITK is not compiled in, this just sets residual to zero.
 */
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeByOptimisingAllExtrinsic(
+NIFTYCAL_WINEXPORT void CalculateHandEyeByOptimisingAllExtrinsic(
     const niftk::Model3D&         model3D,
     const std::list<PointSet>&    listOfPointSets,
     const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
     const cv::Mat&                intrinsic,
     const cv::Mat&                distortion,
+    cv::Matx44d&                  handEye,
+    cv::Matx44d&                  modelToWorld,
     double&                       residual
     );
 
 
 /**
-* \brief Calculates Hand-Eye by optimising extrinsic (tracker matrices), model-to-world,
-* hand-eye matrices and stereo left-to-right matrices.
+* \brief Calculates Hand-Eye by non-linearly optimising extrinsic (tracker matrices),
+* model-to-world, hand-eye matrices and stereo left-to-right matrices.
 * \param residuals returns 2D rms reprojection error if optimise3D is false
 * or 3D rms reconstruction error if optimise3D is true.
 *
-* This does an initial hand-eye using Tsai's 1989 linear approximation, followed by
-* optimisation of the extrinsic (6N DOF), model-to-world (6DOF), hand-eye (6DOF) and left-to-right (6DOF).
+* If ITK is not compiled in, this just sets residual to zero.
 */
-NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
+NIFTYCAL_WINEXPORT void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     const niftk::Model3D&         model3D,
     const std::list<PointSet>&    leftPointSets,
     const cv::Mat&                leftIntrinsic,
@@ -121,8 +122,9 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     const cv::Mat&                rightIntrinsic,
     const cv::Mat&                rightDistortion,
     const std::list<cv::Matx44d>& handMatrices,
-    const std::list<cv::Matx44d>& eyeMatrices,
     const bool&                   optimise3D,
+    cv::Matx44d&                  handEye,
+    cv::Matx44d&                  modelToWorld,
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
     );

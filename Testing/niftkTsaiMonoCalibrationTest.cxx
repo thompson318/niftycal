@@ -20,7 +20,7 @@
 #include <niftkCirclesPointDetector.h>
 #include <niftkIOUtilities.h>
 #include <niftkPointUtilities.h>
-
+#include <niftkSideBySideDetector.h>
 #include <cv.h>
 #include <highgui.h>
 #include <fstream>
@@ -94,49 +94,19 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     }
     else
     {
-      // Noncoplanar case.
-      cv::Mat leftImage = greyImage.clone();
-      cv::rectangle(leftImage,
-                    cv::Point((greyImage.cols/2),0),
-                    cv::Point(greyImage.cols-1,greyImage.rows-1),
-                    cv::Scalar(255, 255, 255),
-                    -1 // fill the right side
-                   );
+      std::unique_ptr<niftk::PointDetector>
+        leftDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
 
-      niftk::CirclesPointDetector leftDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-      leftDetector.SetImage(&leftImage);
-      leftDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+      std::unique_ptr<niftk::PointDetector>
+        rightDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
 
-      cv::Mat rightImage = greyImage.clone();
-      cv::rectangle(rightImage,
-                    cv::Point(0,0),
-                    cv::Point((greyImage.cols/2)-1,greyImage.rows-1),
-                    cv::Scalar(255, 255, 255),
-                    -1 // fill the left side
-                   );
+      std::unique_ptr<niftk::SideBySideDetector>
+        sbs(new niftk::SideBySideDetector(leftDetector, rightDetector));
 
-      niftk::CirclesPointDetector rightDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
-      rightDetector.SetImage(&rightImage);
-      rightDetector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+      sbs->SetImage(&greyImage);
+      sbs->SetImageScaleFactor(cv::Point2d(sx, sy), false);
 
-      imagePoints = leftDetector.GetPoints();
-      REQUIRE( imagePoints.size() == dotsInX*dotsInY );
-
-      niftk::PointSet rightImagePoints = rightDetector.GetPoints();
-      REQUIRE( rightImagePoints.size() == dotsInX*dotsInY );
-
-      // Add right points with IDs that follow after left points.
-      unsigned int numberOfLeftHandPoints = imagePoints.size();
-
-      niftk::PointSet::const_iterator iter;
-      for (iter = rightImagePoints.begin(); iter != rightImagePoints.end(); ++iter)
-      {
-        niftk::NiftyCalIdType id = (*iter).first;
-        niftk::Point2D p = (*iter).second;
-        p.id = id + numberOfLeftHandPoints;
-        imagePoints.insert(niftk::IdPoint2D(id + numberOfLeftHandPoints, p));
-      }
-      REQUIRE( imagePoints.size() == 2*dotsInX*dotsInY );
+      imagePoints = sbs->GetPoints();
       niftk::DumpPoints(std::cout, imagePoints);
     }
   }

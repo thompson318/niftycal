@@ -95,6 +95,8 @@ REQ-2002-CSD-0001-012-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm mo
 
 REQ-2002-CSD-0001-013-01: For OpenCV: Using 14 x 10 chessboard corners, a 3mm model, and real data from a laparoscope, we test OpenCV's stereo calibration, and regression check that OpenCV shall return parameters that do not vary by more than 0.01 compared to a known previous result.
 
+REQ-2002-CSD-0001-014-01: Ring detection will work with the OpenCV asymmetrical circle grid pattern.
+
 \subsection NiftyCalCSDNonFuncReq Non-Functional Requirements
 
 These non-functional requirements shall be expressed, each on a single line, for automatic parsing.
