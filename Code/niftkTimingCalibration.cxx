@@ -120,8 +120,8 @@ TimeMappedSamples1D ResampleTimeStampsToMilliseconds(const TimeSamples1D& a)
       newSample.time = t;
 
       // linear interpolation.
-      newSample.sample = static_cast<double>(t - roundedPreviousTime) * sampleGap
-                       / static_cast<double>(timeGap);
+      newSample.sample = previous.sample + (static_cast<double>(t - roundedPreviousTime) * sampleGap
+                                           / static_cast<double>(timeGap));
 
       result.insert(std::pair<NiftyCalTimeType, double>(newSample.time, newSample.sample));
     }
