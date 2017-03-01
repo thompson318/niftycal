@@ -20,11 +20,15 @@
 
 TEST_CASE( "Timing Calibration 2D/3D", "[timing]" ) {
 
-  int expectedNumberOfArguments =  4;
-  if (niftk::argc != expectedNumberOfArguments)
+  int expectedMinimumNumberOfArguments =  3;
+  int expectedMaximumNumberOfArguments = 4;
+  if (niftk::argc < expectedMinimumNumberOfArguments
+      || niftk::argc < expectedMaximumNumberOfArguments
+     )
   {
-    std::cerr << "Usage: niftkTimingCalibrationTest trackerPoints3D.txt imagePoints2D.txt expectedLagInMilliseconds" << std::endl;
-    REQUIRE( niftk::argc == expectedNumberOfArguments);
+    std::cerr << "Usage: niftkTimingCalibrationTest trackerPoints3D.txt imagePoints2D.txt [expectedLagInMilliseconds]" << std::endl;
+    REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);
+    REQUIRE( niftk::argc <= expectedMaximumNumberOfArguments);
   }
 
   std::string trackerPointsFileName = niftk::argv[1];
@@ -33,8 +37,6 @@ TEST_CASE( "Timing Calibration 2D/3D", "[timing]" ) {
   std::string imagePointsFileName = niftk::argv[2];
   REQUIRE(imagePointsFileName.size() > 0);
 
-  int expectedLag = atoi(niftk::argv[3]);
-
   niftk::TimeSamples3D time3D = niftk::LoadTimeSamples3D(trackerPointsFileName);
   REQUIRE(time3D.size() > 0);
 
@@ -42,5 +44,11 @@ TEST_CASE( "Timing Calibration 2D/3D", "[timing]" ) {
   REQUIRE(time2D.size() > 0);
 
   int actualLag = niftk::TimingCalibration(time3D, time2D);
-  REQUIRE(expectedLag == actualLag);
+  std::cout << "Final value for lag=" << actualLag << std::endl;
+
+  if (niftk::argc == 4)
+  {
+    int expectedLag = atoi(niftk::argv[3]);
+    REQUIRE(expectedLag == actualLag);
+  }
 }
