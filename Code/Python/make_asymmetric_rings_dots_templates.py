@@ -99,6 +99,8 @@ def make_template(ngrids, ncols, nrows, outer_dia_mm, inner_dia_mm, border_mm, p
 #       I also had a problem with calling such a long command_string.
 #       So at the moment we just write to console, and you can paste the command yourself.
 
+
+# Non-coplanar, dots, to print at 12pix per millimetre.
 number_of_grids = 2
 number_of_columns = 15
 number_of_rows = 7
@@ -108,12 +110,47 @@ inner_diameter = 1
 border = 15
 pixelmm = 12
 rings = False
-prefix = "rings-low"
+prefix = "dots-noncoplanar"
 
 make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \
                            outer_diameter, inner_diameter, border, pixelmm, rings, prefix)
 
-border = 3
+
+# Non-coplanar, dots, used as a reference for template matching.
 pixelmm = 120
+prefix = "dots-noncoplanar-reference"
+
+make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \
+                           outer_diameter, inner_diameter, border, pixelmm, rings, prefix)
+
+# Non-coplanar, dots, used as a template for template matching.
+border = 3
+prefix = "dots-noncoplanar"
+make_template(number_of_grids, number_of_columns, number_of_rows, outer_diameter, inner_diameter, \
+              border, pixelmm, rings, prefix)
+
+
+# Coplanar, dots, to print at 12pix per millimetre.
+number_of_grids = 1
+number_of_columns = 23
+number_of_rows = 7
+pixelmm = 12
+border = 15
+prefix = "dots-coplanar"
+
+make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \
+                           outer_diameter, inner_diameter, border, pixelmm, rings, prefix)
+
+
+# Coplanar, dots, used as a reference for template matching.
+pixelmm = 120
+prefix = "dots-coplanar-reference"
+
+make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \
+                           outer_diameter, inner_diameter, border, pixelmm, rings, prefix)
+
+# Coplanar, dots, used as a template for template matching.
+border = 3
+prefix = "dots-coplanar"
 make_template(number_of_grids, number_of_columns, number_of_rows, outer_diameter, inner_diameter, \
               border, pixelmm, rings, prefix)
