@@ -109,7 +109,7 @@ TEST_CASE( "ComputeNCC", "[timing]" ) {
   m.insert(std::pair<niftk::NiftyCalTimeType, double>(1403087518406000000, -1));
   m.insert(std::pair<niftk::NiftyCalTimeType, double>(1403087518407000000, -2));
   m.insert(std::pair<niftk::NiftyCalTimeType, double>(1403087518408000000, -3));
-  REQUIRE(niftk::ComputeNCC(f, m, 0) == -1);
+  REQUIRE(niftk::ComputeNCC(f, m, 0) == 1); // we invert negative correlations.
 
   m.clear();
   m.insert(std::pair<niftk::NiftyCalTimeType, double>(1403087518406000000, 2));

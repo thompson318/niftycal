@@ -203,6 +203,10 @@ double ComputeNCC(const TimeMappedSamples1D& a, const TimeMappedSamples1D& b, co
     cost = sumAB / denom;
   }
 
+  if (cost < 0)
+  {
+    cost *= -1;
+  }
   return cost;
 }
 
