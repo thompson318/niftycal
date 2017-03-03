@@ -203,10 +203,6 @@ double ComputeNCC(const TimeMappedSamples1D& a, const TimeMappedSamples1D& b, co
     cost = sumAB / denom;
   }
 
-  if (cost < 0)
-  {
-    cost *= -1;
-  }
   return cost;
 }
 
@@ -267,8 +263,20 @@ int TimingCalibration(const TimeSamples1D& a,
   TimeMappedSamples1D bMillis = ResampleTimeStampsToMilliseconds(b);
 
   // Work out which direction to move in, using forward difference.
+  double multiplier = 1.0;
+
   double c0 = ComputeNCC(aMillis, bMillis, 0);
   double c1 = ComputeNCC(aMillis, bMillis, 1);
+
+  if (c0 < 0 && c1 < 0)
+  {
+    // time signals are negatively correlated.
+    // e.g one signal going up-down while the other is down-up.
+    multiplier = -1.0;
+    c0 *= multiplier;
+    c1 *= multiplier;
+  }
+
   int step = 1;
   if (c1 < c0)
   {
@@ -286,7 +294,7 @@ int TimingCalibration(const TimeSamples1D& a,
     bestCost = currentCost;
     offset += step;
     previousCost = currentCost;
-    currentCost = ComputeNCC(aMillis, bMillis, offset);
+    currentCost = ComputeNCC(aMillis, bMillis, offset) * multiplier;
     std::cout << "TimingCalibration[" << offset << "]=" << currentCost << std::endl;
   }
   std::cout << "TimingCalibration[" << bestOffset << "]=" << bestCost << std::endl;
