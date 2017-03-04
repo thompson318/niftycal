@@ -123,11 +123,15 @@ void TemplateRingsPointDetector::ExtractBlobs(const cv::Mat& image,
                           cv::THRESH_BINARY, blockSize, m_AdaptiveThreshold);
 
     this->ExtractIndexes(thresholdedImage, hierarchy, contours, innerRingIndexes, outerRingIndexes);
-    if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
-        || outerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height))
-    {
-      return;
-    }
+
+    // Issue #44: We might as well keep going at this point,
+    //            draw the bigBlobs and littleBlobs and see
+    //            what the blob detector makes of it.
+    // if (   innerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height)
+    //     || outerRingIndexes.size() != (m_PatternSize.width * m_PatternSize.height))
+    // {
+    //   return;
+    // }
   }
 
   for (int i = 0; i < outerRingIndexes.size(); i++)
