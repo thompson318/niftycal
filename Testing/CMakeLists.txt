@@ -73,6 +73,7 @@ add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPoints
 add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
 add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
+add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0)
 add_test(UNIT-TimingUtils ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationUtilitiesTest )
 add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-1.txt  0)
 add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)
@@ -87,18 +88,18 @@ add_test(REQ-2002-CSD-0001-001-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboa
 add_test(REQ-2002-CSD-0001-002-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png                1 1 640 480  9  6  54 0)
 
 # Circles
-add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 792 612   11 4  0 0)
-add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png               1280 1024 11 4 44 0)
+add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612   11 4  0 0)
+add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png               1 1 1280 1024 11 4 44 0)
 
 # April
 add_test(REQ-2002-CSD-0001-005-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 36h11 1 1 1280 1024 0 0)
 add_test(REQ-2002-CSD-0001-006-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8-500border-smaller.png 25h7 1 1 1079 973 360 0)
 
 # Rings
-add_test(REQ-2002-CSD-0001-007-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1 1 1280 1024 10 7 0 0 10000  0 2.0)
-add_test(REQ-2002-CSD-0001-008-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1 1 1280 1024 10 7 0 0 260000 1 0.1)
+add_test(REQ-2002-CSD-0001-007-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp                          1 1 1280 1024 10 7 0 0 10000  0 2.0)
+add_test(REQ-2002-CSD-0001-008-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp                          1 1 1280 1024 10 7 0 0 260000 1 0.1)
 add_test(REQ-2002-CSD-0001-009-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1 1 1400 1050 10 7 70 260000 1 0 0.1 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt)
-add_test(REQ-2002-CSD-0001-014-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings-template.png 1 1 780 540 21 7 147 260000 0 1 0.1 ${DATA_DIR}/Tsai/reference_780_540_21_7.txt)
+add_test(REQ-2002-CSD-0001-014-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings-template.png  1 1  780  540 21 7 147 260000 0 1 0.1 ${DATA_DIR}/Tsai/reference_780_540_21_7.txt)
 
 # Test the performance of the underlying OpenCV mono calibration.
 add_test(REQ-2002-CSD-0001-010-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest

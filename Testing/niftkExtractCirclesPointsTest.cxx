@@ -16,6 +16,7 @@
 #include "niftkCatchMain.h"
 #include <niftkCirclesPointDetector.h>
 #include <niftkNiftyCalExceptionMacro.h>
+#include <niftkIOUtilities.h>
 #include <niftkPointUtilities.h>
 
 #include <cv.h>
@@ -24,30 +25,38 @@
 
 TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
 
-  int expectedNumberOfArguments =  8;
-  if (niftk::argc != expectedNumberOfArguments)
+  if (niftk::argc != 10 && niftk::argc != 11)
   {
-    std::cerr << "Usage: niftkExtractCirclesPointsTest image expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberOfCircles expectIntegerLocations" << std::endl;
-    REQUIRE( niftk::argc == expectedNumberOfArguments);
+    std::cerr << "Usage: niftkExtractCirclesPointsTest image scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberOfCircles expectIntegerLocations [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 10);
+    REQUIRE( niftk::argc <= 11);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
-  int expectedWidth = atoi(niftk::argv[2]);
-  int expectedHeight = atoi(niftk::argv[3]);
-  int expectedColumns = atoi(niftk::argv[4]);
-  int expectedCirclesPerColumn = atoi(niftk::argv[5]);
-  int expectedNumberOfCircles = atoi(niftk::argv[6]);
-  int expectIntegerLocations = atoi(niftk::argv[7]);
+  int scaleX = atoi(niftk::argv[2]);
+  int scaleY = atoi(niftk::argv[3]);
+  int expectedWidth = atoi(niftk::argv[4]);
+  int expectedHeight = atoi(niftk::argv[5]);
+  int expectedColumns = atoi(niftk::argv[6]);
+  int expectedCirclesPerColumn = atoi(niftk::argv[7]);
+  int expectedNumberOfCircles = atoi(niftk::argv[8]);
+  int expectIntegerLocations = atoi(niftk::argv[9]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
 
+  cv::Point2d scaleFactors;
+  scaleFactors.x = scaleX;
+  scaleFactors.y = scaleY;
+
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  cv::Size2i patternSize(expectedCirclesPerColumn, expectedColumns);
-  niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+  cv::Size2i patternSize(expectedColumns, expectedCirclesPerColumn);
+  niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+  detector.SetCaching(true);
   detector.SetImage(&greyImage);
+  detector.SetImageScaleFactor(scaleFactors);
 
   niftk::PointSet points;
   if (expectedNumberOfCircles < 0)
@@ -71,5 +80,11 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
     {
       niftkNiftyCalThrow() << "Did not find non-integer coordinates.";
     }
+  }
+
+  if (niftk::argc == 11 && points.size() > 0)
+  {
+    std::string outputFile = niftk::argv[10];
+    niftk::SavePointSet(points, outputFile);
   }
 }

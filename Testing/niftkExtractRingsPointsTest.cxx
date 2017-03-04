@@ -73,7 +73,7 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
   if (asymmetric == 1)
   {
-    flags = cv::CALIB_CB_ASYMMETRIC_GRID;
+    flags = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
   }
 
   niftk::TemplateRingsPointDetector detector(patternSize, offsetSize, flags);
