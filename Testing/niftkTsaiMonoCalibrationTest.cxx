@@ -84,9 +84,9 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     if (niftk::ModelIsPlanar(model))
     {
       // Coplanar case.
-      niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+      niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
       detector.SetImage(&greyImage);
-      detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
+      detector.SetImageScaleFactor(cv::Point2d(sx, sy));
 
       imagePoints = detector.GetPoints();
       REQUIRE( imagePoints.size() == dotsInX*dotsInY );
@@ -104,7 +104,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
         sbs(new niftk::SideBySideDetector(leftDetector, rightDetector));
 
       sbs->SetImage(&greyImage);
-      sbs->SetImageScaleFactor(cv::Point2d(sx, sy), false);
+      sbs->SetImageScaleFactor(cv::Point2d(sx, sy));
 
       imagePoints = sbs->GetPoints();
       niftk::DumpPoints(std::cout, imagePoints);
@@ -115,7 +115,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   sensorDimensions.x = 1;
   sensorDimensions.y = 1;
 
-  cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
+  cv::Size scaledSize(imageSize.width, imageSize.height);
 
   std::cout << "Initial: sd=" << sensorDimensions << ", ss=" << scaledSize << std::endl;
 

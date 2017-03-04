@@ -617,14 +617,15 @@ add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibration
          ${DATA_DIR}/Tsai/Coplanar/model.txt
          10 7 1920 540 1 2 1680.902938 1697.838245 904.3534964 518.0770595 -0.219052053 0.2584777885 1)
 
+add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+         ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
+         ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x120-world.txt
+         23 7 1920 540 1 2 2502.56 2502.56 1202.51 252.707 -0.503841 1.34006)
+
 #
 # Commented out until OpenCV bug is fixed, (duplicates from findCircles)
 # or we have other test data.
 #
-#add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-#         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_left.bmp
-#         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt
-#         10 7 1920 540 1 2 1507.9 1456.72 819.128 583.707 -0.0755172 9.10026)
 #add_test(REG-TsaiNCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
 #         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_right.bmp
 #         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt

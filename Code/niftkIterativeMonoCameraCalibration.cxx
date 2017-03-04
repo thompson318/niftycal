@@ -79,6 +79,9 @@ double IterativeMonoCameraCalibration(
   // camera parameters using Levenberg-Marquardt.
   if (pointsFromOriginalImages.size() == 1)
   {
+    cv::Mat rvec;
+    cv::Mat tvec;
+
     projectedRMS = niftk::TsaiMonoCameraCalibration(
           model,
           *(pointsFromOriginalImages.begin()),
@@ -86,10 +89,16 @@ double IterativeMonoCameraCalibration(
           sensorDimensions,
           intrinsic,
           distortion,
-          rvecs[0],
-          tvecs[0],
+          rvec,
+          tvec,
           true
           );
+
+    rvecs.clear();
+    tvecs.clear();
+
+    rvecs.push_back(rvec);
+    tvecs.push_back(tvec);
   }
   else
   {
@@ -139,6 +148,9 @@ double IterativeMonoCameraCalibration(
 
     if (pointsFromOriginalImages.size() == 1)
     {
+      cv::Mat rvec;
+      cv::Mat tvec;
+
       projectedRMS = niftk::TsaiMonoCameraCalibration(
             model,
             *(distortedPointsFromCanonicalImages.begin()),
@@ -146,10 +158,17 @@ double IterativeMonoCameraCalibration(
             sensorDimensions,
             tmpIntrinsic,
             tmpDistortion,
-            rvecs[0],
-            tvecs[0],
+            rvec,
+            tvec,
             true
             );
+
+      rvecs.clear();
+      tvecs.clear();
+
+      rvecs.push_back(rvec);
+      tvecs.push_back(tvec);
+
     }
     else
     {
