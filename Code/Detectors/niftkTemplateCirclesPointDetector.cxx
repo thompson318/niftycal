@@ -24,11 +24,6 @@ TemplateCirclesPointDetector::TemplateCirclesPointDetector(cv::Size2i patternSiz
                                                           )
 : TemplateMatchingPointDetector(patternSize, offsetForTemplate, flags)
 {
-  // This is intentionally swapped round.
-  // Default OpenCV asymetric circle detection appears
-  // to not work the other way round.
-  m_PatternSize.width = patternSize.height;
-  m_PatternSize.height = patternSize.width;
 }
 
 

@@ -27,8 +27,7 @@ TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternS
                                                              cv::Size2i offsetForTemplate,
                                                              int flags
                                                             )
-: m_PatternSize(patternSize)
-, m_OffsetForTemplate(offsetForTemplate)
+: m_OffsetForTemplate(offsetForTemplate)
 , m_Flags(flags)
 , m_MaxAreaInPixels(10000)
 , m_UseContours(true)
@@ -37,6 +36,12 @@ TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternS
 , m_ReferenceImage(nullptr)
 , m_TemplateImage(nullptr)
 {
+  // This is intentionally swapped round.
+  // Default OpenCV asymetric circle detection appears
+  // to not work the other way round.
+  m_PatternSize.width = patternSize.height;
+  m_PatternSize.height = patternSize.width;
+
   if (m_PatternSize.width < 2)
   {
     niftkNiftyCalThrow() << "Number of circles in width axes is < 2.";

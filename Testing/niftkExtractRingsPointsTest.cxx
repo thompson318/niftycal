@@ -67,7 +67,7 @@ TEST_CASE( "Extract symetric rings points", "[rings]" ) {
   niftk::PointSet referencePoints = niftk::LoadPointSet(referencePointsFileName);
   REQUIRE( referencePoints.size() == ringsInX * ringsInY );
 
-  cv::Size2i patternSize(ringsInY, ringsInX);
+  cv::Size2i patternSize(ringsInX, ringsInY);
   cv::Size2i offsetSize(10, 10);
 
   int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
