@@ -70,6 +70,7 @@ PointSet SideBySideDetector::InternalGetPoints(const cv::Mat& imageToUse)
   niftk::PointSet rightPoints = m_RightDetector->GetPoints();
 
   unsigned int numberOfLeftHandPoints = result.size();
+  unsigned int rightHandOffset = imageToUse.cols / 2;
 
   // Combine points to produce output.
 
@@ -86,6 +87,8 @@ PointSet SideBySideDetector::InternalGetPoints(const cv::Mat& imageToUse)
     {
       p.id = id;
     }
+    p.point.x += rightHandOffset;
+
     result.insert(niftk::IdPoint2D(p.id, p));
   }
 
