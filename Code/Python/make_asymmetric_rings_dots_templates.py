@@ -32,9 +32,9 @@ def make_asymmetric_rings_grid(ngrids, ncols, nrows, spacing_mm, outer_dia_mm, i
                 xinneredge = xcentre + inner_diameter_in_pixels / 2.0
 
                 if c % 2 == 1:
-                    ycentre = spacing_in_pixels * r + border_in_pixels / 2.0 + spacing_in_pixels / 2.0
+                    ycentre = spacing_in_pixels * (nrows-1-r) + border_in_pixels / 2.0 - spacing_in_pixels / 2.0
                 else:
-                    ycentre = spacing_in_pixels * r + border_in_pixels / 2.0
+                    ycentre = spacing_in_pixels * (nrows-1-r) + border_in_pixels / 2.0
 
                 draw_string = draw_string + " fill black circle " + str(xcentre) \
                     + "," + str(ycentre) + " " + str(xedge) + "," + str(ycentre)
