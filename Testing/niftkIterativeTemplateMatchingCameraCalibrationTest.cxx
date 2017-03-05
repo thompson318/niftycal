@@ -80,10 +80,7 @@ TEST_CASE( "Iterative Template Matching (Rings/Circles)", "[MonoCalibration]" ) 
   cv::Size2i imageSize;
   cv::Size2i offset(10, 10);
 
-  // This is passed through to cv::findCirclesGrid, for which the documentation
-  // says "patternSize = Size(points_per_row, points_per_colum)"
-  // which is the opposite way round to the normal cv::Size2i constructor.
-  cv::Size2i rings(ringsInY, ringsInX);
+  cv::Size2i rings(ringsInX, ringsInY);
 
   cv::Point2d scaleFactors;
   scaleFactors.x = 1;

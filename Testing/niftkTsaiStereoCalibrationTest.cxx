@@ -27,10 +27,10 @@
 
 TEST_CASE( "Tsai stereo", "[stereo]" ) {
 
-  int expectedNumberOfArguments =  17;
+  int expectedNumberOfArguments =  18;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageR.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion expectedRMS optimise3D" << std::endl;
+    std::cerr << "Usage: niftkTsaiStereoCalibrationTest imageL.png imageR.png model.txt dotsInX dotsInY nx ny scaleX scaleY asymmetric fx fy cx cy distortion expectedRMS optimise3D" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -43,13 +43,20 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
   int ny = atoi(niftk::argv[7]);
   float sx = atof(niftk::argv[8]);
   float sy = atof(niftk::argv[9]);
-  float eFx = atof(niftk::argv[10]);
-  float eFy = atof(niftk::argv[11]);
-  float eCx = atof(niftk::argv[12]);
-  float eCy = atof(niftk::argv[13]);
-  float dist = atof(niftk::argv[14]);
-  float expectedRMS = atof(niftk::argv[15]);
-  int optimise3D = atoi(niftk::argv[16]);
+  int asymmetric = atoi(niftk::argv[10]);
+  float eFx = atof(niftk::argv[11]);
+  float eFy = atof(niftk::argv[12]);
+  float eCx = atof(niftk::argv[13]);
+  float eCy = atof(niftk::argv[14]);
+  float dist = atof(niftk::argv[15]);
+  float expectedRMS = atof(niftk::argv[16]);
+  int optimise3D = atoi(niftk::argv[17]);
+
+  int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  if (asymmetric == 1)
+  {
+    flags = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  }
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -96,7 +103,7 @@ TEST_CASE( "Tsai stereo", "[stereo]" ) {
       if (niftk::ModelIsPlanar(model))
       {
         // Coplanar case.
-        niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+        niftk::CirclesPointDetector detector(patternSize, flags);
         detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
 
         detector.SetImage(&leftGreyImage);

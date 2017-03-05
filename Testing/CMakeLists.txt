@@ -73,7 +73,7 @@ add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPoints
 add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
 add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
-add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0)
+add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0 1)
 add_test(UNIT-TimingUtils ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationUtilitiesTest )
 add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-1.txt  0)
 add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)
@@ -88,8 +88,8 @@ add_test(REQ-2002-CSD-0001-001-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboa
 add_test(REQ-2002-CSD-0001-002-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/OpenCV-2.4.11/left01.png                1 1 640 480  9  6  54 0)
 
 # Circles
-add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612   11 4  0 0)
-add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png               1 1 1280 1024 11 4 44 0)
+add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612   11 4  0 0 1)
+add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png               1 1 1280 1024 11 4 44 0 1)
 
 # April
 add_test(REQ-2002-CSD-0001-005-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 36h11 1 1 1280 1024 0 0)
@@ -598,38 +598,29 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1676.02 1676.02 903.128 521.947 -0.219052 0.996367)
+         10 7 1920 540 1 2 0 1676.49 1676.49 902.469 521.366 -0.218883 0.996344)
 
 add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1660.29 1660.29 979.617 528.893 -0.260747 1.42307)
+         10 7 1920 540 1 2 0 1660.21 1660.21 977.488 529.236 -0.260808 1.42298)
 
 add_test(REG-TsaiCPStereo2D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1676.020778 1676.020778 903.1279753 521.9467757 -0.219052053 0.6767414659 0)
+         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.6790916665 0)
 
 add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 1680.902938 1697.838245 904.3534964 518.0770595 -0.219052053 0.2584777885 1)
+         10 7 1920 540 1 2 0 1681.497851 1698.974219 903.7269631 517.4167726 -0.2188825101 0.258041612 1)
 
-add_test(REG-TsaiNCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
-         ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x120-world.txt
-         23 7 1920 540 1 2 2502.56 2502.56 1202.51 252.707 -0.503841 1.34006)
-
-#
-# Commented out until OpenCV bug is fixed, (duplicates from findCircles)
-# or we have other test data.
-#
-#add_test(REG-TsaiNCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-#         ${DATA_DIR}/Tsai/NonCoplanar/1479224227386188288_right.bmp
-#         ${DATA_DIR}/Tsai/NonCoplanar/model-2.txt
-#         10 7 1920 540 1 2 1512.35 1459.68 878.344 592.101 -0.0672333 9.57499)
+add_test(REG-TsaiNCPMonoLF ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+         ${DATA_DIR}/Asymmetric/1488546362257514496_left_flipped.bmp
+         ${DATA_DIR}/Asymmetric/dots-noncoplanar-2x15x7x120-world.txt
+         15 7 1920 540 1 2 1 1721.17 1721.17 917.172 512.628 -0.236947 1.88853)
 
 add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
          ${DATA_DIR}/Tsai/NonCoplanar/data.txt

@@ -25,11 +25,11 @@
 
 TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
 
-  if (niftk::argc != 10 && niftk::argc != 11)
+  if (niftk::argc != 11 && niftk::argc != 12)
   {
-    std::cerr << "Usage: niftkExtractCirclesPointsTest image scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberOfCircles expectIntegerLocations [outputFile]" << std::endl;
-    REQUIRE( niftk::argc >= 10);
-    REQUIRE( niftk::argc <= 11);
+    std::cerr << "Usage: niftkExtractCirclesPointsTest image scaleX scaleY expectedImageWidth expectedImageHeight expectedColumns expectedCirclesPerColumn expectedNumberOfCircles expectIntegerLocations asymmetric [outputFile]" << std::endl;
+    REQUIRE( niftk::argc >= 11);
+    REQUIRE( niftk::argc <= 12);
   }
 
   cv::Mat image = cv::imread(niftk::argv[1]);
@@ -41,6 +41,7 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   int expectedCirclesPerColumn = atoi(niftk::argv[7]);
   int expectedNumberOfCircles = atoi(niftk::argv[8]);
   int expectIntegerLocations = atoi(niftk::argv[9]);
+  int asymmetric = atoi(niftk::argv[10]);
 
   REQUIRE( image.cols == expectedWidth );
   REQUIRE( image.rows == expectedHeight );
@@ -52,8 +53,14 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
+  int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  if (asymmetric == 1)
+  {
+    flags = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  }
+
   cv::Size2i patternSize(expectedColumns, expectedCirclesPerColumn);
-  niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+  niftk::CirclesPointDetector detector(patternSize, flags);
   detector.SetCaching(true);
   detector.SetImage(&greyImage);
   detector.SetImageScaleFactor(scaleFactors);
@@ -82,9 +89,9 @@ TEST_CASE( "Extract assymetric circle points", "[circles]" ) {
     }
   }
 
-  if (niftk::argc == 11 && points.size() > 0)
+  if (niftk::argc == 12 && points.size() > 0)
   {
-    std::string outputFile = niftk::argv[10];
+    std::string outputFile = niftk::argv[11];
     niftk::SavePointSet(points, outputFile);
   }
 }
