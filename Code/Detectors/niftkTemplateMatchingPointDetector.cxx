@@ -183,13 +183,13 @@ PointSet TemplateMatchingPointDetector::InternalGetPoints(const cv::Mat& imageTo
       {
         niftkNiftyCalThrow() << "Initial guess contains the wrong number of points.";
       }
-      result = this->GetPointsUsingTemplateMatching(imageToUse, m_InitialGuess);
+      result = this->GetPointsUsingTemplateMatching(*m_Image, m_InitialGuess);
     }
     else
     {
       if (!result.empty())
       {
-        result = this->GetPointsUsingTemplateMatching(imageToUse, result);
+        result = this->GetPointsUsingTemplateMatching(*m_Image, result);
       }
     }
   }
