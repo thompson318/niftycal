@@ -16,6 +16,8 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkHomographyUtilities.h>
 #include <niftkMatrixUtilities.h>
+#include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 #include <niftkTemplateMatching.h>
 #include <cv.h>
 #include <highgui.h>
@@ -183,13 +185,20 @@ PointSet TemplateMatchingPointDetector::InternalGetPoints(const cv::Mat& imageTo
       {
         niftkNiftyCalThrow() << "Initial guess contains the wrong number of points.";
       }
-      result = this->GetPointsUsingTemplateMatching(*m_Image, m_InitialGuess);
+
+      cv::Mat* imageForTemplateMatching = const_cast<cv::Mat*>(&imageToUse);
+      if (this->m_RescalePoints)
+      {
+        imageForTemplateMatching = m_Image;
+      }
+
+      result = this->GetPointsUsingTemplateMatching(*imageForTemplateMatching, m_InitialGuess);
     }
     else
     {
       if (!result.empty())
       {
-        result = this->GetPointsUsingTemplateMatching(*m_Image, result);
+        result = this->GetPointsUsingTemplateMatching(imageToUse, result);
       }
     }
   }

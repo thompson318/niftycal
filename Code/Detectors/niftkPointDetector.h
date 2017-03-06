@@ -73,6 +73,7 @@ protected:
 
   niftk::PointSet m_InitialGuess;
   cv::Mat*        m_Image;
+  bool            m_RescalePoints;
 
   /**
   * \brief Derived classes should implement this to extract points.
@@ -83,7 +84,6 @@ private:
 
   cv::Mat         m_RescaledImage;
   cv::Point2d     m_ScaleFactors;
-  bool            m_RescalePoints;
   bool            m_Caching;
   bool            m_NeedsUpdating;
   niftk::PointSet m_CachedResult;

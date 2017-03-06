@@ -117,7 +117,7 @@ make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, s
 
 
 # Non-coplanar, dots, used as a reference for template matching.
-pixelmm = 120
+pixelmm = 60 
 prefix = "dots-noncoplanar-reference"
 
 make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \
@@ -143,7 +143,7 @@ make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, s
 
 
 # Coplanar, dots, used as a reference for template matching.
-pixelmm = 120
+pixelmm = 60
 prefix = "dots-coplanar-reference"
 
 make_asymmetric_rings_grid(number_of_grids, number_of_columns, number_of_rows, spacing, \

@@ -136,6 +136,7 @@ double IterativeMonoCameraCalibration(
           referenceImageData,
           intrinsic,
           distortion,
+          imageSize,
           detectorAndOriginalImages,
           detectorAndCanonicalImages,
           distortedPointsFromCanonicalImages

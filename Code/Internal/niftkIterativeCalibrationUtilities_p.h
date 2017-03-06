@@ -52,6 +52,7 @@ void ExtractAllDistortedControlPoints(
   const std::pair< cv::Mat, niftk::PointSet>& referenceImageData,
   const cv::Mat& intrinsic,
   const cv::Mat& distortion,
+  const cv::Size2i& imageSize,
   const std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& originalDetectorsAndImages,
   std::list< std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat> >& canonicalDetectorsAndImages,
   std::list<PointSet>& outputPoints
@@ -61,6 +62,7 @@ void ExtractDistortedControlPoints(
   const std::pair< cv::Mat, niftk::PointSet>& referenceData,
   const cv::Mat& intrinsic,
   const cv::Mat& distortion,
+  const cv::Size2i& imageSize,
   const cv::Mat& originalImage,
   std::pair<std::shared_ptr<IPoint2DDetector>, cv::Mat>& outputDetectorAndImage,
   PointSet& outputPoints
