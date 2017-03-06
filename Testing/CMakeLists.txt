@@ -619,12 +619,12 @@ add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibration
 
 add_test(REG-TsaiAsymmCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
-         ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x120-world.txt
+         ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x60-world.txt
          23 7 1920 540 1 2 1 1721.15 1721.15 916.856 512.815 -0.237124 1.88853)
 
 add_test(REG-TsaiAsymmNCPMonoLF ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Asymmetric/1488546362257514496_left_flipped.bmp
-         ${DATA_DIR}/Asymmetric/dots-noncoplanar-2x15x7x120-world.txt
+         ${DATA_DIR}/Asymmetric/1488546362257514496_left_flipped.png
+         ${DATA_DIR}/Asymmetric/dots-noncoplanar-2x15x7x60-world.txt
          15 7 1920 540 1 2 1 1721.88 1729.22 889.967 633.695 -0.273597 1.34762)
 
 add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
