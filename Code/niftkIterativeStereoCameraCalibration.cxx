@@ -291,6 +291,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
           referenceImageData,
           intrinsicLeft,
           distortionLeft,
+          imageSize,
           detectorAndOriginalImagesLeft,
           detectorAndCanonicalImagesLeft,
           distortedPointsFromCanonicalImagesLeft
@@ -300,6 +301,7 @@ cv::Matx21d IterativeStereoCameraCalibration(
           referenceImageData,
           intrinsicRight,
           distortionRight,
+          imageSize,
           detectorAndOriginalImagesRight,
           detectorAndCanonicalImagesRight,
           distortedPointsFromCanonicalImagesRight

@@ -20,9 +20,13 @@ namespace niftk {
 
 //-----------------------------------------------------------------------------
 CirclesPointDetector::CirclesPointDetector(cv::Size2i patternSize, int flags)
-: m_PatternSize(patternSize)
-, m_Flags(flags)
+: m_Flags(flags)
 {
+  // This is intentionally swapped round.
+  // Asymetric circle detection appears to not work the other way round.
+  m_PatternSize.width = patternSize.height;
+  m_PatternSize.height = patternSize.width;
+
   if (m_PatternSize.width < 2)
   {
     niftkNiftyCalThrow() << "Number of circles in width axes is < 2.";
@@ -30,7 +34,7 @@ CirclesPointDetector::CirclesPointDetector(cv::Size2i patternSize, int flags)
   if (m_PatternSize.height < 2)
   {
     niftkNiftyCalThrow() << "Number of circles in height axes is < 2.";
-  }
+  }  
 }
 
 

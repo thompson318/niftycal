@@ -23,8 +23,7 @@ TEST_CASE( "Timing Calibration 2D/3D", "[timing]" ) {
   int expectedMinimumNumberOfArguments =  3;
   int expectedMaximumNumberOfArguments = 4;
   if (niftk::argc < expectedMinimumNumberOfArguments
-      || niftk::argc < expectedMaximumNumberOfArguments
-     )
+      || niftk::argc > expectedMaximumNumberOfArguments)
   {
     std::cerr << "Usage: niftkTimingCalibrationTest trackerPoints3D.txt imagePoints2D.txt [expectedLagInMilliseconds]" << std::endl;
     REQUIRE( niftk::argc >= expectedMinimumNumberOfArguments);

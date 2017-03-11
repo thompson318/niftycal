@@ -27,10 +27,10 @@
 
 TEST_CASE( "Tsai mono", "[mono]" ) {
 
-  int expectedNumberOfArguments =  15;
+  int expectedNumberOfArguments =  16;
   if (niftk::argc < expectedNumberOfArguments)
   {
-    std::cerr << "Usage: niftkTsaiMonoCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY fx fy cx cy distortion rms" << std::endl;
+    std::cerr << "Usage: niftkTsaiMonoCalibrationTest image.png model.txt dotsInX dotsInY nx ny scaleX scaleY asymmetric fx fy cx cy distortion rms" << std::endl;
     REQUIRE( niftk::argc >= expectedNumberOfArguments);
   }
 
@@ -42,12 +42,13 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   int ny = atoi(niftk::argv[6]);
   float sx = atof(niftk::argv[7]);
   float sy = atof(niftk::argv[8]);
-  float eFx = atof(niftk::argv[9]);
-  float eFy = atof(niftk::argv[10]);
-  float eCx = atof(niftk::argv[11]);
-  float eCy = atof(niftk::argv[12]);
-  float dist = atof(niftk::argv[13]);
-  float expectedRMS = atof(niftk::argv[14]);
+  int asymmetric = atoi(niftk::argv[9]);
+  float eFx = atof(niftk::argv[10]);
+  float eFy = atof(niftk::argv[11]);
+  float eCx = atof(niftk::argv[12]);
+  float eCy = atof(niftk::argv[13]);
+  float dist = atof(niftk::argv[14]);
+  float expectedRMS = atof(niftk::argv[15]);
 
   // Loads "model"
   niftk::Model3D model = niftk::LoadModel3D(modelFileName);
@@ -58,6 +59,12 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   else
   {
     REQUIRE( model.size() == 2*dotsInX*dotsInY );
+  }
+
+  int flags = cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
+  if (asymmetric == 1)
+  {
+    flags = cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING;
   }
 
   // Loads image data.
@@ -84,7 +91,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     if (niftk::ModelIsPlanar(model))
     {
       // Coplanar case.
-      niftk::CirclesPointDetector detector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+      niftk::CirclesPointDetector detector(patternSize, flags);
       detector.SetImage(&greyImage);
       detector.SetImageScaleFactor(cv::Point2d(sx, sy), false);
 
@@ -95,10 +102,10 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
     else
     {
       std::unique_ptr<niftk::PointDetector>
-        leftDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
+        leftDetector(new niftk::CirclesPointDetector(patternSize, flags));
 
       std::unique_ptr<niftk::PointDetector>
-        rightDetector(new niftk::CirclesPointDetector(patternSize, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING));
+        rightDetector(new niftk::CirclesPointDetector(patternSize, flags));
 
       std::unique_ptr<niftk::SideBySideDetector>
         sbs(new niftk::SideBySideDetector(leftDetector, rightDetector));
@@ -115,7 +122,7 @@ TEST_CASE( "Tsai mono", "[mono]" ) {
   sensorDimensions.x = 1;
   sensorDimensions.y = 1;
 
-  cv::Size scaledSize(imageSize.width * sx, imageSize.height * sy);
+  cv::Size scaledSize(imageSize.width*sx, imageSize.height*sy);
 
   std::cout << "Initial: sd=" << sensorDimensions << ", ss=" << scaledSize << std::endl;
 

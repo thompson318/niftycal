@@ -16,6 +16,8 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkHomographyUtilities.h>
 #include <niftkMatrixUtilities.h>
+#include <niftkIOUtilities.h>
+#include <niftkPointUtilities.h>
 #include <niftkTemplateMatching.h>
 #include <cv.h>
 #include <highgui.h>
@@ -27,8 +29,7 @@ TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternS
                                                              cv::Size2i offsetForTemplate,
                                                              int flags
                                                             )
-: m_PatternSize(patternSize)
-, m_OffsetForTemplate(offsetForTemplate)
+: m_OffsetForTemplate(offsetForTemplate)
 , m_Flags(flags)
 , m_MaxAreaInPixels(10000)
 , m_UseContours(true)
@@ -37,6 +38,12 @@ TemplateMatchingPointDetector::TemplateMatchingPointDetector(cv::Size2i patternS
 , m_ReferenceImage(nullptr)
 , m_TemplateImage(nullptr)
 {
+  // This is intentionally swapped round.
+  // Default OpenCV asymetric circle detection appears
+  // to not work the other way round.
+  m_PatternSize.width = patternSize.height;
+  m_PatternSize.height = patternSize.width;
+
   if (m_PatternSize.width < 2)
   {
     niftkNiftyCalThrow() << "Number of circles in width axes is < 2.";
@@ -178,7 +185,14 @@ PointSet TemplateMatchingPointDetector::InternalGetPoints(const cv::Mat& imageTo
       {
         niftkNiftyCalThrow() << "Initial guess contains the wrong number of points.";
       }
-      result = this->GetPointsUsingTemplateMatching(imageToUse, m_InitialGuess);
+
+      cv::Mat* imageForTemplateMatching = const_cast<cv::Mat*>(&imageToUse);
+      if (this->m_RescalePoints)
+      {
+        imageForTemplateMatching = m_Image;
+      }
+
+      result = this->GetPointsUsingTemplateMatching(*imageForTemplateMatching, m_InitialGuess);
     }
     else
     {
