@@ -64,7 +64,7 @@ TimeSamples1D ProjectTo1DAndNormalise(const TimeSamples3D& a)
     {
       min = tmp.sample;
     }
-    else if (tmp.sample > max)
+    if (tmp.sample > max)
     {
       max = tmp.sample;
     }
