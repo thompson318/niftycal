@@ -79,8 +79,8 @@ add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DAT
 add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)
 add_test(UNIT-Timing3 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-3.txt -3)
 add_test(UNIT-Timing4 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-4.txt 45)
-add_test(UNIT-TimingSpectraNVidiaSDI ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/spectra-nvidiasdi-cuda55-tracking.txt ${DATA_DIR}/Timing/spectra-nvidiasdi-cuda55-points.txt 53)
-add_test(UNIT-TimingAuroraUltrasonix ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/aurora-ultrasonix-ulterius-tracking.txt ${DATA_DIR}/Timing/aurora-ultrasonix-ulterius-points.txt 60)
+add_test(UNIT-TimingSpectraNVidiaSDI ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/spectra-nvidiasdi-cuda55-tracking.txt ${DATA_DIR}/Timing/spectra-nvidiasdi-cuda55-points.txt 55)
+add_test(UNIT-TimingAuroraUltrasonix ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/aurora-ultrasonix-ulterius-tracking.txt ${DATA_DIR}/Timing/aurora-ultrasonix-ulterius-points.txt 30)
 
 
 # Chess
