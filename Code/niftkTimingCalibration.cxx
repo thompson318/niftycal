@@ -240,6 +240,30 @@ int TimingCalibration(const TimeSamples3D& a,
 
 
 //-----------------------------------------------------------------------------
+TimeSamples1D TakeOffBeginningAndEnd(const TimeSamples1D& input)
+{
+  if (input.size() * 0.8 < 100)
+  {
+    return input;
+  }
+
+  TimeSamples1D result;
+  TimingSample1D tmp;
+  TimeSamples1D::size_type lowest = input.size() * 0.1;
+  TimeSamples1D::size_type highest = input.size() * 0.9;
+
+  for (TimeSamples1D::size_type i = lowest; i <= highest; i++)
+  {
+    tmp.time = input[i].time;
+    tmp.sample = input[i].sample;
+    result.push_back(tmp);
+  }
+
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
 int TimingCalibration(const TimeSamples1D& a,
                       const TimeSamples1D& b
                      )
@@ -258,9 +282,13 @@ int TimingCalibration(const TimeSamples1D& a,
   int bestOffset = 0;
   double bestCost = 0;
 
+  // Chop off beginning and end, as user is likely to be inaccurate.
+  TimeSamples1D aChopped = TakeOffBeginningAndEnd(a);
+  TimeSamples1D bChopped = TakeOffBeginningAndEnd(b);
+
   // This also converts to a hash map for the subsequent optimisation.
-  TimeMappedSamples1D aMillis = ResampleTimeStampsToMilliseconds(a);
-  TimeMappedSamples1D bMillis = ResampleTimeStampsToMilliseconds(b);
+  TimeMappedSamples1D aMillis = ResampleTimeStampsToMilliseconds(aChopped);
+  TimeMappedSamples1D bMillis = ResampleTimeStampsToMilliseconds(bChopped);
 
   // Work out which direction to move in, using forward difference.
   double multiplier = 1.0;
