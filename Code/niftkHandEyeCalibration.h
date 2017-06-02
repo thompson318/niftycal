@@ -72,6 +72,7 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 * \param residual returns 2D rms reprojection error.
 *
 * Optimises intrinsic (4DOF), distortion (5DOF), model-to-world (6DOF) and hand-eye (6DOF).
+*
 * If ITK is not compiled in, this just sets residual to zero.
 */
 NIFTYCAL_WINEXPORT void CalculateHandEyeUsingMaltisMethod(
@@ -127,6 +128,26 @@ NIFTYCAL_WINEXPORT void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     cv::Matx44d&                  modelToWorld,
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
+    );
+
+
+/**
+* \brief Calculates Hand-Eye by Morgan et al. IPCAI 2017 paper.
+*
+* Note: The input are 3D points, and their corresponding 2D
+* undistorted image points (i.e. 2D points after distortion
+* correction has happened). Furthermore, the 3D points, are
+* not model points, like points on a chessboard using the
+* chessboard coordinate system. They are in fact in tracker
+* space. As such, there is no need to have a regular grid
+* of fiducials.
+*
+*/
+NIFTYCAL_WINEXPORT void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                                           cameraMatrix,
+    const std::vector<std::pair<cv::Point2d, cv::Point3d> >& pairedPoints,
+    const double&                                            exitCondition,
+    cv::Matx44d&                                             handEye
     );
 
 } // end namespace

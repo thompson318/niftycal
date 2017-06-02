@@ -103,6 +103,126 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 }
 
 
+/**
+ From Morgan et al. IPCAI 2017
+
+ MATLAB code provided in paper:
+
+% INPUTS: X : (3xn) 3D coordinates (tracker space).
+%         Q : (2xn) 2D pixel coordinates (image space).
+%         A : (3x3) camera Matrix.
+%       tol : exit condition.
+% OUTPUTS R : 3x3 rotation matrix
+%         t : 3x1 translation vector.
+%
+% n = size(Q,2); e = ones(1,n); j=eye(n)-((e'*e)./n);
+% Q = normc(inv(A)*[Q;e]);
+% Y = Q;
+% err = +Inf; E_old = 1000*ones(3,n);
+% while err > tol
+%   [U,~,V] = svd(Y*J*X');
+%   R = U*[1 0 0; 0 1 0; 0 0 det (U*V')]*V';
+%   t = mean(Y-R*X, 2);
+%   Y = repmat(dot(R*X + t*e, Q), [3,1]) .* Q;
+%   E = Y-R*X - t*e;
+%   err = norm(E-E_old, ' fro '); E_old = E;
+% end
+*/
+
+//-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                                           cameraMatrix,
+    const std::vector<std::pair<cv::Point2d, cv::Point3d> >& pairedPoints,
+    const double&                                            tol,
+    cv::Matx44d&                                             handEye
+    )
+{
+  int n = pairedPoints.size();
+
+  cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
+  cv::Mat Q = cvCreateMat ( 2, n, CV_64FC1 );
+  cv::Mat Qe = cvCreateMat ( 3, n, CV_64FC1 );
+  cv::Mat e = cv::Mat::ones( 1, n, CV_64FC1 );
+
+  for (int i = 0; i < n; i++)
+  {
+    Q.at<double>(0, i)  = pairedPoints[i].first.x;
+    Q.at<double>(1, i)  = pairedPoints[i].first.y;
+    Qe.at<double>(0, i) = pairedPoints[i].first.x;
+    Qe.at<double>(1, i) = pairedPoints[i].first.y;
+    Qe.at<double>(2, i) = e.at<double>(0, i);
+    X.at<double>(0, i)  = pairedPoints[i].second.x;
+    X.at<double>(1, i)  = pairedPoints[i].second.y;
+    X.at<double>(2, i)  = pairedPoints[i].second.z;
+  }
+
+  cv::Mat XPrime;
+  cv::transpose(X, XPrime);
+
+  cv::Mat ePrime;
+  cv::transpose(e, ePrime);
+
+  cv::Mat J = cv::Mat::eye(n, n, CV_64FC1 ) - ((ePrime * e)/n);
+  cv::Mat AInv = cameraMatrix.inv();
+  cv::Mat lines = AInv * Qe;
+
+  assert(lines.rows == Q.rows);
+  assert(lines.cols == Q.cols);
+
+  // Normalise columns
+  for (int c = 0; c < lines.cols; c++)
+  {
+    double magnitude = 0;
+    for (int r = 0; r < lines.rows; r++)
+    {
+      magnitude += (lines.at<double>(r, c) * lines.at<double>(r, c));
+    }
+    magnitude = sqrt(magnitude);
+
+    for (int r = 0; r < Q.rows; r++)
+    {
+      Q.at<double>(r, c) = lines.at<double>(r, c) / magnitude;
+    }
+  }
+
+  // Setup loop.
+  cv::Mat Y = Q;
+  cv::Mat R = cv::Mat::eye(3, 3, CV_64FC1);
+  cv::Mat t = cv::Mat::ones(3, 1, CV_64FC1);
+  double err = std::numeric_limits<double>::max();
+  cv::Mat E_old = 1000*cv::Mat::ones(3, n, CV_64FC1);
+
+  // Iterate to minimise error.
+  while (err > tol)
+  {
+    cv::SVD svd(Y*J*XPrime);
+    cv::Mat U = svd.u;
+    cv::Mat VPrime = svd.vt;
+
+    double det = cv::determinant(U*VPrime);
+
+    cv::Mat tmp = cv::Mat::ones(3, 3, CV_64FC1);
+    tmp.at<double>(2, 2) = det;
+
+    R = U * tmp * VPrime;
+
+    tmp = Y - R*X;
+
+    // mean along row
+    for (int r = 0; r < tmp.rows; r++)
+    {
+      double mean = 0;
+      for (int c = 0; c < tmp.cols; c++)
+      {
+        mean += tmp.at<double>(r,c);
+      }
+      mean /= static_cast<double>(tmp.cols);
+      t.at<double>(r, 0) = mean;
+    }
+  }
+}
+
+
 //-----------------------------------------------------------------------------
 cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& handMatrices,
