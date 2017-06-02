@@ -98,6 +98,10 @@ if(ITK_FOUND)
 
 endif()
 
+if(VTK_FOUND)
+  list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedCamera.cxx)
+endif()
+
 add_library(niftycal ${NIFTYCAL_SRCS})
 
 if(BUILD_SHARED_LIBS)
