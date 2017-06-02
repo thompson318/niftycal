@@ -130,6 +130,13 @@ if(ITK_FOUND)
   add_definitions(-DNIFTYCAL_WITH_ITK)
 endif()
 
+find_package(VTK)
+if (VTK_FOUND)
+  include_directories(${VTK_INCLUDE_DIRS})
+  list(APPEND ALL_THIRD_PARTY_LIBRARIES ${VTK_LIBRARIES})
+  add_definitions(-DNIFTYCAL_WITH_VTK)
+endif()
+
 set(ALL_LIBRARIES niftycal ${ALL_THIRD_PARTY_LIBRARIES})
 
 find_package(OpenMP)
