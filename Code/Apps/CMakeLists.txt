@@ -23,6 +23,10 @@ set(NIFTYCAL_APPS
   niftkTimingCalibrationFromPoints
   niftkPoseFromPoints
 )
+if (VTK_FOUND)
+  list(APPEND NIFTYCAL_APPS niftkRenderCalibratedModel)
+endif()
+
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)
   target_link_libraries(${app} niftycal ${ALL_THIRD_PARTY_LIBRARIES})

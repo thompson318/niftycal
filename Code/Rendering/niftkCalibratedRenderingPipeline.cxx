@@ -20,8 +20,8 @@
 
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::CalibratedRenderingPipeline(
-    const cv::Vec2i&   windowSize,           // e.g. 1920x1080
-    const cv::Vec2i&   calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
+    const cv::Size2i&  windowSize,           // e.g. 1920x1080
+    const cv::Size2i&  calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
     const std::string& modelFileName,
     const std::string& textureFileName
     )
@@ -29,11 +29,11 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 , m_CalibratedWindowSize(calibratedWindowSize)
 {
   // Do all validation early, and bail out without doing anything.
-  if (windowSize[0] <= 0 || windowSize[1] <= 0)
+  if (windowSize.width <= 0 || windowSize.height <= 0)
   {
     niftkNiftyCalThrow() << "Invalid windowSize:" << windowSize;
   }
-  if (calibratedWindowSize[0] <= 0 || calibratedWindowSize[1] <= 0)
+  if (calibratedWindowSize.width <= 0 || calibratedWindowSize.height <= 0)
   {
     niftkNiftyCalThrow() << "Invalid windowSize:" << windowSize;
   }
@@ -46,12 +46,12 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
     niftkNiftyCalThrow() << "Texture file name is empty.";
   }
 
-  m_AspectRatio[0] = static_cast<double>(windowSize[0])/static_cast<double>(calibratedWindowSize[0]);
-  m_AspectRatio[1] = static_cast<double>(windowSize[1])/static_cast<double>(calibratedWindowSize[1]);
+  m_AspectRatio[0] = static_cast<double>(windowSize.width)/static_cast<double>(calibratedWindowSize.width);
+  m_AspectRatio[1] = static_cast<double>(windowSize.height)/static_cast<double>(calibratedWindowSize.height);
 
   m_Camera = vtkSmartPointer<CalibratedCamera>::New();
-  m_Camera->SetActualWindowSize(windowSize[0], windowSize[1]);
-  m_Camera->SetCalibratedImageSize(calibratedWindowSize[0], calibratedWindowSize[1], m_AspectRatio[0]/m_AspectRatio[1]);
+  m_Camera->SetActualWindowSize(windowSize.width, windowSize.height);
+  m_Camera->SetCalibratedImageSize(calibratedWindowSize.width, calibratedWindowSize.height, m_AspectRatio[0]/m_AspectRatio[1]);
   m_Camera->SetUseCalibratedCamera(true);
 
   m_ModelReader = vtkSmartPointer<vtkPolyDataReader>::New();
@@ -92,7 +92,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_RenderWin = vtkSmartPointer<vtkRenderWindow>::New();
   m_RenderWin->AddRenderer(m_Renderer);
 
-  m_RenderWin->SetSize(m_WindowSize[0], m_WindowSize[1]);
+  m_RenderWin->SetSize(m_WindowSize.width, m_WindowSize.height);
   m_RenderWin->DoubleBufferOff();
   m_RenderWin->Render();
 

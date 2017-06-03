@@ -41,8 +41,8 @@ class NIFTYCAL_WINEXPORT CalibratedRenderingPipeline {
 public:
 
   CalibratedRenderingPipeline(
-    const cv::Vec2i&   windowSize,           // e.g. 1920x1080
-    const cv::Vec2i&   calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
+    const cv::Size2i& windowSize,           // e.g. 1920x1080
+    const cv::Size2i& calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
     const std::string& modelFileName,
     const std::string& textureFileName
   );
@@ -97,8 +97,8 @@ private:
   void UpdateCamera();
   void OpenCVToVTK(const cv::Matx44d& openCV, vtkMatrix4x4& vtk);
 
-  cv::Vec2i                                    m_WindowSize;
-  cv::Vec2i                                    m_CalibratedWindowSize;
+  cv::Size2i                                   m_WindowSize;
+  cv::Size2i                                   m_CalibratedWindowSize;
   cv::Vec2d                                    m_AspectRatio;
 
   cv::Mat                                      m_IntrinsicMatrix;
