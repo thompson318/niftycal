@@ -31,8 +31,6 @@ namespace niftk
 
 /**
 * \brief Performs a stereo camera calibration.
-* \param optimise3D if true and ITK is compiled in, will additionally optimise all
-* camera parameters by minimising the RMS reconstruction error, reconstructing the target points in 3D.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
 * \param optimise3D if true will use Levenberg-Marquart to optimise the 3D reconstruction error (not recommended).
 * \return rms re-projection and 3D reconstruction error
