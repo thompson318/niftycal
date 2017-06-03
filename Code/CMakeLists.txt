@@ -100,6 +100,7 @@ endif()
 
 if(VTK_FOUND)
   list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedCamera.cxx)
+  list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedRenderingPipeline.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
