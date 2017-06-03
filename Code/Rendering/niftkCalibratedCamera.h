@@ -41,9 +41,9 @@ class NIFTYCAL_WINEXPORT CalibratedCamera : public vtkOpenGLCamera
 public:
   static CalibratedCamera *New();
   vtkTypeMacro(CalibratedCamera, vtkOpenGLCamera);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Render(vtkRenderer *ren) override;
+  void Render(vtkRenderer *ren);
 
   vtkSetMacro(UseCalibratedCamera, bool);
   vtkGetMacro(UseCalibratedCamera, bool);
