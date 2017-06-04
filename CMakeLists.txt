@@ -132,6 +132,7 @@ endif()
 
 find_package(VTK)
 if (VTK_FOUND)
+  include(${VTK_USE_FILE})
   include_directories(${VTK_INCLUDE_DIRS})
   list(APPEND ALL_THIRD_PARTY_LIBRARIES ${VTK_LIBRARIES})
   add_definitions(-DNIFTYCAL_WITH_VTK)

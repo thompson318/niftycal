@@ -76,7 +76,7 @@ public:
   * \brief Used to set the camera position in world coordinates.
   * \param cameraToWorld rigid body transform
   */
-  void SetCameraToWorldMatrix(const cv::Matx44d& modelToWorld);
+  void SetWorldToCameraMatrix(const cv::Matx44d& worldToCamera);
 
   /**
    * \brief Defaults to Identity.
@@ -104,7 +104,7 @@ private:
   cv::Mat                                      m_IntrinsicMatrix;
   cv::Matx44d                                  m_LeftToRightMatrix;
   cv::Matx44d                                  m_RightToLeftMatrix;
-  cv::Matx44d                                  m_CameraToWorldMatrix;
+  cv::Matx44d                                  m_WorldToCameraMatrix;
   cv::Matx44d                                  m_CameraMatrix;
 
   vtkSmartPointer<CalibratedCamera>            m_Camera;

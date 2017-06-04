@@ -46,13 +46,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
     niftkNiftyCalThrow() << "Texture file name is empty.";
   }
 
-  m_AspectRatio[0] = static_cast<double>(windowSize.width)/static_cast<double>(calibratedWindowSize.width);
-  m_AspectRatio[1] = static_cast<double>(windowSize.height)/static_cast<double>(calibratedWindowSize.height);
-
   m_Camera = vtkSmartPointer<CalibratedCamera>::New();
-  m_Camera->SetActualWindowSize(windowSize.width, windowSize.height);
-  m_Camera->SetCalibratedImageSize(calibratedWindowSize.width, calibratedWindowSize.height, m_AspectRatio[0]/m_AspectRatio[1]);
-  m_Camera->SetUseCalibratedCamera(true);
 
   m_ModelReader = vtkSmartPointer<vtkPolyDataReader>::New();
   m_ModelReader->SetFileName(modelFileName.c_str());
@@ -64,8 +58,8 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_ModelToWorldTransform->SetInput(m_ModelToWorldMatrix);
 
   m_ModelTransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-  m_ModelTransformFilter->SetInputConnection(m_ModelReader->GetOutputPort());
   m_ModelTransformFilter->SetTransform(m_ModelToWorldTransform);
+  m_ModelTransformFilter->SetInputConnection(m_ModelReader->GetOutputPort());
 
   m_TextureReader = vtkSmartPointer<vtkPNGReader>::New();
   m_TextureReader->SetFileName(textureFileName.c_str());
@@ -79,8 +73,10 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_ModelMapper->ScalarVisibilityOff();
 
   m_ModelActor = vtkSmartPointer<vtkActor>::New();
-  m_ModelActor->GetProperty()->BackfaceCullingOn();
+  //m_ModelActor->GetProperty()->BackfaceCullingOn();
   m_ModelActor->GetProperty()->SetInterpolationToFlat();
+  m_ModelActor->SetTexture(m_Texture);
+  m_ModelActor->SetMapper(m_ModelMapper);
 
   m_Renderer = vtkSmartPointer<vtkRenderer>::New();
   m_Renderer->SetBackground(0, 0, 255);  // RGB
@@ -88,6 +84,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 
   m_Renderer->SetActiveCamera(m_Camera);
   m_Renderer->SetLightFollowCamera(true);
+  m_Renderer->ResetCamera();
 
   m_RenderWin = vtkSmartPointer<vtkRenderWindow>::New();
   m_RenderWin->AddRenderer(m_Renderer);
@@ -99,7 +96,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_IntrinsicMatrix = cv::Mat::eye(3, 3, CV_64FC1);
   m_LeftToRightMatrix = cv::Matx44d::eye();
   m_RightToLeftMatrix = cv::Matx44d::eye();
-  m_CameraToWorldMatrix = cv::Matx44d::eye();
+  m_WorldToCameraMatrix = cv::Matx44d::eye();
   m_CameraMatrix = cv::Matx44d::eye();
 }
 
@@ -144,9 +141,10 @@ void CalibratedRenderingPipeline::Render()
 //-----------------------------------------------------------------------------
 void CalibratedRenderingPipeline::DumpScreen(const std::string fileName)
 {
-  // Keep these local, or else the vtkWindowToImageFilter always appeared to cache its output,
-  // regardless of the value of ShouldRerenderOn.
+  this->Render();
 
+  // Keep these local, or else the vtkWindowToImageFilter always appeared to cache its output,
+  // regardless of the value of ShouldRerenderOn.  
   vtkSmartPointer<vtkWindowToImageFilter> renderWindowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
   renderWindowToImageFilter->SetInput(m_RenderWin);
   renderWindowToImageFilter->SetInputBufferTypeToRGB();
@@ -177,9 +175,9 @@ void CalibratedRenderingPipeline::SetModelToWorldMatrix(const cv::Matx44d& model
 
 
 //-----------------------------------------------------------------------------
-void CalibratedRenderingPipeline::SetCameraToWorldMatrix(const cv::Matx44d& cameraToWorld)
+void CalibratedRenderingPipeline::SetWorldToCameraMatrix(const cv::Matx44d& worldToCamera)
 {
-  m_CameraToWorldMatrix = cameraToWorld;
+  m_WorldToCameraMatrix = worldToCamera;
 }
 
 
@@ -195,15 +193,22 @@ void CalibratedRenderingPipeline::SetLeftToRightMatrix(const cv::Matx44d& leftTo
 void CalibratedRenderingPipeline::UpdateCamera()
 {
   double origin[4]     = {0, 0,    0,    1};
-  double focalPoint[4] = {0, 0,   1000, 1};
+  double focalPoint[4] = {0, 0,    1000, 1};
   double viewUp[4]     = {0, -1000, 0,    1};
+
+  m_AspectRatio[0] = static_cast<double>(m_WindowSize.width)/static_cast<double>(m_CalibratedWindowSize.width);
+  m_AspectRatio[1] = static_cast<double>(m_WindowSize.height)/static_cast<double>(m_CalibratedWindowSize.height);
+
+  m_Camera->SetUseCalibratedCamera(true);
+  m_Camera->SetActualWindowSize(m_WindowSize.width, m_WindowSize.height);
+  m_Camera->SetCalibratedImageSize(m_CalibratedWindowSize.width, m_CalibratedWindowSize.height, m_AspectRatio[0]/m_AspectRatio[1]);
 
   m_Camera->SetIntrinsicParameters(m_IntrinsicMatrix.at<double>(0,0),
                                    m_IntrinsicMatrix.at<double>(1,1),
                                    m_IntrinsicMatrix.at<double>(0,2),
                                    m_IntrinsicMatrix.at<double>(1,2));
 
-  m_CameraMatrix = m_CameraToWorldMatrix * m_RightToLeftMatrix;
+  m_CameraMatrix = (m_WorldToCameraMatrix * m_RightToLeftMatrix).inv();
 
   vtkSmartPointer<vtkMatrix4x4> tmp = vtkSmartPointer<vtkMatrix4x4>::New();
   this->OpenCVToVTK(m_CameraMatrix, *tmp);

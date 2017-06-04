@@ -72,12 +72,9 @@ int main(int argc, char ** argv)
     cv::Mat intrinsics = niftk::LoadMatrix(argv[7]);
     cv::Mat extrinsics = niftk::LoadMatrix(argv[8]);
 
-    cv::Matx44d cameraMatrix = extrinsics;
-
     p.SetIntrinsics(intrinsics);
-    p.SetCameraToWorldMatrix(cameraMatrix);
+    p.SetWorldToCameraMatrix(extrinsics);
     p.DumpScreen(argv[9]);
-
   }
   catch (niftk::NiftyCalException& e)
   {

@@ -1,0 +1,17 @@
+# vtk DataFile Version 2.0
+Single polygon to be texture mapped to calibration grid
+ASCII
+DATASET POLYDATA
+POINTS 4 float
+-3.0 -3.0 0.0
+42.0 -3.0 0.0
+42.0 30.0 0.0
+-3.0 30.0 0.0
+POLYGONS 1 5
+4 0 1 2 3
+POINT_DATA 4
+TEXTURE_COORDINATES texture 2 float
+0.0 0.0
+1.0 0.0
+1.0 1.0
+0.0 1.0
