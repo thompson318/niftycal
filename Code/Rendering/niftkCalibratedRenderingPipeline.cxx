@@ -17,6 +17,7 @@
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
 #include <vtkProperty.h>
+#include <vtkRenderWindow.h>
 
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::CalibratedRenderingPipeline(
@@ -85,13 +86,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_Renderer->SetActiveCamera(m_Camera);
   m_Renderer->SetLightFollowCamera(true);
   m_Renderer->ResetCamera();
-
-  m_RenderWin = vtkSmartPointer<vtkRenderWindow>::New();
-  m_RenderWin->AddRenderer(m_Renderer);
-
-  m_RenderWin->SetSize(m_WindowSize.width, m_WindowSize.height);
-  m_RenderWin->DoubleBufferOff();
-  m_RenderWin->Render();
+  m_Renderer->InteractiveOff();
 
   m_IntrinsicMatrix = cv::Mat::eye(3, 3, CV_64FC1);
   m_LeftToRightMatrix = cv::Matx44d::eye();
@@ -104,6 +99,14 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::~CalibratedRenderingPipeline()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow *w)
+{
+  m_RenderWindow = w;
+  m_RenderWindow->AddRenderer(m_Renderer);
 }
 
 
@@ -121,20 +124,10 @@ void CalibratedRenderingPipeline::OpenCVToVTK(const cv::Matx44d& openCV, vtkMatr
 
 
 //-----------------------------------------------------------------------------
-vtkRenderWindow* CalibratedRenderingPipeline::GetRenderWindow() const
-{
-  return m_RenderWin;
-}
-
-
-//-----------------------------------------------------------------------------
 void CalibratedRenderingPipeline::Render()
 {
   this->UpdateCamera();
-  m_Camera->Modified();
-  m_ModelActor->Modified();
-  m_Renderer->Modified();
-  m_RenderWin->Render();
+  m_RenderWindow->Render();
 }
 
 
@@ -146,7 +139,7 @@ void CalibratedRenderingPipeline::DumpScreen(const std::string fileName)
   // Keep these local, or else the vtkWindowToImageFilter always appeared to cache its output,
   // regardless of the value of ShouldRerenderOn.  
   vtkSmartPointer<vtkWindowToImageFilter> renderWindowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
-  renderWindowToImageFilter->SetInput(m_RenderWin);
+  renderWindowToImageFilter->SetInput(m_RenderWindow);
   renderWindowToImageFilter->SetInputBufferTypeToRGB();
   renderWindowToImageFilter->SetMagnification(1);
   renderWindowToImageFilter->ShouldRerenderOn();
@@ -199,14 +192,14 @@ void CalibratedRenderingPipeline::UpdateCamera()
   m_AspectRatio[0] = static_cast<double>(m_WindowSize.width)/static_cast<double>(m_CalibratedWindowSize.width);
   m_AspectRatio[1] = static_cast<double>(m_WindowSize.height)/static_cast<double>(m_CalibratedWindowSize.height);
 
-  m_Camera->SetUseCalibratedCamera(true);
-  m_Camera->SetActualWindowSize(m_WindowSize.width, m_WindowSize.height);
   m_Camera->SetCalibratedImageSize(m_CalibratedWindowSize.width, m_CalibratedWindowSize.height, m_AspectRatio[0]/m_AspectRatio[1]);
-
   m_Camera->SetIntrinsicParameters(m_IntrinsicMatrix.at<double>(0,0),
                                    m_IntrinsicMatrix.at<double>(1,1),
                                    m_IntrinsicMatrix.at<double>(0,2),
                                    m_IntrinsicMatrix.at<double>(1,2));
+
+  m_Camera->SetUseCalibratedCamera(true);
+  m_Camera->SetActualWindowSize(m_WindowSize.width, m_WindowSize.height);
 
   m_CameraMatrix = (m_WorldToCameraMatrix * m_RightToLeftMatrix).inv();
 
@@ -224,6 +217,6 @@ void CalibratedRenderingPipeline::UpdateCamera()
   m_Camera->SetPosition(origin[0], origin[1], origin[2]);
   m_Camera->SetFocalPoint(focalPoint[0], focalPoint[1], focalPoint[2]);
   m_Camera->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
-  m_Camera->SetClippingRange(1, 10000);
+  m_Camera->SetClippingRange(2, 5000);
   m_Camera->Modified();
 }

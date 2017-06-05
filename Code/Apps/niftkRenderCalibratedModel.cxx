@@ -16,9 +16,14 @@
 #include <niftkNiftyCalException.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkCalibratedRenderingPipeline.h>
+
+#include <vtkRenderWindow.h>
 #include <cv.h>
 #include <list>
 #include <cstdlib>
+
+#include <QVTKWidget.h>
+#include <QApplication>
 
 /**
 * \file niftkRenderCalibratedModel.cxx
@@ -69,11 +74,24 @@ int main(int argc, char ** argv)
                                   textureFile
                                   );
 
-    cv::Mat intrinsics = niftk::LoadMatrix(argv[7]);
-    cv::Mat extrinsics = niftk::LoadMatrix(argv[8]);
+    QApplication app(argc,argv);
 
+    QVTKWidget *widget = new QVTKWidget();
+    widget->show();
+    widget->resize(windowSize.width, windowSize.height);
+
+    vtkRenderWindow *window = widget->GetRenderWindow();
+    window->DoubleBufferOff();
+    window->GetInteractor()->Disable();
+
+    p.ConnectToRenderWindow(window);
+
+    cv::Mat intrinsics = niftk::LoadMatrix(argv[7]);
     p.SetIntrinsics(intrinsics);
+
+    cv::Mat extrinsics = niftk::LoadMatrix(argv[8]);    
     p.SetWorldToCameraMatrix(extrinsics);
+
     p.DumpScreen(argv[9]);
   }
   catch (niftk::NiftyCalException& e)

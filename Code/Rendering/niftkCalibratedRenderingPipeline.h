@@ -21,7 +21,6 @@
 #include <vtkObject.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
 #include <vtkPolyDataReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -48,6 +47,8 @@ public:
   );
 
   virtual ~CalibratedRenderingPipeline();
+
+  void ConnectToRenderWindow(vtkRenderWindow *w);
 
   /**
   * \brief Updates the whole VTK pipeline.
@@ -84,11 +85,6 @@ public:
    */
   void SetLeftToRightMatrix(const cv::Matx44d& leftToRight);
 
-  /**
-  * \brief Returns a pointer to the vtkRenderWindow.
-  */
-  vtkRenderWindow* GetRenderWindow() const;
-
 private:
 
   CalibratedRenderingPipeline(const CalibratedRenderingPipeline&);  // Purposefully not implemented.
@@ -121,7 +117,7 @@ private:
   vtkSmartPointer<vtkActor>                    m_ModelActor;
 
   vtkSmartPointer<vtkRenderer>                 m_Renderer;
-  vtkSmartPointer<vtkRenderWindow>             m_RenderWin;
+  vtkRenderWindow*                             m_RenderWindow;
 };
 
 #endif

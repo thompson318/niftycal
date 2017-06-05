@@ -23,7 +23,13 @@ set(NIFTYCAL_APPS
   niftkTimingCalibrationFromPoints
   niftkPoseFromPoints
 )
-if (VTK_FOUND)
+find_package(Qt4)
+if (QT_FOUND)
+  include(${QT_USE_FILE})
+  list(APPEND ${ALL_THIRD_PARTY_LIBRARIES} ${QT_LIBRARIES})
+endif()
+
+if (VTK_FOUND AND QT_FOUND)
   list(APPEND NIFTYCAL_APPS niftkRenderCalibratedModel)
 endif()
 
