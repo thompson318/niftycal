@@ -45,7 +45,8 @@ public:
     const cv::Size2i& windowSize,           // e.g. 1920x1080
     const cv::Size2i& calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
     const std::string& modelFileName,
-    const std::string& textureFileName
+    const std::string& textureFileName,
+    const bool& useInterpolation = true
   );
 
   virtual ~CalibratedRenderingPipeline();

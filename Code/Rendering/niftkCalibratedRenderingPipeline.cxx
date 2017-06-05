@@ -24,7 +24,8 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
     const cv::Size2i&  windowSize,           // e.g. 1920x1080
     const cv::Size2i&  calibratedWindowSize, // normally, 1920x1080, but could be scaled such as 1920x540.
     const std::string& modelFileName,
-    const std::string& textureFileName
+    const std::string& textureFileName,
+    const bool& useInterpolation
     )
 : m_WindowSize(windowSize)
 , m_CalibratedWindowSize(calibratedWindowSize)
@@ -67,7 +68,7 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 
   m_Texture = vtkSmartPointer<vtkTexture>::New();
   m_Texture->SetInputConnection(m_TextureReader->GetOutputPort());
-  m_Texture->InterpolateOff();
+  m_Texture->SetInterpolate(useInterpolation);
 
   m_ModelMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_ModelMapper->SetInputConnection(m_ModelTransformFilter->GetOutputPort());
