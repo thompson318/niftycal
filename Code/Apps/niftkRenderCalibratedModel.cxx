@@ -32,10 +32,10 @@
 */
 int main(int argc, char ** argv)
 {
-  if (argc != 10)
+  if (argc != 10 && argc != 11)
   {
     std::cerr << "Usage: niftkRenderCalibratedModel imageSizeX imageSizeY calibratedSizeX calibratedSizeY vtkPolyData.vtk texture.png "
-              << "intrinsics3x3.txt extrinsics4x4.txt output.png" << std::endl;
+              << "intrinsics3x3.txt extrinsics4x4.txt [leftToRightExtrinsics4x4.txt] output.png" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -92,7 +92,26 @@ int main(int argc, char ** argv)
     cv::Mat extrinsics = niftk::LoadMatrix(argv[8]);    
     p.SetWorldToCameraMatrix(extrinsics);
 
-    p.DumpScreen(argv[9]);
+    cv::Matx44d leftToRight = cv::Matx44d::eye();
+    if (argc == 11)
+    {
+      leftToRight = niftk::LoadMatrix(argv[9]);
+      p.SetLeftToRightMatrix(leftToRight);
+    }
+
+    if (argc == 10)
+    {
+      p.DumpScreen(argv[9]);
+    }
+    else if (argc == 11)
+    {
+      p.DumpScreen(argv[10]);
+    }
+    else
+    {
+      niftkNiftyCalThrow() << "Incorrect number of parameters, "
+                           << "which at this point, must be a programming bug.";
+    }
   }
   catch (niftk::NiftyCalException& e)
   {

@@ -90,7 +90,6 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 
   m_IntrinsicMatrix = cv::Mat::eye(3, 3, CV_64FC1);
   m_LeftToRightMatrix = cv::Matx44d::eye();
-  m_RightToLeftMatrix = cv::Matx44d::eye();
   m_WorldToCameraMatrix = cv::Matx44d::eye();
   m_CameraMatrix = cv::Matx44d::eye();
 }
@@ -178,7 +177,6 @@ void CalibratedRenderingPipeline::SetWorldToCameraMatrix(const cv::Matx44d& worl
 void CalibratedRenderingPipeline::SetLeftToRightMatrix(const cv::Matx44d& leftToRight)
 {
   m_LeftToRightMatrix = leftToRight;
-  m_RightToLeftMatrix = leftToRight.inv();
 }
 
 
@@ -201,7 +199,7 @@ void CalibratedRenderingPipeline::UpdateCamera()
   m_Camera->SetUseCalibratedCamera(true);
   m_Camera->SetActualWindowSize(m_WindowSize.width, m_WindowSize.height);
 
-  m_CameraMatrix = (m_WorldToCameraMatrix * m_RightToLeftMatrix).inv();
+  m_CameraMatrix = ((m_WorldToCameraMatrix).inv()) * m_LeftToRightMatrix.inv();
 
   vtkSmartPointer<vtkMatrix4x4> tmp = vtkSmartPointer<vtkMatrix4x4>::New();
   this->OpenCVToVTK(m_CameraMatrix, *tmp);

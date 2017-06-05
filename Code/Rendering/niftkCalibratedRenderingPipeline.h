@@ -34,6 +34,8 @@
  * \class CalibratedRenderingPipeline
  * \brief Generates a texture (e.g. calibration image) onto
  * a vtkPolyData model, and renders it with a calibrated camera.
+ *
+ * Note:
  */
 class NIFTYCAL_WINEXPORT CalibratedRenderingPipeline {
 
@@ -63,12 +65,15 @@ public:
 
   /**
   * \brief Sets the intrinsic parameters on the camera.
+  *
+  * This is the 3x3 matrix that you would get from OpenCV calibration.
   */
   void SetIntrinsics(const cv::Mat& intrinsics);
 
   /**
   * \brief Multiplies model vtkPolyData points by modelToWorld to give a position
   * in world coordinates, having the effect of moving the model relative to the world coordinates.
+  *
   * \param modelToWorld rigid body transform
   */
   void SetModelToWorldMatrix(const cv::Matx44d& modelToWorld);
@@ -76,6 +81,10 @@ public:
   /**
   * \brief Used to set the camera position in world coordinates.
   * \param cameraToWorld rigid body transform
+  *
+  * This is the camera extrinsic matrix you get from OpenCV calibration.
+  * From a pure calibration perspective, the chessboard, or similar model IS
+  * the world coordinate system.
   */
   void SetWorldToCameraMatrix(const cv::Matx44d& worldToCamera);
 
@@ -99,7 +108,6 @@ private:
 
   cv::Mat                                      m_IntrinsicMatrix;
   cv::Matx44d                                  m_LeftToRightMatrix;
-  cv::Matx44d                                  m_RightToLeftMatrix;
   cv::Matx44d                                  m_WorldToCameraMatrix;
   cv::Matx44d                                  m_CameraMatrix;
 
