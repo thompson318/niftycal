@@ -38,14 +38,9 @@ void WhiteBallDetector::FillMask(const cv::Mat& imageToUse)
     niftkNiftyCalThrow() << "Should be 3 channel, BGR (standard OpenCV) image.";
   }
 
-  cv::cvtColor(imageToUse, m_HSVImage, CV_BGR2HSV);
+  cv::cvtColor(imageToUse, m_GreyImage, CV_BGR2GRAY);
+  cv::inRange(m_GreyImage, cv::Scalar(240), cv::Scalar(255), m_Mask);
 
-  // OpenCV huse values go from 0 to 180 and red wraps around.
-
-  inRange(m_HSVImage, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), m_Mask1);
-  inRange(m_HSVImage, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), m_Mask2);
-
-  m_Mask = m_Mask1 | m_Mask2;
 }
 
 } // end namespace

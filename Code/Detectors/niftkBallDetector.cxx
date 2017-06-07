@@ -41,7 +41,7 @@ PointSet BallDetector::InternalGetPoints(const cv::Mat& imageToUse)
   cv::medianBlur(m_GaussianSmoothed, m_MedianSmoothed, 5);
 
   std::vector<cv::Vec3f> circles;
-  cv::HoughCircles(m_MedianSmoothed, circles, CV_HOUGH_GRADIENT, 1, m_MedianSmoothed.rows/8, 200, 200, 0, 0);
+  cv::HoughCircles(m_MedianSmoothed, circles, CV_HOUGH_GRADIENT, 1, m_MedianSmoothed.rows/8, 200, 100);
 
   for (int i = 0; i < circles.size(); i++)
   {

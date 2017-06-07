@@ -51,8 +51,8 @@ protected:
 
 private:
 
-  cv::Mat   m_GaussianSmoothed;
-  cv::Mat   m_MedianSmoothed;
+  cv::Mat m_GaussianSmoothed;
+  cv::Mat m_MedianSmoothed;
 };
 
 } // end namespace

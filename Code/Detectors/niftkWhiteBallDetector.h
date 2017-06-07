@@ -44,9 +44,7 @@ protected:
 
 private:
 
-  cv::Mat1b m_Mask1;
-  cv::Mat1b m_Mask2;
-  cv::Mat   m_HSVImage;
+  cv::Mat m_GreyImage;
 
 };
 
