@@ -40,7 +40,7 @@ void RedBallDetector::FillMask(const cv::Mat& imageToUse)
 
   cv::cvtColor(imageToUse, m_HSVImage, CV_BGR2HSV);
 
-  // OpenCV huse values go from 0 to 180 and red wraps around,
+  // OpenCV hue values go from 0 to 180 and red wraps around,
   // so we look for 10 lowest and 10 highest.
 
   cv::inRange(m_HSVImage, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), m_Mask1);

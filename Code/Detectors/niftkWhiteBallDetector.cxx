@@ -40,7 +40,6 @@ void WhiteBallDetector::FillMask(const cv::Mat& imageToUse)
 
   cv::cvtColor(imageToUse, m_GreyImage, CV_BGR2GRAY);
   cv::inRange(m_GreyImage, cv::Scalar(240), cv::Scalar(255), m_Mask);
-
 }
 
 } // end namespace
