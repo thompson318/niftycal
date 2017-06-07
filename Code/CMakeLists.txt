@@ -24,6 +24,9 @@ set(NIFTYCAL_SRCS
   Detectors/niftkTemplateRingsPointDetector.cxx
   Detectors/niftkTemplateCirclesPointDetector.cxx
   Detectors/niftkSideBySideDetector.cxx
+  Detectors/niftkBallDetector.cxx
+  Detectors/niftkRedBallDetector.cxx
+  Detectors/niftkWhiteBallDetector.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
