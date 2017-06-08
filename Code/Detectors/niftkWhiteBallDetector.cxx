@@ -14,6 +14,7 @@
 
 #include "niftkWhiteBallDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
+#include <highgui.h>
 
 namespace niftk
 {
@@ -38,8 +39,9 @@ void WhiteBallDetector::FillMask(const cv::Mat& imageToUse)
     niftkNiftyCalThrow() << "Should be 3 channel, BGR (standard OpenCV) image.";
   }
 
-  cv::cvtColor(imageToUse, m_GreyImage, CV_BGR2GRAY);
-  cv::inRange(m_GreyImage, cv::Scalar(240), cv::Scalar(255), m_Mask);
+  cv::cvtColor(imageToUse, m_HSVImage, CV_BGR2HSV);
+  cv::inRange(m_HSVImage, cv::Scalar(0, 0, 245), cv::Scalar(2, 2, 255), m_Mask);
+
 }
 
 } // end namespace

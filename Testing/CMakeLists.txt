@@ -26,6 +26,7 @@ set(TEST_CASES
   niftkExtractChessboardPointsTest
   niftkExtractCirclesPointsTest
   niftkExtractRingsPointsTest
+  niftkExtractBallTest
   niftkMonoChessboardCameraCalibrationTest
   niftkIterativeMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
@@ -74,6 +75,9 @@ add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPoint
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
 add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
 add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0 1)
+add_test(UNIT-ExtRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red.png  1 1 1920 1080 0 788.5 581.5)
+add_test(UNIT-ExtSmallRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red-smaller.png  1 1 1920 1080 0 862.5 670.5)
+add_test(UNIT-ExtWhiteBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-white.png  1 1 1920 1080 1 914.5 575.5)
 add_test(UNIT-TimingUtils ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationUtilitiesTest )
 add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-1.txt  0)
 add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)

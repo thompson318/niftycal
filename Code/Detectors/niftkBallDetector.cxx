@@ -15,6 +15,8 @@
 #include "niftkBallDetector.h"
 #include "niftkNiftyCalExceptionMacro.h"
 
+#include <highgui.h>
+
 namespace niftk
 {
 
@@ -35,13 +37,13 @@ PointSet BallDetector::InternalGetPoints(const cv::Mat& imageToUse)
 {
   this->FillMask(imageToUse);
 
-  niftk::PointSet result;
-
-  cv::GaussianBlur(m_Mask, m_GaussianSmoothed, cv::Size(5,5), 1, 1);
-  cv::medianBlur(m_GaussianSmoothed, m_MedianSmoothed, 5);
+  cv::medianBlur(m_Mask, m_MedianSmoothed, 13);
+  cv::GaussianBlur(m_MedianSmoothed, m_GaussianSmoothed, cv::Size(5,5), 3, 3);
 
   std::vector<cv::Vec3f> circles;
-  cv::HoughCircles(m_MedianSmoothed, circles, CV_HOUGH_GRADIENT, 1, m_MedianSmoothed.rows/8, 200, 100);
+  cv::HoughCircles(m_GaussianSmoothed, circles, CV_HOUGH_GRADIENT, 1, 100, 200, 20, 0, 0);
+
+  niftk::PointSet result;
 
   for (int i = 0; i < circles.size(); i++)
   {

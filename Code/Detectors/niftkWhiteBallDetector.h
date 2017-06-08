@@ -44,7 +44,7 @@ protected:
 
 private:
 
-  cv::Mat m_GreyImage;
+  cv::Mat   m_HSVImage;
 
 };
 
