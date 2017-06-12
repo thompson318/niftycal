@@ -47,8 +47,8 @@ NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const std::string& modelF
 */
 NIFTYCAL_WINEXPORT void RenderingStereoCameraCalibration(const std::string& modelFileName,
                                                          const std::string& textureFileName,
-                                                         const std::vector<PointSet>& leftImages,
-                                                         const std::vector<PointSet>& rightImages,
+                                                         const std::vector<cv::Mat>& leftImages,
+                                                         const std::vector<cv::Mat>& rightImages,
                                                          cv::Mat& intrinsicLeft,
                                                          cv::Mat& distortionLeft,
                                                          std::vector<cv::Mat>& rvecsLeft,
