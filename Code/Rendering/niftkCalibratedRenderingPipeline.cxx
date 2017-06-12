@@ -18,6 +18,7 @@
 #include <vtkPNGWriter.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
+#include <cv.h>
 
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::CalibratedRenderingPipeline(
@@ -148,6 +149,29 @@ void CalibratedRenderingPipeline::DumpScreen(const std::string fileName)
   renderedImageWriter->SetInputConnection(renderWindowToImageFilter->GetOutputPort());
   renderedImageWriter->SetFileName(fileName.c_str());
   renderedImageWriter->Write();
+}
+
+
+//-----------------------------------------------------------------------------
+void CalibratedRenderingPipeline::DumpScreen(cv::Mat& image)
+{
+  this->Render();
+
+  // Keep these local, or else the vtkWindowToImageFilter always appeared to cache its output,
+  // regardless of the value of ShouldRerenderOn.
+  vtkSmartPointer<vtkWindowToImageFilter> renderWindowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
+  renderWindowToImageFilter->SetInput(m_RenderWindow);
+  renderWindowToImageFilter->SetInputBufferTypeToRGB();
+  renderWindowToImageFilter->SetMagnification(1);
+  renderWindowToImageFilter->ShouldRerenderOn();
+  renderWindowToImageFilter->Update();
+
+  cv::Mat rgbImage = cvCreateMat(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
+  memcpy(rgbImage.data,
+         renderWindowToImageFilter->GetOutput()->GetScalarPointer(),
+         m_WindowSize.height * m_WindowSize.width * 3
+        );
+  cv::cvtColor(rgbImage, image, CV_RGB2BGR);
 }
 
 

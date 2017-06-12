@@ -18,7 +18,9 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-double RenderingMonoCameraCalibration(const std::string& modelFileName,
+double RenderingMonoCameraCalibration(const niftk::Model3D& model3D,
+                                      const niftk::PointSet& imagePoints2D,
+                                      const std::string& modelFileName,
                                       const std::string& textureFileName,
                                       const std::vector<cv::Mat>& images,
                                       const cv::Size2i& imageSize,
@@ -29,12 +31,24 @@ double RenderingMonoCameraCalibration(const std::string& modelFileName,
                                      )
 {
   double rms = 0;
+
+  // Algorithm
+  // While still improving.
+  //   1. Optimise intrinsic/distortion, as you render ONCE at each pose,
+  //   then repeatedly undistort/unwarp the distorted image to match.
+  //   2. Optimise extrinsic, as you unwarp once for each image,
+  //   then repeatedly render the model to match the images.
+  // end
+
   return rms;
 }
 
 
 //-----------------------------------------------------------------------------
-cv::Matx21d RenderingStereoCameraCalibration(const std::string& modelFileName,
+cv::Matx21d RenderingStereoCameraCalibration(const niftk::Model3D& model3D,
+                                             const niftk::PointSet& points2DLeft,
+                                             const niftk::PointSet& points2DRight,
+                                             const std::string& modelFileName,
                                              const std::string& textureFileName,
                                              const std::vector<PointSet>& leftImages,
                                              const std::vector<PointSet>& rightImages,
@@ -51,6 +65,14 @@ cv::Matx21d RenderingStereoCameraCalibration(const std::string& modelFileName,
                                             )
 {
   cv::Matx21d rms;
+
+  // Algorithm
+  // While still improving.
+  //   1. Optimise intrinsic/distortion for left camera
+  //   2. Optimise intrinsic/distortion for right camera
+  //   3. Optimise extrinsic for left and right simultanously.
+  // end
+
   return rms;
 }
 

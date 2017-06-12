@@ -65,6 +65,15 @@ public:
   void DumpScreen(const std::string fileName);
 
   /**
+   * \brief Overriden version of above, to copy output direct to OpenCV image.
+   *
+   * So, if you DumpScreen(filename), or DumpScreen(image) and then cv::imwrite image
+   * the result must be identical. i.e. We copy the output into OpenCV buffer, and then
+   * if you save the image, its equivalent to saving via VTK.
+   */
+  void DumpScreen(cv::Mat& image);
+
+  /**
   * \brief Sets the intrinsic parameters on the camera.
   *
   * This is the 3x3 matrix that you would get from OpenCV calibration.
