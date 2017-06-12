@@ -19,6 +19,7 @@
 
 #include <vtkRenderWindow.h>
 #include <cv.h>
+#include <highgui.h>
 #include <list>
 #include <cstdlib>
 
@@ -101,11 +102,15 @@ int main(int argc, char ** argv)
 
     if (argc == 10)
     {
-      p.DumpScreen(argv[9]);
+      cv::Mat tmp;
+      p.DumpScreen(tmp);
+      cv::imwrite(argv[9], tmp);
     }
     else if (argc == 11)
     {
-      p.DumpScreen(argv[10]);
+      cv::Mat tmp;
+      p.DumpScreen(tmp);
+      cv::imwrite(argv[10], tmp);
     }
     else
     {

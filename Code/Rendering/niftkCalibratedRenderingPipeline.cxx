@@ -15,10 +15,12 @@
 #include "niftkCalibratedRenderingPipeline.h"
 #include <niftkNiftyCalExceptionMacro.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtkImageFlip.h>
 #include <vtkPNGWriter.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <cv.h>
+#include <highgui.h>
 
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::CalibratedRenderingPipeline(
@@ -171,7 +173,9 @@ void CalibratedRenderingPipeline::DumpScreen(cv::Mat& image)
          renderWindowToImageFilter->GetOutput()->GetScalarPointer(),
          m_WindowSize.height * m_WindowSize.width * 3
         );
-  cv::cvtColor(rgbImage, image, CV_RGB2BGR);
+  cv::Mat flipped;
+  cv::flip(rgbImage, flipped, 0);
+  cv::cvtColor(flipped, image, CV_RGB2BGR);
 }
 
 
