@@ -102,9 +102,10 @@ if(ITK_FOUND)
 
 endif()
 
-if(VTK_FOUND)
+if(VTK_FOUND AND ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedCamera.cxx)
   list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedRenderingPipeline.cxx)
+  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})

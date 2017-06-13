@@ -32,7 +32,9 @@ namespace niftk
 /**
 * \brief Performs a mono camera calibration using rendering of a model.
 */
-NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const std::string& modelFileName,
+NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const cv::Size2i& windowSize,
+                                                       const cv::Size2i& calibratedWindowSize,
+                                                       const std::string& modelFileName,
                                                        const std::string& textureFileName,
                                                        const std::vector<cv::Mat>& images,
                                                        cv::Mat& intrinsic,
@@ -44,7 +46,9 @@ NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const std::string& modelF
 /**
 * \brief Performs a stereo camera calibration using rendering of a model.
 */
-NIFTYCAL_WINEXPORT void RenderingStereoCameraCalibration(const std::string& modelFileName,
+NIFTYCAL_WINEXPORT void RenderingStereoCameraCalibration(const cv::Size2i& windowSize,
+                                                         const cv::Size2i& calibratedWindowSize,
+                                                         const std::string& modelFileName,
                                                          const std::string& textureFileName,
                                                          const std::vector<cv::Mat>& leftImages,
                                                          const std::vector<cv::Mat>& rightImages,
