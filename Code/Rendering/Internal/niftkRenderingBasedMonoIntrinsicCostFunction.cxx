@@ -116,12 +116,37 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
   distortion.at<double>(0, 2) = parameters[6];
   distortion.at<double>(0, 3) = parameters[7];
 
+  cv::Vec3i blueBackGround; // BGR
+  blueBackGround[0] = 255;
+  blueBackGround[1] = 0;
+  blueBackGround[2] = 0;
+
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
     cv::undistort(m_OriginalVideoImagesInGreyScale[i],
                   m_UndistortedVideoImagesInGreyScale[i],
                   intrinsics, distortion, intrinsics);
+
+    for (int r = 0; r < m_OriginalVideoImages[i].rows; r++)
+    {
+      for (int c = 0; c < m_OriginalVideoImages[i].cols; c++)
+      {
+        if (   r != 0
+            && c != 0
+            && r != (m_OriginalVideoImages[i].rows - 1)
+            && c != (m_OriginalVideoImages[i].cols - 1)
+            && m_RenderedImages[i].at<cv::Vec3i>(r, c) != blueBackGround)
+        {
+          // SSD for now
+          double diff = m_UndistortedVideoImagesInGreyScale[i].at<unsigned char>(r, c)
+                      - m_RenderedImagesInGreyscale[i].at<unsigned char>(r, c);
+          cost += (diff*diff);
+        }
+      }
+    }
   }
+
+  std::cout << "RenderingBasedMonoIntrinsicCostFunction: p=" << parameters << ", c=" << cost << std::endl;
 
   return cost;
 }
@@ -131,6 +156,38 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
 void RenderingBasedMonoIntrinsicCostFunction::GetDerivative(const ParametersType & parameters,
                                                             DerivativeType & derivative) const
 {
+  ParametersType stepSize;
+  stepSize.SetSize(parameters.GetSize());
+  stepSize[0] = 1;
+  stepSize[1] = 1;
+  stepSize[2] = 1;
+  stepSize[3] = 1;
+  stepSize[4] = 0.1;
+  stepSize[5] = 0.1;
+  stepSize[6] = 0.1;
+  stepSize[7] = 0.1;
+
+  derivative.SetSize(parameters.GetSize());
+
+  MeasureType current = this->GetValue(parameters);
+
+  for (int i = 0; i < parameters.GetSize(); i++)
+  {
+    ParametersType copyOfParams = parameters;
+
+    copyOfParams[i] += stepSize[i];
+    MeasureType plus = this->GetValue(copyOfParams);
+
+    copyOfParams[i] -= (2.0 * stepSize[i]);
+    MeasureType minus = this->GetValue(copyOfParams);
+
+    MeasureType diff = plus - minus;
+    if (plus > current && minus > current)
+    {
+      diff = 0;
+    }
+    derivative[i] = diff;
+  }
 }
 
 } // end niftk

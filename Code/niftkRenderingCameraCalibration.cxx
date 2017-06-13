@@ -60,7 +60,7 @@ double InternalRenderingMonoIntrinsicCameraCalibration(const cv::Size2i& windowS
   opt->SetCostFunction(cost);
   opt->SetInitialPosition(initial);
   opt->SetLearningRate(learningRate);
-  opt->SetMaximize(true);
+  opt->SetMaximize(false);
   opt->SetNumberOfIterations(20);
   opt->StartOptimization();
 
