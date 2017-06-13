@@ -42,6 +42,12 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& windo
                                                          const cv::Mat& distortion
                                                         )
 {
+  // Main aim here.
+  // 1. Copy videoImages,
+  // 2. Create space to store undistored video images
+  // 3. Generate rendering of all views and cache it.
+  //
+  // each iteration then just warps the video images.
 }
 
 
