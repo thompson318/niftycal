@@ -85,8 +85,10 @@ protected:
 private:
 
   std::vector<cv::Mat>                         m_OriginalVideoImages;
-  std::vector<cv::Mat>                         m_UndistortedVideoImages;
+  std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
+  std::vector<cv::Mat>                         m_UndistortedVideoImagesInGreyScale;
   std::vector<cv::Mat>                         m_RenderedImages;
+  std::vector<cv::Mat>                         m_RenderedImagesInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
 };
 

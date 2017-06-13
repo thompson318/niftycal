@@ -67,9 +67,13 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& windo
   m_OriginalVideoImages = videoImages;
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-    cv::Mat video;
-    m_OriginalVideoImages[i].copyTo(video);
-    m_UndistortedVideoImages.push_back(video);
+    cv::Mat videoInGreyScale;
+    cv::cvtColor(m_OriginalVideoImages[i], videoInGreyScale, CV_BGR2GRAY);
+    m_OriginalVideoImagesInGreyScale.push_back(videoInGreyScale);
+
+    cv::Mat undistorted;
+    m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
+    m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
 
     cv::Mat rendering;
     m_OriginalVideoImages[i].copyTo(rendering);
@@ -79,6 +83,10 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& windo
     m_Pipeline->SetWorldToCameraMatrix(worldToCamera);
 
     m_Pipeline->DumpScreen(m_RenderedImages[i]);
+
+    cv::Mat renderingInGreyScale;
+    cv::cvtColor(m_RenderedImages[i], renderingInGreyScale, CV_BGR2GRAY);
+    m_RenderedImagesInGreyscale.push_back(renderingInGreyScale);
   }
 }
 
@@ -93,8 +101,29 @@ unsigned int RenderingBasedMonoIntrinsicCostFunction::GetNumberOfParameters(void
 //-----------------------------------------------------------------------------
 RenderingBasedMonoIntrinsicCostFunction::MeasureType
 RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & parameters) const
-{
-  return 0;
+{  
+  MeasureType cost = 0;
+
+  cv::Mat intrinsics = cv::Mat::eye(3, 3, CV_64FC1);
+  intrinsics.at<double>(0, 0) = parameters[0];
+  intrinsics.at<double>(1, 1) = parameters[1];
+  intrinsics.at<double>(0, 2) = parameters[2];
+  intrinsics.at<double>(1, 2) = parameters[3];
+
+  cv::Mat distortion = cv::Mat::zeros(1, 4, CV_64FC1);
+  distortion.at<double>(0, 0) = parameters[4];
+  distortion.at<double>(0, 1) = parameters[5];
+  distortion.at<double>(0, 2) = parameters[6];
+  distortion.at<double>(0, 3) = parameters[7];
+
+  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
+  {
+    cv::undistort(m_OriginalVideoImagesInGreyScale[i],
+                  m_UndistortedVideoImagesInGreyScale[i],
+                  intrinsics, distortion, intrinsics);
+  }
+
+  return cost;
 }
 
 
