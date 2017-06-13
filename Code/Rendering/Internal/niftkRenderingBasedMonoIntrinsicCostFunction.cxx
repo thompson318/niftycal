@@ -13,6 +13,8 @@
 =============================================================================*/
 
 #include "niftkRenderingBasedMonoIntrinsicCostFunction.h"
+#include <niftkMatrixUtilities.h>
+#include <niftkNiftyCalExceptionMacro.h>
 
 namespace niftk
 {
@@ -42,12 +44,42 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& windo
                                                          const cv::Mat& distortion
                                                         )
 {
-  // Main aim here.
-  // 1. Copy videoImages,
-  // 2. Create space to store undistored video images
-  // 3. Generate rendering of all views and cache it.
-  //
-  // each iteration then just warps the video images.
+  if (rvecs.size() != videoImages.size())
+  {
+    niftkNiftyCalThrow() << "Number of rotation vectors (" << rvecs.size()
+                         << "), doesn't match number of images (" << videoImages.size() << ")";
+  }
+
+  if (tvecs.size() != videoImages.size())
+  {
+    niftkNiftyCalThrow() << "Number of translation vectors (" << tvecs.size()
+                         << "), doesn't match number of images (" << videoImages.size() << ")";
+  }
+
+  m_Pipeline.reset(new CalibratedRenderingPipeline(windowSize,
+                                                   calibratedWindowSize,
+                                                   model,
+                                                   texture,
+                                                   true));
+
+  m_Pipeline->SetIntrinsics(intrinsic); // so these rendered images are fixed during optimisation.
+
+  m_OriginalVideoImages = videoImages;
+  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
+  {
+    cv::Mat video;
+    m_OriginalVideoImages[i].copyTo(video);
+    m_UndistortedVideoImages.push_back(video);
+
+    cv::Mat rendering;
+    m_OriginalVideoImages[i].copyTo(rendering);
+    m_RenderedImages.push_back(rendering);
+
+    cv::Matx44d worldToCamera = niftk::RodriguesToMatrix(rvecs[i], tvecs[i]);
+    m_Pipeline->SetWorldToCameraMatrix(worldToCamera);
+
+    m_Pipeline->DumpScreen(m_RenderedImages[i]);
+  }
 }
 
 
