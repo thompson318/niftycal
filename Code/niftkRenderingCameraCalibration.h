@@ -35,7 +35,6 @@ namespace niftk
 NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const std::string& modelFileName,
                                                        const std::string& textureFileName,
                                                        const std::vector<cv::Mat>& images,
-                                                       const cv::Size2i& imageSize,
                                                        cv::Mat& intrinsic,
                                                        cv::Mat& distortion,
                                                        std::vector<cv::Mat>& rvecs,
