@@ -19,6 +19,7 @@
 #include "niftkIPoint2DDetector.h"
 #include <vector>
 #include <cv.h>
+#include <vtkRenderWindow.h>
 
 namespace niftk
 {
@@ -32,7 +33,8 @@ namespace niftk
 /**
 * \brief Performs a mono camera calibration using rendering of a model.
 */
-NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const cv::Size2i& windowSize,
+NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(vtkRenderWindow* win,
+                                                       const cv::Size2i& windowSize,
                                                        const cv::Size2i& calibratedWindowSize,
                                                        const std::string& modelFileName,
                                                        const std::string& textureFileName,
@@ -46,7 +48,8 @@ NIFTYCAL_WINEXPORT void RenderingMonoCameraCalibration(const cv::Size2i& windowS
 /**
 * \brief Performs a stereo camera calibration using rendering of a model.
 */
-NIFTYCAL_WINEXPORT void RenderingStereoCameraCalibration(const cv::Size2i& windowSize,
+NIFTYCAL_WINEXPORT void RenderingStereoCameraCalibration(vtkRenderWindow* win,
+                                                         const cv::Size2i& windowSize,
                                                          const cv::Size2i& calibratedWindowSize,
                                                          const std::string& modelFileName,
                                                          const std::string& textureFileName,

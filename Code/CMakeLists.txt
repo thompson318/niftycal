@@ -102,7 +102,7 @@ if(ITK_FOUND)
 
 endif()
 
-if(VTK_FOUND AND ITK_FOUND)
+if(VTK_FOUND AND ITK_FOUND AND QT_FOUND)
   list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedCamera.cxx)
   list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedRenderingPipeline.cxx)
   list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.cxx)

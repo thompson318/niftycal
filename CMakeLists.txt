@@ -138,6 +138,12 @@ if (VTK_FOUND)
   add_definitions(-DNIFTYCAL_WITH_VTK)
 endif()
 
+find_package(Qt4)
+if (QT_FOUND)
+  include(${QT_USE_FILE})
+  list(APPEND ${ALL_THIRD_PARTY_LIBRARIES} ${QT_LIBRARIES})
+endif()
+
 set(ALL_LIBRARIES niftycal ${ALL_THIRD_PARTY_LIBRARIES})
 
 find_package(OpenMP)

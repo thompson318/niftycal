@@ -63,15 +63,14 @@ public:
   /**
    * \brief Instantiates the internal rendering pipeline.
    */
-  void Initialise(const cv::Size2i& windowSize,
+  void Initialise(vtkRenderWindow* win,
+                  const cv::Size2i& windowSize,
                   const cv::Size2i& calibratedWindowSize,
                   const std::string& model,
                   const std::string& texture,
                   const std::vector<cv::Mat>& videoImages,
                   const std::vector<cv::Mat>& rvecs,
-                  const std::vector<cv::Mat>& tvecs,
-                  const cv::Mat& intrinsic,
-                  const cv::Mat& distortion
+                  const std::vector<cv::Mat>& tvecs
                  );
 
 protected:
@@ -84,11 +83,13 @@ protected:
 
 private:
 
+  std::vector<cv::Mat>                         m_Rvecs;
+  std::vector<cv::Mat>                         m_Tvecs;
   std::vector<cv::Mat>                         m_OriginalVideoImages;
   std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
-  std::vector<cv::Mat>                         m_UndistortedVideoImagesInGreyScale;
-  std::vector<cv::Mat>                         m_RenderedImages;
-  std::vector<cv::Mat>                         m_RenderedImagesInGreyscale;
+  mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
+  mutable std::vector<cv::Mat>                 m_RenderedImages;
+  mutable std::vector<cv::Mat>                 m_RenderedImagesInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
 };
 

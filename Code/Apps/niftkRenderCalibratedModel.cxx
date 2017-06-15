@@ -103,13 +103,13 @@ int main(int argc, char ** argv)
     if (argc == 10)
     {
       cv::Mat tmp;
-      p.DumpScreen(tmp);
+      p.CopyScreen(tmp);
       cv::imwrite(argv[9], tmp);
     }
     else if (argc == 11)
     {
       cv::Mat tmp;
-      p.DumpScreen(tmp);
+      p.CopyScreen(tmp);
       cv::imwrite(argv[10], tmp);
     }
     else

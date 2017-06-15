@@ -102,6 +102,10 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::~CalibratedRenderingPipeline()
 {
+  if (m_RenderWindow != nullptr)
+  {
+    m_RenderWindow->RemoveRenderer(m_Renderer);
+  }
 }
 
 
@@ -155,7 +159,7 @@ void CalibratedRenderingPipeline::DumpScreen(const std::string fileName)
 
 
 //-----------------------------------------------------------------------------
-void CalibratedRenderingPipeline::DumpScreen(cv::Mat& image)
+void CalibratedRenderingPipeline::CopyScreen(cv::Mat& image)
 {
   this->Render();
 
@@ -173,6 +177,7 @@ void CalibratedRenderingPipeline::DumpScreen(cv::Mat& image)
          renderWindowToImageFilter->GetOutput()->GetScalarPointer(),
          m_WindowSize.height * m_WindowSize.width * 3
         );
+
   cv::Mat flipped;
   cv::flip(rgbImage, flipped, 0);
   cv::cvtColor(flipped, image, CV_RGB2BGR);
