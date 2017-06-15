@@ -14,6 +14,7 @@
 
 #include "niftkRenderingCameraCalibration.h"
 #include <Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
+#include <Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
 #include <itkGradientDescentOptimizer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
@@ -115,7 +116,70 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
                                                        std::vector<cv::Mat>& tvecs
                                                       )
 {
-  return 0;
+  win->DoubleBufferOff();
+  win->GetInteractor()->Disable();
+
+  niftk::RenderingBasedMonoExtrinsicCostFunction::Pointer cost = niftk::RenderingBasedMonoExtrinsicCostFunction::New();
+  cost->Initialise(win,
+                   windowSize,
+                   calibratedWindowSize,
+                   modelFileName,
+                   textureFileName,
+                   images,
+                   intrinsic,
+                   distortion
+                  );
+
+  niftk::RenderingBasedMonoExtrinsicCostFunction::ParametersType currentParams;
+  currentParams.SetSize(cost->GetNumberOfParameters());
+
+  for (int i = 0; i < images.size(); i++)
+  {
+    currentParams[i*6 + 0] = rvecs[i].at<double>(0, 0);
+    currentParams[i*6 + 1] = rvecs[i].at<double>(0, 1);
+    currentParams[i*6 + 2] = rvecs[i].at<double>(0, 2);
+    currentParams[i*6 + 3] = tvecs[i].at<double>(0, 0);
+    currentParams[i*6 + 4] = tvecs[i].at<double>(0, 1);
+    currentParams[i*6 + 5] = tvecs[i].at<double>(0, 2);
+  }
+
+  itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
+  itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
+
+  while (currentValue > previousValue)
+  {
+    previousValue = currentValue;
+
+    itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
+    opt->SetCostFunction(cost);
+    opt->SetInitialPosition(currentParams);
+    opt->SetLearningRate(learningRate);
+    opt->SetMaximize(true);        // Because cost function is currently NMI.
+    opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+    opt->StartOptimization();
+
+    currentValue = opt->GetValue();
+
+    if (currentValue > previousValue)
+    {
+      currentParams = opt->GetCurrentPosition();
+
+      std::cout << "p=" << currentParams << ":" << currentValue << std::endl;
+    }
+  }
+
+  niftk::RenderingBasedMonoIntrinsicCostFunction::ParametersType final = currentParams;
+  for (int i = 0; i < images.size(); i++)
+  {
+    rvecs[i].at<double>(0, 0) = final[i*6 + 0];
+    rvecs[i].at<double>(0, 1) = final[i*6 + 1];
+    rvecs[i].at<double>(0, 2) = final[i*6 + 2];
+    tvecs[i].at<double>(0, 0) = final[i*6 + 3];
+    tvecs[i].at<double>(0, 1) = final[i*6 + 4];
+    tvecs[i].at<double>(0, 2) = final[i*6 + 5];
+  }
+
+  return previousValue;
 }
 
 
@@ -171,12 +235,6 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
 
       previousValue = currentValue;
 
-      cv::Mat tmpIntrinsic = cv::Mat::eye(3, 3, CV_64FC1);
-      intrinsic.copyTo(tmpIntrinsic);
-
-      cv::Mat tmpDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
-      distortion.copyTo(tmpDistortion);
-
       currentValue = InternalRenderingMonoIntrinsicCameraCalibration(win,
                                                                      windowSize,
                                                                      calibratedWindowSize,
@@ -186,39 +244,27 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                                                      rvecs,
                                                                      tvecs,
                                                                      learningRate,
-                                                                     tmpIntrinsic,
-                                                                     tmpDistortion
+                                                                     intrinsic,
+                                                                     distortion
                                                                      );
 
+      currentValue = InternalRenderingMonoExtrinsicCameraCalibration(win,
+                                                                     windowSize,
+                                                                     calibratedWindowSize,
+                                                                     modelFileName,
+                                                                     textureFileName,
+                                                                     images,
+                                                                     intrinsic,
+                                                                     distortion,
+                                                                     learningRate,
+                                                                     rvecs,
+                                                                     tvecs
+                                                                     );
 
       std::cout << "RenderingMonoCameraCalibration:Cost=" << currentValue
                 << ", Learning=" << learningRate
-                << ", Intrinsic="
-                << intrinsic.at<double>(0, 0) << " "
-                << intrinsic.at<double>(1, 1) << " "
-                << intrinsic.at<double>(0, 2) << " "
-                << intrinsic.at<double>(1, 2) << " "
-                << distortion.at<double>(0, 0) << " "
-                << distortion.at<double>(0, 1) << " "
-                << distortion.at<double>(0, 2) << " "
-                << distortion.at<double>(0, 3)
                 << std::endl;
-/*
-      cost = InternalRenderingMonoExtrinsicCameraCalibration(win,
-                                                             windowSize,
-                                                             calibratedWindowSize,
-                                                             modelFileName,
-                                                             textureFileName,
-                                                             images,
-                                                             intrinsic,
-                                                             distortion,
-                                                             learningRate,
-                                                             rvecs,
-                                                             tvecs
-                                                             );
 
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << cost << std::endl;
-*/
       numberOfIterations++;
 
     }
@@ -249,96 +295,77 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                       cv::Mat& leftToRightTranslationVector
                                      )
 {
-  double learningRate = 0.001;
+  double learningRate = 0.005;
 
   do
   {
 
-    double cost = std::numeric_limits<double>::min() + 1;
-    double previousCost = std::numeric_limits<double>::min();
+    double previousValue = std::numeric_limits<double>::min();
+    double currentValue = std::numeric_limits<double>::min() + 1;
     unsigned int numberOfIterations = 0;
 
-    do
+    while (currentValue > previousValue && numberOfIterations < 1)
     {
 
-      cost = InternalRenderingMonoIntrinsicCameraCalibration(win,
-                                                             windowSize,
-                                                             calibratedWindowSize,
-                                                             modelFileName,
-                                                             textureFileName,
-                                                             leftImages,
-                                                             rvecsLeft,
-                                                             tvecsLeft,
-                                                             learningRate,
-                                                             intrinsicLeft,
-                                                             distortionLeft
+      previousValue = currentValue;
+
+      currentValue = InternalRenderingMonoIntrinsicCameraCalibration(win,
+                                                                     windowSize,
+                                                                     calibratedWindowSize,
+                                                                     modelFileName,
+                                                                     textureFileName,
+                                                                     leftImages,
+                                                                     rvecsLeft,
+                                                                     tvecsLeft,
+                                                                     learningRate,
+                                                                     intrinsicLeft,
+                                                                     distortionLeft
+                                                                     );
+
+      currentValue = InternalRenderingMonoIntrinsicCameraCalibration(win,
+                                                                     windowSize,
+                                                                     calibratedWindowSize,
+                                                                     modelFileName,
+                                                                     textureFileName,
+                                                                     rightImages,
+                                                                     rvecsRight,
+                                                                     tvecsRight,
+                                                                     learningRate,
+                                                                     intrinsicRight,
+                                                                     distortionRight
+                                                                     );
+
+      currentValue = InternalRenderingStereoCameraCalibration(win,
+                                                              windowSize,
+                                                              calibratedWindowSize,
+                                                              modelFileName,
+                                                              textureFileName,
+                                                              leftImages,
+                                                              rightImages,
+                                                              intrinsicLeft,
+                                                              distortionLeft,
+                                                              intrinsicRight,
+                                                              distortionRight,
+                                                              learningRate,
+                                                              rvecsLeft,
+                                                              tvecsLeft,
+                                                              rvecsRight,
+                                                              tvecsRight,
+                                                              leftToRightRotationMatrix,
+                                                              leftToRightTranslationVector
                                                              );
 
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << cost << ", Left Intrinsic="
-                << intrinsicLeft.at<double>(0, 0) << " "
-                << intrinsicLeft.at<double>(1, 1) << " "
-                << intrinsicLeft.at<double>(0, 2) << " "
-                << intrinsicLeft.at<double>(1, 2) << " "
-                << distortionLeft.at<double>(0, 0) << " "
-                << distortionLeft.at<double>(0, 1) << " "
-                << distortionLeft.at<double>(0, 2) << " "
-                << distortionLeft.at<double>(0, 3)
+      std::cout << "RenderingMonoCameraCalibration:Cost=" << currentValue
+                << ", Learning=" << learningRate
                 << std::endl;
-
-      cost = InternalRenderingMonoIntrinsicCameraCalibration(win,
-                                                             windowSize,
-                                                             calibratedWindowSize,
-                                                             modelFileName,
-                                                             textureFileName,
-                                                             rightImages,
-                                                             rvecsRight,
-                                                             tvecsRight,
-                                                             learningRate,
-                                                             intrinsicRight,
-                                                             distortionRight
-                                                             );
-
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << cost << ", Right Intrinsic="
-                << intrinsicRight.at<double>(0, 0) << " "
-                << intrinsicRight.at<double>(1, 1) << " "
-                << intrinsicRight.at<double>(0, 2) << " "
-                << intrinsicRight.at<double>(1, 2) << " "
-                << distortionRight.at<double>(0, 0) << " "
-                << distortionRight.at<double>(0, 1) << " "
-                << distortionRight.at<double>(0, 2) << " "
-                << distortionRight.at<double>(0, 3)
-                << std::endl;
-
-
-      cost = InternalRenderingStereoCameraCalibration(win,
-                                                      windowSize,
-                                                      calibratedWindowSize,
-                                                      modelFileName,
-                                                      textureFileName,
-                                                      leftImages,
-                                                      rightImages,
-                                                      intrinsicLeft,
-                                                      distortionLeft,
-                                                      intrinsicRight,
-                                                      distortionRight,
-                                                      learningRate,
-                                                      rvecsLeft,
-                                                      tvecsLeft,
-                                                      rvecsRight,
-                                                      tvecsRight,
-                                                      leftToRightRotationMatrix,
-                                                      leftToRightTranslationVector
-                                                     );
-
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << cost << std::endl;
 
       numberOfIterations++;
 
-    } while (previousCost - cost > 0.0001 && numberOfIterations < 20);
+    }
 
     learningRate /= 2.0;
 
-  } while (learningRate > 0.001);
+  } while (learningRate > 0.0001);
 }
 
 } // end namespace

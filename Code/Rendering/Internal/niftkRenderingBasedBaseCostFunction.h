@@ -83,6 +83,12 @@ protected:
                     const cv::Mat& histogramCols,
                     const cv::Mat& jointHist) const;
 
+  void AccumulateSamples(unsigned long int& counter,
+                         cv::Mat& histogramRows,
+                         cv::Mat& histogramCols,
+                         cv::Mat& jointHistogram
+                        ) const;
+
   virtual ParametersType GetStepSizes() const = 0;
 
   std::vector<cv::Mat>                         m_OriginalVideoImages;
