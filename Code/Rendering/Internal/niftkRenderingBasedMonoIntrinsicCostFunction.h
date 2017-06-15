@@ -16,11 +16,7 @@
 #define niftkRenderingBasedMonoIntrinsicCostFunction_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkCalibratedRenderingPipeline.h"
-#include <itkSingleValuedCostFunction.h>
-#include <cv.h>
-#include <vector>
-#include <memory>
+#include "niftkRenderingBasedBaseCostFunction.h"
 
 namespace niftk
 {
@@ -29,13 +25,13 @@ namespace niftk
  * \class RenderingBasedMonoIntrinsicCostFunction
  * \brief Optimises intrinsic parameters only by matching to rendering of model.
  */
-class RenderingBasedMonoIntrinsicCostFunction : public itk::SingleValuedCostFunction
+class RenderingBasedMonoIntrinsicCostFunction : public niftk::RenderingBasedBaseCostFunction
 {
 
 public:
 
   typedef RenderingBasedMonoIntrinsicCostFunction Self;
-  typedef itk::SingleValuedCostFunction           Superclass;
+  typedef niftk::RenderingBasedBaseCostFunction   Superclass;
   typedef itk::SmartPointer<Self>                 Pointer;
   typedef itk::SmartPointer<const Self>           ConstPointer;
   itkNewMacro(Self);
@@ -53,12 +49,6 @@ public:
    * \see itk::SingleValuedCostFunction::GetValue()
    */
   virtual MeasureType GetValue(const ParametersType & parameters) const;
-
-  /**
-   * \see itk::SingleValuedCostFunction::GetDerivative()
-   */
-  virtual void GetDerivative(const ParametersType & parameters,
-                             DerivativeType & derivative) const;
 
   /**
    * \brief Instantiates the internal rendering pipeline.
@@ -81,16 +71,12 @@ protected:
   RenderingBasedMonoIntrinsicCostFunction(const RenderingBasedMonoIntrinsicCostFunction&); // deliberately not implemented
   RenderingBasedMonoIntrinsicCostFunction& operator=(const RenderingBasedMonoIntrinsicCostFunction&); // deliberately not implemented
 
+  virtual ParametersType GetStepSizes() const;
+
 private:
 
-  std::vector<cv::Mat>                         m_Rvecs;
-  std::vector<cv::Mat>                         m_Tvecs;
-  std::vector<cv::Mat>                         m_OriginalVideoImages;
-  std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
-  mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
-  mutable std::vector<cv::Mat>                 m_RenderedImages;
-  mutable std::vector<cv::Mat>                 m_RenderedImagesInGreyscale;
-  std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
+  std::vector<cv::Mat> m_Rvecs;
+  std::vector<cv::Mat> m_Tvecs;
 };
 
 } // end namespace

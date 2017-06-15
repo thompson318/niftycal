@@ -22,7 +22,6 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 RenderingBasedMonoIntrinsicCostFunction::RenderingBasedMonoIntrinsicCostFunction()
-: m_Pipeline(nullptr)
 {
 }
 
@@ -44,6 +43,8 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(vtkRenderWindow* win,
                                                          const std::vector<cv::Mat>& tvecs
                                                         )
 {
+  Superclass::Initialise(win, windowSize, calibratedWindowSize, model, texture, videoImages);
+
   if (rvecs.size() != videoImages.size())
   {
     niftkNiftyCalThrow() << "Number of rotation vectors (" << rvecs.size()
@@ -56,41 +57,8 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(vtkRenderWindow* win,
                          << "), doesn't match number of images (" << videoImages.size() << ")";
   }
 
-  if (win == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null Window provided.";
-  }
-
-  m_Pipeline.reset(new CalibratedRenderingPipeline(windowSize,
-                                                   calibratedWindowSize,
-                                                   model,
-                                                   texture,
-                                                   true));
-
-  m_Pipeline->ConnectToRenderWindow(win);
-
   m_Rvecs = rvecs;
   m_Tvecs = tvecs;
-
-  m_OriginalVideoImages = videoImages;
-  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
-  {
-    cv::Mat videoInGreyScale = cvCreateMat(m_OriginalVideoImages[i].rows, m_OriginalVideoImages[i].cols, CV_8UC3);
-    cv::cvtColor(m_OriginalVideoImages[i], videoInGreyScale, CV_BGR2GRAY);
-    m_OriginalVideoImagesInGreyScale.push_back(videoInGreyScale);
-
-    cv::Mat undistorted;
-    m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
-    m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
-
-    cv::Mat rendering;
-    m_OriginalVideoImages[i].copyTo(rendering);
-    m_RenderedImages.push_back(rendering);
-
-    cv::Mat renderingInGreyScale;
-    cv::cvtColor(m_RenderedImages[i], renderingInGreyScale, CV_BGR2GRAY);
-    m_RenderedImagesInGreyscale.push_back(renderingInGreyScale);
-  }
 }
 
 
@@ -123,11 +91,6 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
   distortion.at<double>(0, 2) = parameters[6];
   distortion.at<double>(0, 3) = parameters[7];
 
-  cv::Vec3i blueBackGround; // BGR
-  blueBackGround[0] = 255;
-  blueBackGround[1] = 0;
-  blueBackGround[2] = 0;
-
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
     cv::Matx44d worldToCamera = niftk::RodriguesToMatrix(m_Rvecs[i], m_Tvecs[i]);
@@ -147,7 +110,7 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
             && c != 0
             && r != (m_RenderedImagesInGreyscale[i].rows - 1)
             && c != (m_RenderedImagesInGreyscale[i].cols - 1)
-            && m_RenderedImages[i].at<cv::Vec3i>(r, c) != blueBackGround)
+            && m_RenderedImages[i].at<cv::Vec3i>(r, c) != m_BackgroundColour)
         {
           unsigned int a = static_cast<unsigned int>(m_RenderedImagesInGreyscale[i].at<unsigned char>(r, c)) / 8;
           unsigned int b = static_cast<unsigned int>(m_UndistortedVideoImagesInGreyScale[i].at<unsigned char>(r, c)) / 8;
@@ -161,85 +124,29 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
     }
   }
 
-  // Now compute NMI
-  double value = 0;
-  double p = 0;
-  double entropyRows = 0;
-  double entropyCols = 0;
-  double jointEntropy = 0;
-
-  if (counter > 0)
-  {
-    for (int r = 0; r < histogramRows.rows; r++)
-    {
-      value = histogramRows.at<double>(r, 0);
-      p = value / static_cast<double>(counter);
-      if (p > 0)
-      {
-        entropyRows += p * log(p);
-      }
-    }
-
-    for (int c = 0; c < histogramCols.cols; c++)
-    {
-      value = histogramCols.at<double>(0, c);
-      p = value / static_cast<double>(counter);
-      if (p > 0)
-      {
-        entropyCols += p * log(p);
-      }
-    }
-
-    for (int r = 0; r < jointHist.rows; r++)
-    {
-      for (int c = 0; c < jointHist.cols; c++)
-      {
-        value = jointHist.at<double>(r, c);
-        p = value / static_cast<double>(counter);
-        if (p > 0)
-        {
-          jointEntropy += p * log(p);
-        }
-      }
-    }
-  }
-
-  cost = (-entropyRows + -entropyCols)/-jointEntropy;
+  cost = this->ComputeNMI(counter, histogramRows, histogramCols, jointHist);
 
   return cost;
 }
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedMonoIntrinsicCostFunction::GetDerivative(const ParametersType & parameters,
-                                                            DerivativeType & derivative) const
+RenderingBasedMonoIntrinsicCostFunction::ParametersType
+RenderingBasedMonoIntrinsicCostFunction::GetStepSizes() const
 {
   ParametersType stepSize;
-  stepSize.SetSize(parameters.GetSize());
-  stepSize[0] = 50;
-  stepSize[1] = 50;
-  stepSize[2] = 2;
-  stepSize[3] = 2;
-  stepSize[4] = 0.01;
-  stepSize[5] = 0.01;
+  stepSize.SetSize(this->GetNumberOfParameters());
+
+  stepSize[0] = 50;    // fx
+  stepSize[1] = 50;    // fy
+  stepSize[2] = 2;     // cx
+  stepSize[3] = 2;     // cy
+  stepSize[4] = 0.01;  // k1
+  stepSize[5] = 0.01;  // etc.
   stepSize[6] = 0.01;
   stepSize[7] = 0.01;
 
-  derivative.SetSize(parameters.GetSize());
-
-  for (int i = 0; i < parameters.GetSize(); i++)
-  {
-    ParametersType copyOfParams = parameters;
-
-    copyOfParams[i] += stepSize[i];
-    MeasureType plus = this->GetValue(copyOfParams);
-
-    copyOfParams[i] -= (2.0 * stepSize[i]);
-    MeasureType minus = this->GetValue(copyOfParams);
-
-    MeasureType diff = plus - minus;
-    derivative[i] = diff / (2.0*stepSize[i]);
-  }
+  return stepSize;
 }
 
 } // end niftk
