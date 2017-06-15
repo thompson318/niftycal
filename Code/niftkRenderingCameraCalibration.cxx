@@ -73,7 +73,7 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
-    opt->SetMaximize(true);
+    opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
     opt->StartOptimization();
 
