@@ -143,6 +143,9 @@ private:
 
   vtkSmartPointer<vtkRenderer>                 m_Renderer;
   vtkRenderWindow*                             m_RenderWindow;
+
+  cv::Mat                                      m_RGBImage;
+  cv::Mat                                      m_BGRImage;
 };
 
 #endif

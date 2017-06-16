@@ -96,6 +96,9 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_LeftToRightMatrix = cv::Matx44d::eye();
   m_WorldToCameraMatrix = cv::Matx44d::eye();
   m_CameraMatrix = cv::Matx44d::eye();
+
+  m_RGBImage = cv::Mat::eye(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
+  m_BGRImage = cv::Mat::eye(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
 }
 
 
@@ -182,15 +185,13 @@ void CalibratedRenderingPipeline::CopyScreen(cv::Mat& image)
   renderWindowToImageFilter->ShouldRerenderOn();
   renderWindowToImageFilter->Update();
 
-  cv::Mat rgbImage = cvCreateMat(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
-  memcpy(rgbImage.data,
+  memcpy(m_RGBImage.data,
          renderWindowToImageFilter->GetOutput()->GetScalarPointer(),
          m_WindowSize.height * m_WindowSize.width * 3
         );
 
-  cv::Mat flipped = cvCreateMat(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
-  cv::flip(rgbImage, flipped, 0);
-  cv::cvtColor(flipped, image, CV_RGB2BGR);
+  cv::cvtColor(m_RGBImage, m_BGRImage, CV_RGB2BGR);
+  cv::flip(m_BGRImage, image, 0);
 }
 
 
