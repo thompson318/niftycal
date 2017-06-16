@@ -67,33 +67,30 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
   currentParams[7] = distortion.at<double>(0, 3);
 
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
-  itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
+  itk::GradientDescentOptimizer::MeasureType currentValue = cost->GetValue(currentParams);
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.001)
   {
+    previousValue = currentValue;
+
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
-
-    currentValue = opt->GetValue();
-    previousValue = currentValue;
-
     opt->StartOptimization();
 
     loopCounter++;
-
-    currentValue = opt->GetValue();
+    currentValue = cost->GetValue(opt->GetCurrentPosition());
 
     if (currentValue > previousValue)
     {
       currentParams = opt->GetCurrentPosition();
 
-      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << previousValue << "," << currentValue << std::endl;
     }
   }
 
@@ -160,33 +157,30 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
   }
 
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
-  itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
+  itk::GradientDescentOptimizer::MeasureType currentValue = cost->GetValue(currentParams);
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.001)
   {
+    previousValue = currentValue;
+
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
-
-    currentValue = opt->GetValue();
-    previousValue = currentValue;
-
     opt->StartOptimization();
 
     loopCounter++;
-
-    currentValue = opt->GetValue();
+    currentValue = cost->GetValue(opt->GetCurrentPosition());
 
     if (currentValue > previousValue)
     {
       currentParams = opt->GetCurrentPosition();
 
-      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << previousValue << "," << currentValue << std::endl;
     }
   }
 
@@ -274,33 +268,30 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
   }
 
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
-  itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
+  itk::GradientDescentOptimizer::MeasureType currentValue = cost->GetValue(currentParams);
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.001)
   {
+    previousValue = currentValue;
+
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
-
-    currentValue = opt->GetValue();
-    previousValue = currentValue;
-
     opt->StartOptimization();
 
     loopCounter++;
-
-    currentValue = opt->GetValue();
+    currentValue = cost->GetValue(opt->GetCurrentPosition());
 
     if (currentValue > previousValue)
     {
       currentParams = opt->GetCurrentPosition();
 
-      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << previousValue << "," << currentValue << std::endl;
     }
   }
 
@@ -365,7 +356,7 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
     double previousValue = std::numeric_limits<double>::min();
     double currentValue = std::numeric_limits<double>::min() + 1;
 
-    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
+    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.001)
     {
 
       previousValue = currentValue;
@@ -445,7 +436,7 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
     double previousValue = std::numeric_limits<double>::min();
     double currentValue = std::numeric_limits<double>::min() + 1;
 
-    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
+    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.001)
     {
 
       previousValue = currentValue;
