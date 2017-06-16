@@ -71,7 +71,7 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
     previousValue = currentValue;
 
@@ -155,7 +155,7 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
     previousValue = currentValue;
 
@@ -260,7 +260,7 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
 
   unsigned int loopCounter = 0;
 
-  while (currentValue > previousValue)
+  while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
     previousValue = currentValue;
 
@@ -338,7 +338,7 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
     double currentValue = std::numeric_limits<double>::min() + 1;
     unsigned int numberOfIterations = 0;
 
-    while (currentValue > previousValue && numberOfIterations < 1)
+    while (currentValue > previousValue && numberOfIterations < 10)
     {
 
       previousValue = currentValue;
@@ -416,7 +416,7 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
     double currentValue = std::numeric_limits<double>::min() + 1;
     unsigned int numberOfIterations = 0;
 
-    while (currentValue > previousValue && numberOfIterations < 1)
+    while (currentValue > previousValue && numberOfIterations < 10)
     {
 
       previousValue = currentValue;
