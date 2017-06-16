@@ -74,6 +74,13 @@ public:
   void CopyScreen(cv::Mat& image);
 
   /**
+   * \brief Sets background colour, values should be zero to 255.
+   */
+  void SetBackgroundColour(const unsigned char& red,
+                           const unsigned char& green,
+                           const unsigned char& blue
+                           );
+  /**
   * \brief Sets the intrinsic parameters on the camera.
   *
   * This is the 3x3 matrix that you would get from OpenCV calibration.

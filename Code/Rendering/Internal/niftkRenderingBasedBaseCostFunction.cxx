@@ -24,9 +24,9 @@ namespace niftk
 RenderingBasedBaseCostFunction::RenderingBasedBaseCostFunction()
 : m_Pipeline(nullptr)
 {
-  m_BackgroundColour[0] = 255;
-  m_BackgroundColour[1] = 0;
-  m_BackgroundColour[2] = 0;
+  m_BackgroundColour[0] = 255; // B
+  m_BackgroundColour[1] = 0;   // G
+  m_BackgroundColour[2] = 0;   // R
 }
 
 
@@ -50,6 +50,11 @@ void RenderingBasedBaseCostFunction::Initialise(vtkRenderWindow* win,
     niftkNiftyCalThrow() << "Null Window provided.";
   }
 
+  if (videoImages.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No images provided.";
+  }
+
   m_Pipeline.reset(new CalibratedRenderingPipeline(windowSize,
                                                    calibratedWindowSize,
                                                    model,
@@ -57,60 +62,55 @@ void RenderingBasedBaseCostFunction::Initialise(vtkRenderWindow* win,
                                                    true));
 
   m_Pipeline->ConnectToRenderWindow(win);
+  m_Pipeline->SetBackgroundColour(m_BackgroundColour[2], m_BackgroundColour[1], m_BackgroundColour[0]); // OpenCV is BGR, VTK is RGB.
 
   m_OriginalVideoImages = videoImages;
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-    cv::Mat videoInGreyScale = cvCreateMat(m_OriginalVideoImages[i].rows, m_OriginalVideoImages[i].cols, CV_8UC3);
+    cv::Mat videoInGreyScale;
     cv::cvtColor(m_OriginalVideoImages[i], videoInGreyScale, CV_BGR2GRAY);
     m_OriginalVideoImagesInGreyScale.push_back(videoInGreyScale);
 
     cv::Mat undistorted;
     m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
     m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
-
-    cv::Mat rendering;
-    m_OriginalVideoImages[i].copyTo(rendering);
-    m_RenderedImages.push_back(rendering);
-
-    cv::Mat renderingInGreyScale;
-    cv::cvtColor(m_RenderedImages[i], renderingInGreyScale, CV_BGR2GRAY);
-    m_RenderedImagesInGreyscale.push_back(renderingInGreyScale);
   }
+
+  m_OriginalVideoImages[0].copyTo(m_RenderedImage);
+  cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
+
 }
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedBaseCostFunction::AccumulateSamples(unsigned long int& counter,
+void RenderingBasedBaseCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideoImage,
+                                                       unsigned long int& counter,
                                                        cv::Mat& histogramRows,
                                                        cv::Mat& histogramCols,
                                                        cv::Mat& jointHistogram
                                                       ) const
 {
-  for (int i = 0; i < m_RenderedImagesInGreyscale.size(); i++)
+  for (int r = 0; r < m_RenderedImageInGreyscale.rows; r++)
   {
-    for (int r = 0; r < m_RenderedImagesInGreyscale[i].rows; r++)
+    for (int c = 0; c < m_RenderedImageInGreyscale.cols; c++)
     {
-      for (int c = 0; c < m_RenderedImagesInGreyscale[i].cols; c++)
+      if (   r != 0
+          && c != 0
+          && r != (m_RenderedImageInGreyscale.rows - 1)
+          && c != (m_RenderedImageInGreyscale.cols - 1)
+          && m_RenderedImage.at<cv::Vec3i>(r, c) != m_BackgroundColour)
       {
-        if (   r != 0
-            && c != 0
-            && r != (m_RenderedImagesInGreyscale[i].rows - 1)
-            && c != (m_RenderedImagesInGreyscale[i].cols - 1)
-            && m_RenderedImages[i].at<cv::Vec3i>(r, c) != m_BackgroundColour)
-        {
-          unsigned int a = static_cast<unsigned int>(m_RenderedImagesInGreyscale[i].at<unsigned char>(r, c)) / 8;
-          unsigned int b = static_cast<unsigned int>(m_UndistortedVideoImagesInGreyScale[i].at<unsigned char>(r, c)) / 8;
+        unsigned int a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 8;
+        unsigned int b = static_cast<unsigned int>(greyScaleVideoImage.at<unsigned char>(r, c)) / 8;
 
-          jointHistogram.at<double>(a, b) += 1;
-          histogramRows.at<double>(a, 0) += 1;
-          histogramCols.at<double>(0, b) += 1;
-          counter += 1;
+        jointHistogram.at<double>(a, b) += 1;
+        histogramRows.at<double>(a, 0) += 1;
+        histogramCols.at<double>(0, b) += 1;
+        counter += 1;
 
-        } // if not background
-      } // end for cols
-    } // end for rows
-  } // end for each image
+      } // if not background
+    } // end for cols
+  } // end for rows
 }
 
 

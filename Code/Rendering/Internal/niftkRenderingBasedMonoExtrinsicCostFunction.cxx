@@ -88,9 +88,11 @@ RenderingBasedMonoExtrinsicCostFunction::GetValue(const ParametersType & paramet
     cv::Matx44d worldToCamera = niftk::RodriguesToMatrix(rotation, translation);
     m_Pipeline->SetWorldToCameraMatrix(worldToCamera);
     m_Pipeline->SetIntrinsics(m_Intrinsics);
-    m_Pipeline->CopyScreen(m_RenderedImages[i]);
+    m_Pipeline->CopyScreen(m_RenderedImage);
+    cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
 
-    this->AccumulateSamples(counter, histogramRows, histogramCols, jointHist);
+    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i],
+                            counter, histogramRows, histogramCols, jointHist);
 
   }
 

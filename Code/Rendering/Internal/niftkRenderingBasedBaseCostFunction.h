@@ -83,7 +83,8 @@ protected:
                     const cv::Mat& histogramCols,
                     const cv::Mat& jointHist) const;
 
-  void AccumulateSamples(unsigned long int& counter,
+  void AccumulateSamples(const cv::Mat& greyScaleVideoImage,
+                         unsigned long int& counter,
                          cv::Mat& histogramRows,
                          cv::Mat& histogramCols,
                          cv::Mat& jointHistogram
@@ -94,8 +95,8 @@ protected:
   std::vector<cv::Mat>                         m_OriginalVideoImages;
   std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
   mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
-  mutable std::vector<cv::Mat>                 m_RenderedImages;
-  mutable std::vector<cv::Mat>                 m_RenderedImagesInGreyscale;
+  mutable cv::Mat                              m_RenderedImage;
+  mutable cv::Mat                              m_RenderedImageInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
   cv::Vec3i                                    m_BackgroundColour; // (BGR, pure Blue)
 

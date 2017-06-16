@@ -96,13 +96,15 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
     cv::Matx44d worldToCamera = niftk::RodriguesToMatrix(m_Rvecs[i], m_Tvecs[i]);
     m_Pipeline->SetWorldToCameraMatrix(worldToCamera);
     m_Pipeline->SetIntrinsics(intrinsics);
-    m_Pipeline->CopyScreen(m_RenderedImages[i]);
+    m_Pipeline->CopyScreen(m_RenderedImage);
+    cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
 
     cv::undistort(m_OriginalVideoImagesInGreyScale[i],
                   m_UndistortedVideoImagesInGreyScale[i],
                   intrinsics, distortion, intrinsics);
 
-    this->AccumulateSamples(counter, histogramRows, histogramCols, jointHist);
+    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i],
+                            counter, histogramRows, histogramCols, jointHist);
   }
 
   cost = this->ComputeNMI(counter, histogramRows, histogramCols, jointHist);

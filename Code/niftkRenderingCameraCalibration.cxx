@@ -13,8 +13,11 @@
 =============================================================================*/
 
 #include "niftkRenderingCameraCalibration.h"
+#include <niftkMatrixUtilities.h>
 #include <Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
 #include <Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
+#include <Internal/niftkRenderingBasedStereoExtrinsicCostFunction.h>
+#include <Internal/niftkCalibrationUtilities_p.h>
 #include <itkGradientDescentOptimizer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
@@ -66,6 +69,8 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
   itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
 
+  unsigned int loopCounter = 0;
+
   while (currentValue > previousValue)
   {
     previousValue = currentValue;
@@ -78,13 +83,15 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
     opt->StartOptimization();
 
+    loopCounter++;
+
     currentValue = opt->GetValue();
 
     if (currentValue > previousValue)
     {
       currentParams = opt->GetCurrentPosition();
 
-      std::cout << "p=" << currentParams << ":" << currentValue << std::endl;
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
     }
   }
 
@@ -146,6 +153,8 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
   itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
 
+  unsigned int loopCounter = 0;
+
   while (currentValue > previousValue)
   {
     previousValue = currentValue;
@@ -158,13 +167,15 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
     opt->StartOptimization();
 
+    loopCounter++;
+
     currentValue = opt->GetValue();
 
     if (currentValue > previousValue)
     {
       currentParams = opt->GetCurrentPosition();
 
-      std::cout << "p=" << currentParams << ":" << currentValue << std::endl;
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
     }
   }
 
@@ -204,7 +215,104 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
                                                 cv::Mat& leftToRightTranslationVector
                                                )
 {
-  return 0;
+  win->DoubleBufferOff();
+  win->GetInteractor()->Disable();
+
+  niftk::RenderingBasedStereoExtrinsicCostFunction::Pointer cost = niftk::RenderingBasedStereoExtrinsicCostFunction::New();
+  cost->Initialise(win,
+                   windowSize,
+                   calibratedWindowSize,
+                   modelFileName,
+                   textureFileName,
+                   leftImages,
+                   rightImages,
+                   intrinsicLeft,
+                   distortionLeft,
+                   intrinsicRight,
+                   distortionRight
+                  );
+
+  niftk::RenderingBasedStereoExtrinsicCostFunction::ParametersType currentParams;
+  currentParams.SetSize(cost->GetNumberOfParameters());
+
+  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+  cv::Rodrigues(leftToRightRotationMatrix, rvec);
+
+  currentParams[0] = rvec.at<double>(0, 0);
+  currentParams[1] = rvec.at<double>(0, 1);
+  currentParams[2] = rvec.at<double>(0, 2);
+  currentParams[3] = leftToRightTranslationVector.at<double>(0, 0);
+  currentParams[4] = leftToRightTranslationVector.at<double>(0, 1);
+  currentParams[5] = leftToRightTranslationVector.at<double>(0, 2);
+
+  for (int i = 0; i < leftImages.size(); i++)
+  {
+    currentParams[(i+1)*6 + 0] = rvecsLeft[i].at<double>(0, 0);
+    currentParams[(i+1)*6 + 1] = rvecsLeft[i].at<double>(0, 1);
+    currentParams[(i+1)*6 + 2] = rvecsLeft[i].at<double>(0, 2);
+    currentParams[(i+1)*6 + 3] = tvecsLeft[i].at<double>(0, 0);
+    currentParams[(i+1)*6 + 4] = tvecsLeft[i].at<double>(0, 1);
+    currentParams[(i+1)*6 + 5] = tvecsLeft[i].at<double>(0, 2);
+  }
+
+  itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
+  itk::GradientDescentOptimizer::MeasureType currentValue = std::numeric_limits<double>::min() + 1;
+
+  unsigned int loopCounter = 0;
+
+  while (currentValue > previousValue)
+  {
+    previousValue = currentValue;
+
+    itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
+    opt->SetCostFunction(cost);
+    opt->SetInitialPosition(currentParams);
+    opt->SetLearningRate(learningRate);
+    opt->SetMaximize(true);        // Because cost function is currently NMI.
+    opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+    opt->StartOptimization();
+
+    loopCounter++;
+
+    currentValue = opt->GetValue();
+
+    if (currentValue > previousValue)
+    {
+      currentParams = opt->GetCurrentPosition();
+
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << currentValue << std::endl;
+    }
+  }
+
+  niftk::RenderingBasedStereoExtrinsicCostFunction::ParametersType final = currentParams;
+  rvec.at<double>(0, 0) = final[0];
+  rvec.at<double>(0, 1) = final[1];
+  rvec.at<double>(0, 2) = final[2];
+  cv::Rodrigues(rvec, leftToRightRotationMatrix);
+  leftToRightTranslationVector.at<double>(0, 0) = final[3];
+  leftToRightTranslationVector.at<double>(0, 1) = final[4];
+  leftToRightTranslationVector.at<double>(0, 2) = final[5];
+
+  for (int i = 0; i < leftImages.size(); i++)
+  {
+    rvecsLeft[i].at<double>(0, 0) = final[(i+1)*6 + 0];
+    rvecsLeft[i].at<double>(0, 1) = final[(i+1)*6 + 1];
+    rvecsLeft[i].at<double>(0, 2) = final[(i+1)*6 + 2];
+    tvecsLeft[i].at<double>(0, 0) = final[(i+1)*6 + 3];
+    tvecsLeft[i].at<double>(0, 1) = final[(i+1)*6 + 4];
+    tvecsLeft[i].at<double>(0, 2) = final[(i+1)*6 + 5];
+  }
+
+  // Makes sure that right hand rvecs and tvecs are consistent.
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+  return previousValue;
 }
 
 
@@ -248,6 +356,10 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                                                      distortion
                                                                      );
 
+      std::cerr << "RenderingMonoCameraCalibration:Intrinsic done, l=" << learningRate
+                << ", c=" << currentValue
+                << std::endl;
+
       currentValue = InternalRenderingMonoExtrinsicCameraCalibration(win,
                                                                      windowSize,
                                                                      calibratedWindowSize,
@@ -261,8 +373,8 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                                                      tvecs
                                                                      );
 
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << currentValue
-                << ", Learning=" << learningRate
+      std::cerr << "RenderingMonoCameraCalibration:Extrinsic done, l=" << learningRate
+                << ", c=" << currentValue
                 << std::endl;
 
       numberOfIterations++;
@@ -355,7 +467,7 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                                               leftToRightTranslationVector
                                                              );
 
-      std::cout << "RenderingMonoCameraCalibration:Cost=" << currentValue
+      std::cerr << "RenderingStereoCameraCalibration:Cost=" << currentValue
                 << ", Learning=" << learningRate
                 << std::endl;
 

@@ -118,6 +118,16 @@ void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow *w)
 
 
 //-----------------------------------------------------------------------------
+void CalibratedRenderingPipeline::SetBackgroundColour(const unsigned char& red,
+                                                      const unsigned char& green,
+                                                      const unsigned char& blue
+                                                      )
+{
+  m_Renderer->SetBackground(red, green, blue);
+}
+
+
+//-----------------------------------------------------------------------------
 void CalibratedRenderingPipeline::OpenCVToVTK(const cv::Matx44d& openCV, vtkMatrix4x4& vtk)
 {
   for (int r = 0; r < 4; r++)
