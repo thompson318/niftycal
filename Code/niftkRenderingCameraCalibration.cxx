@@ -73,14 +73,16 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
 
   while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
-    previousValue = currentValue;
-
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+
+    currentValue = opt->GetValue();
+    previousValue = currentValue;
+
     opt->StartOptimization();
 
     loopCounter++;
@@ -105,7 +107,14 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
   distortion.at<double>(0, 2) = final[6];
   distortion.at<double>(0, 3) = final[7];
 
-  return previousValue;
+  if (currentValue > previousValue)
+  {
+    return currentValue; // as loop exited due to tolerance
+  }
+  else
+  {
+    return previousValue; // as loop exited due to no improvement.
+  }
 }
 
 
@@ -157,14 +166,16 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
 
   while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
-    previousValue = currentValue;
-
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+
+    currentValue = opt->GetValue();
+    previousValue = currentValue;
+
     opt->StartOptimization();
 
     loopCounter++;
@@ -190,7 +201,14 @@ double InternalRenderingMonoExtrinsicCameraCalibration(vtkRenderWindow* win,
     tvecs[i].at<double>(0, 2) = final[i*6 + 5];
   }
 
-  return previousValue;
+  if (currentValue > previousValue)
+  {
+    return currentValue; // as loop exited due to tolerance
+  }
+  else
+  {
+    return previousValue; // as loop exited due to no improvement.
+  }
 }
 
 
@@ -262,14 +280,16 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
 
   while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
   {
-    previousValue = currentValue;
-
     itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
     opt->SetCostFunction(cost);
     opt->SetInitialPosition(currentParams);
     opt->SetLearningRate(learningRate);
     opt->SetMaximize(true);        // Because cost function is currently NMI.
     opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+
+    currentValue = opt->GetValue();
+    previousValue = currentValue;
+
     opt->StartOptimization();
 
     loopCounter++;
@@ -312,7 +332,14 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
                                  tvecsRight
                                 );
 
-  return previousValue;
+  if (currentValue > previousValue)
+  {
+    return currentValue; // as loop exited due to tolerance
+  }
+  else
+  {
+    return previousValue; // as loop exited due to no improvement.
+  }
 }
 
 
@@ -329,16 +356,16 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                     std::vector<cv::Mat>& tvecs
                                    )
 {
-  double learningRate = 0.005;
+  double learningRate = 0.01;
 
   do
   {
 
+    unsigned int loopCounter = 0;
     double previousValue = std::numeric_limits<double>::min();
     double currentValue = std::numeric_limits<double>::min() + 1;
-    unsigned int numberOfIterations = 0;
 
-    while (currentValue > previousValue && numberOfIterations < 10)
+    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
     {
 
       previousValue = currentValue;
@@ -356,8 +383,9 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                                                      distortion
                                                                      );
 
-      std::cerr << "RenderingMonoCameraCalibration:Intrinsic done, l=" << learningRate
-                << ", c=" << currentValue
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", mono, intrinsic done, c=" << currentValue
                 << std::endl;
 
       currentValue = InternalRenderingMonoExtrinsicCameraCalibration(win,
@@ -373,17 +401,18 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
                                                                      tvecs
                                                                      );
 
-      std::cerr << "RenderingMonoCameraCalibration:Extrinsic done, l=" << learningRate
-                << ", c=" << currentValue
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", mono, extrinsic done, c=" << currentValue
                 << std::endl;
 
-      numberOfIterations++;
+      loopCounter++;
 
     }
 
     learningRate /= 2.0;
 
-  } while (learningRate > 0.0001);
+  } while (learningRate > 0.001);
 }
 
 
@@ -407,16 +436,16 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                       cv::Mat& leftToRightTranslationVector
                                      )
 {
-  double learningRate = 0.005;
+  double learningRate = 0.01;
 
   do
   {
 
+    unsigned int loopCounter = 0;
     double previousValue = std::numeric_limits<double>::min();
     double currentValue = std::numeric_limits<double>::min() + 1;
-    unsigned int numberOfIterations = 0;
 
-    while (currentValue > previousValue && numberOfIterations < 10)
+    while (currentValue > previousValue && fabs(currentValue - previousValue) > 0.0001)
     {
 
       previousValue = currentValue;
@@ -434,6 +463,11 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                                                      distortionLeft
                                                                      );
 
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", mono, left intrinsic done, c=" << currentValue
+                << std::endl;
+
       currentValue = InternalRenderingMonoIntrinsicCameraCalibration(win,
                                                                      windowSize,
                                                                      calibratedWindowSize,
@@ -446,6 +480,10 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                                                      intrinsicRight,
                                                                      distortionRight
                                                                      );
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", mono, right intrinsic done, c=" << currentValue
+                << std::endl;
 
       currentValue = InternalRenderingStereoCameraCalibration(win,
                                                               windowSize,
@@ -467,17 +505,17 @@ void RenderingStereoCameraCalibration(vtkRenderWindow* win,
                                                               leftToRightTranslationVector
                                                              );
 
-      std::cerr << "RenderingStereoCameraCalibration:Cost=" << currentValue
-                << ", Learning=" << learningRate
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", stereo, extrinsic done, c=" << currentValue
                 << std::endl;
 
-      numberOfIterations++;
-
+      loopCounter++;
     }
 
     learningRate /= 2.0;
 
-  } while (learningRate > 0.0001);
+  } while (learningRate > 0.001);
 }
 
 } // end namespace
