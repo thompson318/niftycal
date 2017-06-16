@@ -20,11 +20,17 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
+#include <niftkPointUtilities.h>
+#include <niftkRenderingCameraCalibration.h>
 
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
 #include <list>
+
+#include <QApplication>
+#include <QVTKWidget.h>
+#include <vtkRenderWindow.h>
 
 TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
@@ -75,6 +81,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::list<niftk::PointSet> listOfPointsLeft;
   std::list<niftk::PointSet> listOfPointsRight;
 
+  std::vector<cv::Mat> colourLeftImages;
+  std::vector<cv::Mat> colourRightImages;
+
   for (int i = 13; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
@@ -98,11 +107,15 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
         {
           listOfPointsLeft.push_back(pointSet);
           std::cout << " left." << std::endl;
+
+          colourLeftImages.push_back(image);
         }
         else
         {
           listOfPointsRight.push_back(pointSet);
           std::cout << " right." << std::endl;
+
+          colourRightImages.push_back(image);
         }
       }
     }
@@ -178,10 +191,54 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                       false // just do optimisation of 2D reprojection error.
                                                      );
 
+  QApplication app(niftk::argc, niftk::argv);
+
+  QVTKWidget *widget = new QVTKWidget();
+  widget->show();
+  widget->resize(imageSize.width, imageSize.height);
+
+  vtkRenderWindow *window = widget->GetRenderWindow();
+
+  niftk::RenderingStereoCameraCalibration(window,
+                                          imageSize,
+                                          imageSize,
+                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                          colourLeftImages,
+                                          colourRightImages,
+                                          intrinsicLeft,
+                                          distortionLeft,
+                                          rvecsLeft,
+                                          tvecsLeft,
+                                          intrinsicRight,
+                                          distortionRight,
+                                          rvecsRight,
+                                          tvecsRight,
+                                          leftToRightRotationMatrix,
+                                          leftToRightTranslationVector
+                                         );
+
+  // Recompute RMS error
+  cv::Point3d rmsPerAxis;
+  double rmsAgain = niftk::ComputeRMSReconstructionError(model,
+                                                         listOfPointsLeft,
+                                                         listOfPointsRight,
+                                                         intrinsicLeft,
+                                                         distortionLeft,
+                                                         rvecsLeft,
+                                                         tvecsLeft,
+                                                         intrinsicRight,
+                                                         distortionRight,
+                                                         leftToRightRotationMatrix,
+                                                         leftToRightTranslationVector,
+                                                         rmsPerAxis
+                                                         );
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
-  std::cout << "Stereo RMS=" << result(0, 0) << std::endl;
+  std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;

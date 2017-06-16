@@ -18,15 +18,10 @@
 #include <niftkChessboardPointDetector.h>
 #include <niftkZhangCameraCalibration.h>
 #include <niftkIOUtilities.h>
-#include <niftkRenderingCameraCalibration.h>
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
 #include <list>
-
-#include <QApplication>
-#include <QVTKWidget.h>
-#include <vtkRenderWindow.h>
 
 TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
 
@@ -74,15 +69,11 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::list<niftk::PointSet> listOfPoints;
   cv::Size2i imageSize;
 
-  std::vector<cv::Mat> colourImages;
-
   for (int i = 17; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
     if (image.rows > 0 && image.cols > 0)
     {
-      colourImages.push_back(image);
-
       cv::Mat greyImage;
       cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
@@ -135,26 +126,6 @@ TEST_CASE( "Mono Chessboard", "[MonoCalibration]" ) {
   std::cout << "K2=" << distortion.at<double>(0,1) << std::endl;
   std::cout << "P1=" << distortion.at<double>(0,2) << std::endl;
   std::cout << "P2=" << distortion.at<double>(0,3) << std::endl;
-
-  QApplication app(niftk::argc, niftk::argv);
-
-  QVTKWidget *widget = new QVTKWidget();
-  widget->show();
-  widget->resize(imageSize.width, imageSize.height);
-
-  vtkRenderWindow *window = widget->GetRenderWindow();
-
-  niftk::RenderingMonoCameraCalibration(window,
-                                        imageSize,
-                                        imageSize,
-                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
-                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
-                                        colourImages,
-                                        intrinsic,
-                                        distortion,
-                                        rvecs,
-                                        tvecs
-                                        );
 
   REQUIRE( fabs(rms - eRMS) < 0.001 );
   REQUIRE( fabs(intrinsic.at<double>(0,0) - eFx) < fxTol );

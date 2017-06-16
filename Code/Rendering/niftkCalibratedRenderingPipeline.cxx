@@ -188,7 +188,7 @@ void CalibratedRenderingPipeline::CopyScreen(cv::Mat& image)
          m_WindowSize.height * m_WindowSize.width * 3
         );
 
-  cv::Mat flipped;
+  cv::Mat flipped = cvCreateMat(m_WindowSize.height, m_WindowSize.width, CV_8UC3);
   cv::flip(rgbImage, flipped, 0);
   cv::cvtColor(flipped, image, CV_RGB2BGR);
 }

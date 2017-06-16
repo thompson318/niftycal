@@ -15,6 +15,7 @@
 #include "niftkRenderingBasedStereoExtrinsicCostFunction.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
+#include <highgui.h>
 
 namespace niftk
 {
@@ -111,7 +112,7 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
   tvec.at<double>(0, 1) = parameters[4];
   tvec.at<double>(0, 2) = parameters[5];
 
-  cv::Matx44d leftToRight = niftk::RotationAndTranslationToMatrix(rvec, tvec);
+  cv::Matx44d leftToRight = niftk::RodriguesToMatrix(rvec, tvec);
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
