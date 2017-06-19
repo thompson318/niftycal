@@ -68,9 +68,9 @@ RenderingBasedMonoExtrinsicCostFunction::MeasureType
 RenderingBasedMonoExtrinsicCostFunction::GetValue(const ParametersType & parameters) const
 {  
   MeasureType cost = 0;
-  cv::Mat jointHist = cv::Mat::zeros(32, 32, CV_64FC1);
-  cv::Mat histogramRows = cv::Mat::zeros(32, 1, CV_64FC1);
-  cv::Mat histogramCols = cv::Mat::zeros(1, 32, CV_64FC1);
+  cv::Mat jointHist = cv::Mat::zeros(16, 16, CV_64FC1);
+  cv::Mat histogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
+  cv::Mat histogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
   unsigned long int counter = 0;
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)

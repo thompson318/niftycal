@@ -80,6 +80,9 @@ CalibratedRenderingPipeline::CalibratedRenderingPipeline(
   m_ModelActor = vtkSmartPointer<vtkActor>::New();
   //m_ModelActor->GetProperty()->BackfaceCullingOn();
   m_ModelActor->GetProperty()->SetInterpolationToFlat();
+  m_ModelActor->GetProperty()->SetAmbient(1);
+  m_ModelActor->GetProperty()->SetDiffuse(0);
+  m_ModelActor->GetProperty()->SetSpecular(0);
   m_ModelActor->SetTexture(m_Texture);
   m_ModelActor->SetMapper(m_ModelMapper);
 

@@ -98,10 +98,10 @@ void RenderingBasedBaseCostFunction::AccumulateSamples(const cv::Mat& greyScaleV
           && c != 0
           && r != (m_RenderedImageInGreyscale.rows - 1)
           && c != (m_RenderedImageInGreyscale.cols - 1)
-          && m_RenderedImage.at<cv::Vec3i>(r, c) != m_BackgroundColour)
+          && m_RenderedImage.at<cv::Vec3b>(r, c) != m_BackgroundColour)
       {
-        unsigned int a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 8;
-        unsigned int b = static_cast<unsigned int>(greyScaleVideoImage.at<unsigned char>(r, c)) / 8;
+        unsigned int a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 16;
+        unsigned int b = static_cast<unsigned int>(greyScaleVideoImage.at<unsigned char>(r, c)) / 16;
 
         jointHistogram.at<double>(a, b) += 1;
         histogramRows.at<double>(a, 0) += 1;

@@ -43,8 +43,7 @@ void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
                                                            const cv::Mat& leftIntrinsics,
                                                            const cv::Mat& leftDistortion,
                                                            const cv::Mat& rightIntrinsics,
-                                                           const cv::Mat& rightDistortion
-                                                          )
+                                                           const cv::Mat& rightDistortion)
 {
   Superclass::Initialise(win, windowSize, calibratedWindowSize, model, texture, leftVideoImages);
 
@@ -88,7 +87,7 @@ void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
 unsigned int RenderingBasedStereoExtrinsicCostFunction::GetNumberOfParameters(void) const
 {
   return 6 +
-         m_OriginalVideoImages.size() * 6;
+         (6 * m_OriginalVideoImages.size());
 }
 
 
@@ -97,9 +96,9 @@ RenderingBasedStereoExtrinsicCostFunction::MeasureType
 RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & parameters) const
 {  
   MeasureType cost = 0;
-  cv::Mat jointHist = cv::Mat::zeros(32, 32, CV_64FC1);
-  cv::Mat histogramRows = cv::Mat::zeros(32, 1, CV_64FC1);
-  cv::Mat histogramCols = cv::Mat::zeros(1, 32, CV_64FC1);
+  cv::Mat jointHist = cv::Mat::zeros(16, 16, CV_64FC1);
+  cv::Mat histogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
+  cv::Mat histogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
   unsigned long int counter = 0;
 
   cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
@@ -116,18 +115,19 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-    cv::Mat rotation = cv::Mat::zeros(1, 3, CV_64FC1);
-    rotation.at<double>(0, 0) = parameters[(i+1)*6 + 0];
-    rotation.at<double>(0, 1) = parameters[(i+1)*6 + 1];
-    rotation.at<double>(0, 2) = parameters[(i+1)*6 + 2];
 
-    cv::Mat translation = cv::Mat::zeros(1, 3, CV_64FC1);
-    translation.at<double>(0, 0) = parameters[(i+1)*6 + 3];
-    translation.at<double>(0, 1) = parameters[(i+1)*6 + 4];
-    translation.at<double>(0, 2) = parameters[(i+1)*6 + 5];
+    cv::Mat rvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
+    rvecLeft.at<double>(0, 0) = parameters[(6*(i+1))+0];
+    rvecLeft.at<double>(0, 1) = parameters[(6*(i+1))+1];
+    rvecLeft.at<double>(0, 2) = parameters[(6*(i+1))+2];
+
+    cv::Mat tvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
+    tvecLeft.at<double>(0, 0) = parameters[(6*(i+1))+3];
+    tvecLeft.at<double>(0, 1) = parameters[(6*(i+1))+4];
+    tvecLeft.at<double>(0, 2) = parameters[(6*(i+1))+5];
 
     // Render left
-    cv::Matx44d worldToLeftCamera = niftk::RodriguesToMatrix(rotation, translation);
+    cv::Matx44d worldToLeftCamera = niftk::RodriguesToMatrix(rvecLeft, tvecLeft);
     m_Pipeline->SetWorldToCameraMatrix(worldToLeftCamera);
     m_Pipeline->SetIntrinsics(m_LeftIntrinsics);
     m_Pipeline->CopyScreen(m_RenderedImage);
@@ -159,15 +159,23 @@ RenderingBasedStereoExtrinsicCostFunction::GetStepSizes() const
   ParametersType stepSize;
   stepSize.SetSize(this->GetNumberOfParameters());
 
-  for (int i = 0; i < m_OriginalVideoImages.size()+1; i++)
+  stepSize[0] = 0.001;
+  stepSize[1] = 0.001;
+  stepSize[2] = 0.001;
+  stepSize[3] = 0.01;
+  stepSize[4] = 0.01;
+  stepSize[5] = 0.01;
+
+  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-    stepSize[i*6 + 0] = 0.01; // r1 (Rodrigues)
-    stepSize[i*6 + 1] = 0.01; // r2 (Rodrigues)
-    stepSize[i*6 + 2] = 0.01; // r3 (Rodrigues)
-    stepSize[i*6 + 3] = 0.5;  // tx
-    stepSize[i*6 + 4] = 0.5;  // ty
-    stepSize[i*6 + 5] = 0.5;  // tz
+    stepSize[(i+1)*6 + 0] = 0.01; // r1 (Rodrigues)
+    stepSize[(i+1)*6 + 1] = 0.01; // r2 (Rodrigues)
+    stepSize[(i+1)*6 + 2] = 0.01; // r3 (Rodrigues)
+    stepSize[(i+1)*6 + 3] = 0.1;  // tx
+    stepSize[(i+1)*6 + 4] = 0.1;  // ty
+    stepSize[(i+1)*6 + 5] = 0.1;  // tz
   }
+
   return stepSize;
 }
 

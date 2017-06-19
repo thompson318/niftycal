@@ -204,6 +204,34 @@ add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
   ${DATA_DIR}/Laparoscope/Right/right-798.png
 )
 
+add_test(REQ-2002-CSD-0001-015-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
+  14 10                                          # internal corners
+  -0.0198931 0.0402461 0.000409826               # rvec
+  -4.64005 0.26403 0.297868                      # tvec
+  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
+  0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
+  0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-1.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-2.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-3.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-4.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-5.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-6.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-7.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-8.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-9.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-1.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-2.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-3.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-4.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-5.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-6.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-7.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-8.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-9.png
+)
+
 # Now try iterative. Using simulation 2. No distortion.
 add_test(REG-CalibIterMonoSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChessboardCameraCalibrationTest
   ${DATA_DIR}/Simulation2/reference_1500_1100_14_10.png # Model image

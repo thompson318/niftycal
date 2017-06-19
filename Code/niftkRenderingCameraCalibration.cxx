@@ -65,6 +65,7 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
   currentParams[5] = distortion.at<double>(0, 1);
   currentParams[6] = distortion.at<double>(0, 2);
   currentParams[7] = distortion.at<double>(0, 3);
+  currentParams[8] = distortion.at<double>(0, 4);
 
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
   itk::GradientDescentOptimizer::MeasureType currentValue = cost->GetValue(currentParams);
@@ -97,6 +98,7 @@ double InternalRenderingMonoIntrinsicCameraCalibration(vtkRenderWindow* win,
   }
 
   niftk::RenderingBasedMonoIntrinsicCostFunction::ParametersType final = currentParams;
+
   intrinsic.at<double>(0, 0) = final[0];
   intrinsic.at<double>(1, 1) = final[1];
   intrinsic.at<double>(0, 2) = final[2];
@@ -245,8 +247,7 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
                    intrinsicLeft,
                    distortionLeft,
                    intrinsicRight,
-                   distortionRight
-                  );
+                   distortionRight);
 
   niftk::RenderingBasedStereoExtrinsicCostFunction::ParametersType currentParams;
   currentParams.SetSize(cost->GetNumberOfParameters());
@@ -263,12 +264,12 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
 
   for (int i = 0; i < leftImages.size(); i++)
   {
-    currentParams[(i+1)*6 + 0] = rvecsLeft[i].at<double>(0, 0);
-    currentParams[(i+1)*6 + 1] = rvecsLeft[i].at<double>(0, 1);
-    currentParams[(i+1)*6 + 2] = rvecsLeft[i].at<double>(0, 2);
-    currentParams[(i+1)*6 + 3] = tvecsLeft[i].at<double>(0, 0);
-    currentParams[(i+1)*6 + 4] = tvecsLeft[i].at<double>(0, 1);
-    currentParams[(i+1)*6 + 5] = tvecsLeft[i].at<double>(0, 2);
+    currentParams[(6*(i+1)) + 0] = rvecsLeft[i].at<double>(0, 0);
+    currentParams[(6*(i+1)) + 1] = rvecsLeft[i].at<double>(0, 1);
+    currentParams[(6*(i+1)) + 2] = rvecsLeft[i].at<double>(0, 2);
+    currentParams[(6*(i+1)) + 3] = tvecsLeft[i].at<double>(0, 0);
+    currentParams[(6*(i+1)) + 4] = tvecsLeft[i].at<double>(0, 1);
+    currentParams[(6*(i+1)) + 5] = tvecsLeft[i].at<double>(0, 2);
   }
 
   itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
@@ -312,12 +313,12 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
 
   for (int i = 0; i < leftImages.size(); i++)
   {
-    rvecsLeft[i].at<double>(0, 0) = final[(i+1)*6 + 0];
-    rvecsLeft[i].at<double>(0, 1) = final[(i+1)*6 + 1];
-    rvecsLeft[i].at<double>(0, 2) = final[(i+1)*6 + 2];
-    tvecsLeft[i].at<double>(0, 0) = final[(i+1)*6 + 3];
-    tvecsLeft[i].at<double>(0, 1) = final[(i+1)*6 + 4];
-    tvecsLeft[i].at<double>(0, 2) = final[(i+1)*6 + 5];
+    rvecsLeft[i].at<double>(0, 0) = final[(6*(i+1)) + 0];
+    rvecsLeft[i].at<double>(0, 1) = final[(6*(i+1)) + 1];
+    rvecsLeft[i].at<double>(0, 2) = final[(6*(i+1)) + 2];
+    tvecsLeft[i].at<double>(0, 0) = final[(6*(i+1)) + 3];
+    tvecsLeft[i].at<double>(0, 1) = final[(6*(i+1)) + 4];
+    tvecsLeft[i].at<double>(0, 2) = final[(6*(i+1)) + 5];
   }
 
   // Makes sure that right hand rvecs and tvecs are consistent.

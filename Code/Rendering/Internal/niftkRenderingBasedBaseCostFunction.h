@@ -98,7 +98,7 @@ protected:
   mutable cv::Mat                              m_RenderedImage;
   mutable cv::Mat                              m_RenderedImageInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
-  cv::Vec3i                                    m_BackgroundColour; // (BGR, pure Blue)
+  cv::Vec3b                                    m_BackgroundColour; // (BGR, pure Blue)
 
 };
 

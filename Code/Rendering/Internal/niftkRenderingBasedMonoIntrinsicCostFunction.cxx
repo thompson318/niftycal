@@ -65,7 +65,7 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(vtkRenderWindow* win,
 //-----------------------------------------------------------------------------
 unsigned int RenderingBasedMonoIntrinsicCostFunction::GetNumberOfParameters(void) const
 {
-  return 8;
+  return 9;
 }
 
 
@@ -74,9 +74,9 @@ RenderingBasedMonoIntrinsicCostFunction::MeasureType
 RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & parameters) const
 {  
   MeasureType cost = 0;
-  cv::Mat jointHist = cv::Mat::zeros(32, 32, CV_64FC1);
-  cv::Mat histogramRows = cv::Mat::zeros(32, 1, CV_64FC1);
-  cv::Mat histogramCols = cv::Mat::zeros(1, 32, CV_64FC1);
+  cv::Mat jointHist = cv::Mat::zeros(16, 16, CV_64FC1);
+  cv::Mat histogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
+  cv::Mat histogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
   unsigned long int counter = 0;
 
   cv::Mat intrinsics = cv::Mat::eye(3, 3, CV_64FC1);
@@ -85,11 +85,12 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
   intrinsics.at<double>(0, 2) = parameters[2];
   intrinsics.at<double>(1, 2) = parameters[3];
 
-  cv::Mat distortion = cv::Mat::zeros(1, 4, CV_64FC1);
+  cv::Mat distortion = cv::Mat::zeros(1, 5, CV_64FC1);
   distortion.at<double>(0, 0) = parameters[4];
   distortion.at<double>(0, 1) = parameters[5];
   distortion.at<double>(0, 2) = parameters[6];
   distortion.at<double>(0, 3) = parameters[7];
+  distortion.at<double>(0, 4) = parameters[8];
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
@@ -128,6 +129,7 @@ RenderingBasedMonoIntrinsicCostFunction::GetStepSizes() const
   stepSize[5] = 0.01;  // etc.
   stepSize[6] = 0.01;
   stepSize[7] = 0.01;
+  stepSize[8] = 0.01;
 
   return stepSize;
 }

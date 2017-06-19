@@ -99,7 +99,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
       detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 
-      std::cout << "i=" << i << ", file=" << niftk::argv[i] << ", points=" << pointSet.size();
+      std::cout << "i=" << i << ", file=" << niftk::argv[i] << ", points=" << pointSet.size() << std::endl;
 
       if (pointSet.size() > 0)
       {
@@ -239,6 +239,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
   std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
   std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
+  std::cout << "Stereo RMS-3Dx=" << rmsPerAxis.x << std::endl;
+  std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
+  std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
