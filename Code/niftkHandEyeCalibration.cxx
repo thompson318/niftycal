@@ -103,6 +103,95 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 }
 
 
+//-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const cv::Point3d&              stylusOrigin,
+    const std::vector<cv::Matx44d>& stylusTrackingMatrices,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    )
+{
+  if (stylusTrackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of stylus matrices (" << stylusTrackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  if (trackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracking matrices (" << trackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  std::vector<std::pair<cv::Point2d, cv::Point3d> > data;
+  cv::Matx41d inputPoint;
+  inputPoint(3, 0) = 1;
+  cv::Matx41d transformedPoint;
+  cv::Point3d point3D;
+
+  for (int i = 0; i < undistortedPoints.size(); i++)
+  {
+    inputPoint(0, 0) = stylusOrigin.x;
+    inputPoint(1, 0) = stylusOrigin.y;
+    inputPoint(2, 0) = stylusOrigin.z;
+    transformedPoint = (trackingMatrices[i].inv()) * stylusTrackingMatrices[i] * inputPoint;
+    point3D.x = transformedPoint(0, 0);
+    point3D.y = transformedPoint(1, 0);
+    point3D.z = transformedPoint(2, 0);
+
+    data.push_back(std::pair<cv::Point2d, cv::Point3d>(undistortedPoints[i], point3D));
+  }
+  CalculateHandEyeUsingPoint2Line(cameraMatrix, data, exitCondition, handEye);
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point3d>& pointsInTrackerSpace,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    )
+{
+  if (pointsInTrackerSpace.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracker points (" << pointsInTrackerSpace.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  if (trackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracking matrices (" << trackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  std::vector<std::pair<cv::Point2d, cv::Point3d> > data;
+  cv::Matx41d inputPoint;
+  inputPoint(3, 0) = 1;
+  cv::Matx41d transformedPoint;
+  cv::Point3d point3D;
+
+  for (int i = 0; i < undistortedPoints.size(); i++)
+  {
+    inputPoint(0, 0) = pointsInTrackerSpace[i].x;
+    inputPoint(1, 0) = pointsInTrackerSpace[i].y;
+    inputPoint(2, 0) = pointsInTrackerSpace[i].z;
+    transformedPoint = (trackingMatrices[i].inv()) * inputPoint;
+    point3D.x = transformedPoint(0, 0);
+    point3D.y = transformedPoint(1, 0);
+    point3D.z = transformedPoint(2, 0);
+
+    data.push_back(std::pair<cv::Point2d, cv::Point3d>(undistortedPoints[i], point3D));
+  }
+  CalculateHandEyeUsingPoint2Line(cameraMatrix, data, exitCondition, handEye);
+}
+
+
 /**
  From Morgan et al. IPCAI 2017
 
@@ -128,7 +217,6 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 %   err = norm(E-E_old, ' fro '); E_old = E;
 % end
 */
-
 //-----------------------------------------------------------------------------
 void CalculateHandEyeUsingPoint2Line(
     const cv::Mat&                                           cameraMatrix,
