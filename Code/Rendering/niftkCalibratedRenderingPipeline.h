@@ -30,6 +30,9 @@
 
 #include <cv.h>
 
+namespace niftk
+{
+
 /**
  * \class CalibratedRenderingPipeline
  * \brief Generates a texture (e.g. calibration image) onto
@@ -147,5 +150,7 @@ private:
   cv::Mat                                      m_RGBImage;
   cv::Mat                                      m_BGRImage;
 };
+
+} // end namepace
 
 #endif

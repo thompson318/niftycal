@@ -22,12 +22,12 @@
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
 #include <niftkRenderingCameraCalibration.h>
-
+#include <niftkCalibratedRenderingPipeline.h>
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
 #include <list>
-
+#include <ostream>
 #include <QApplication>
 #include <QVTKWidget.h>
 #include <vtkRenderWindow.h>
@@ -198,6 +198,115 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   widget->resize(imageSize.width, imageSize.height);
 
   vtkRenderWindow *window = widget->GetRenderWindow();
+  window->DoubleBufferOff();
+  window->GetInteractor()->Disable();
+
+  niftk::CalibratedRenderingPipeline *p = new niftk::CalibratedRenderingPipeline(imageSize, imageSize,
+                                                                                 "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                                                                 "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                                                                 true);
+  p->ConnectToRenderWindow(window);
+
+  // Dump rhs, video+rendering for all views.
+  for (int i = 0; i < colourRightImages.size(); i++)
+  {
+    std::ostringstream videoFileName;
+    videoFileName << "/tmp/matt.rhs.normal.video." << i << ".png";
+
+    cv::Mat mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistorted;
+    cv::remap(colourRightImages[i], undistorted, mapX, mapY, CV_INTER_LANCZOS4);
+
+    cv::imwrite(videoFileName.str(), undistorted);
+
+    cv::Matx44d cameraMatrix = niftk::RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
+
+    std::ostringstream renderedFileName;
+    renderedFileName << "/tmp/matt.rhs.normal.rendering." << i << ".png";
+
+    p->SetBackgroundColour(0, 0, 255);
+    p->SetIntrinsics(intrinsicRight);
+    p->SetWorldToCameraMatrix(cameraMatrix);
+    p->DumpScreen(renderedFileName.str());
+  }
+
+  delete p;
+
+  std::list<niftk::PointSet> listOfPointsOnUndistortedLeft;
+  std::list<niftk::PointSet> listOfPointsOnUndistortedRight;
+
+  for (int i = 0; i < colourLeftImages.size(); i++)
+  {
+    cv::Mat greyLeft;
+    cv::cvtColor(colourLeftImages[i], greyLeft, CV_BGR2GRAY);
+
+    cv::Mat mapX = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicLeft, distortionLeft, cv::noArray(), intrinsicLeft, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistorted;
+    cv::remap(greyLeft, undistorted, mapX, mapY, CV_INTER_LANCZOS4);
+
+    niftk::ChessboardPointDetector detector(corners);
+    detector.SetImage(&undistorted);
+    pointSet = detector.GetPoints();
+    if (pointSet.size() != numberInternalCornersInX * numberInternalCornersInY)
+    {
+      niftkNiftyCalThrow() << "Failed to extract left points, i=" << i;
+    }
+    listOfPointsOnUndistortedLeft.push_back(pointSet);
+  }
+
+  for (int i = 0; i < colourRightImages.size(); i++)
+  {
+    cv::Mat greyRight;
+    cv::cvtColor(colourRightImages[i], greyRight, CV_BGR2GRAY);
+
+    cv::Mat mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistorted;
+    cv::remap(greyRight, undistorted, mapX, mapY, CV_INTER_LANCZOS4);
+
+    niftk::ChessboardPointDetector detector(corners);
+    detector.SetImage(&undistorted);
+    pointSet = detector.GetPoints();
+    if (pointSet.size() != numberInternalCornersInX * numberInternalCornersInY)
+    {
+      niftkNiftyCalThrow() << "Failed to extract right points, i=" << i;
+    }
+
+    listOfPointsOnUndistortedRight.push_back(pointSet);
+  }
+
+  // Recompute RMS error
+  cv::Mat zeroDistortionParams = cv::Mat::zeros(1, 5, CV_64FC1);
+
+  cv::Point3d rmsPerAxis;
+  double rmsAgain = niftk::ComputeRMSReconstructionError(model,
+                                                         listOfPointsOnUndistortedLeft,
+                                                         listOfPointsOnUndistortedRight,
+                                                         intrinsicLeft,
+                                                         zeroDistortionParams,
+                                                         rvecsLeft,
+                                                         tvecsLeft,
+                                                         intrinsicRight,
+                                                         zeroDistortionParams,
+                                                         leftToRightRotationMatrix,
+                                                         leftToRightTranslationVector,
+                                                         rmsPerAxis
+                                                         );
+
+  std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
+  std::cout << "Stereo RMS-3Dx=" << rmsPerAxis.x << std::endl;
+  std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
+  std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
 
   niftk::RenderingStereoCameraCalibration(window,
                                           imageSize,
@@ -218,30 +327,115 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           leftToRightTranslationVector
                                          );
 
+  p = new niftk::CalibratedRenderingPipeline(imageSize, imageSize,
+                                             "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                             "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                             true);
+  p->ConnectToRenderWindow(window);
+
+  // Dump rhs, video+rendering for all views.
+  for (int i = 0; i < colourRightImages.size(); i++)
+  {
+    std::ostringstream videoFileName;
+    videoFileName << "/tmp/matt.rhs.optimised.video." << i << ".png";
+
+    cv::Mat mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistorted;
+    cv::remap(colourRightImages[i], undistorted, mapX, mapY, CV_INTER_LANCZOS4);
+
+    cv::imwrite(videoFileName.str(), undistorted);
+
+    cv::Matx44d cameraMatrix = niftk::RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
+
+    std::ostringstream renderedFileName;
+    renderedFileName << "/tmp/matt.rhs.optimised.rendering." << i << ".png";
+
+    p->SetBackgroundColour(0, 0, 255);
+    p->SetIntrinsics(intrinsicRight);
+    p->SetWorldToCameraMatrix(cameraMatrix);
+    p->DumpScreen(renderedFileName.str());
+  }
+
+  delete p;
+
+  std::vector<cv::Mat> optimisedRVecLeft;
+  std::vector<cv::Mat> optimisedTVecLeft;
+
+  std::list<niftk::PointSet> listOfPointsOnUndistortedOptimisedLeft;
+  std::list<niftk::PointSet> listOfPointsOnUndistortedOptimisedRight;
+  niftk::PointSet pointSetLeft;
+  niftk::PointSet pointSetRight;
+
+  for (int i = 0; i < colourLeftImages.size(); i++)
+  {
+    cv::Mat greyLeft;
+    cv::cvtColor(colourLeftImages[i], greyLeft, CV_BGR2GRAY);
+
+    cv::Mat mapX = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicLeft, distortionLeft, cv::noArray(), intrinsicLeft, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistortedLeft;
+    cv::remap(greyLeft, undistortedLeft, mapX, mapY, CV_INTER_LANCZOS4);
+
+    niftk::ChessboardPointDetector leftDetector(corners);
+    leftDetector.SetImage(&undistortedLeft);
+    pointSetLeft = leftDetector.GetPoints();
+
+    cv::Mat greyRight;
+    cv::cvtColor(colourRightImages[i], greyRight, CV_BGR2GRAY);
+
+    mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
+
+    cv::Mat undistortedRight;
+    cv::remap(greyRight, undistortedRight, mapX, mapY, CV_INTER_LANCZOS4);
+
+    niftk::ChessboardPointDetector detectorRight(corners);
+    detectorRight.SetImage(&undistortedRight);
+    pointSetRight = detectorRight.GetPoints();
+
+    if (   pointSetLeft.size() == numberInternalCornersInX * numberInternalCornersInY
+        && pointSetRight.size() == numberInternalCornersInX * numberInternalCornersInY
+        )
+    {
+      listOfPointsOnUndistortedOptimisedLeft.push_back(pointSetLeft);
+      listOfPointsOnUndistortedOptimisedRight.push_back(pointSetRight);
+      optimisedRVecLeft.push_back(rvecsLeft[i]);
+      optimisedTVecLeft.push_back(tvecsLeft[i]);
+    }
+    else
+    {
+      std::cerr << "Dropping frame i=" << i << std::endl;
+    }
+  }
+
   // Recompute RMS error
-  cv::Point3d rmsPerAxis;
-  double rmsAgain = niftk::ComputeRMSReconstructionError(model,
-                                                         listOfPointsLeft,
-                                                         listOfPointsRight,
-                                                         intrinsicLeft,
-                                                         distortionLeft,
-                                                         rvecsLeft,
-                                                         tvecsLeft,
-                                                         intrinsicRight,
-                                                         distortionRight,
-                                                         leftToRightRotationMatrix,
-                                                         leftToRightTranslationVector,
-                                                         rmsPerAxis
-                                                         );
+  rmsAgain = niftk::ComputeRMSReconstructionError(model,
+                                                  listOfPointsOnUndistortedOptimisedLeft,
+                                                  listOfPointsOnUndistortedOptimisedRight,
+                                                  intrinsicLeft,
+                                                  zeroDistortionParams,
+                                                  optimisedRVecLeft,
+                                                  optimisedTVecLeft,
+                                                  intrinsicRight,
+                                                  zeroDistortionParams,
+                                                  leftToRightRotationMatrix,
+                                                  leftToRightTranslationVector,
+                                                  rmsPerAxis
+                                                  );
+
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
-  std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
-  std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
-  std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
-  std::cout << "Stereo RMS-3Dx=" << rmsPerAxis.x << std::endl;
-  std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
-  std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
+  std::cout << "Stereo RMS-(Rendered)-3D=" << rmsAgain << std::endl;
+  std::cout << "Stereo RMS-(Rendered)-3Dx=" << rmsPerAxis.x << std::endl;
+  std::cout << "Stereo RMS-(Rendered)-3Dy=" << rmsPerAxis.y << std::endl;
+  std::cout << "Stereo RMS-(Rendered)-3Dz=" << rmsPerAxis.z << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;

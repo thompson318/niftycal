@@ -22,6 +22,9 @@
 #include <cv.h>
 #include <highgui.h>
 
+namespace niftk
+{
+
 //-----------------------------------------------------------------------------
 CalibratedRenderingPipeline::CalibratedRenderingPipeline(
     const cv::Size2i&  windowSize,           // e.g. 1920x1080
@@ -160,7 +163,7 @@ void CalibratedRenderingPipeline::DumpScreen(const std::string fileName)
   this->Render();
 
   // Keep these local, or else the vtkWindowToImageFilter always appeared to cache its output,
-  // regardless of the value of ShouldRerenderOn.  
+  // regardless of the value of ShouldRerenderOn.
   vtkSmartPointer<vtkWindowToImageFilter> renderWindowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
   renderWindowToImageFilter->SetInput(m_RenderWindow);
   renderWindowToImageFilter->SetInputBufferTypeToRGB();
@@ -265,4 +268,6 @@ void CalibratedRenderingPipeline::UpdateCamera()
   m_Camera->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
   m_Camera->SetClippingRange(2, 5000);
   m_Camera->Modified();
+}
+
 }

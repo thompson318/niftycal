@@ -69,11 +69,11 @@ int main(int argc, char ** argv)
     std::string modelFile = argv[5];
     std::string textureFile = argv[6];
 
-    CalibratedRenderingPipeline p(windowSize,
-                                  calibratedSize,
-                                  modelFile,
-                                  textureFile
-                                  );
+    niftk::CalibratedRenderingPipeline p(windowSize,
+                                         calibratedSize,
+                                         modelFile,
+                                         textureFile
+                                         );
 
     QApplication app(argc,argv);
 
