@@ -12,36 +12,34 @@
 
 =============================================================================*/
 
-#ifndef niftkRenderingBasedBaseCostFunction_h
-#define niftkRenderingBasedBaseCostFunction_h
+#ifndef niftkRenderingBasedCostFunction_h
+#define niftkRenderingBasedCostFunction_h
 
 #include "niftkWin32ExportHeader.h"
 #include "niftkCalibratedRenderingPipeline.h"
-#include <itkSingleValuedCostFunction.h>
-#include <cv.h>
+#include "niftkIntensityBasedCostFunction.h"
 #include <vector>
-#include <memory>
 
 namespace niftk
 {
 
 /**
- * \class RenderingBasedBaseCostFunction
+ * \class RenderingBasedCostFunction
  * \brief Base class for cost functions that measure cost by matching to rendering of model.
  */
-class RenderingBasedBaseCostFunction : public itk::SingleValuedCostFunction
+class RenderingBasedCostFunction : public niftk::IntensityBasedCostFunction
 {
 
 public:
 
-  typedef RenderingBasedBaseCostFunction Self;
-  typedef itk::SingleValuedCostFunction  Superclass;
-  typedef itk::SmartPointer<Self>        Pointer;
-  typedef itk::SmartPointer<const Self>  ConstPointer;
+  typedef RenderingBasedCostFunction        Self;
+  typedef niftk::IntensityBasedCostFunction Superclass;
+  typedef itk::SmartPointer<Self>           Pointer;
+  typedef itk::SmartPointer<const Self>     ConstPointer;
 
-  typedef Superclass::ParametersType     ParametersType;
-  typedef Superclass::DerivativeType     DerivativeType;
-  typedef Superclass::MeasureType        MeasureType;
+  typedef Superclass::ParametersType        ParametersType;
+  typedef Superclass::DerivativeType        DerivativeType;
+  typedef Superclass::MeasureType           MeasureType;
 
   /**
    * \see itk::CostFunction::GetNumberOfParameters()
@@ -52,12 +50,6 @@ public:
    * \see itk::SingleValuedCostFunction::GetValue()
    */
   virtual MeasureType GetValue(const ParametersType & parameters) const = 0;
-
-  /**
-   * \see itk::SingleValuedCostFunction::GetDerivative()
-   */
-  virtual void GetDerivative(const ParametersType & parameters,
-                             DerivativeType & derivative) const;
 
   /**
    * \brief Instantiates the internal rendering pipeline.
@@ -72,16 +64,11 @@ public:
 
 protected:
 
-  RenderingBasedBaseCostFunction(); // deliberately protected.
-  virtual ~RenderingBasedBaseCostFunction(); // deliberately protected.
+  RenderingBasedCostFunction(); // deliberately protected.
+  virtual ~RenderingBasedCostFunction(); // deliberately protected.
 
-  RenderingBasedBaseCostFunction(const RenderingBasedBaseCostFunction&); // deliberately not implemented
-  RenderingBasedBaseCostFunction& operator=(const RenderingBasedBaseCostFunction&); // deliberately not implemented
-
-  double ComputeNMI(const unsigned long int& counter,
-                    const cv::Mat& histogramRows,
-                    const cv::Mat& histogramCols,
-                    const cv::Mat& jointHist) const;
+  RenderingBasedCostFunction(const RenderingBasedCostFunction&); // deliberately not implemented
+  RenderingBasedCostFunction& operator=(const RenderingBasedCostFunction&); // deliberately not implemented
 
   void AccumulateSamples(const cv::Mat& greyScaleVideoImage,
                          unsigned long int& counter,
@@ -92,9 +79,6 @@ protected:
 
   virtual ParametersType GetStepSizes() const = 0;
 
-  std::vector<cv::Mat>                         m_OriginalVideoImages;
-  std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
-  mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
   mutable cv::Mat                              m_RenderedImage;
   mutable cv::Mat                              m_RenderedImageInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;

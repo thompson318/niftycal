@@ -16,7 +16,7 @@
 #define niftkRenderingBasedMonoIntrinsicCostFunction_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkRenderingBasedBaseCostFunction.h"
+#include "niftkRenderingBasedCostFunction.h"
 
 namespace niftk
 {
@@ -25,13 +25,13 @@ namespace niftk
  * \class RenderingBasedMonoIntrinsicCostFunction
  * \brief Optimises intrinsic parameters only by matching to rendering of model.
  */
-class RenderingBasedMonoIntrinsicCostFunction : public niftk::RenderingBasedBaseCostFunction
+class RenderingBasedMonoIntrinsicCostFunction : public niftk::RenderingBasedCostFunction
 {
 
 public:
 
   typedef RenderingBasedMonoIntrinsicCostFunction Self;
-  typedef niftk::RenderingBasedBaseCostFunction   Superclass;
+  typedef niftk::RenderingBasedCostFunction       Superclass;
   typedef itk::SmartPointer<Self>                 Pointer;
   typedef itk::SmartPointer<const Self>           ConstPointer;
   itkNewMacro(Self);

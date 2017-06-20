@@ -14,7 +14,6 @@
 
 #include "niftkRenderingBasedMonoExtrinsicCostFunction.h"
 #include <niftkMatrixUtilities.h>
-#include <niftkNiftyCalExceptionMacro.h>
 
 namespace niftk
 {

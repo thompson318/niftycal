@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkRenderingBasedBaseCostFunction.h"
+#include "niftkIntensityBasedCostFunction.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <highgui.h>
@@ -21,50 +21,27 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-RenderingBasedBaseCostFunction::RenderingBasedBaseCostFunction()
-: m_Pipeline(nullptr)
-{
-  m_BackgroundColour[0] = 255; // B
-  m_BackgroundColour[1] = 0;   // G
-  m_BackgroundColour[2] = 0;   // R
-}
-
-
-//-----------------------------------------------------------------------------
-RenderingBasedBaseCostFunction::~RenderingBasedBaseCostFunction()
+IntensityBasedCostFunction::IntensityBasedCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedBaseCostFunction::Initialise(vtkRenderWindow* win,
-                                                const cv::Size2i& windowSize,
-                                                const cv::Size2i& calibratedWindowSize,
-                                                const std::string& model,
-                                                const std::string& texture,
-                                                const std::vector<cv::Mat>& videoImages
-                                               )
+IntensityBasedCostFunction::~IntensityBasedCostFunction()
 {
-  if (win == nullptr)
-  {
-    niftkNiftyCalThrow() << "Null Window provided.";
-  }
+}
 
+
+//-----------------------------------------------------------------------------
+void IntensityBasedCostFunction::Initialise(const std::vector<cv::Mat>& videoImages)
+{
   if (videoImages.size() == 0)
   {
     niftkNiftyCalThrow() << "No images provided.";
   }
 
-  m_Pipeline.reset(new CalibratedRenderingPipeline(windowSize,
-                                                   calibratedWindowSize,
-                                                   model,
-                                                   texture,
-                                                   true));
+  m_OriginalVideoImages = videoImages; // cv::Mat structures will wrap videoImages.
 
-  m_Pipeline->ConnectToRenderWindow(win);
-  m_Pipeline->SetBackgroundColour(m_BackgroundColour[2], m_BackgroundColour[1], m_BackgroundColour[0]); // OpenCV is BGR, VTK is RGB.
-
-  m_OriginalVideoImages = videoImages;
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
     cv::Mat videoInGreyScale;
@@ -75,47 +52,11 @@ void RenderingBasedBaseCostFunction::Initialise(vtkRenderWindow* win,
     m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
     m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
   }
-
-  m_OriginalVideoImages[0].copyTo(m_RenderedImage);
-  cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
-
 }
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedBaseCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideoImage,
-                                                       unsigned long int& counter,
-                                                       cv::Mat& histogramRows,
-                                                       cv::Mat& histogramCols,
-                                                       cv::Mat& jointHistogram
-                                                      ) const
-{
-  for (int r = 0; r < m_RenderedImageInGreyscale.rows; r++)
-  {
-    for (int c = 0; c < m_RenderedImageInGreyscale.cols; c++)
-    {
-      if (   r != 0
-          && c != 0
-          && r != (m_RenderedImageInGreyscale.rows - 1)
-          && c != (m_RenderedImageInGreyscale.cols - 1)
-          && m_RenderedImage.at<cv::Vec3b>(r, c) != m_BackgroundColour)
-      {
-        unsigned int a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 16;
-        unsigned int b = static_cast<unsigned int>(greyScaleVideoImage.at<unsigned char>(r, c)) / 16;
-
-        jointHistogram.at<double>(a, b) += 1;
-        histogramRows.at<double>(a, 0) += 1;
-        histogramCols.at<double>(0, b) += 1;
-        counter += 1;
-
-      } // if not background
-    } // end for cols
-  } // end for rows
-}
-
-
-//-----------------------------------------------------------------------------
-double RenderingBasedBaseCostFunction::ComputeNMI(const unsigned long int& counter,
+double IntensityBasedCostFunction::ComputeNMI(const unsigned long int& counter,
                                                   const cv::Mat& histogramRows,
                                                   const cv::Mat& histogramCols,
                                                   const cv::Mat& jointHist
@@ -171,7 +112,7 @@ double RenderingBasedBaseCostFunction::ComputeNMI(const unsigned long int& count
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedBaseCostFunction::GetDerivative(const ParametersType & parameters,
+void IntensityBasedCostFunction::GetDerivative(const ParametersType & parameters,
                                                    DerivativeType & derivative) const
 {
   ParametersType stepSizes = this->GetStepSizes(); // from derived class
