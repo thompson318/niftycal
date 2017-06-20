@@ -21,7 +21,7 @@
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
-#include <niftkRenderingCameraCalibration.h>
+#include <niftkIntensityBasedCameraCalibration.h>
 #include <niftkCalibratedRenderingPipeline.h>
 #include <cv.h>
 #include <highgui.h>
@@ -308,24 +308,24 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
   std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
 
-  niftk::RenderingStereoCameraCalibration(window,
-                                          imageSize,
-                                          imageSize,
-                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
-                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
-                                          colourLeftImages,
-                                          colourRightImages,
-                                          intrinsicLeft,
-                                          distortionLeft,
-                                          rvecsLeft,
-                                          tvecsLeft,
-                                          intrinsicRight,
-                                          distortionRight,
-                                          rvecsRight,
-                                          tvecsRight,
-                                          leftToRightRotationMatrix,
-                                          leftToRightTranslationVector
-                                         );
+  niftk::IntensityBasedStereoCameraCalibration(window,
+                                               imageSize,
+                                               imageSize,
+                                               "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                               "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                               colourLeftImages,
+                                               colourRightImages,
+                                               intrinsicLeft,
+                                               distortionLeft,
+                                               rvecsLeft,
+                                               tvecsLeft,
+                                               intrinsicRight,
+                                               distortionRight,
+                                               rvecsRight,
+                                               tvecsRight,
+                                               leftToRightRotationMatrix,
+                                               leftToRightTranslationVector
+                                              );
 
   p = new niftk::CalibratedRenderingPipeline(imageSize, imageSize,
                                              "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",

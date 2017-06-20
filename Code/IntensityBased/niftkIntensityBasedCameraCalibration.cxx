@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkRenderingCameraCalibration.h"
+#include "niftkIntensityBasedCameraCalibration.h"
 #include <niftkMatrixUtilities.h>
 #include <Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
 #include <Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
@@ -342,17 +342,17 @@ double InternalRenderingStereoCameraCalibration(vtkRenderWindow* win,
 
 
 //-----------------------------------------------------------------------------
-void RenderingMonoCameraCalibration(vtkRenderWindow* win,
-                                    const cv::Size2i& windowSize,
-                                    const cv::Size2i& calibratedWindowSize,
-                                    const std::string& modelFileName,
-                                    const std::string& textureFileName,
-                                    const std::vector<cv::Mat>& images,
-                                    cv::Mat& intrinsic,
-                                    cv::Mat& distortion,
-                                    std::vector<cv::Mat>& rvecs,
-                                    std::vector<cv::Mat>& tvecs
-                                   )
+void IntensityBasedMonoCameraCalibration(vtkRenderWindow* win,
+                                         const cv::Size2i& windowSize,
+                                         const cv::Size2i& calibratedWindowSize,
+                                         const std::string& modelFileName,
+                                         const std::string& textureFileName,
+                                         const std::vector<cv::Mat>& images,
+                                         cv::Mat& intrinsic,
+                                         cv::Mat& distortion,
+                                         std::vector<cv::Mat>& rvecs,
+                                         std::vector<cv::Mat>& tvecs
+                                        )
 {
   double learningRate = 0.01;
 
@@ -417,24 +417,24 @@ void RenderingMonoCameraCalibration(vtkRenderWindow* win,
 
 
 //-----------------------------------------------------------------------------
-void RenderingStereoCameraCalibration(vtkRenderWindow* win,
-                                      const cv::Size2i& windowSize,
-                                      const cv::Size2i& calibratedWindowSize,
-                                      const std::string& modelFileName,
-                                      const std::string& textureFileName,
-                                      const std::vector<cv::Mat>& leftImages,
-                                      const std::vector<cv::Mat>& rightImages,
-                                      cv::Mat& intrinsicLeft,
-                                      cv::Mat& distortionLeft,
-                                      std::vector<cv::Mat>& rvecsLeft,
-                                      std::vector<cv::Mat>& tvecsLeft,
-                                      cv::Mat& intrinsicRight,
-                                      cv::Mat& distortionRight,
-                                      std::vector<cv::Mat>& rvecsRight,
-                                      std::vector<cv::Mat>& tvecsRight,
-                                      cv::Mat& leftToRightRotationMatrix,
-                                      cv::Mat& leftToRightTranslationVector
-                                     )
+void IntensityBasedStereoCameraCalibration(vtkRenderWindow* win,
+                                           const cv::Size2i& windowSize,
+                                           const cv::Size2i& calibratedWindowSize,
+                                           const std::string& modelFileName,
+                                           const std::string& textureFileName,
+                                           const std::vector<cv::Mat>& leftImages,
+                                           const std::vector<cv::Mat>& rightImages,
+                                           cv::Mat& intrinsicLeft,
+                                           cv::Mat& distortionLeft,
+                                           std::vector<cv::Mat>& rvecsLeft,
+                                           std::vector<cv::Mat>& tvecsLeft,
+                                           cv::Mat& intrinsicRight,
+                                           cv::Mat& distortionRight,
+                                           std::vector<cv::Mat>& rvecsRight,
+                                           std::vector<cv::Mat>& tvecsRight,
+                                           cv::Mat& leftToRightRotationMatrix,
+                                           cv::Mat& leftToRightTranslationVector
+                                          )
 {
   double learningRate = 0.01;
 

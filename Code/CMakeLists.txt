@@ -43,7 +43,6 @@ set(NIFTYCAL_SRCS
   niftkIterativeStereoCameraCalibration.cxx
   niftkTimingCalibration.cxx
   niftkPoseFromPoints.cxx
-  niftkRenderingCameraCalibration.cxx
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -103,13 +102,14 @@ if(ITK_FOUND)
 endif()
 
 if(VTK_FOUND AND ITK_FOUND AND QT_FOUND)
-  list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedCamera.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/niftkCalibratedRenderingPipeline.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkIntensityBasedCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.cxx)
-  list(APPEND NIFTYCAL_SRCS Rendering/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedCamera.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedRenderingPipeline.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkIntensityBasedCameraCalibration.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkIntensityBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
