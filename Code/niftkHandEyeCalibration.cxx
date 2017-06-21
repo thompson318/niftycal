@@ -226,11 +226,10 @@ void CalculateHandEyeUsingPoint2Line(
     )
 {
   int n = pairedPoints.size();
-
+  cv::Mat e = cv::Mat::ones( 1, n, CV_64FC1 );
   cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
   cv::Mat Q = cvCreateMat ( 2, n, CV_64FC1 );
   cv::Mat Qe = cvCreateMat ( 3, n, CV_64FC1 );
-  cv::Mat e = cv::Mat::ones( 1, n, CV_64FC1 );
 
   for (int i = 0; i < n; i++)
   {
@@ -279,6 +278,7 @@ void CalculateHandEyeUsingPoint2Line(
   cv::Mat t = cv::Mat::ones(3, 1, CV_64FC1);
   double err = std::numeric_limits<double>::max();
   cv::Mat E_old = 1000*cv::Mat::ones(3, n, CV_64FC1);
+  cv::Mat E;
 
   // Iterate to minimise error.
   while (err > tol)
@@ -307,6 +307,11 @@ void CalculateHandEyeUsingPoint2Line(
       mean /= static_cast<double>(tmp.cols);
       t.at<double>(r, 0) = mean;
     }
+
+    E = tmp - t * e;
+    e = 0; // frobenius norm of (E-E_old)
+    E_old = E;
+
   }
 }
 
