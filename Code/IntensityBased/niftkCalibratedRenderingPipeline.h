@@ -54,8 +54,13 @@ public:
 
   virtual ~CalibratedRenderingPipeline();
 
-  void ConnectToRenderWindow(vtkRenderWindow *w);
-  void DisconnectFromRenderWindow();
+  void ConnectToRenderWindow(vtkRenderWindow* w);
+
+  /**
+   * \brief Basically, activated means the actor is connected to renderer,
+   * and de-activated means the actor is not connected to renderer.
+   */
+  void SetActivated(const bool& isActivated);
 
   /**
   * \brief Updates the whole VTK pipeline.

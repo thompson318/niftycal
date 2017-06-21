@@ -66,27 +66,12 @@ void RenderingBasedCostFunction::Initialise(vtkRenderWindow* win,
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedCostFunction::ConnectToRenderWindow(vtkRenderWindow *w)
+void RenderingBasedCostFunction::SetActivated(const bool& isActivated)
 {
-  if (m_Pipeline.get() == nullptr)
+  if (m_Pipeline.get() != nullptr)
   {
-    niftkNiftyCalThrow() << "Not initialised yet.";
+    m_Pipeline->SetActivated(isActivated);
   }
-
-  m_Pipeline->ConnectToRenderWindow(w);
-
-}
-
-
-//-----------------------------------------------------------------------------
-void RenderingBasedCostFunction::DisconnectFromRenderWindow()
-{
-  if (m_Pipeline.get() == nullptr)
-  {
-    niftkNiftyCalThrow() << "Not initialised yet.";
-  }
-
-  m_Pipeline->DisconnectFromRenderWindow();
 }
 
 

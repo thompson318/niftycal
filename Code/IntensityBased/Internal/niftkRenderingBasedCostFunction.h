@@ -62,8 +62,7 @@ public:
                   const std::vector<cv::Mat>& videoImages
                  );
 
-  void ConnectToRenderWindow(vtkRenderWindow *w);
-  void DisconnectFromRenderWindow();
+  virtual void SetActivated(const bool& isActivated);
 
 protected:
 

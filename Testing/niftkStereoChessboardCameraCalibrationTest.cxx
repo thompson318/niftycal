@@ -235,7 +235,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
     p->DumpScreen(renderedFileName.str());
   }
 
-  p->DisconnectFromRenderWindow();
+  p->SetActivated(false);
   delete p;
 
   std::list<niftk::PointSet> listOfPointsOnUndistortedLeft;
@@ -394,7 +394,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
     p->DumpScreen(renderedFileName.str());
   }
 
-  p->DisconnectFromRenderWindow();
+  p->SetActivated(false);
   delete p;
 
   std::vector<cv::Mat> optimisedRVecLeft;

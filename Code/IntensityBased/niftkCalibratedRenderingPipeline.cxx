@@ -119,11 +119,11 @@ CalibratedRenderingPipeline::~CalibratedRenderingPipeline()
 
 
 //-----------------------------------------------------------------------------
-void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow *w)
+void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow* w)
 {
-  if (m_RenderWindow != nullptr)
+  if (w == nullptr)
   {
-    this->DisconnectFromRenderWindow();
+    niftkNiftyCalThrow() << "Null render window provided.";
   }
   m_RenderWindow = w;
   m_RenderWindow->AddRenderer(m_Renderer);
@@ -131,13 +131,16 @@ void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow *w)
 
 
 //-----------------------------------------------------------------------------
-void CalibratedRenderingPipeline::DisconnectFromRenderWindow()
+void CalibratedRenderingPipeline::SetActivated(const bool& isActivated)
 {
-  if (m_Renderer.GetPointer() != nullptr)
+  if (isActivated)
   {
-    m_RenderWindow->RemoveRenderer(m_Renderer);
+    m_Renderer->AddActor(m_ModelActor);
   }
-  m_RenderWindow = nullptr;
+  else
+  {
+    m_Renderer->RemoveActor(m_ModelActor);
+  }
 }
 
 

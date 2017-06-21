@@ -62,6 +62,11 @@ public:
    */
   void Initialise(const std::vector<cv::Mat>& videoImages);
 
+  /**
+   * \brief Used to tell base classes to enter Activated/Not Activated state.
+   */
+  virtual void SetActivated(const bool& isActivated) = 0;
+
 protected:
 
   IntensityBasedCostFunction(); // deliberately protected.
