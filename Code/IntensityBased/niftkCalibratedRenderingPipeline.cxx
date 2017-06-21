@@ -133,13 +133,15 @@ void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow* w)
 //-----------------------------------------------------------------------------
 void CalibratedRenderingPipeline::SetActivated(const bool& isActivated)
 {
-  if (isActivated)
+  if (isActivated && m_RenderWindow != nullptr)
   {
     m_Renderer->AddActor(m_ModelActor);
+    m_RenderWindow->AddRenderer(m_Renderer);
   }
   else
   {
     m_Renderer->RemoveActor(m_ModelActor);
+    m_RenderWindow->RemoveRenderer(m_Renderer);
   }
 }
 
@@ -171,6 +173,7 @@ void CalibratedRenderingPipeline::OpenCVToVTK(const cv::Matx44d& openCV, vtkMatr
 void CalibratedRenderingPipeline::Render()
 {
   this->UpdateCamera();
+  m_Renderer->Modified();
   m_RenderWindow->Render();
 }
 

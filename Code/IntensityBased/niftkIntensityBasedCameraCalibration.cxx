@@ -271,18 +271,19 @@ void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Poin
       previousValue = currentValue;
 
       intrinsicCostFunction->SetActivated(true);
+      extrinsicCostFunction->SetActivated(false);
       currentValue = InternalIntensityBasedMonoIntrinsicCameraCalibration(intrinsicCostFunction,
                                                                           learningRate,
                                                                           intrinsic,
                                                                           distortion
                                                                          );
-      intrinsicCostFunction->SetActivated(false);
 
       std::cerr << loopCounter
                 << ", l=" << learningRate
                 << ", mono, intrinsic done, c=" << currentValue
                 << std::endl;
 
+      intrinsicCostFunction->SetActivated(false);
       extrinsicCostFunction->SetActivated(true);
       currentValue = InternalIntensityBasedMonoExtrinsicCameraCalibration(extrinsicCostFunction,
                                                                           learningRate,
@@ -339,31 +340,35 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
       previousValue = currentValue;
 
       intrinsicLeftCostFunction->SetActivated(true);
+      intrinsicRightCostFunction->SetActivated(false);
+      stereoExtrinsicCostFunction->SetActivated(false);
       currentValue = InternalIntensityBasedMonoIntrinsicCameraCalibration(intrinsicLeftCostFunction,
                                                                           learningRate,
                                                                           intrinsicLeft,
                                                                           distortionLeft
                                                                          );
-      intrinsicLeftCostFunction->SetActivated(false);
-
       std::cerr << loopCounter
                 << ", l=" << learningRate
                 << ", mono, left intrinsic done, c=" << currentValue
                 << std::endl;
 
+      intrinsicLeftCostFunction->SetActivated(false);
       intrinsicRightCostFunction->SetActivated(true);
+      stereoExtrinsicCostFunction->SetActivated(false);
       currentValue = InternalIntensityBasedMonoIntrinsicCameraCalibration(intrinsicRightCostFunction,
                                                                           learningRate,
                                                                           intrinsicRight,
                                                                           distortionRight
                                                                          );
-      intrinsicRightCostFunction->SetActivated(false);
+
 
       std::cerr << loopCounter
                 << ", l=" << learningRate
                 << ", mono, right intrinsic done, c=" << currentValue
                 << std::endl;
 
+      intrinsicLeftCostFunction->SetActivated(false);
+      intrinsicRightCostFunction->SetActivated(false);
       stereoExtrinsicCostFunction->SetActivated(true);
       currentValue = InternalRenderingStereoCameraCalibration(stereoExtrinsicCostFunction,
                                                               learningRate,
@@ -374,6 +379,7 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
                                                               leftToRightRotationMatrix,
                                                               leftToRightTranslationVector
                                                              );
+
       stereoExtrinsicCostFunction->SetActivated(false);
 
       std::cerr << loopCounter
