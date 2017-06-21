@@ -227,9 +227,15 @@ void CalculateHandEyeUsingPoint2Line(
 {
   int n = pairedPoints.size();
   cv::Mat e = cv::Mat::ones( 1, n, CV_64FC1 );
-  cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
+
+  cv::Mat ePrime;
+  cv::transpose(e, ePrime);
+
+  cv::Mat J = cv::Mat::eye(n, n, CV_64FC1 ) - ((ePrime * e)/n);
+
   cv::Mat Q = cvCreateMat ( 2, n, CV_64FC1 );
   cv::Mat Qe = cvCreateMat ( 3, n, CV_64FC1 );
+  cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
 
   for (int i = 0; i < n; i++)
   {
@@ -243,13 +249,6 @@ void CalculateHandEyeUsingPoint2Line(
     X.at<double>(2, i)  = pairedPoints[i].second.z;
   }
 
-  cv::Mat XPrime;
-  cv::transpose(X, XPrime);
-
-  cv::Mat ePrime;
-  cv::transpose(e, ePrime);
-
-  cv::Mat J = cv::Mat::eye(n, n, CV_64FC1 ) - ((ePrime * e)/n);
   cv::Mat AInv = cameraMatrix.inv();
   cv::Mat lines = AInv * Qe;
 
@@ -272,6 +271,10 @@ void CalculateHandEyeUsingPoint2Line(
     }
   }
 
+  // Set up X' for SVD part.
+  cv::Mat XPrime;
+  cv::transpose(X, XPrime);
+
   // Setup loop.
   cv::Mat Y = Q;
   cv::Mat R = cv::Mat::eye(3, 3, CV_64FC1);
@@ -289,29 +292,52 @@ void CalculateHandEyeUsingPoint2Line(
 
     double det = cv::determinant(U*VPrime);
 
-    cv::Mat tmp = cv::Mat::ones(3, 3, CV_64FC1);
-    tmp.at<double>(2, 2) = det;
+    cv::Mat detMatrix = cv::Mat::ones(3, 3, CV_64FC1);
+    detMatrix.at<double>(2, 2) = det;
 
-    R = U * tmp * VPrime;
+    R = U * detMatrix * VPrime;
 
-    tmp = Y - R*X;
+    cv::Mat yMinusRotatedX = Y - R*X;
 
     // mean along row
-    for (int r = 0; r < tmp.rows; r++)
+    for (int r = 0; r < yMinusRotatedX.rows; r++)
     {
       double mean = 0;
-      for (int c = 0; c < tmp.cols; c++)
+      for (int c = 0; c < yMinusRotatedX.cols; c++)
       {
-        mean += tmp.at<double>(r,c);
+        mean += yMinusRotatedX.at<double>(r,c);
       }
-      mean /= static_cast<double>(tmp.cols);
+      mean /= static_cast<double>(yMinusRotatedX.cols);
       t.at<double>(r, 0) = mean;
     }
 
-    E = tmp - t * e;
-    e = 0; // frobenius norm of (E-E_old)
-    E_old = E;
+    // Next section should be:
+    // Y = repmat(dot(R*X+t*e,Q), [3,1]).* Q;
+    cv::Mat rotatedXPlusTrans = R*X + t*e;
+    cv::Mat dot = cv::Mat::zeros(1, n, CV_64FC1);
 
+    // Dot product bit.
+    for (int r = 0; r < dot.rows; r++)
+    {
+      for (int c = 0; c < dot.cols; c++)
+      {
+        dot.at<double>(0, c) += rotatedXPlusTrans.at<double>(r, c) * Q.at<double>(r,c);
+      }
+    }
+    // Repmat and element-wise multiplication by Q.
+    for (int r = 0; r < Y.rows; r++)
+    {
+      for (int c = 0; c < Y.cols; c++)
+      {
+        Y.at<double>(r, c) = dot.at<double>(0, c) * Q.at<double>(r,c);
+      }
+    }
+    E = yMinusRotatedX - t * e;
+    cv::Mat residual = E-E_old;
+    cv::Mat residualTransposed;
+    cv::transpose(residual, residualTransposed);
+    err = std::sqrt(cv::sum(cv::Mat::diag(residualTransposed * residual))[0]); // Frobenius norm of E - E_old
+    E_old = E;
   }
 }
 
