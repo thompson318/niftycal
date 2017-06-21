@@ -66,6 +66,8 @@ public:
                   const cv::Mat& rightDistortion
                  );
 
+  void InitLeftToRight(const cv::Mat& rvec, const cv::Mat& tvec);
+
 protected:
 
   RenderingBasedStereoExtrinsicCostFunction(); // deliberately protected.
@@ -82,6 +84,8 @@ private:
   cv::Mat                      m_LeftDistortion;
   cv::Mat                      m_RightIntrinsics;
   cv::Mat                      m_RightDistortion;
+  cv::Mat                      m_LeftToRightRVec;
+  cv::Mat                      m_LeftToRightTVec;
   std::vector<cv::Mat>         m_RightOriginalVideoImages;
   std::vector<cv::Mat>         m_RightOriginalVideoImagesInGreyScale;
   mutable std::vector<cv::Mat> m_RightUndistortedVideoImagesInGreyScale;

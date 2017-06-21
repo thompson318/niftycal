@@ -311,6 +311,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
   std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
 
+  cv::Mat rvec;
+  cv::Rodrigues(leftToRightRotationMatrix, rvec);
+
   niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
   leftIntrinsicCostFunction->Initialise(window,
                                         imageSize,
@@ -346,6 +349,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           intrinsicRight,
                                           distortionRight
                                          );
+
+  stereoExtrinsicCostFunction->InitLeftToRight(rvec, leftToRightTranslationVector);
 
   niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
                                                rightIntrinsicCostFunction.GetPointer(),
@@ -465,7 +470,6 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                   rmsPerAxis
                                                   );
 
-  cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
   std::cout << "Stereo RMS-(Rendered)-3D=" << rmsAgain << std::endl;

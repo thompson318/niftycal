@@ -32,6 +32,14 @@ RenderingBasedStereoExtrinsicCostFunction::~RenderingBasedStereoExtrinsicCostFun
 
 
 //-----------------------------------------------------------------------------
+void RenderingBasedStereoExtrinsicCostFunction::InitLeftToRight(const cv::Mat& rvec, const cv::Mat& tvec)
+{
+  m_LeftToRightRVec = rvec;
+  m_LeftToRightTVec = tvec;
+}
+
+
+//-----------------------------------------------------------------------------
 void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
                                                            const cv::Size2i& windowSize,
                                                            const cv::Size2i& calibratedWindowSize,
@@ -101,14 +109,14 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
   unsigned long int counter = 0;
 
   cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
-  rvec.at<double>(0, 0) = 0;
-  rvec.at<double>(0, 1) = 0;
-  rvec.at<double>(0, 2) = 0;
+  rvec.at<double>(0, 0) = m_LeftToRightRVec.at<double>(0, 0);
+  rvec.at<double>(0, 1) = m_LeftToRightRVec.at<double>(0, 1);
+  rvec.at<double>(0, 2) = m_LeftToRightRVec.at<double>(0, 2);
 
   cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
   tvec.at<double>(0, 0) = parameters[0];
   tvec.at<double>(0, 1) = parameters[1];
-  tvec.at<double>(0, 2) = 0;
+  tvec.at<double>(0, 2) = m_LeftToRightTVec.at<double>(0, 2);
 
   cv::Matx44d leftToRight = niftk::RodriguesToMatrix(rvec, tvec);
 
