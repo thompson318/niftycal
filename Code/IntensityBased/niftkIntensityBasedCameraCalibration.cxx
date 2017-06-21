@@ -104,6 +104,7 @@ double InternalIntensityBasedMonoIntrinsicCameraCalibration(niftk::IntensityBase
   distortion.at<double>(0, 1) = currentParams[5];
   distortion.at<double>(0, 2) = currentParams[6];
   distortion.at<double>(0, 3) = currentParams[7];
+  distortion.at<double>(0, 4) = currentParams[8];
 
   return finalCost;
 }
