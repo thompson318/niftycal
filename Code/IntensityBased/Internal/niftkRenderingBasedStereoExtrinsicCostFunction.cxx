@@ -85,7 +85,7 @@ void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
 //-----------------------------------------------------------------------------
 unsigned int RenderingBasedStereoExtrinsicCostFunction::GetNumberOfParameters(void) const
 {
-  return 6 +
+  return 2 + // JUST do x and y translation.
          (6 * m_OriginalVideoImages.size());
 }
 
@@ -101,14 +101,14 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
   unsigned long int counter = 0;
 
   cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
-  rvec.at<double>(0, 0) = parameters[0];
-  rvec.at<double>(0, 1) = parameters[1];
-  rvec.at<double>(0, 2) = parameters[2];
+  rvec.at<double>(0, 0) = 0;
+  rvec.at<double>(0, 1) = 0;
+  rvec.at<double>(0, 2) = 0;
 
   cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
-  tvec.at<double>(0, 0) = parameters[3];
-  tvec.at<double>(0, 1) = parameters[4];
-  tvec.at<double>(0, 2) = parameters[5];
+  tvec.at<double>(0, 0) = parameters[0];
+  tvec.at<double>(0, 1) = parameters[1];
+  tvec.at<double>(0, 2) = 0;
 
   cv::Matx44d leftToRight = niftk::RodriguesToMatrix(rvec, tvec);
 
@@ -116,14 +116,14 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
   {
 
     cv::Mat rvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
-    rvecLeft.at<double>(0, 0) = parameters[(6*(i+1))+0];
-    rvecLeft.at<double>(0, 1) = parameters[(6*(i+1))+1];
-    rvecLeft.at<double>(0, 2) = parameters[(6*(i+1))+2];
+    rvecLeft.at<double>(0, 0) = parameters[(6*i)+2];
+    rvecLeft.at<double>(0, 1) = parameters[(6*i)+3];
+    rvecLeft.at<double>(0, 2) = parameters[(6*i)+4];
 
     cv::Mat tvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
-    tvecLeft.at<double>(0, 0) = parameters[(6*(i+1))+3];
-    tvecLeft.at<double>(0, 1) = parameters[(6*(i+1))+4];
-    tvecLeft.at<double>(0, 2) = parameters[(6*(i+1))+5];
+    tvecLeft.at<double>(0, 0) = parameters[(6*i)+5];
+    tvecLeft.at<double>(0, 1) = parameters[(6*i)+6];
+    tvecLeft.at<double>(0, 2) = parameters[(6*i)+7];
 
     // Render left
     cv::Matx44d worldToLeftCamera = niftk::RodriguesToMatrix(rvecLeft, tvecLeft);
@@ -158,21 +158,17 @@ RenderingBasedStereoExtrinsicCostFunction::GetStepSizes() const
   ParametersType stepSize;
   stepSize.SetSize(this->GetNumberOfParameters());
 
-  stepSize[0] = 0.001;
-  stepSize[1] = 0.001;
-  stepSize[2] = 0.001;
-  stepSize[3] = 0.01;
-  stepSize[4] = 0.01;
-  stepSize[5] = 0.01;
+  stepSize[0] = 0.1; // x-translation.
+  stepSize[1] = 0.1; // y-translation.
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-    stepSize[(i+1)*6 + 0] = 0.01; // r1 (Rodrigues)
-    stepSize[(i+1)*6 + 1] = 0.01; // r2 (Rodrigues)
-    stepSize[(i+1)*6 + 2] = 0.01; // r3 (Rodrigues)
-    stepSize[(i+1)*6 + 3] = 0.1;  // tx
-    stepSize[(i+1)*6 + 4] = 0.1;  // ty
-    stepSize[(i+1)*6 + 5] = 0.1;  // tz
+    stepSize[6*i + 2] = 0.01; // r1 (Rodrigues)
+    stepSize[6*i + 3] = 0.01; // r2 (Rodrigues)
+    stepSize[6*i + 4] = 0.01; // r3 (Rodrigues)
+    stepSize[6*i + 5] = 0.1;  // tx
+    stepSize[6*i + 6] = 0.1;  // ty
+    stepSize[6*i + 7] = 0.1;  // tz
   }
 
   return stepSize;

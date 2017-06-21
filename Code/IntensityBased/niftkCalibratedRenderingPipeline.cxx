@@ -19,8 +19,6 @@
 #include <vtkPNGWriter.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
-#include <cv.h>
-#include <highgui.h>
 
 namespace niftk
 {

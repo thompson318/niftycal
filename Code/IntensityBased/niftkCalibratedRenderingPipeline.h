@@ -27,7 +27,6 @@
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkPNGReader.h>
 #include <vtkTexture.h>
-
 #include <cv.h>
 
 namespace niftk
