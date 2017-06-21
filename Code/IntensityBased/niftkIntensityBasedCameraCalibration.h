@@ -25,7 +25,7 @@ namespace niftk
 
 /**
 * \file niftkRenderingCameraCalibration.h
-* \brief Calibration routines based on rendering a model.
+* \brief Intensity based mono/stereo calibration routines.
 * \ingroup calibration
 */
 
