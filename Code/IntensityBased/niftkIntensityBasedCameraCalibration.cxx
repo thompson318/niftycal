@@ -364,7 +364,7 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
       std::cerr << loopCounter
                 << ", l=" << learningRate
                 << ", mono, right intrinsic done, i=" << std::endl << intrinsicRight << std::endl
-                << ", d=" << distortionRight
+                << "d=" << distortionRight
                 << ", c=" <<  currentValue
                 << std::endl;
 
