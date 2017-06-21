@@ -121,8 +121,23 @@ CalibratedRenderingPipeline::~CalibratedRenderingPipeline()
 //-----------------------------------------------------------------------------
 void CalibratedRenderingPipeline::ConnectToRenderWindow(vtkRenderWindow *w)
 {
+  if (m_RenderWindow != nullptr)
+  {
+    this->DisconnectFromRenderWindow();
+  }
   m_RenderWindow = w;
   m_RenderWindow->AddRenderer(m_Renderer);
+}
+
+
+//-----------------------------------------------------------------------------
+void CalibratedRenderingPipeline::DisconnectFromRenderWindow()
+{
+  if (m_Renderer.GetPointer() != nullptr)
+  {
+    m_RenderWindow->RemoveRenderer(m_Renderer);
+  }
+  m_RenderWindow = nullptr;
 }
 
 

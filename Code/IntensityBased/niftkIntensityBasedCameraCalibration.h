@@ -16,8 +16,7 @@
 #define niftkRenderingCameraCalibration_h
 
 #include "niftkWin32ExportHeader.h"
-#include "Internal/niftkIntensityBasedCostFunction.h"
-#include <vtkRenderWindow.h>
+#include <Internal/niftkIntensityBasedCostFunction.h>
 #include <vector>
 #include <cv.h>
 
@@ -33,12 +32,8 @@ namespace niftk
 /**
 * \brief Performs a mono camera calibration using intensity based methods.
 */
-NIFTYCAL_WINEXPORT void IntensityBasedMonoCameraCalibration(vtkRenderWindow* win,
-                                                            const cv::Size2i& windowSize,
-                                                            const cv::Size2i& calibratedWindowSize,
-                                                            const std::string& modelFileName,
-                                                            const std::string& textureFileName,
-                                                            const std::vector<cv::Mat>& images,
+NIFTYCAL_WINEXPORT void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicCostFunction,
+                                                            niftk::IntensityBasedCostFunction::Pointer monoExtrinsicCostFunction,
                                                             cv::Mat& intrinsic,
                                                             cv::Mat& distortion,
                                                             std::vector<cv::Mat>& rvecs,
@@ -48,13 +43,9 @@ NIFTYCAL_WINEXPORT void IntensityBasedMonoCameraCalibration(vtkRenderWindow* win
 /**
 * \brief Performs a stereo camera calibration using intensity based methods.
 */
-NIFTYCAL_WINEXPORT void IntensityBasedStereoCameraCalibration(vtkRenderWindow* win,
-                                                              const cv::Size2i& windowSize,
-                                                              const cv::Size2i& calibratedWindowSize,
-                                                              const std::string& modelFileName,
-                                                              const std::string& textureFileName,
-                                                              const std::vector<cv::Mat>& leftImages,
-                                                              const std::vector<cv::Mat>& rightImages,
+NIFTYCAL_WINEXPORT void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
+                                                              niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
+                                                              niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
                                                               cv::Mat& intrinsicLeft,
                                                               cv::Mat& distortionLeft,
                                                               std::vector<cv::Mat>& rvecsLeft,

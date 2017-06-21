@@ -66,6 +66,31 @@ void RenderingBasedCostFunction::Initialise(vtkRenderWindow* win,
 
 
 //-----------------------------------------------------------------------------
+void RenderingBasedCostFunction::ConnectToRenderWindow(vtkRenderWindow *w)
+{
+  if (m_Pipeline.get() == nullptr)
+  {
+    niftkNiftyCalThrow() << "Not initialised yet.";
+  }
+
+  m_Pipeline->ConnectToRenderWindow(w);
+
+}
+
+
+//-----------------------------------------------------------------------------
+void RenderingBasedCostFunction::DisconnectFromRenderWindow()
+{
+  if (m_Pipeline.get() == nullptr)
+  {
+    niftkNiftyCalThrow() << "Not initialised yet.";
+  }
+
+  m_Pipeline->DisconnectFromRenderWindow();
+}
+
+
+//-----------------------------------------------------------------------------
 void RenderingBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideoImage,
                                                    unsigned long int& counter,
                                                    cv::Mat& histogramRows,

@@ -55,6 +55,7 @@ public:
   virtual ~CalibratedRenderingPipeline();
 
   void ConnectToRenderWindow(vtkRenderWindow *w);
+  void DisconnectFromRenderWindow();
 
   /**
   * \brief Updates the whole VTK pipeline.

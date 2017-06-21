@@ -23,6 +23,8 @@
 #include <niftkPointUtilities.h>
 #include <niftkIntensityBasedCameraCalibration.h>
 #include <niftkCalibratedRenderingPipeline.h>
+#include <IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.h>
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
@@ -233,6 +235,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
     p->DumpScreen(renderedFileName.str());
   }
 
+  p->DisconnectFromRenderWindow();
   delete p;
 
   std::list<niftk::PointSet> listOfPointsOnUndistortedLeft;
@@ -308,13 +311,45 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
   std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
 
-  niftk::IntensityBasedStereoCameraCalibration(window,
-                                               imageSize,
-                                               imageSize,
-                                               "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
-                                               "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
-                                               colourLeftImages,
-                                               colourRightImages,
+  niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
+  leftIntrinsicCostFunction->Initialise(window,
+                                        imageSize,
+                                        imageSize,
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                        colourLeftImages,
+                                        rvecsLeft,
+                                        tvecsLeft
+                                       );
+
+  niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer rightIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
+  rightIntrinsicCostFunction->Initialise(window,
+                                         imageSize,
+                                         imageSize,
+                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                         colourRightImages,
+                                         rvecsRight,
+                                         tvecsRight
+                                        );
+
+  niftk::RenderingBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::RenderingBasedStereoExtrinsicCostFunction::New();
+  stereoExtrinsicCostFunction->Initialise(window,
+                                          imageSize,
+                                          imageSize,
+                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                          colourLeftImages,
+                                          colourRightImages,
+                                          intrinsicLeft,
+                                          distortionLeft,
+                                          intrinsicRight,
+                                          distortionRight
+                                         );
+
+  niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
+                                               rightIntrinsicCostFunction.GetPointer(),
+                                               stereoExtrinsicCostFunction.GetPointer(),
                                                intrinsicLeft,
                                                distortionLeft,
                                                rvecsLeft,
@@ -359,6 +394,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
     p->DumpScreen(renderedFileName.str());
   }
 
+  p->DisconnectFromRenderWindow();
   delete p;
 
   std::vector<cv::Mat> optimisedRVecLeft;

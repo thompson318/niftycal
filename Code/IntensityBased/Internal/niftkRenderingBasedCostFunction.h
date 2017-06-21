@@ -62,6 +62,9 @@ public:
                   const std::vector<cv::Mat>& videoImages
                  );
 
+  void ConnectToRenderWindow(vtkRenderWindow *w);
+  void DisconnectFromRenderWindow();
+
 protected:
 
   RenderingBasedCostFunction(); // deliberately protected.
