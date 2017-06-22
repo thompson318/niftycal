@@ -63,10 +63,10 @@ public:
                   const cv::Mat& leftIntrinsics,
                   const cv::Mat& leftDistortion,
                   const cv::Mat& rightIntrinsics,
-                  const cv::Mat& rightDistortion
+                  const cv::Mat& rightDistortion,
+                  const cv::Mat& leftToRightRotationMatrix,
+                  const cv::Mat& leftToRightTranslationVector
                  );
-
-  void InitLeftToRight(const cv::Mat& rvec, const cv::Mat& tvec);
 
 protected:
 

@@ -32,14 +32,6 @@ RenderingBasedStereoExtrinsicCostFunction::~RenderingBasedStereoExtrinsicCostFun
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedStereoExtrinsicCostFunction::InitLeftToRight(const cv::Mat& rvec, const cv::Mat& tvec)
-{
-  m_LeftToRightRVec = rvec;
-  m_LeftToRightTVec = tvec;
-}
-
-
-//-----------------------------------------------------------------------------
 void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
                                                            const cv::Size2i& windowSize,
                                                            const cv::Size2i& calibratedWindowSize,
@@ -50,7 +42,10 @@ void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
                                                            const cv::Mat& leftIntrinsics,
                                                            const cv::Mat& leftDistortion,
                                                            const cv::Mat& rightIntrinsics,
-                                                           const cv::Mat& rightDistortion)
+                                                           const cv::Mat& rightDistortion,
+                                                           const cv::Mat& leftToRightRotationMatrix,
+                                                           const cv::Mat& leftToRightTranslationVector
+                                                          )
 {
   Superclass::Initialise(win, windowSize, calibratedWindowSize, model, texture, leftVideoImages);
 
@@ -64,6 +59,9 @@ void RenderingBasedStereoExtrinsicCostFunction::Initialise(vtkRenderWindow* win,
   m_LeftDistortion = leftDistortion;
   m_RightIntrinsics = rightIntrinsics;
   m_RightDistortion = rightDistortion;
+
+  cv::Rodrigues(leftToRightRotationMatrix, m_LeftToRightRVec);
+  m_LeftToRightTVec = leftToRightTranslationVector;
 
   m_RightOriginalVideoImages = rightVideoImages;
   for (int i = 0; i < m_RightOriginalVideoImages.size(); i++)

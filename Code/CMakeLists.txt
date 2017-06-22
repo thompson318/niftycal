@@ -111,6 +111,7 @@ if(VTK_FOUND AND ITK_FOUND AND QT_FOUND)
   list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedStereoExtrinsicCostFunction.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})

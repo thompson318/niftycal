@@ -83,6 +83,8 @@ protected:
 
   virtual ParametersType GetStepSizes() const = 0;
 
+  unsigned int BiLinearInterpolate(const cv::Mat& image, cv::Point2f& pixel) const;
+
   cv::Size2i               m_WindowSize;
   std::vector<cv::Point3f> m_Model;
 };
