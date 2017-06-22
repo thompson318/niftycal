@@ -22,6 +22,7 @@ set(NIFTYCAL_APPS
   niftkStereoChessboardCalibration
   niftkTimingCalibrationFromPoints
   niftkPoseFromPoints
+  niftkHandEyeCalibrationUsingPointToLine
 )
 
 if (VTK_FOUND AND QT_FOUND)
