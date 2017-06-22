@@ -211,13 +211,8 @@ double InternalRenderingStereoCameraCalibration(niftk::IntensityBasedCostFunctio
 
   double finalCost = InternalGradientDescentOptimisation(currentParams, cost, learningRate);
 
-  rvec.at<double>(0, 0) = 0;
-  rvec.at<double>(0, 1) = 0;
-  rvec.at<double>(0, 2) = 0;
-  cv::Rodrigues(rvec, leftToRightRotationMatrix);
   leftToRightTranslationVector.at<double>(0, 0) = currentParams[0];
   leftToRightTranslationVector.at<double>(0, 1) = currentParams[1];
-  leftToRightTranslationVector.at<double>(0, 2) = 0;
 
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
