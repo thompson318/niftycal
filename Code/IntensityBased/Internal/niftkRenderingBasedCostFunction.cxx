@@ -43,12 +43,28 @@ void RenderingBasedCostFunction::Initialise(vtkRenderWindow* win,
                                             const std::string& texture,
                                             const std::vector<cv::Mat>& videoImages
                                            )
-{
-  IntensityBasedCostFunction::Initialise(videoImages);
-
+{  
   if (win == nullptr)
   {
     niftkNiftyCalThrow() << "Null Window provided.";
+  }
+
+  if (videoImages.size() == 0)
+  {
+    niftkNiftyCalThrow() << "No images provided.";
+  }
+
+  m_OriginalVideoImages = videoImages; // cv::Mat structures will wrap videoImages.
+
+  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
+  {
+    cv::Mat videoInGreyScale;
+    cv::cvtColor(m_OriginalVideoImages[i], videoInGreyScale, CV_BGR2GRAY);
+    m_OriginalVideoImagesInGreyScale.push_back(videoInGreyScale);
+
+    cv::Mat undistorted;
+    m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
+    m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
   }
 
   m_Pipeline.reset(new CalibratedRenderingPipeline(windowSize,

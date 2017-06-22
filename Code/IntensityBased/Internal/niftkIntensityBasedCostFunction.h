@@ -58,11 +58,6 @@ public:
                              DerivativeType & derivative) const;
 
   /**
-   * \brief Instantiates the internal arrays for each video image.
-   */
-  void Initialise(const std::vector<cv::Mat>& videoImages);
-
-  /**
    * \brief Used to tell base classes to enter Activated/Not Activated state.
    */
   virtual void SetActivated(const bool& isActivated) = 0;
@@ -81,10 +76,6 @@ protected:
                     const cv::Mat& jointHist) const;
 
   virtual ParametersType GetStepSizes() const = 0; // used for derivative
-
-  std::vector<cv::Mat>         m_OriginalVideoImages;
-  std::vector<cv::Mat>         m_OriginalVideoImagesInGreyScale;
-  mutable std::vector<cv::Mat> m_UndistortedVideoImagesInGreyScale;
 
 };
 

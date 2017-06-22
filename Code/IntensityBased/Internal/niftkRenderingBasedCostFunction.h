@@ -81,6 +81,9 @@ protected:
 
   virtual ParametersType GetStepSizes() const = 0;
 
+  std::vector<cv::Mat>                         m_OriginalVideoImages;
+  std::vector<cv::Mat>                         m_OriginalVideoImagesInGreyScale;
+  mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
   mutable cv::Mat                              m_RenderedImage;
   mutable cv::Mat                              m_RenderedImageInGreyscale;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;

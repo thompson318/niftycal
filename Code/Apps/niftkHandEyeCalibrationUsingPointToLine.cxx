@@ -76,9 +76,21 @@ int main(int argc, char ** argv)
           niftkNiftyCalThrow() << "Did not find 1 point in:" << argv[numberOfPreliminaryArgs + i] << ", actually found:" << p.size();
         }
 
-        cv::Mat tmp = niftk::LoadMatrix(argv[numberOfPreliminaryArgs + i + numberOfSamples]);
-        cv::Matx44d trackingMatrix(tmp);
+        int trackingMatrixArgNumber = numberOfPreliminaryArgs + i + numberOfSamples;
 
+        cv::Mat tmp = niftk::LoadMatrix(argv[trackingMatrixArgNumber]);
+        if (tmp.rows != 4)
+        {
+          niftkNiftyCalThrow() << "Tracking matrix " << argv[trackingMatrixArgNumber]
+                               << " does not have 4 rows.";
+        }
+        if (tmp.cols != 4)
+        {
+          niftkNiftyCalThrow() << "Tracking matrix " << argv[trackingMatrixArgNumber]
+                               << " does not have 4 columns.";
+        }
+
+        cv::Matx44d trackingMatrix(tmp);
         trackingMatrices.push_back(trackingMatrix);
         pointsInTrackerSpace.push_back(ballPositionInTrackerSpace);
         undistortedPoints.push_back((*(p.begin())).second.point);

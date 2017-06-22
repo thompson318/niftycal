@@ -33,34 +33,11 @@ IntensityBasedCostFunction::~IntensityBasedCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void IntensityBasedCostFunction::Initialise(const std::vector<cv::Mat>& videoImages)
-{
-  if (videoImages.size() == 0)
-  {
-    niftkNiftyCalThrow() << "No images provided.";
-  }
-
-  m_OriginalVideoImages = videoImages; // cv::Mat structures will wrap videoImages.
-
-  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
-  {
-    cv::Mat videoInGreyScale;
-    cv::cvtColor(m_OriginalVideoImages[i], videoInGreyScale, CV_BGR2GRAY);
-    m_OriginalVideoImagesInGreyScale.push_back(videoInGreyScale);
-
-    cv::Mat undistorted;
-    m_OriginalVideoImagesInGreyScale[i].copyTo(undistorted);
-    m_UndistortedVideoImagesInGreyScale.push_back(undistorted);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
 double IntensityBasedCostFunction::ComputeNMI(const unsigned long int& counter,
-                                                  const cv::Mat& histogramRows,
-                                                  const cv::Mat& histogramCols,
-                                                  const cv::Mat& jointHist
-                                                 ) const
+                                              const cv::Mat& histogramRows,
+                                              const cv::Mat& histogramCols,
+                                              const cv::Mat& jointHist
+                                             ) const
 {
   MeasureType cost = 0;
   double value = 0;
@@ -113,7 +90,7 @@ double IntensityBasedCostFunction::ComputeNMI(const unsigned long int& counter,
 
 //-----------------------------------------------------------------------------
 void IntensityBasedCostFunction::GetDerivative(const ParametersType & parameters,
-                                                   DerivativeType & derivative) const
+                                                     DerivativeType & derivative) const
 {
   ParametersType stepSizes = this->GetStepSizes(); // from derived class
   derivative.SetSize(this->GetNumberOfParameters());
