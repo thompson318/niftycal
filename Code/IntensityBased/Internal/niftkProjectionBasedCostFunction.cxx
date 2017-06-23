@@ -14,6 +14,10 @@
 
 #include "niftkProjectionBasedCostFunction.h"
 #include <niftkNiftyCalExceptionMacro.h>
+#include <vtkPolyDataReader.h>
+#include <vtkPolyData.h>
+#include <vtkPointData.h>
+#include <vtkSmartPointer.h>
 
 namespace niftk
 {
@@ -43,14 +47,84 @@ void ProjectionBasedCostFunction::Initialise(const cv::Size2i& windowSize, const
     niftkNiftyCalThrow() << "Invalid height.";
   }
 
-  // Load Model, and extend it.
+  vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
+  reader->SetFileName(model.c_str());
+  reader->Update();
+
+  if (reader->GetOutput() == nullptr)
+  {
+    niftkNiftyCalThrow() << "Invalid Poly Data:" << model;
+  }
+  if (reader->GetOutput()->GetPoints() == nullptr)
+  {
+    niftkNiftyCalThrow() << "No points found in:" << model;
+  }
+
+  vtkPoints* points = reader->GetOutput()->GetPoints();
+
+  double point[3];
+  cv::Point3f modelPoint;
+
+  for (int i = 0; i < points->GetNumberOfPoints(); i++)
+  {
+    points->GetPoint(i, point);
+
+    // We create 4 points per point.
+    modelPoint.x = point[0] - 0.1;
+    modelPoint.y = point[1] - 0.1;
+    modelPoint.z = point[2];
+    m_Model.push_back(modelPoint);
+
+    modelPoint.x = point[0] + 0.1;
+    modelPoint.y = point[1] - 0.1;
+    modelPoint.z = point[2];
+    m_Model.push_back(modelPoint);
+
+    modelPoint.x = point[0] + 0.1;
+    modelPoint.y = point[1] + 0.1;
+    modelPoint.z = point[2];
+    m_Model.push_back(modelPoint);
+
+    modelPoint.x = point[0] - 0.1;
+    modelPoint.y = point[1] + 0.1;
+    modelPoint.z = point[2];
+    m_Model.push_back(modelPoint);
+  }
 }
 
 
 //-----------------------------------------------------------------------------
 unsigned int ProjectionBasedCostFunction::BiLinearInterpolate(const cv::Mat& image, cv::Point2f& pixel) const
 {
-  return 0;
+  unsigned int result = 0;
+
+  int x = static_cast<int>(pixel.x);
+  int y = static_cast<int>(pixel.y);
+
+  if (   x >= 0
+      && y >= 0
+      && x < image.cols - 1
+      && y < image.rows - 1
+     )
+  {
+    float dx = pixel.x - x;
+    float dy = pixel.y - y;
+
+    float weightTL = (1.0 - dx) * (1.0 - dy);
+    float weightTR = (dx)       * (1.0 - dy);
+    float weightBL = (1.0 - dx) * (dy);
+    float weightBR = (dx)       * (dy);
+
+    float value = static_cast<float>(image.at<unsigned char>(y,   x))   * weightTL
+                + static_cast<float>(image.at<unsigned char>(y,   x+1)) * weightTR
+                + static_cast<float>(image.at<unsigned char>(y+1, x))   * weightBL
+                + static_cast<float>(image.at<unsigned char>(y+1, x+1)) * weightBR;
+
+    result = static_cast<unsigned int>(value);
+
+  }
+
+  return result;
 }
 
 
@@ -109,8 +183,9 @@ void ProjectionBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVide
         && projectedB[0].y < (greyScaleVideoImageB.rows - 1)
        )
     {
-      unsigned int a = this->BiLinearInterpolate(greyScaleVideoImageA, projectedA[0]);
-      unsigned int b = this->BiLinearInterpolate(greyScaleVideoImageB, projectedB[0]);
+      unsigned int a = this->BiLinearInterpolate(greyScaleVideoImageA, projectedA[0]) / 16;
+      unsigned int b = this->BiLinearInterpolate(greyScaleVideoImageB, projectedB[0]) / 16;
+
       jointHistogram.at<double>(a, b) += 1;
       histogramRows.at<double>(a, 0) += 1;
       histogramCols.at<double>(0, b) += 1;

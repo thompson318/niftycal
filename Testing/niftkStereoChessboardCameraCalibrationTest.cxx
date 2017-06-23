@@ -24,7 +24,9 @@
 #include <niftkIntensityBasedCameraCalibration.h>
 #include <niftkCalibratedRenderingPipeline.h>
 #include <IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkProjectionBasedStereoExtrinsicCostFunction.h>
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
@@ -336,6 +338,15 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                          tvecsRight
                                         );
 
+  niftk::RenderingBasedMonoExtrinsicCostFunction::Pointer leftExtrinsicCostFunction = niftk::RenderingBasedMonoExtrinsicCostFunction::New();
+  leftExtrinsicCostFunction->Initialise(window, imageSize, imageSize,
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                                        colourLeftImages,
+                                        intrinsicLeft,
+                                        distortionLeft
+                                       );
+/*
   niftk::RenderingBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::RenderingBasedStereoExtrinsicCostFunction::New();
   stereoExtrinsicCostFunction->Initialise(window,
                                           imageSize,
@@ -351,10 +362,24 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           leftToRightRotationMatrix,
                                           leftToRightTranslationVector
                                          );
+*/
+  niftk::ProjectionBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsic = niftk::ProjectionBasedStereoExtrinsicCostFunction::New();
+  stereoExtrinsic->Initialise(imageSize,
+                              "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                              colourLeftImages,
+                              colourRightImages,
+                              intrinsicLeft,
+                              distortionLeft,
+                              intrinsicRight,
+                              distortionRight,
+                              rvecsLeft,
+                              tvecsLeft
+                              );
 
   niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
                                                rightIntrinsicCostFunction.GetPointer(),
-                                               stereoExtrinsicCostFunction.GetPointer(),
+                                               leftExtrinsicCostFunction.GetPointer(),
+                                               stereoExtrinsic.GetPointer(),
                                                intrinsicLeft,
                                                distortionLeft,
                                                rvecsLeft,

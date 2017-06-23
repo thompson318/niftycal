@@ -196,33 +196,23 @@ double InternalRenderingStereoCameraCalibration(niftk::IntensityBasedCostFunctio
   cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
-  currentParams[0] = leftToRightTranslationVector.at<double>(0, 0);
-  currentParams[1] = leftToRightTranslationVector.at<double>(0, 1);
-
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    currentParams[i*6 + 2] = rvecsLeft[i].at<double>(0, 0);
-    currentParams[i*6 + 3] = rvecsLeft[i].at<double>(0, 1);
-    currentParams[i*6 + 4] = rvecsLeft[i].at<double>(0, 2);
-    currentParams[i*6 + 5] = tvecsLeft[i].at<double>(0, 0);
-    currentParams[i*6 + 6] = tvecsLeft[i].at<double>(0, 1);
-    currentParams[i*6 + 7] = tvecsLeft[i].at<double>(0, 2);
-  }
+  currentParams[0] = rvec.at<double>(0, 0);
+  currentParams[1] = rvec.at<double>(0, 1);
+  currentParams[2] = rvec.at<double>(0, 2);
+  currentParams[3] = leftToRightTranslationVector.at<double>(0, 0);
+  currentParams[4] = leftToRightTranslationVector.at<double>(0, 1);
+  currentParams[5] = leftToRightTranslationVector.at<double>(0, 2);
 
   double finalCost = InternalGradientDescentOptimisation(currentParams, cost, learningRate);
 
-  leftToRightTranslationVector.at<double>(0, 0) = currentParams[0];
-  leftToRightTranslationVector.at<double>(0, 1) = currentParams[1];
+  rvec.at<double>(0, 0) = currentParams[0];
+  rvec.at<double>(0, 1) = currentParams[1];
+  rvec.at<double>(0, 2) = currentParams[2];
+  cv::Rodrigues(rvec, leftToRightRotationMatrix);
 
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    rvecsLeft[i].at<double>(0, 0) = currentParams[6*i + 2];
-    rvecsLeft[i].at<double>(0, 1) = currentParams[6*i + 3];
-    rvecsLeft[i].at<double>(0, 2) = currentParams[6*i + 4];
-    tvecsLeft[i].at<double>(0, 0) = currentParams[6*i + 5];
-    tvecsLeft[i].at<double>(0, 1) = currentParams[6*i + 6];
-    tvecsLeft[i].at<double>(0, 2) = currentParams[6*i + 7];
-  }
+  leftToRightTranslationVector.at<double>(0, 0) = currentParams[3];
+  leftToRightTranslationVector.at<double>(0, 1) = currentParams[4];
+  leftToRightTranslationVector.at<double>(0, 2) = currentParams[5];
 
   // Makes sure that right hand rvecs and tvecs are consistent.
   niftk::ComputeStereoExtrinsics(rvecsLeft,
@@ -302,6 +292,7 @@ void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Poin
 //-----------------------------------------------------------------------------
 void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
                                            niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
+                                           niftk::IntensityBasedCostFunction::Pointer extrinsicLeftCostFunction,
                                            niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
                                            cv::Mat& intrinsicLeft,
                                            cv::Mat& distortionLeft,
@@ -333,6 +324,7 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
 
       intrinsicLeftCostFunction->SetActivated(true);
       intrinsicRightCostFunction->SetActivated(false);
+      extrinsicLeftCostFunction->SetActivated(false);
       stereoExtrinsicCostFunction->SetActivated(false);
       currentValue = InternalIntensityBasedMonoIntrinsicCameraCalibration(intrinsicLeftCostFunction,
                                                                           learningRate,
@@ -348,6 +340,7 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
 
       intrinsicLeftCostFunction->SetActivated(false);
       intrinsicRightCostFunction->SetActivated(true);
+      extrinsicLeftCostFunction->SetActivated(false);
       stereoExtrinsicCostFunction->SetActivated(false);
       currentValue = InternalIntensityBasedMonoIntrinsicCameraCalibration(intrinsicRightCostFunction,
                                                                           learningRate,
@@ -365,6 +358,23 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
 
       intrinsicLeftCostFunction->SetActivated(false);
       intrinsicRightCostFunction->SetActivated(false);
+      extrinsicLeftCostFunction->SetActivated(true);
+      stereoExtrinsicCostFunction->SetActivated(false);
+      currentValue = InternalIntensityBasedMonoExtrinsicCameraCalibration(extrinsicLeftCostFunction,
+                                                                          learningRate,
+                                                                          rvecsLeft,
+                                                                          tvecsLeft
+                                                                         );
+
+
+      std::cerr << loopCounter
+                << ", l=" << learningRate
+                << ", mono, left extrinsic done, c=" <<  currentValue
+                << std::endl;
+
+      intrinsicLeftCostFunction->SetActivated(false);
+      intrinsicRightCostFunction->SetActivated(false);
+      extrinsicLeftCostFunction->SetActivated(false);
       stereoExtrinsicCostFunction->SetActivated(true);
       currentValue = InternalRenderingStereoCameraCalibration(stereoExtrinsicCostFunction,
                                                               learningRate,

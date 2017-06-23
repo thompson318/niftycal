@@ -45,6 +45,7 @@ NIFTYCAL_WINEXPORT void IntensityBasedMonoCameraCalibration(niftk::IntensityBase
 */
 NIFTYCAL_WINEXPORT void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
                                                               niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
+                                                              niftk::IntensityBasedCostFunction::Pointer extrinsicLeftCostFunction,
                                                               niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
                                                               cv::Mat& intrinsicLeft,
                                                               cv::Mat& distortionLeft,
