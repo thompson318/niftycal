@@ -26,6 +26,8 @@
 #include <IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkProjectionBasedMonoIntrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkProjectionBasedMonoExtrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkProjectionBasedStereoExtrinsicCostFunction.h>
 #include <cv.h>
 #include <highgui.h>
@@ -338,6 +340,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Stereo P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
+  /*
   niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
   leftIntrinsicCostFunction->Initialise(window,
                                         imageSize,
@@ -359,7 +362,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                          rvecsRight,
                                          tvecsRight
                                         );
-/*
+
   niftk::RenderingBasedMonoExtrinsicCostFunction::Pointer leftExtrinsicCostFunction = niftk::RenderingBasedMonoExtrinsicCostFunction::New();
   leftExtrinsicCostFunction->Initialise(window, imageSize, imageSize,
                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
@@ -384,23 +387,40 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           leftToRightRotationMatrix,
                                           leftToRightTranslationVector
                                          );
-*/
-  niftk::ProjectionBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsic = niftk::ProjectionBasedStereoExtrinsicCostFunction::New();
-  stereoExtrinsic->Initialise(imageSize,
-                              "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
-                              colourLeftImages,
-                              colourRightImages,
-                              intrinsicLeft,
-                              distortionLeft,
-                              intrinsicRight,
-                              distortionRight,
-                              leftToRightRotationMatrix,
-                              leftToRightTranslationVector
-                              );
+  */
+
+  niftk::ProjectionBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::ProjectionBasedMonoIntrinsicCostFunction::New();
+  leftIntrinsicCostFunction->Initialise(imageSize,
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                        colourLeftImages,
+                                        rvecsLeft,
+                                        tvecsLeft
+                                        );
+
+  niftk::ProjectionBasedMonoIntrinsicCostFunction::Pointer rightIntrinsicCostFunction = niftk::ProjectionBasedMonoIntrinsicCostFunction::New();
+  leftIntrinsicCostFunction->Initialise(imageSize,
+                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                        colourRightImages,
+                                        rvecsRight,
+                                        tvecsRight
+                                        );
+
+  niftk::ProjectionBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::ProjectionBasedStereoExtrinsicCostFunction::New();
+  stereoExtrinsicCostFunction->Initialise(imageSize,
+                                          "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                          colourLeftImages,
+                                          colourRightImages,
+                                          intrinsicLeft,
+                                          distortionLeft,
+                                          intrinsicRight,
+                                          distortionRight,
+                                          leftToRightRotationMatrix,
+                                          leftToRightTranslationVector
+                                          );
 
   niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
                                                rightIntrinsicCostFunction.GetPointer(),
-                                               stereoExtrinsic.GetPointer(),
+                                               stereoExtrinsicCostFunction.GetPointer(),
                                                intrinsicLeft,
                                                distortionLeft,
                                                rvecsLeft,
