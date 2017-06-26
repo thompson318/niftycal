@@ -116,7 +116,7 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
   cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
   tvec.at<double>(0, 0) = parameters[0];                       // i.e. only optimise t_x, t_y.
   tvec.at<double>(0, 1) = parameters[1];
-  tvec.at<double>(0, 2) = m_LeftToRightTVec.at<double>(0, 2);
+  tvec.at<double>(0, 2) = m_LeftToRightTVec.at<double>(2, 0);
 
   cv::Matx44d leftToRight = niftk::RodriguesToMatrix(rvec, tvec);
 
@@ -149,6 +149,7 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
       // same model point onto all other left hand views.
       if (leftA != leftB)
       {
+
         this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
                                 m_LeftIntrinsics,
                                 m_LeftDistortion,
@@ -164,33 +165,34 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
                                 histogramCols,
                                 jointHist
                                 );
-      }
 
-      cv::Matx44d leftCameraB = niftk::RodriguesToMatrix(rvecLeftB, tvecLeftB);
-      cv::Matx44d rightCameraB = leftToRight * leftCameraB;
+        cv::Matx44d leftCameraB = niftk::RodriguesToMatrix(rvecLeftB, tvecLeftB);
+        cv::Matx44d rightCameraB = leftToRight * leftCameraB;
 
-      cv::Mat rvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
-      cv::Mat tvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
-      niftk::MatrixToRodrigues(rightCameraB, rvecRightB, tvecRightB);
+        cv::Mat rvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
+        cv::Mat tvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
+        niftk::MatrixToRodrigues(rightCameraB, rvecRightB, tvecRightB);
 
-      // At registration, the grey value of a projected model point
-      // should be related to all other grey values found by projecting the
-      // same model point onto all other right hand views.
-      this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
-                              m_LeftIntrinsics,
-                              m_LeftDistortion,
-                              rvecLeftA,
-                              tvecLeftA,
-                              m_RightImagesInGreyScale[leftB],
-                              m_RightIntrinsics,
-                              m_RightDistortion,
-                              rvecRightB,
-                              tvecRightB,
-                              counter,
-                              histogramRows,
-                              histogramCols,
-                              jointHist
-                              );
+        // At registration, the grey value of a projected model point
+        // should be related to all other grey values found by projecting the
+        // same model point onto all other right hand views.
+        this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
+                                m_LeftIntrinsics,
+                                m_LeftDistortion,
+                                rvecLeftA,
+                                tvecLeftA,
+                                m_RightImagesInGreyScale[leftB],
+                                m_RightIntrinsics,
+                                m_RightDistortion,
+                                rvecRightB,
+                                tvecRightB,
+                                counter,
+                                histogramRows,
+                                histogramCols,
+                                jointHist
+                                );
+
+      } // end if leftA != leftB
     }
   }
 

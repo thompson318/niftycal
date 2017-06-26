@@ -152,8 +152,8 @@ void ProjectionBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVide
 
   for (int i = 0; i < m_Model.size(); i++)
   {
-    std::vector<cv::Point2f> projectedA;
-    std::vector<cv::Point2f> projectedB;
+    std::vector<cv::Point2f> projectedA(1);
+    std::vector<cv::Point2f> projectedB(1);
     std::vector<cv::Point3f> modelPoint;
     modelPoint.push_back(m_Model[i]);
 

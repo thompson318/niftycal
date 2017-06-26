@@ -398,12 +398,12 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                         );
 
   niftk::ProjectionBasedMonoIntrinsicCostFunction::Pointer rightIntrinsicCostFunction = niftk::ProjectionBasedMonoIntrinsicCostFunction::New();
-  leftIntrinsicCostFunction->Initialise(imageSize,
-                                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
-                                        colourRightImages,
-                                        rvecsRight,
-                                        tvecsRight
-                                        );
+  rightIntrinsicCostFunction->Initialise(imageSize,
+                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                                         colourRightImages,
+                                         rvecsRight,
+                                         tvecsRight
+                                         );
 
   niftk::ProjectionBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::ProjectionBasedStereoExtrinsicCostFunction::New();
   stereoExtrinsicCostFunction->Initialise(imageSize,

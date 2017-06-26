@@ -114,7 +114,7 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
   cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
   tvec.at<double>(0, 0) = parameters[0];                      // i.e. only optimise t_x, t_y.
   tvec.at<double>(0, 1) = parameters[1];
-  tvec.at<double>(0, 2) = m_LeftToRightTVec.at<double>(0, 2);
+  tvec.at<double>(0, 2) = m_LeftToRightTVec.at<double>(2, 0);
 
   cv::Matx44d leftToRight = niftk::RodriguesToMatrix(rvec, tvec);
 

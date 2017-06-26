@@ -41,9 +41,23 @@ void ProjectionBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& wind
 {
   Superclass::Initialise(windowSize, model);
 
-  if (videoImages.size() <= 1)
+  if (videoImages.size() < 2)
   {
     niftkNiftyCalThrow() << "Too few left video images.";
+  }
+
+  if (rvecs.size() != tvecs.size())
+  {
+    niftkNiftyCalThrow() << "Number of rotation vectors (" << rvecs.size()
+                         << ") does not match the number of translation vectors (" << tvecs.size()
+                         << ")" << std::endl;
+  }
+
+  if (rvecs.size() != videoImages.size())
+  {
+    niftkNiftyCalThrow() << "Number of rotation vectors (" << rvecs.size()
+                         << ") does not match the number of images (" << videoImages.size()
+                         << ")" << std::endl;
   }
 
   m_Rvecs = rvecs;
