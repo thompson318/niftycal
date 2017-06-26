@@ -62,8 +62,8 @@ public:
                   const cv::Mat& leftDistortion,
                   const cv::Mat& rightIntrinsics,
                   const cv::Mat& rightDistortion,
-                  const std::vector<cv::Mat>& rvecLeft,
-                  const std::vector<cv::Mat>& tvecLeft
+                  const cv::Mat& leftToRightRotationMatrix,
+                  const cv::Mat& leftToRightTranslationVector
                  );
 
 protected:
@@ -80,8 +80,8 @@ protected:
   cv::Mat              m_LeftDistortion;
   cv::Mat              m_RightIntrinsics;
   cv::Mat              m_RightDistortion;
-  std::vector<cv::Mat> m_RVecLeft;
-  std::vector<cv::Mat> m_TVecLeft;
+  cv::Mat              m_LeftToRightRVec;
+  cv::Mat              m_LeftToRightTVec;
   std::vector<cv::Mat> m_LeftImages;
   std::vector<cv::Mat> m_LeftImagesInGreyScale;
   std::vector<cv::Mat> m_RightImages;

@@ -372,13 +372,12 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                               distortionLeft,
                               intrinsicRight,
                               distortionRight,
-                              rvecsLeft,
-                              tvecsLeft
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector
                               );
 
   niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
                                                rightIntrinsicCostFunction.GetPointer(),
-                                               leftExtrinsicCostFunction.GetPointer(),
                                                stereoExtrinsic.GetPointer(),
                                                intrinsicLeft,
                                                distortionLeft,
