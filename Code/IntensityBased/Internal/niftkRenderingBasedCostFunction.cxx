@@ -74,6 +74,7 @@ void RenderingBasedCostFunction::Initialise(vtkRenderWindow* win,
                                                    true));
 
   m_Pipeline->ConnectToRenderWindow(win);
+  m_Pipeline->SetActivated(false);
   m_Pipeline->SetBackgroundColour(m_BackgroundColour[2], m_BackgroundColour[1], m_BackgroundColour[0]); // OpenCV is BGR, VTK is RGB.
 
   m_OriginalVideoImages[0].copyTo(m_RenderedImage);
