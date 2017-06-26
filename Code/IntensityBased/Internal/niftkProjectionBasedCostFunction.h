@@ -53,7 +53,10 @@ public:
   /**
    * \brief Instantiates the internal list of points.
    */
-  void Initialise(const cv::Size2i& windowSize, const std::string& model);
+  void Initialise(const cv::Size2i& windowSize,
+                  const std::string& model,
+                  const unsigned int& histogramDivisor
+                 );
 
   virtual void SetActivated(const bool& isActivated) {}
 
@@ -87,6 +90,7 @@ protected:
 
   cv::Size2i               m_WindowSize;
   std::vector<cv::Point3f> m_Model;
+  unsigned int             m_HistogramDivisor;
 };
 
 } // end namespace

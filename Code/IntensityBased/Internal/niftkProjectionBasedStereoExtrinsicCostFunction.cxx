@@ -44,7 +44,7 @@ void ProjectionBasedStereoExtrinsicCostFunction::Initialise(const cv::Size2i& wi
                                                             const cv::Mat& leftToRightTranslationVector
                                                            )
 {
-  Superclass::Initialise(windowSize, model);
+  Superclass::Initialise(windowSize, model, 16);
 
   if (leftVideoImages.size() != rightVideoImages.size())
   {

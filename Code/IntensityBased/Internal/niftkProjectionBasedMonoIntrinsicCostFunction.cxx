@@ -39,7 +39,7 @@ void ProjectionBasedMonoIntrinsicCostFunction::Initialise(const cv::Size2i& wind
                                                           const std::vector<cv::Mat>& tvecs
                                                          )
 {
-  Superclass::Initialise(windowSize, model);
+  Superclass::Initialise(windowSize, model, 16);
 
   if (videoImages.size() < 2)
   {

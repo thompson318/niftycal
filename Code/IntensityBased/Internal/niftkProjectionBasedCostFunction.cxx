@@ -35,7 +35,10 @@ ProjectionBasedCostFunction::~ProjectionBasedCostFunction()
 
 
 //-----------------------------------------------------------------------------
-void ProjectionBasedCostFunction::Initialise(const cv::Size2i& windowSize, const std::string& model)
+void ProjectionBasedCostFunction::Initialise(const cv::Size2i& windowSize,
+                                             const std::string& model,
+                                             const unsigned int& histogramDivisor
+                                            )
 {
   if (windowSize.width <= 0)
   {
@@ -90,6 +93,8 @@ void ProjectionBasedCostFunction::Initialise(const cv::Size2i& windowSize, const
     modelPoint.z = point[2];
     m_Model.push_back(modelPoint);
   }
+
+  m_HistogramDivisor =  histogramDivisor;
 }
 
 
@@ -185,8 +190,8 @@ void ProjectionBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVide
         && projectedB[0].y < (greyScaleVideoImageB.rows - 1)
        )
     {
-      unsigned int a = this->BiLinearInterpolate(greyScaleVideoImageA, projectedA[0]) / 16;
-      unsigned int b = this->BiLinearInterpolate(greyScaleVideoImageB, projectedB[0]) / 16;
+      unsigned int a = this->BiLinearInterpolate(greyScaleVideoImageA, projectedA[0]) / m_HistogramDivisor;
+      unsigned int b = this->BiLinearInterpolate(greyScaleVideoImageB, projectedB[0]) / m_HistogramDivisor;
 
       jointHistogram.at<double>(a, b) += 1;
       histogramRows.at<double>(a, 0) += 1;

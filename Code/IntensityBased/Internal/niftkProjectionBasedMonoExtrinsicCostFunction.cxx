@@ -39,7 +39,7 @@ void ProjectionBasedMonoExtrinsicCostFunction::Initialise(const cv::Size2i& wind
                                                           const cv::Mat& distortion
                                                          )
 {
-  Superclass::Initialise(windowSize, model);
+  Superclass::Initialise(windowSize, model, 16);
 
   if (videoImages.size() <= 1)
   {
