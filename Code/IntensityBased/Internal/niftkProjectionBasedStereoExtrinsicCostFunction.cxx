@@ -103,10 +103,15 @@ ProjectionBasedStereoExtrinsicCostFunction::MeasureType
 ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & parameters) const
 {
   MeasureType cost = 0;
-  cv::Mat jointHist = cv::Mat::zeros(16, 16, CV_64FC1);
-  cv::Mat histogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
-  cv::Mat histogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
-  unsigned long int counter = 0;
+  cv::Mat leftJointHist = cv::Mat::zeros(16, 16, CV_64FC1);
+  cv::Mat leftHistogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
+  cv::Mat leftHistogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
+  unsigned long int leftCounter = 0;
+
+  cv::Mat rightJointHist = cv::Mat::zeros(16, 16, CV_64FC1);
+  cv::Mat rightHistogramRows = cv::Mat::zeros(16, 1, CV_64FC1);
+  cv::Mat rightHistogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
+  unsigned long int rightCounter = 0;
 
   cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
   rvec.at<double>(0, 0) = m_LeftToRightRVec.at<double>(0, 0);
@@ -144,12 +149,8 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
       tvecLeftB.at<double>(0, 1) = parameters[(6*leftB)+6];
       tvecLeftB.at<double>(0, 2) = parameters[(6*leftB)+7];
 
-      // At registration, the grey value of a projected model point
-      // should be related to all other grey values found by projecting the
-      // same model point onto all other left hand views.
       if (leftA != leftB)
       {
-
         this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
                                 m_LeftIntrinsics,
                                 m_LeftDistortion,
@@ -160,11 +161,18 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
                                 m_LeftDistortion,
                                 rvecLeftB,
                                 tvecLeftB,
-                                counter,
-                                histogramRows,
-                                histogramCols,
-                                jointHist
+                                leftCounter,
+                                leftHistogramRows,
+                                leftHistogramCols,
+                                leftJointHist
                                 );
+
+        cv::Matx44d leftCameraA = niftk::RodriguesToMatrix(rvecLeftA, tvecLeftA);
+        cv::Matx44d rightCameraA = leftToRight * leftCameraA;
+
+        cv::Mat rvecRightA = cv::Mat::zeros(1, 3, CV_64FC1);
+        cv::Mat tvecRightA = cv::Mat::zeros(1, 3, CV_64FC1);
+        niftk::MatrixToRodrigues(rightCameraA, rvecRightA, tvecRightA);
 
         cv::Matx44d leftCameraB = niftk::RodriguesToMatrix(rvecLeftB, tvecLeftB);
         cv::Matx44d rightCameraB = leftToRight * leftCameraB;
@@ -173,32 +181,30 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
         cv::Mat tvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
         niftk::MatrixToRodrigues(rightCameraB, rvecRightB, tvecRightB);
 
-        // At registration, the grey value of a projected model point
-        // should be related to all other grey values found by projecting the
-        // same model point onto all other right hand views.
-        this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
-                                m_LeftIntrinsics,
-                                m_LeftDistortion,
-                                rvecLeftA,
-                                tvecLeftA,
+        this->AccumulateSamples(m_RightImagesInGreyScale[leftA],
+                                m_RightIntrinsics,
+                                m_RightDistortion,
+                                rvecRightA,
+                                tvecRightA,
                                 m_RightImagesInGreyScale[leftB],
                                 m_RightIntrinsics,
                                 m_RightDistortion,
                                 rvecRightB,
                                 tvecRightB,
-                                counter,
-                                histogramRows,
-                                histogramCols,
-                                jointHist
+                                rightCounter,
+                                rightHistogramRows,
+                                rightHistogramCols,
+                                rightJointHist
                                 );
 
       } // end if leftA != leftB
     }
   }
 
-  cost = this->ComputeNMI(counter, histogramRows, histogramCols, jointHist);
+  double costLeft = this->ComputeNMI(leftCounter, leftHistogramRows, leftHistogramCols, leftJointHist);
+  double costRight = this->ComputeNMI(rightCounter, rightHistogramRows, rightHistogramCols, rightJointHist);
 
-  return cost;
+  return costLeft + costRight;
 }
 
 

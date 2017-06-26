@@ -120,7 +120,6 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
 
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
-
     cv::Mat rvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
     rvecLeft.at<double>(0, 0) = parameters[(6*i)+2];
     rvecLeft.at<double>(0, 1) = parameters[(6*i)+3];
