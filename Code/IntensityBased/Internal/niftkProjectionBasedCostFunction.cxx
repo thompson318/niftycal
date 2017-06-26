@@ -173,7 +173,9 @@ void ProjectionBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVide
                       projectedB);
 
     // Check both points project inside images.
-    if (   projectedA[0].x > 0
+    if (   projectedA.size() > 0
+        && projectedB.size() > 0
+        && projectedA[0].x > 0
         && projectedA[0].x < (greyScaleVideoImageA.cols - 1)
         && projectedA[0].y > 0
         && projectedA[0].y < (greyScaleVideoImageA.rows - 1)

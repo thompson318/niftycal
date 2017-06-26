@@ -386,8 +386,6 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
                                                               leftToRightTranslationVector
                                                              );
 
-      stereoExtrinsicCostFunction->SetActivated(false);
-
       std::cerr << loopCounter
                 << ", l=" << learningRate
                 << ", stereo, extrinsic done, t=" << leftToRightTranslationVector

@@ -145,7 +145,8 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
       tvecLeftB.at<double>(0, 2) = parameters[(6*leftB)+7];
 
       // At registration, the grey value of a projected model point
-      // should be related to all other grey values projected into all other left views.
+      // should be related to all other grey values found by projecting the
+      // same model point onto all other left hand views.
       if (leftA != leftB)
       {
         this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
@@ -172,6 +173,9 @@ ProjectionBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & para
       cv::Mat tvecRightB = cv::Mat::zeros(1, 3, CV_64FC1);
       niftk::MatrixToRodrigues(rightCameraB, rvecRightB, tvecRightB);
 
+      // At registration, the grey value of a projected model point
+      // should be related to all other grey values found by projecting the
+      // same model point onto all other right hand views.
       this->AccumulateSamples(m_LeftImagesInGreyScale[leftA],
                               m_LeftIntrinsics,
                               m_LeftDistortion,

@@ -306,15 +306,37 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                          rmsPerAxis
                                                          );
 
+  cv::Mat rvec;
+  cv::Rodrigues(leftToRightRotationMatrix, rvec);
+
   std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
   std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
   std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
   std::cout << "Stereo RMS-3Dx=" << rmsPerAxis.x << std::endl;
   std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
   std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
-
-  cv::Mat rvec;
-  cv::Rodrigues(leftToRightRotationMatrix, rvec);
+  std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "Stereo T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "Stereo T2=" << leftToRightTranslationVector.at<double>(1,0) << std::endl;
+  std::cout << "Stereo T3=" << leftToRightTranslationVector.at<double>(2,0) << std::endl;
+  std::cout << "Stereo Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
+  std::cout << "Stereo Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
+  std::cout << "Stereo Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
+  std::cout << "Stereo Cyl=" << intrinsicLeft.at<double>(1,2) << std::endl;
+  std::cout << "Stereo K1l=" << distortionLeft.at<double>(0,0) << std::endl;
+  std::cout << "Stereo K2l=" << distortionLeft.at<double>(0,1) << std::endl;
+  std::cout << "Stereo P1l=" << distortionLeft.at<double>(0,2) << std::endl;
+  std::cout << "Stereo P2l=" << distortionLeft.at<double>(0,3) << std::endl;
+  std::cout << "Stereo Fxr=" << intrinsicRight.at<double>(0,0) << std::endl;
+  std::cout << "Stereo Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
+  std::cout << "Stereo Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
+  std::cout << "Stereo Cyr=" << intrinsicRight.at<double>(1,2) << std::endl;
+  std::cout << "Stereo K1r=" << distortionRight.at<double>(0,0) << std::endl;
+  std::cout << "Stereo K2r=" << distortionRight.at<double>(0,1) << std::endl;
+  std::cout << "Stereo P1r=" << distortionRight.at<double>(0,2) << std::endl;
+  std::cout << "Stereo P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
   niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
   leftIntrinsicCostFunction->Initialise(window,
@@ -337,7 +359,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                          rvecsRight,
                                          tvecsRight
                                         );
-
+/*
   niftk::RenderingBasedMonoExtrinsicCostFunction::Pointer leftExtrinsicCostFunction = niftk::RenderingBasedMonoExtrinsicCostFunction::New();
   leftExtrinsicCostFunction->Initialise(window, imageSize, imageSize,
                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
@@ -346,7 +368,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                         intrinsicLeft,
                                         distortionLeft
                                        );
-/*
+
   niftk::RenderingBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::RenderingBasedStereoExtrinsicCostFunction::New();
   stereoExtrinsicCostFunction->Initialise(window,
                                           imageSize,
@@ -496,10 +518,12 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
-  std::cout << "Stereo RMS-(Rendered)-3D=" << rmsAgain << std::endl;
-  std::cout << "Stereo RMS-(Rendered)-3Dx=" << rmsPerAxis.x << std::endl;
-  std::cout << "Stereo RMS-(Rendered)-3Dy=" << rmsPerAxis.y << std::endl;
-  std::cout << "Stereo RMS-(Rendered)-3Dz=" << rmsPerAxis.z << std::endl;
+  std::cout << "Stereo RMS-2D=" << result(0, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << result(1, 0) << std::endl;
+  std::cout << "Stereo RMS-3D=" << rmsAgain << std::endl;
+  std::cout << "Stereo RMS-3Dx=" << rmsPerAxis.x << std::endl;
+  std::cout << "Stereo RMS-3Dy=" << rmsPerAxis.y << std::endl;
+  std::cout << "Stereo RMS-3Dz=" << rmsPerAxis.z << std::endl;
   std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
   std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
   std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
