@@ -67,10 +67,20 @@ int main(int argc, char ** argv)
         cv::Mat undistortedImage;
         cv::undistort(imageInColour, undistortedImage, cameraMatrix, distortionMatrix);
 
-        niftk::RedBallDetector detector;
-        detector.SetImage(&undistortedImage);
+        niftk::PointSet p;
+        if (method == 1)
+        {
+          niftk::RedBallDetector detector;
+          detector.SetImage(&undistortedImage);
+          p = detector.GetPoints();
+        }
+        else
+        {
+          niftk::WhiteBallDetector detector;
+          detector.SetImage(&undistortedImage);
+          p = detector.GetPoints();
+        }
 
-        niftk::PointSet p = detector.GetPoints();
         if (p.size() != 1)
         {
           niftkNiftyCalThrow() << "Did not find 1 point in:" << argv[numberOfPreliminaryArgs + i] << ", actually found:" << p.size();
