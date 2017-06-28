@@ -41,6 +41,11 @@ public:
   typedef Superclass::DerivativeType        DerivativeType;
   typedef Superclass::MeasureType           MeasureType;
 
+  itkSetMacro(Sigma, double);
+  itkGetMacro(Sigma, double);
+  itkSetMacro(UseBlurring, bool);
+  itkGetMacro(UseBlurring, bool);
+
   /**
    * \see itk::CostFunction::GetNumberOfParameters()
    */
@@ -73,6 +78,7 @@ protected:
   RenderingBasedCostFunction& operator=(const RenderingBasedCostFunction&); // deliberately not implemented
 
   void AccumulateSamples(const cv::Mat& greyScaleVideoImage,
+                         const double& sigma,
                          unsigned long int& counter,
                          cv::Mat& histogramRows,
                          cv::Mat& histogramCols,
@@ -86,9 +92,11 @@ protected:
   mutable std::vector<cv::Mat>                 m_UndistortedVideoImagesInGreyScale;
   mutable cv::Mat                              m_RenderedImage;
   mutable cv::Mat                              m_RenderedImageInGreyscale;
+  double                                       m_Sigma;
+  bool                                         m_UseBlurring;
+  mutable cv::Mat                              m_RenderedImageBlurred;
   std::unique_ptr<CalibratedRenderingPipeline> m_Pipeline;
   cv::Vec3b                                    m_BackgroundColour; // (BGR, pure Blue)
-
 };
 
 } // end namespace

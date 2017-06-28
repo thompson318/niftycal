@@ -21,6 +21,7 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 RenderingBasedStereoExtrinsicCostFunction::RenderingBasedStereoExtrinsicCostFunction()
+: m_SigmaRight(0)
 {
 }
 
@@ -136,7 +137,7 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
     m_Pipeline->SetIntrinsics(m_LeftIntrinsics);
     m_Pipeline->CopyScreen(m_RenderedImage);
     cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
-    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i],
+    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i], m_Sigma,
                             counter, histogramRows, histogramCols, jointHist);
 
     // Render right
@@ -145,7 +146,7 @@ RenderingBasedStereoExtrinsicCostFunction::GetValue(const ParametersType & param
     m_Pipeline->SetIntrinsics(m_RightIntrinsics);
     m_Pipeline->CopyScreen(m_RenderedImage);
     cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
-    this->AccumulateSamples(m_RightUndistortedVideoImagesInGreyScale[i],
+    this->AccumulateSamples(m_RightUndistortedVideoImagesInGreyScale[i], m_SigmaRight,
                             counter, histogramRows, histogramCols, jointHist);
 
   }

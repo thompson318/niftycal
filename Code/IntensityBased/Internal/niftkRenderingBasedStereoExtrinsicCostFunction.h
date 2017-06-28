@@ -40,6 +40,9 @@ public:
   typedef Superclass::DerivativeType                DerivativeType;
   typedef Superclass::MeasureType                   MeasureType;
 
+  itkSetMacro(SigmaRight, double);
+  itkGetMacro(SigmaRight, double);
+
   /**
    * \see itk::CostFunction::GetNumberOfParameters()
    */
@@ -89,6 +92,7 @@ private:
   std::vector<cv::Mat>         m_RightOriginalVideoImages;
   std::vector<cv::Mat>         m_RightOriginalVideoImagesInGreyScale;
   mutable std::vector<cv::Mat> m_RightUndistortedVideoImagesInGreyScale;
+  double                       m_SigmaRight;
 
 };
 

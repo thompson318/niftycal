@@ -406,7 +406,7 @@ double IntensityBasedBlurringCalibration(niftk::IntensityBasedCostFunction::Poin
     niftkNiftyCalThrow() << "Expected 1 parameter, but cost function wants " << cost->GetNumberOfParameters();
   }
 
-  double learningRate = 0.1;
+  double learningRate = 100;
 
   niftk::IntensityBasedCostFunction::ParametersType currentParams;
   currentParams.SetSize(cost->GetNumberOfParameters());

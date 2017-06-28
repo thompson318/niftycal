@@ -22,6 +22,8 @@ namespace niftk
 //-----------------------------------------------------------------------------
 RenderingBasedCostFunction::RenderingBasedCostFunction()
 : m_Pipeline(nullptr)
+, m_Sigma(0)
+, m_UseBlurring(false)
 {
   m_BackgroundColour[0] = 255; // B
   m_BackgroundColour[1] = 0;   // G
@@ -94,12 +96,20 @@ void RenderingBasedCostFunction::SetActivated(const bool& isActivated)
 
 //-----------------------------------------------------------------------------
 void RenderingBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideoImage,
+                                                   const double& sigma,
                                                    unsigned long int& counter,
                                                    cv::Mat& histogramRows,
                                                    cv::Mat& histogramCols,
                                                    cv::Mat& jointHistogram
                                                   ) const
 {
+
+  if (m_UseBlurring)
+  {
+    // Will crash if sigma too small.
+    cv::GaussianBlur(m_RenderedImageInGreyscale, m_RenderedImageBlurred, cv::Size(0, 0), sigma, sigma);
+  }
+
   for (int r = 0; r < m_RenderedImageInGreyscale.rows; r++)
   {
     for (int c = 0; c < m_RenderedImageInGreyscale.cols; c++)
@@ -110,7 +120,15 @@ void RenderingBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideo
           && c != (m_RenderedImageInGreyscale.cols - 1)
           && m_RenderedImage.at<cv::Vec3b>(r, c) != m_BackgroundColour)
       {
-        unsigned int a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 16;
+        unsigned int a = 0;
+        if (m_UseBlurring)
+        {
+          a = static_cast<unsigned int>(m_RenderedImageBlurred.at<unsigned char>(r, c)) / 16;
+        }
+        else
+        {
+          a = static_cast<unsigned int>(m_RenderedImageInGreyscale.at<unsigned char>(r, c)) / 16;
+        }
         unsigned int b = static_cast<unsigned int>(greyScaleVideoImage.at<unsigned char>(r, c)) / 16;
 
         jointHistogram.at<double>(a, b) += 1;

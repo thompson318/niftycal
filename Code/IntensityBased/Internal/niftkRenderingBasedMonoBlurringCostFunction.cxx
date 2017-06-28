@@ -12,7 +12,7 @@
 
 =============================================================================*/
 
-#include "niftkRenderingBasedMonoIntrinsicCostFunction.h"
+#include "niftkRenderingBasedMonoBlurringCostFunction.h"
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 
@@ -20,27 +20,29 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-RenderingBasedMonoIntrinsicCostFunction::RenderingBasedMonoIntrinsicCostFunction()
+RenderingBasedMonoBlurringCostFunction::RenderingBasedMonoBlurringCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-RenderingBasedMonoIntrinsicCostFunction::~RenderingBasedMonoIntrinsicCostFunction()
+RenderingBasedMonoBlurringCostFunction::~RenderingBasedMonoBlurringCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void RenderingBasedMonoIntrinsicCostFunction::Initialise(vtkRenderWindow* win,
-                                                         const cv::Size2i& windowSize,
-                                                         const cv::Size2i& calibratedWindowSize,
-                                                         const std::string& model,
-                                                         const std::string& texture,
-                                                         const std::vector<cv::Mat>& videoImages,
-                                                         const std::vector<cv::Mat>& rvecs,
-                                                         const std::vector<cv::Mat>& tvecs
-                                                        )
+void RenderingBasedMonoBlurringCostFunction::Initialise(vtkRenderWindow* win,
+                                                        const cv::Size2i& windowSize,
+                                                        const cv::Size2i& calibratedWindowSize,
+                                                        const std::string& model,
+                                                        const std::string& texture,
+                                                        const std::vector<cv::Mat>& videoImages,
+                                                        const cv::Mat& intrinsics,
+                                                        const cv::Mat& distortion,
+                                                        const std::vector<cv::Mat>& rvecs,
+                                                        const std::vector<cv::Mat>& tvecs
+                                                       )
 {
   Superclass::Initialise(win, windowSize, calibratedWindowSize, model, texture, videoImages);
 
@@ -56,21 +58,30 @@ void RenderingBasedMonoIntrinsicCostFunction::Initialise(vtkRenderWindow* win,
                          << "), doesn't match number of images (" << videoImages.size() << ")";
   }
 
+  m_Intrinsics = intrinsics;
+  m_Distortion = distortion;
   m_Rvecs = rvecs;
   m_Tvecs = tvecs;
+
+  for (int i = 0; i < m_OriginalVideoImages.size(); i++)
+  {
+    cv::undistort(m_OriginalVideoImagesInGreyScale[i],
+                  m_UndistortedVideoImagesInGreyScale[i],
+                  m_Intrinsics, m_Distortion, m_Intrinsics);
+  }
 }
 
 
 //-----------------------------------------------------------------------------
-unsigned int RenderingBasedMonoIntrinsicCostFunction::GetNumberOfParameters(void) const
+unsigned int RenderingBasedMonoBlurringCostFunction::GetNumberOfParameters(void) const
 {
-  return 9;
+  return 1;
 }
 
 
 //-----------------------------------------------------------------------------
-RenderingBasedMonoIntrinsicCostFunction::MeasureType
-RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & parameters) const
+RenderingBasedMonoBlurringCostFunction::MeasureType
+RenderingBasedMonoBlurringCostFunction::GetValue(const ParametersType & parameters) const
 {  
   MeasureType cost = 0;
   cv::Mat jointHist = cv::Mat::zeros(16, 16, CV_64FC1);
@@ -78,32 +89,15 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
   cv::Mat histogramCols = cv::Mat::zeros(1, 16, CV_64FC1);
   unsigned long int counter = 0;
 
-  cv::Mat intrinsics = cv::Mat::eye(3, 3, CV_64FC1);
-  intrinsics.at<double>(0, 0) = parameters[0];
-  intrinsics.at<double>(1, 1) = parameters[1];
-  intrinsics.at<double>(0, 2) = parameters[2];
-  intrinsics.at<double>(1, 2) = parameters[3];
-
-  cv::Mat distortion = cv::Mat::zeros(1, 5, CV_64FC1);
-  distortion.at<double>(0, 0) = parameters[4];
-  distortion.at<double>(0, 1) = parameters[5];
-  distortion.at<double>(0, 2) = parameters[6];
-  distortion.at<double>(0, 3) = parameters[7];
-  distortion.at<double>(0, 4) = parameters[8];
-
   for (int i = 0; i < m_OriginalVideoImages.size(); i++)
   {
     cv::Matx44d worldToCamera = niftk::RodriguesToMatrix(m_Rvecs[i], m_Tvecs[i]);
     m_Pipeline->SetWorldToCameraMatrix(worldToCamera);
-    m_Pipeline->SetIntrinsics(intrinsics);
+    m_Pipeline->SetIntrinsics(m_Intrinsics);
     m_Pipeline->CopyScreen(m_RenderedImage);
     cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
 
-    cv::undistort(m_OriginalVideoImagesInGreyScale[i],
-                  m_UndistortedVideoImagesInGreyScale[i],
-                  intrinsics, distortion, intrinsics);
-
-    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i], m_Sigma,
+    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i], parameters[0],
                             counter, histogramRows, histogramCols, jointHist);
   }
 
@@ -114,22 +108,13 @@ RenderingBasedMonoIntrinsicCostFunction::GetValue(const ParametersType & paramet
 
 
 //-----------------------------------------------------------------------------
-RenderingBasedMonoIntrinsicCostFunction::ParametersType
-RenderingBasedMonoIntrinsicCostFunction::GetStepSizes() const
+RenderingBasedMonoBlurringCostFunction::ParametersType
+RenderingBasedMonoBlurringCostFunction::GetStepSizes() const
 {
   ParametersType stepSize;
   stepSize.SetSize(this->GetNumberOfParameters());
 
-  stepSize[0] = 50;    // fx
-  stepSize[1] = 50;    // fy
-  stepSize[2] = 2;     // cx
-  stepSize[3] = 2;     // cy
-  stepSize[4] = 0.01;  // k1
-  stepSize[5] = 0.01;  // etc.
-  stepSize[6] = 0.01;
-  stepSize[7] = 0.01;
-  stepSize[8] = 0.01;
-
+  stepSize[0] = 0.5;    // sigma
   return stepSize;
 }
 

@@ -90,7 +90,7 @@ RenderingBasedMonoExtrinsicCostFunction::GetValue(const ParametersType & paramet
     m_Pipeline->CopyScreen(m_RenderedImage);
     cv::cvtColor(m_RenderedImage, m_RenderedImageInGreyscale, CV_BGR2GRAY);
 
-    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i],
+    this->AccumulateSamples(m_UndistortedVideoImagesInGreyScale[i], m_Sigma,
                             counter, histogramRows, histogramCols, jointHist);
 
   }

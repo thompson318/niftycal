@@ -25,6 +25,7 @@
 #include <niftkCalibratedRenderingPipeline.h>
 #include <IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.h>
+#include <IntensityBased/Internal/niftkRenderingBasedMonoBlurringCostFunction.h>
 #include <IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkProjectionBasedMonoIntrinsicCostFunction.h>
 #include <IntensityBased/Internal/niftkProjectionBasedMonoExtrinsicCostFunction.h>
@@ -340,7 +341,48 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::cout << "Stereo P1r=" << distortionRight.at<double>(0,2) << std::endl;
   std::cout << "Stereo P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
-  /*
+  niftk::RenderingBasedMonoBlurringCostFunction::Pointer blurLeft = niftk::RenderingBasedMonoBlurringCostFunction::New();
+  blurLeft->Initialise(window,
+                       imageSize,
+                       imageSize,
+                       "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                       "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                       colourLeftImages,
+                       intrinsicLeft,
+                       distortionLeft,
+                       rvecsLeft,
+                       tvecsLeft
+                       );
+  blurLeft->SetUseBlurring(true);
+  blurLeft->SetActivated(true);
+
+  double sigmaLeft = 2;
+  niftk::IntensityBasedBlurringCalibration(blurLeft.GetPointer(), sigmaLeft);
+
+  blurLeft->SetActivated(false);
+
+  niftk::RenderingBasedMonoBlurringCostFunction::Pointer blurRight = niftk::RenderingBasedMonoBlurringCostFunction::New();
+  blurRight->Initialise(window,
+                        imageSize,
+                        imageSize,
+                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
+                        "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3-large.png",
+                        colourLeftImages,
+                        intrinsicRight,
+                        distortionRight,
+                        rvecsRight,
+                        tvecsRight
+                        );
+  blurRight->SetUseBlurring(true);
+  blurRight->SetActivated(true);
+
+  double sigmaRight = 2;
+  niftk::IntensityBasedBlurringCalibration(blurRight.GetPointer(), sigmaRight);
+
+  blurRight->SetActivated(false);
+
+  std::cerr << "Matt, blurring revealed left=" << sigmaLeft << ", right=" << sigmaRight << std::endl;
+
   niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
   leftIntrinsicCostFunction->Initialise(window,
                                         imageSize,
@@ -351,6 +393,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                         rvecsLeft,
                                         tvecsLeft
                                        );
+  leftIntrinsicCostFunction->SetSigma(sigmaLeft);
+  leftIntrinsicCostFunction->SetUseBlurring(true);
 
   niftk::RenderingBasedMonoIntrinsicCostFunction::Pointer rightIntrinsicCostFunction = niftk::RenderingBasedMonoIntrinsicCostFunction::New();
   rightIntrinsicCostFunction->Initialise(window,
@@ -362,6 +406,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                          rvecsRight,
                                          tvecsRight
                                         );
+  rightIntrinsicCostFunction->SetSigma(sigmaRight);
+  rightIntrinsicCostFunction->SetUseBlurring(true);
 
   niftk::RenderingBasedMonoExtrinsicCostFunction::Pointer leftExtrinsicCostFunction = niftk::RenderingBasedMonoExtrinsicCostFunction::New();
   leftExtrinsicCostFunction->Initialise(window, imageSize, imageSize,
@@ -371,6 +417,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                         intrinsicLeft,
                                         distortionLeft
                                        );
+  leftExtrinsicCostFunction->SetSigma(sigmaLeft);
+  leftExtrinsicCostFunction->SetUseBlurring(true);
 
   niftk::RenderingBasedStereoExtrinsicCostFunction::Pointer stereoExtrinsicCostFunction = niftk::RenderingBasedStereoExtrinsicCostFunction::New();
   stereoExtrinsicCostFunction->Initialise(window,
@@ -387,8 +435,11 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           leftToRightRotationMatrix,
                                           leftToRightTranslationVector
                                          );
-  */
+  stereoExtrinsicCostFunction->SetSigma(sigmaLeft);
+  stereoExtrinsicCostFunction->SetSigmaRight(sigmaRight);
+  stereoExtrinsicCostFunction->SetUseBlurring(true);
 
+/*
   niftk::ProjectionBasedMonoIntrinsicCostFunction::Pointer leftIntrinsicCostFunction = niftk::ProjectionBasedMonoIntrinsicCostFunction::New();
   leftIntrinsicCostFunction->Initialise(imageSize,
                                         "/Users/mattclarkson/build/NiftyCal/Testing/Data/VTK/chess-14x10x3.vtk",
@@ -417,6 +468,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                           leftToRightRotationMatrix,
                                           leftToRightTranslationVector
                                           );
+
+  */
 
   niftk::IntensityBasedStereoCameraCalibration(leftIntrinsicCostFunction.GetPointer(),
                                                rightIntrinsicCostFunction.GetPointer(),
