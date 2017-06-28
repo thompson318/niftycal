@@ -30,7 +30,7 @@ namespace niftk
 */
 
 /**
-* \brief Calibrates the blur found in a video image of a calibration object.
+* \brief Calibrates the blur found in a video image of a calibration object, using intensity based methods.
 */
 NIFTYCAL_WINEXPORT double IntensityBasedBlurringCalibration(niftk::IntensityBasedCostFunction::Pointer blurringCostFunction,
                                                             double& sigma
