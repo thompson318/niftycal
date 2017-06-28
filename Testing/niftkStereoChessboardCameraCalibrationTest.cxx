@@ -195,7 +195,9 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                       essentialMatrix,
                                                       fundamentalMatrix,
                                                       flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                      false // just do optimisation of 2D reprojection error.
+                                                      false, // just do optimisation of 2D reprojection error.
+                                                      true,  // for stereo extrinsics, only do 2DOF
+                                                      true   // also, simplify to perfect x translation and y rotation
                                                      );
 
   QApplication app(niftk::argc, niftk::argv);

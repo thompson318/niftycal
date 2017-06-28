@@ -45,7 +45,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                     cv::Mat& essentialMatrix,
                                     cv::Mat& fundamentalMatrix,
                                     const int& cvFlags,
-                                    const bool& optimise3D
+                                    const bool& optimise3D,
+                                    const bool& optimise2DOFStereo,
+                                    const bool& force2DOFStereoAxis
                                    )
 {
   cv::Matx21d result;
@@ -211,10 +213,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     optimiser2D->SetOptimiseIntrinsics(true);
   }
 
-  // Can't really find much evidence that these are better.
+  // bit unstable.
   // optimiser2D->SetOptimiseIntrinsics(true);
-  // optimiser2D->SetOptimise2DOFStereo(true);
-  // optimiser2D->SetForceUnitVectorAxes(false);
+
+  optimiser2D->SetOptimise2DOFStereo(optimise2DOFStereo);
+  optimiser2D->SetForceUnitVectorAxes(force2DOFStereoAxis);
 
   optimiser2D->Optimise(intrinsicLeft,
                         intrinsicRight,
@@ -335,7 +338,9 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                         cv::Mat& leftToRightTranslationVector,
                                         cv::Mat& essentialMatrix,
                                         cv::Mat& fundamentalMatrix,
-                                        const bool& optimise3D
+                                        const bool& optimise3D,
+                                        const bool& optimise2DOFStereo,
+                                        const bool& force2DOFStereoAxis
                                        )
 {
   cv::Matx21d result;
@@ -392,7 +397,9 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
                                                 CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                optimise3D
+                                                optimise3D,
+                                                optimise2DOFStereo,
+                                                force2DOFStereoAxis
                                                );
 
     rvecsLeft.clear();
@@ -442,7 +449,9 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                             essentialMatrix,
                                             fundamentalMatrix,
                                             CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                            optimise3D
+                                            optimise3D,
+                                            optimise2DOFStereo,
+                                            force2DOFStereoAxis
                                            );
   }
   return result;

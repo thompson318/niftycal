@@ -60,7 +60,9 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        cv::Mat& essentialMatrix,
                                                        cv::Mat& fundamentalMatrix,
                                                        const int& cvFlags = 0,
-                                                       const bool& optimise3D = false
+                                                       const bool& optimise3D = false,
+                                                       const bool& optimise2DOFStereo = false,
+                                                       const bool& force2DOFStereoAxis = false
                                                       );
 
 /**
@@ -82,7 +84,9 @@ NIFTYCAL_WINEXPORT cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                                            cv::Mat& leftToRightTranslationVector,
                                                            cv::Mat& essentialMatrix,
                                                            cv::Mat& fundamentalMatrix,
-                                                           const bool& optimise3D = false
+                                                           const bool& optimise3D = false,
+                                                           const bool& optimise2DOFStereo = false,
+                                                           const bool& force2DOFStereoAxis = false
                                                           );
 
 } // end namespace

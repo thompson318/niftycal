@@ -448,7 +448,9 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                         cv::Mat& essentialMatrix,
                                         cv::Mat& fundamentalMatrix,
                                         const int& cvFlags,
-                                        const bool& optimise3D
+                                        const bool& optimise3D,
+                                        const bool& optimise2DOFStereo,
+                                        const bool& force2DOFStereoAxis
                                        )
 {
   std::list<niftk::PointSet> leftPoints;
@@ -492,7 +494,9 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                    essentialMatrix,
                                                    fundamentalMatrix,
                                                    cvFlags,
-                                                   optimise3D
+                                                   optimise3D,
+                                                   optimise2DOFStereo,
+                                                   force2DOFStereoAxis
                                                   );
 
   rvecsLeft[0].copyTo(rvec1x3Left);
