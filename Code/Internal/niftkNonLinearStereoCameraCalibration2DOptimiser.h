@@ -61,18 +61,13 @@ public:
   *
   * In addition, if Optimise2DOFStereo is true (default is false), then
   * we only optimise 2 DOF of the left-to-right transform, namely
-  * 1 translation and the rotation about the view up axes. The specifc axes
+  * x and y translation. The specifc axes of translation
   * are deduced from the initial values passed in for leftToRightRotationMatrix
   * and leftToRightTranslationVector.
   *
   * Furthermore, if Force2DOFAxes is true (default is false), then
-  * for this 2DOF optimisation, the major axes of the rotation vector
-  * is set to be either the x,y or z axis unit vector. Similarly,
-  * the translation left-to-right is set to be either the x, y, or z
-  * axis. For example, if z is the camera depth direction, y is normally
-  * vertical, and x is normally horizontal. So this setting would make
-  * the translation exactly along the camera x axis, and the rotation
-  * about the vertical y axis.
+  * for this 2DOF optimisation, the axes are forced to be the cameras
+  * x and y axes, and rotational parameters are reset.
   *
   * Note: You probably need a very good calibration before calling this.
   */

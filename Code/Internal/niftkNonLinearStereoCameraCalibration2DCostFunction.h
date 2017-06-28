@@ -52,6 +52,9 @@ public:
   itkSetMacro(AxisOfRotation, cv::Vec3d);
   itkGetConstMacro(AxisOfRotation, cv::Vec3d);
 
+  itkSetMacro(AngleOfRotation, double);
+  itkGetMacro(AngleOfRotation, double);
+
   itkSetMacro(TranslationVector, cv::Vec3d);
   itkGetConstMacro(TranslationVector, cv::Vec3d);
 
@@ -70,6 +73,7 @@ private:
   bool      m_OptimiseIntrinsics;
   bool      m_Optimise2DOFStereo;
   cv::Vec3d m_AxisOfRotation;
+  double    m_AngleOfRotation;
   cv::Vec3d m_TranslationVector;
 };
 

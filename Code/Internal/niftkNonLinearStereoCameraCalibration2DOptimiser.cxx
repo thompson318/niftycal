@@ -164,6 +164,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   int counter = 0;
   cv::Vec3d translationUnitVector = 0;
   cv::Vec3d rotationUnitVector = 0;
+  double angle = 0;
   cv::Matx14d axisAngle = 0;
 
   if (m_OptimiseIntrinsics)
@@ -180,35 +181,31 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
 
   if (m_Optimise2DOFStereo)
   {
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0); // tx
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 1); // ty
+
+    translationUnitVector[0] = leftToRightTranslationVector.at<double>(0, 0);
+    translationUnitVector[1] = leftToRightTranslationVector.at<double>(0, 1);
+    translationUnitVector[2] = leftToRightTranslationVector.at<double>(0, 2);
+
     axisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
-    initialParameters[counter++] = axisAngle(0, 3); // angle in radians.
-    initialParameters[counter++] = cv::norm(leftToRightTranslationVector); // magnitude of trans.
-
-    translationUnitVector[0] = leftToRightTranslationVector.at<double>(0, 0) / initialParameters[counter - 1];
-    translationUnitVector[1] = leftToRightTranslationVector.at<double>(0, 1) / initialParameters[counter - 1];
-    translationUnitVector[2] = leftToRightTranslationVector.at<double>(0, 2) / initialParameters[counter - 1];
-
-    if (m_ForceUnitVectorAxes)
-    {
-      int maxIndex = niftk::GetMajorAxisIndex(translationUnitVector);
-      int sign = niftk::Signum(translationUnitVector[maxIndex]);
-      translationUnitVector = 0;
-      translationUnitVector[maxIndex] = sign;
-    }
-    m_CostFunction->SetTranslationVector(translationUnitVector);
-
     rotationUnitVector[0] = axisAngle(0, 0);
     rotationUnitVector[1] = axisAngle(0, 1);
     rotationUnitVector[2] = axisAngle(0, 2);
+    angle = axisAngle(0, 3);
 
     if (m_ForceUnitVectorAxes)
     {
-      int maxIndex = niftk::GetMajorAxisIndex(rotationUnitVector);
-      int sign = niftk::Signum(rotationUnitVector[maxIndex]);
-      rotationUnitVector = 0;
-      rotationUnitVector[maxIndex] = sign;
+      translationUnitVector[2] = 0;
+      rotationUnitVector[0] = 0;
+      rotationUnitVector[1] = -1;
+      rotationUnitVector[2] = 0;
+      angle = 0;
     }
+
+    m_CostFunction->SetTranslationVector(translationUnitVector);
     m_CostFunction->SetAxisOfRotation(rotationUnitVector);
+    m_CostFunction->SetAngleOfRotation(angle);
   }
   else
   {
@@ -262,18 +259,19 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
 
   if (m_Optimise2DOFStereo)
   {
+    if (m_ForceUnitVectorAxes)
+    {
+      leftToRightTranslationVector.at<double>(0, 2) = 0;
+    }
+
     axisAngle(0, 0) = rotationUnitVector[0];
     axisAngle(0, 1) = rotationUnitVector[1];
     axisAngle(0, 2) = rotationUnitVector[2];
-    axisAngle(0, 3) = finalParameters[counter++];
+    axisAngle(0, 3) = angle;
 
     leftToRightRotationVector = niftk::AxisAngleToRodrigues(axisAngle);
-
-    double translationInMillimetres = finalParameters[counter++];
-
-    leftToRightTranslationVector.at<double>(0, 0) = translationUnitVector[0] * translationInMillimetres;
-    leftToRightTranslationVector.at<double>(0, 1) = translationUnitVector[1] * translationInMillimetres;
-    leftToRightTranslationVector.at<double>(0, 2) = translationUnitVector[2] * translationInMillimetres;
+    leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
   }
   else
   {
