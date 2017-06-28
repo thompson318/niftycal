@@ -17,6 +17,7 @@
 #include <niftkMatrixUtilities.h>
 #include <Internal/niftkCalibrationUtilities_p.h>
 #include <itkGradientDescentOptimizer.h>
+#include <itkRegularStepGradientDescentOptimizer.h>
 
 namespace niftk
 {
@@ -406,18 +407,61 @@ double IntensityBasedBlurringCalibration(niftk::IntensityBasedCostFunction::Poin
     niftkNiftyCalThrow() << "Expected 1 parameter, but cost function wants " << cost->GetNumberOfParameters();
   }
 
-  double learningRate = 100;
-
   niftk::IntensityBasedCostFunction::ParametersType currentParams;
   currentParams.SetSize(cost->GetNumberOfParameters());
 
   currentParams[0] = sigma;
+  double minimumSigma = 1.5;
 
-  double finalCost = InternalGradientDescentOptimisation(currentParams, cost, learningRate);
+  itk::GradientDescentOptimizer::MeasureType previousValue = std::numeric_limits<double>::min();
+  itk::GradientDescentOptimizer::MeasureType currentValue = cost->GetValue(currentParams);
 
-  sigma = currentParams[0];
+  unsigned int loopCounter = 0;
 
-  return finalCost;
+  while (currentValue > previousValue
+         && currentParams[0] > minimumSigma
+         && (fabs(currentValue - previousValue) > 0.0001)
+        )
+  {
+    previousValue = currentValue;
+
+    itk::RegularStepGradientDescentOptimizer::Pointer opt = itk::RegularStepGradientDescentOptimizer::New();
+    opt->SetCostFunction(cost);
+    opt->SetInitialPosition(currentParams);
+    opt->SetMaximize(true);        // Because cost function is currently NMI.
+    opt->SetNumberOfIterations(1); // ITK doesn't guarantee each step is an improvement.
+    opt->SetMaximumStepLength(1);
+    opt->SetMinimumStepLength(0.5);
+    opt->StartOptimization();
+
+    loopCounter++;
+    currentValue = cost->GetValue(opt->GetCurrentPosition());
+
+    if (currentValue > previousValue)
+    {
+      currentParams = opt->GetCurrentPosition();
+
+      std::cerr << loopCounter << ": p=" << currentParams << ":" << previousValue << "," << currentValue << std::endl;
+    }
+  }
+
+  if (currentParams[0] < minimumSigma)
+  {
+    sigma = 0;
+  }
+  else
+  {
+    sigma = currentParams[0];
+  }
+
+  if (currentValue > previousValue)
+  {
+    return currentValue; // as loop exited due to tolerance
+  }
+  else
+  {
+    return previousValue; // as loop exited due to no improvement.
+  }
 }
 
 } // end namespace

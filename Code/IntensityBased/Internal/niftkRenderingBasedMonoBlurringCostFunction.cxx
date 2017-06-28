@@ -114,7 +114,7 @@ RenderingBasedMonoBlurringCostFunction::GetStepSizes() const
   ParametersType stepSize;
   stepSize.SetSize(this->GetNumberOfParameters());
 
-  stepSize[0] = 0.5;    // sigma
+  stepSize[0] = 1.0;    // sigma
   return stepSize;
 }
 

@@ -196,8 +196,8 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                       fundamentalMatrix,
                                                       flags | CV_CALIB_USE_INTRINSIC_GUESS,
                                                       false, // just do optimisation of 2D reprojection error.
-                                                      true,  // for stereo extrinsics, only do 2DOF
-                                                      true   // also, simplify to perfect x translation and y rotation
+                                                      false,  // for stereo extrinsics, only do 2DOF
+                                                      false   // also, simplify to perfect x translation and y rotation
                                                      );
 
   QApplication app(niftk::argc, niftk::argv);
@@ -358,7 +358,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   blurLeft->SetUseBlurring(true);
   blurLeft->SetActivated(true);
 
-  double sigmaLeft = 2;
+  double sigmaLeft = 5;
   niftk::IntensityBasedBlurringCalibration(blurLeft.GetPointer(), sigmaLeft);
 
   blurLeft->SetActivated(false);
@@ -378,7 +378,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   blurRight->SetUseBlurring(true);
   blurRight->SetActivated(true);
 
-  double sigmaRight = 2;
+  double sigmaRight = 5;
   niftk::IntensityBasedBlurringCalibration(blurRight.GetPointer(), sigmaRight);
 
   blurRight->SetActivated(false);

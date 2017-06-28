@@ -104,7 +104,13 @@ void RenderingBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideo
                                                   ) const
 {
 
-  if (m_UseBlurring)
+  bool useBlurring = m_UseBlurring;
+  if (sigma < 1.5)
+  {
+    useBlurring = false;
+  }
+
+  if (useBlurring)
   {
     // Will crash if sigma too small.
     cv::GaussianBlur(m_RenderedImageInGreyscale, m_RenderedImageBlurred, cv::Size(0, 0), sigma, sigma);
@@ -121,7 +127,7 @@ void RenderingBasedCostFunction::AccumulateSamples(const cv::Mat& greyScaleVideo
           && m_RenderedImage.at<cv::Vec3b>(r, c) != m_BackgroundColour)
       {
         unsigned int a = 0;
-        if (m_UseBlurring)
+        if (useBlurring)
         {
           a = static_cast<unsigned int>(m_RenderedImageBlurred.at<unsigned char>(r, c)) / 16;
         }
