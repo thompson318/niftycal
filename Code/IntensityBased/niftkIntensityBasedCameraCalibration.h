@@ -30,33 +30,39 @@ namespace niftk
 */
 
 /**
+* \brief Calibrates the blur found in a video image of a calibration object.
+*/
+NIFTYCAL_WINEXPORT double IntensityBasedBlurringCalibration(niftk::IntensityBasedCostFunction::Pointer blurringCostFunction,
+                                                            double& sigma
+                                                           );
+/**
 * \brief Performs a mono camera calibration using intensity based methods.
 */
-NIFTYCAL_WINEXPORT void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicCostFunction,
-                                                            niftk::IntensityBasedCostFunction::Pointer monoExtrinsicCostFunction,
-                                                            cv::Mat& intrinsic,
-                                                            cv::Mat& distortion,
-                                                            std::vector<cv::Mat>& rvecs,
-                                                            std::vector<cv::Mat>& tvecs
-                                                           );
+NIFTYCAL_WINEXPORT double IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer monoIntrinsicCostFunction,
+                                                              niftk::IntensityBasedCostFunction::Pointer monoExtrinsicCostFunction,
+                                                              cv::Mat& intrinsic,
+                                                              cv::Mat& distortion,
+                                                              std::vector<cv::Mat>& rvecs,
+                                                              std::vector<cv::Mat>& tvecs
+                                                             );
 
 /**
 * \brief Performs a stereo camera calibration using intensity based methods.
 */
-NIFTYCAL_WINEXPORT void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
-                                                              niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
-                                                              niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
-                                                              cv::Mat& intrinsicLeft,
-                                                              cv::Mat& distortionLeft,
-                                                              std::vector<cv::Mat>& rvecsLeft,
-                                                              std::vector<cv::Mat>& tvecsLeft,
-                                                              cv::Mat& intrinsicRight,
-                                                              cv::Mat& distortionRight,
-                                                              std::vector<cv::Mat>& rvecsRight,
-                                                              std::vector<cv::Mat>& tvecsRight,
-                                                              cv::Mat& leftToRightRotationMatrix,
-                                                              cv::Mat& leftToRightTranslationVector
-                                                             );
+NIFTYCAL_WINEXPORT double IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer monoIntrinsicLeftCostFunction,
+                                                                niftk::IntensityBasedCostFunction::Pointer monoIntrinsicRightCostFunction,
+                                                                niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
+                                                                cv::Mat& intrinsicLeft,
+                                                                cv::Mat& distortionLeft,
+                                                                std::vector<cv::Mat>& rvecsLeft,
+                                                                std::vector<cv::Mat>& tvecsLeft,
+                                                                cv::Mat& intrinsicRight,
+                                                                cv::Mat& distortionRight,
+                                                                std::vector<cv::Mat>& rvecsRight,
+                                                                std::vector<cv::Mat>& tvecsRight,
+                                                                cv::Mat& leftToRightRotationMatrix,
+                                                                cv::Mat& leftToRightTranslationVector
+                                                               );
 } // end namespace
 
 #endif

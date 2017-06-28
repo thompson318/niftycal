@@ -235,22 +235,23 @@ double InternalRenderingStereoCameraCalibration(niftk::IntensityBasedCostFunctio
 
 
 //-----------------------------------------------------------------------------
-void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicCostFunction,
-                                         niftk::IntensityBasedCostFunction::Pointer extrinsicCostFunction,
-                                         cv::Mat& intrinsic,
-                                         cv::Mat& distortion,
-                                         std::vector<cv::Mat>& rvecs,
-                                         std::vector<cv::Mat>& tvecs
-                                        )
+double IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicCostFunction,
+                                           niftk::IntensityBasedCostFunction::Pointer extrinsicCostFunction,
+                                           cv::Mat& intrinsic,
+                                           cv::Mat& distortion,
+                                           std::vector<cv::Mat>& rvecs,
+                                           std::vector<cv::Mat>& tvecs
+                                          )
 {
   double learningRate = 0.01;
+  double currentValue = 0;
 
   do
   {
 
     unsigned int loopCounter = 0;
     double previousValue = std::numeric_limits<double>::min();
-    double currentValue = std::numeric_limits<double>::min() + 1;
+    currentValue = std::numeric_limits<double>::min() + 1;
 
     while (currentValue > previousValue
            && (fabs(currentValue - previousValue) > 0.0001)
@@ -293,33 +294,36 @@ void IntensityBasedMonoCameraCalibration(niftk::IntensityBasedCostFunction::Poin
     learningRate /= 2.0;
 
   } while (learningRate > 0.001);
+
+  return currentValue;
 }
 
 
 //-----------------------------------------------------------------------------
-void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
-                                           niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
-                                           niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
-                                           cv::Mat& intrinsicLeft,
-                                           cv::Mat& distortionLeft,
-                                           std::vector<cv::Mat>& rvecsLeft,
-                                           std::vector<cv::Mat>& tvecsLeft,
-                                           cv::Mat& intrinsicRight,
-                                           cv::Mat& distortionRight,
-                                           std::vector<cv::Mat>& rvecsRight,
-                                           std::vector<cv::Mat>& tvecsRight,
-                                           cv::Mat& leftToRightRotationMatrix,
-                                           cv::Mat& leftToRightTranslationVector
-                                          )
+double IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Pointer intrinsicLeftCostFunction,
+                                             niftk::IntensityBasedCostFunction::Pointer intrinsicRightCostFunction,
+                                             niftk::IntensityBasedCostFunction::Pointer stereoExtrinsicCostFunction,
+                                             cv::Mat& intrinsicLeft,
+                                             cv::Mat& distortionLeft,
+                                             std::vector<cv::Mat>& rvecsLeft,
+                                             std::vector<cv::Mat>& tvecsLeft,
+                                             cv::Mat& intrinsicRight,
+                                             cv::Mat& distortionRight,
+                                             std::vector<cv::Mat>& rvecsRight,
+                                             std::vector<cv::Mat>& tvecsRight,
+                                             cv::Mat& leftToRightRotationMatrix,
+                                             cv::Mat& leftToRightTranslationVector
+                                            )
 {
   double learningRate = 0.01;
+  double currentValue = 0;
 
   do
   {
 
     unsigned int loopCounter = 0;
     double previousValue = std::numeric_limits<double>::min();
-    double currentValue = std::numeric_limits<double>::min() + 1;
+    currentValue = std::numeric_limits<double>::min() + 1;
 
     while (currentValue > previousValue
            && (fabs(currentValue - previousValue) > 0.0001)
@@ -387,6 +391,33 @@ void IntensityBasedStereoCameraCalibration(niftk::IntensityBasedCostFunction::Po
     learningRate /= 2.0;
 
   } while (learningRate > 0.001);
+
+  return currentValue;
+}
+
+
+//-----------------------------------------------------------------------------
+double IntensityBasedBlurringCalibration(niftk::IntensityBasedCostFunction::Pointer cost,
+                                         double& sigma
+                                        )
+{
+  if (cost->GetNumberOfParameters() != 1)
+  {
+    niftkNiftyCalThrow() << "Expected 1 parameter, but cost function wants " << cost->GetNumberOfParameters();
+  }
+
+  double learningRate = 0.1;
+
+  niftk::IntensityBasedCostFunction::ParametersType currentParams;
+  currentParams.SetSize(cost->GetNumberOfParameters());
+
+  currentParams[0] = sigma;
+
+  double finalCost = InternalGradientDescentOptimisation(currentParams, cost, learningRate);
+
+  sigma = currentParams[0];
+
+  return finalCost;
 }
 
 } // end namespace
