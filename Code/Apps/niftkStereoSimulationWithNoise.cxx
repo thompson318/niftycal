@@ -27,7 +27,7 @@
 /**
  * \file niftkStereoSimulationWithNoise.cxx
  * \brief Runs stereo simulation, using pre-extracted points, to
- * assess the 3D reconstruction error, and the effect of noise.
+ * assess the 3D reconstruction error, and the effect of noise on the 2D points.
  * \ingroup applications
  */
 int main(int argc, char ** argv)
