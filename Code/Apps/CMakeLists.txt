@@ -27,6 +27,9 @@ set(NIFTYCAL_APPS
 
 if (VTK_FOUND AND QT_FOUND)
   list(APPEND NIFTYCAL_APPS niftkRenderCalibratedModel)
+  if(ITK_FOUND)
+    list(APPEND NIFTYCAL_APPS niftkAprilTagsCalibrationWithRendering)
+  endif()
 endif()
 
 foreach(app ${NIFTYCAL_APPS})

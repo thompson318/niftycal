@@ -219,7 +219,8 @@ TEST_CASE( "Iterative Stereo AprilTags", "[StereoCalibration]" ) {
   std::cout << "T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
   std::cout << "T2=" << leftToRightTranslationVector.at<double>(1,0) << std::endl;
   std::cout << "T3=" << leftToRightTranslationVector.at<double>(2,0) << std::endl;
-  std::cout << "RMS=" << rms(0, 0) << std::endl;
+  std::cout << "RMS 2D=" << rms(0, 0) << std::endl;
+  std::cout << "RMS 3D=" << rms(1, 0) << std::endl;
 
   REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < tolerance );
   REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < tolerance );

@@ -454,7 +454,7 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
-  1 2                                                       # Simulation has proper scale factors
+  1 2                                                       # Real data needs scaling
   0.00870366 -0.0224016 -0.00259507 # rvec
   -2.77744 0.0814374 -0.523483 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
