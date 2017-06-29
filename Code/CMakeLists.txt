@@ -101,6 +101,10 @@ if(ITK_FOUND)
 
 endif()
 
+###############################################################################
+# Experimental: Try to calibrate based on rendering the model.
+# Conclusion  : Slow, and not much benefit at the moment.
+###############################################################################
 if(VTK_FOUND AND ITK_FOUND AND QT_FOUND)
   list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedCamera.cxx)
   list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedRenderingPipeline.cxx)
