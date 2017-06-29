@@ -20,12 +20,11 @@
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkIOUtilities.h>
 #include <niftkMatrixUtilities.h>
-#include <niftkPointUtilities.h>
+
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>
 #include <list>
-#include <ostream>
 
 TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
 
@@ -76,9 +75,6 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
   std::list<niftk::PointSet> listOfPointsLeft;
   std::list<niftk::PointSet> listOfPointsRight;
 
-  std::vector<cv::Mat> colourLeftImages;
-  std::vector<cv::Mat> colourRightImages;
-
   for (int i = 13; i < niftk::argc; i++)
   {
     cv::Mat image = cv::imread(niftk::argv[i]);
@@ -94,7 +90,7 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
       detector.SetImage(&greyImage);
       pointSet = detector.GetPoints();
 
-      std::cout << "i=" << i << ", file=" << niftk::argv[i] << ", points=" << pointSet.size() << std::endl;
+      std::cout << "i=" << i << ", file=" << niftk::argv[i] << ", points=" << pointSet.size();
 
       if (pointSet.size() > 0)
       {
@@ -102,15 +98,11 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
         {
           listOfPointsLeft.push_back(pointSet);
           std::cout << " left." << std::endl;
-
-          colourLeftImages.push_back(image);
         }
         else
         {
           listOfPointsRight.push_back(pointSet);
           std::cout << " right." << std::endl;
-
-          colourRightImages.push_back(image);
         }
       }
     }
@@ -183,14 +175,35 @@ TEST_CASE( "Stereo Chessboard", "[StereoCalibration]" ) {
                                                       essentialMatrix,
                                                       fundamentalMatrix,
                                                       flags | CV_CALIB_USE_INTRINSIC_GUESS,
-                                                      false, // just do optimisation of 2D reprojection error.
-                                                      false,  // for stereo extrinsics, only do 2DOF
-                                                      false   // also, simplify to perfect x translation and y rotation
+                                                      false // just do optimisation of 2D reprojection error.
                                                      );
 
   cv::Mat rvec;
   cv::Rodrigues(leftToRightRotationMatrix, rvec);
 
+  std::cout << "Stereo RMS=" << result(0, 0) << std::endl;
+  std::cout << "Stereo R1=" << rvec.at<double>(0,0) << std::endl;
+  std::cout << "Stereo R2=" << rvec.at<double>(0,1) << std::endl;
+  std::cout << "Stereo R3=" << rvec.at<double>(0,2) << std::endl;
+  std::cout << "Stereo T1=" << leftToRightTranslationVector.at<double>(0,0) << std::endl;
+  std::cout << "Stereo T2=" << leftToRightTranslationVector.at<double>(1,0) << std::endl;
+  std::cout << "Stereo T3=" << leftToRightTranslationVector.at<double>(2,0) << std::endl;
+  std::cout << "Stereo Fxl=" << intrinsicLeft.at<double>(0,0) << std::endl;
+  std::cout << "Stereo Fyl=" << intrinsicLeft.at<double>(1,1) << std::endl;
+  std::cout << "Stereo Cxl=" << intrinsicLeft.at<double>(0,2) << std::endl;
+  std::cout << "Stereo Cyl=" << intrinsicLeft.at<double>(1,2) << std::endl;
+  std::cout << "Stereo K1l=" << distortionLeft.at<double>(0,0) << std::endl;
+  std::cout << "Stereo K2l=" << distortionLeft.at<double>(0,1) << std::endl;
+  std::cout << "Stereo P1l=" << distortionLeft.at<double>(0,2) << std::endl;
+  std::cout << "Stereo P2l=" << distortionLeft.at<double>(0,3) << std::endl;
+  std::cout << "Stereo Fxr=" << intrinsicRight.at<double>(0,0) << std::endl;
+  std::cout << "Stereo Fyr=" << intrinsicRight.at<double>(1,1) << std::endl;
+  std::cout << "Stereo Cxr=" << intrinsicRight.at<double>(0,2) << std::endl;
+  std::cout << "Stereo Cyr=" << intrinsicRight.at<double>(1,2) << std::endl;
+  std::cout << "Stereo K1r=" << distortionRight.at<double>(0,0) << std::endl;
+  std::cout << "Stereo K2r=" << distortionRight.at<double>(0,1) << std::endl;
+  std::cout << "Stereo P1r=" << distortionRight.at<double>(0,2) << std::endl;
+  std::cout << "Stereo P2r=" << distortionRight.at<double>(0,3) << std::endl;
 
   REQUIRE( fabs(rvec.at<double>(0,0) - eR1) < rotationTolerance );
   REQUIRE( fabs(rvec.at<double>(0,1) - eR2) < rotationTolerance );
