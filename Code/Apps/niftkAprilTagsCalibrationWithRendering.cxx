@@ -136,7 +136,7 @@ int main(int argc, char ** argv)
 {
   if (argc < 10)
   {
-    std::cerr << "Usage: niftkAprilTagsCalibrationWithRendering modelPoints.txt model.vtk texture.vtk method[0=normal,1=rendering,2=projection]"
+    std::cerr << "Usage: niftkAprilTagsCalibrationWithRendering modelPoints.txt model.vtk texture.vtk method[0=normal,1=rendering,2=projection] "
               << "tagFamily rescaleX rescaleY "
               << "leftImage1.png leftImage2.png ... leftImageN.txt "
               << "rightImage1.png rightImage2.png ... rightImageN.txt "
