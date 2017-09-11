@@ -41,7 +41,7 @@ set(TEST_CASES
   niftkTsaiReferenceNonCoplanerCalibrationTest
   niftkTimingCalibrationUtilitiesTest
   niftkTimingCalibrationTest
-  niftkElvisHandEye
+  niftkElvisHandEyeTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -665,10 +665,16 @@ add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerC
          576 576 0.02300000 0.02300000 3041.15 3040 262.302 212.689 3.07898 0.0898487
         )
 
-add_test(Elvis-HandEye ${EXECUTABLE_OUTPUT_PATH}/niftkElvisHandEye
+add_test(Elvis-HandEye ${EXECUTABLE_OUTPUT_PATH}/niftkElvisHandEyeTest
+         ${DATA_DIR}/Elvis/calib.left.intrinsic.txt
          ${DATA_DIR}/Elvis/Elvis3DPoints.txt      # Just contains 3D location of 1 fixed point.
          ${DATA_DIR}/Elvis/Elvis2DPoints.txt      # Camera moves relative to point, so 12x2D image points.
-         0.0 0.0 0.0 0.0 0.0 0.0                  # rx ry rz tx ty tz
+         0.2236744227                             # Rodrigues R1
+         0.6797945064                             # Rodrigues R2
+         -2.396782218345076                       # Rodrigues R3
+         3.31430930118319                         # Tx
+         5.361905898640054                        # Ty
+         -19.07104693894011                       # Tz
          ${DATA_DIR}/Elvis/ElvisLaparoscope01.4x4 # Corresponding Laparoscope tracking matrices for each 2D point.
          ${DATA_DIR}/Elvis/ElvisLaparoscope02.4x4
          ${DATA_DIR}/Elvis/ElvisLaparoscope03.4x4

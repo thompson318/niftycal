@@ -252,8 +252,8 @@ void CalculateHandEyeUsingPoint2Line(
   cv::Mat AInv = cameraMatrix.inv();
   cv::Mat lines = AInv * Qe;
 
-  assert(lines.rows == Q.rows);
-  assert(lines.cols == Q.cols);
+  assert(lines.rows == Qe.rows);
+  assert(lines.cols == Qe.cols);
 
   // Normalise columns
   for (int c = 0; c < lines.cols; c++)
@@ -265,23 +265,26 @@ void CalculateHandEyeUsingPoint2Line(
     }
     magnitude = sqrt(magnitude);
 
-    for (int r = 0; r < Q.rows; r++)
+    for (int r = 0; r < lines.rows; r++)
     {
-      Q.at<double>(r, c) = lines.at<double>(r, c) / magnitude;
+      lines.at<double>(r, c) = lines.at<double>(r, c) / magnitude;
     }
   }
+  lines.copyTo(Q); // Assigns 3xn matrix to Q, so Q is now 3xn not 2xn
 
   // Set up X' for SVD part.
   cv::Mat XPrime;
   cv::transpose(X, XPrime);
 
   // Setup loop.
-  cv::Mat Y = Q;
-  cv::Mat R = cv::Mat::eye(3, 3, CV_64FC1);
-  cv::Mat t = cv::Mat::ones(3, 1, CV_64FC1);
+  cv::Mat Y;
+  Q.copyTo(Y);
+
   double err = std::numeric_limits<double>::max();
   cv::Mat E_old = 1000*cv::Mat::ones(3, n, CV_64FC1);
   cv::Mat E;
+  cv::Mat R = cv::Mat::eye(3, 3, CV_64FC1);
+  cv::Mat t = cv::Mat::zeros(3, 1, CV_64FC1);
 
   // Iterate to minimise error.
   while (err > tol)
@@ -292,7 +295,7 @@ void CalculateHandEyeUsingPoint2Line(
 
     double det = cv::determinant(U*VPrime);
 
-    cv::Mat detMatrix = cv::Mat::ones(3, 3, CV_64FC1);
+    cv::Mat detMatrix = cv::Mat::eye(3, 3, CV_64FC1);
     detMatrix.at<double>(2, 2) = det;
 
     R = U * detMatrix * VPrime;
@@ -316,10 +319,13 @@ void CalculateHandEyeUsingPoint2Line(
     cv::Mat rotatedXPlusTrans = R*X + t*e;
     cv::Mat dot = cv::Mat::zeros(1, n, CV_64FC1);
 
+    assert(rotatedXPlusTrans.rows == Q.rows);
+    assert(rotatedXPlusTrans.cols == Q.cols);
+
     // Dot product bit.
-    for (int r = 0; r < dot.rows; r++)
+    for (int r = 0; r < Q.rows; r++)
     {
-      for (int c = 0; c < dot.cols; c++)
+      for (int c = 0; c < Q.cols; c++)
       {
         dot.at<double>(0, c) += rotatedXPlusTrans.at<double>(r, c) * Q.at<double>(r,c);
       }
@@ -332,12 +338,28 @@ void CalculateHandEyeUsingPoint2Line(
         Y.at<double>(r, c) = dot.at<double>(0, c) * Q.at<double>(r,c);
       }
     }
+
+    yMinusRotatedX = Y - R*X; // as y has been updated.
     E = yMinusRotatedX - t * e;
+
     cv::Mat residual = E-E_old;
     cv::Mat residualTransposed;
     cv::transpose(residual, residualTransposed);
-    err = std::sqrt(cv::sum(cv::Mat::diag(residualTransposed * residual))[0]); // Frobenius norm of E - E_old
-    E_old = E;
+    cv::Mat squaredResiduals = residualTransposed * residual;
+    cv::Mat trace = squaredResiduals.diag(0);
+    err = std::sqrt(cv::sum(trace)[0]); // Frobenius norm of E - E_old
+    E.copyTo(E_old);
+  }
+
+  handEye = cv::Matx44d::eye();
+
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      handEye(r, c) = R.at<double>(r, c);
+    }
+    handEye(r, 3) = t.at<double>(r, 0);
   }
 }
 
