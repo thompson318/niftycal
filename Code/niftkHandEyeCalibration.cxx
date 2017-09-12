@@ -351,16 +351,17 @@ void CalculateHandEyeUsingPoint2Line(
     E.copyTo(E_old);
   }
 
-  handEye = cv::Matx44d::eye();
-
+  cv::Matx44d eyeHand = cv::Matx44d::eye();
   for (int r = 0; r < 3; r++)
   {
     for (int c = 0; c < 3; c++)
     {
-      handEye(r, c) = R.at<double>(r, c);
+      eyeHand(r, c) = R.at<double>(r, c);
     }
-    handEye(r, 3) = t.at<double>(r, 0);
+    eyeHand(r, 3) = t.at<double>(r, 0);
   }
+
+  handEye = eyeHand.inv();
 }
 
 

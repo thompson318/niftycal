@@ -669,12 +669,12 @@ add_test(Morgan-HandEye ${EXECUTABLE_OUTPUT_PATH}/niftkMorganHandEyeTest
          ${DATA_DIR}/Morgan/calib.left.intrinsic.txt
          ${DATA_DIR}/Morgan/Morgan3DPoints.txt      # Just contains 3D location of 1 fixed point.
          ${DATA_DIR}/Morgan/Morgan2DPoints.txt      # Camera moves relative to point, so 12x2D image points.
-         0.2236744227                             # Rodrigues R1
-         0.6797945064                             # Rodrigues R2
-         -2.396782218345076                       # Rodrigues R3
-         3.31430930118319                         # Tx
-         5.361905898640054                        # Ty
-         -19.07104693894011                       # Tz
+         -0.2236744227315183                        # Rodrigues R1
+         -0.6797945064485761                        # Rodrigues R2
+         2.396782218345076                          # Rodrigues R3
+         -0.59618984788028                          # Tx
+         -6.386247216929902                         # Ty
+         19.03417758944623                          # Tz
          ${DATA_DIR}/Morgan/MorganLaparoscope01.4x4 # Corresponding Laparoscope tracking matrices for each 2D point.
          ${DATA_DIR}/Morgan/MorganLaparoscope02.4x4
          ${DATA_DIR}/Morgan/MorganLaparoscope03.4x4
