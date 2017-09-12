@@ -53,8 +53,10 @@ TEST_CASE( "Elvis Hand Eye", "[HandEye]" ) {
 
   niftk::Point3D point3D = pointsIn3D[0];
 
+  std::vector<cv::Point3d> points3D;
+  std::vector<cv::Point2d> points2D;
+
   cv::Matx44d handEye;
-  std::vector<std::pair<cv::Point2d, cv::Point3d> > pairedPoints;
 
   for (int i = 0; i < matrices.size(); i++)
   {
@@ -64,27 +66,16 @@ TEST_CASE( "Elvis Hand Eye", "[HandEye]" ) {
     }
 
     cv::Point2d p2 = pointsIn2D.find(i)->second.point;
+    points2D.push_back(p2);
 
-    // Need 3D point, in coordinate system of laparoscope marker.
-    cv::Matx44d tmp = matrices[i].inv();
-    cv::Matx41d pointInTrackerSpace;
-    pointInTrackerSpace(0, 0) = point3D.point.x;
-    pointInTrackerSpace(1, 0) = point3D.point.y;
-    pointInTrackerSpace(2, 0) = point3D.point.z;
-    pointInTrackerSpace(3, 0) = 1;
-
-    cv::Matx41d pointInMarkerSpace = tmp * pointInTrackerSpace;
-
-    cv::Point3d p3;
-    p3.x = pointInMarkerSpace(0, 0);
-    p3.y = pointInMarkerSpace(1, 0);
-    p3.z = pointInMarkerSpace(2, 0);
-
-    pairedPoints.push_back(std::pair<cv::Point2d, cv::Point3d>(p2, p3));
+    cv::Point3d p3 = point3D.point;
+    points3D.push_back(p3);
   }
 
-  niftk::CalculateHandEyeUsingPoint2Line(intrinsic, pairedPoints, 0.00001, handEye);
+  niftk::CalculateHandEyeUsingPoint2Line(intrinsic, matrices, points3D, points2D, 0.00001, handEye);
+
   std::cerr << "Hand-eye:" << std::endl << handEye << std::endl;
+  std::cerr << "Hand-eye Inv:" << std::endl << handEye.inv() << std::endl;
 
   cv::Mat rotationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Mat translationVector = cvCreateMat(1, 3, CV_64FC1);
