@@ -51,7 +51,7 @@ TEST_CASE( "Extract AprilTags points", "[AprilTags]" ) {
   cv::Mat greyImage;
   cv::cvtColor(image, greyImage, CV_BGR2GRAY);
 
-  niftk::AprilTagsPointDetector detector(false,      // do include corners
+  niftk::AprilTagsPointDetector detector(true,      // do include corners
                                          tagFamily,
                                          0,
                                          0.8
