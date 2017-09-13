@@ -19,6 +19,7 @@
 #include "niftkCalibratedRenderingPipeline.h"
 #include "niftkIntensityBasedCostFunction.h"
 #include <vector>
+#include <memory>
 
 namespace niftk
 {
