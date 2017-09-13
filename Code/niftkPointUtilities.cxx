@@ -1256,12 +1256,7 @@ double ComputeRMSReprojectionError(const Model3D& model,
                                    const cv::Mat& tvec
                                   )
 {
-  cv::Mat t = cvCreateMat(3, 1, CV_64FC1);
-  t.at<double>(0, 0) = tvec.at<double>(0, 0);
-  t.at<double>(1, 0) = tvec.at<double>(0, 1);
-  t.at<double>(2, 0) = tvec.at<double>(0, 2);
-
-  cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, t);
+  cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvec, tvec);
 
   std::vector<cv::Point2f> observed;
   std::vector<cv::Point2f> projected;

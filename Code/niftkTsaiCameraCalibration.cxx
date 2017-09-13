@@ -267,7 +267,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
   tvec.at<double>(0, 1) = Ty;
   tvec.at<double>(0, 2) = Tz;
 
-  cv::Rodrigues(R, rvec);
+  niftk::SafeRodrigues(R, rvec);
 
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 
@@ -369,7 +369,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   tvec.at<double>(0, 1) = Ty;
   tvec.at<double>(0, 2) = Tz;
 
-  cv::Rodrigues(R, rvec);
+  niftk::SafeRodrigues(R, rvec);
 
   double rmsLinear = niftk::ComputeRMSReprojectionError(model3D, imagePoints2D, intrinsic, distortion, rvec, tvec);
 

@@ -19,6 +19,18 @@
 namespace niftk {
 
 //-----------------------------------------------------------------------------
+void SafeRodrigues(const cv::Mat& rotationMatrix3x3,
+                   cv::Mat& rotationVector1x3)
+{
+  cv::Mat tmp = cvCreateMat(3, 1, CV_64FC1);
+  cv::Rodrigues(rotationMatrix3x3, tmp);
+  rotationVector1x3.at<double>(0, 0) = tmp.at<double>(0, 0);
+  rotationVector1x3.at<double>(0, 1) = tmp.at<double>(1, 0);
+  rotationVector1x3.at<double>(0, 2) = tmp.at<double>(2, 0);
+}
+
+
+//-----------------------------------------------------------------------------
 cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix3x3,
                                            const cv::Mat& translationVector3x1)
 {
@@ -71,7 +83,7 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
     }
     translationVector1x3.at<double>(0, r) = mat(r, 3);
   }
-  cv::Rodrigues(rotationMatrix, rotationVector1x3);
+  niftk::SafeRodrigues(rotationMatrix, rotationVector1x3);
 }
 
 

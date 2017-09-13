@@ -73,18 +73,18 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
     }
 
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
-    cv::Matx33d rightRotation;
+    cv::Mat rightRotation = cvCreateMat(3, 3, CV_64FC1);
 
     for (int r = 0; r < 3; r++)
     {
       for (int c = 0; c < 3; c++)
       {
-        rightRotation(r, c) = rightExtrinsic(r, c);
+        rightRotation.at<double>(r, c) = rightExtrinsic(r, c);
       }
     }
 
     cv::Mat rightRotationVec = cvCreateMat(1, 3, CV_64FC1);
-    cv::Rodrigues(rightRotation, rightRotationVec);
+    niftk::SafeRodrigues(rightRotation, rightRotationVec);
 
     rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);
     rvecsRight[i].at<double>(0, 1) = rightRotationVec.at<double>(0,1);

@@ -142,7 +142,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   }
 
   cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
+  niftk::SafeRodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
   int numberOfParameters = 6 * rvecsLeft.size(); // extrinsics of each left hand camera
   if (m_OptimiseIntrinsics)
@@ -182,11 +182,11 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   if (m_Optimise2DOFStereo)
   {
     initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0); // tx
-    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 1); // ty
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(1, 0); // ty
 
     translationUnitVector[0] = leftToRightTranslationVector.at<double>(0, 0);
-    translationUnitVector[1] = leftToRightTranslationVector.at<double>(0, 1);
-    translationUnitVector[2] = leftToRightTranslationVector.at<double>(0, 2);
+    translationUnitVector[1] = leftToRightTranslationVector.at<double>(1, 0);
+    translationUnitVector[2] = leftToRightTranslationVector.at<double>(2, 0);
 
     axisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
     rotationUnitVector[0] = axisAngle(0, 0);
@@ -213,8 +213,8 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 1);
     initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 2);
     initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0);
-    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 1);
-    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 2);
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(1, 0);
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(2, 0);
   }
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
@@ -261,7 +261,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   {
     if (m_ForceUnitVectorAxes)
     {
-      leftToRightTranslationVector.at<double>(0, 2) = 0;
+      leftToRightTranslationVector.at<double>(2, 0) = 0;
     }
 
     axisAngle(0, 0) = rotationUnitVector[0];
@@ -271,7 +271,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
 
     leftToRightRotationVector = niftk::AxisAngleToRodrigues(axisAngle);
     leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
-    leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(1, 0) = finalParameters[counter++];
   }
   else
   {
@@ -279,8 +279,8 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
     leftToRightRotationVector.at<double>(0, 2) = finalParameters[counter++];
     leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
-    leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
-    leftToRightTranslationVector.at<double>(0, 2) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(1, 0) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(2, 0) = finalParameters[counter++];
   }
 
   for (int i = 0; i < rvecsLeft.size(); i++)
