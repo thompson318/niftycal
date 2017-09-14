@@ -24,6 +24,7 @@
 /**
 * \file niftkPoseFromPoints.cxx
 * \brief Calculates Camera Pose from pre-extracted points.
+* \ingroup applications
 */
 int main(int argc, char ** argv)
 {

@@ -104,6 +104,268 @@ std::vector<unsigned int> ExtractMaximumDistanceIndexes(const std::vector<cv::Ma
 
 
 //-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const cv::Point3d&              stylusOrigin,
+    const std::vector<cv::Matx44d>& stylusTrackingMatrices,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    )
+{
+  if (stylusTrackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of stylus matrices (" << stylusTrackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  if (trackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracking matrices (" << trackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  std::vector<std::pair<cv::Point2d, cv::Point3d> > data;
+  cv::Matx41d inputPoint;
+  inputPoint(3, 0) = 1;
+  cv::Matx41d transformedPoint;
+  cv::Point3d point3D;
+
+  for (int i = 0; i < undistortedPoints.size(); i++)
+  {
+    inputPoint(0, 0) = stylusOrigin.x;
+    inputPoint(1, 0) = stylusOrigin.y;
+    inputPoint(2, 0) = stylusOrigin.z;
+    transformedPoint = (trackingMatrices[i].inv()) * stylusTrackingMatrices[i] * inputPoint;
+    point3D.x = transformedPoint(0, 0);
+    point3D.y = transformedPoint(1, 0);
+    point3D.z = transformedPoint(2, 0);
+
+    data.push_back(std::pair<cv::Point2d, cv::Point3d>(undistortedPoints[i], point3D));
+  }
+  CalculateHandEyeUsingPoint2Line(cameraMatrix, data, exitCondition, handEye);
+}
+
+
+//-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point3d>& pointsInTrackerSpace,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    )
+{
+  if (pointsInTrackerSpace.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracker points (" << pointsInTrackerSpace.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  if (trackingMatrices.size() != undistortedPoints.size())
+  {
+    niftkNiftyCalThrow() << "Unequal number of tracking matrices (" << trackingMatrices.size()
+                         << ") and undistorted points (" << undistortedPoints.size()
+                         << ")" << std::endl;
+  }
+  std::vector<std::pair<cv::Point2d, cv::Point3d> > data;
+  cv::Matx41d inputPoint;
+  inputPoint(3, 0) = 1;
+  cv::Matx41d transformedPoint;
+  cv::Point3d point3D;
+
+  for (int i = 0; i < undistortedPoints.size(); i++)
+  {
+    inputPoint(0, 0) = pointsInTrackerSpace[i].x;
+    inputPoint(1, 0) = pointsInTrackerSpace[i].y;
+    inputPoint(2, 0) = pointsInTrackerSpace[i].z;
+    transformedPoint = (trackingMatrices[i].inv()) * inputPoint;
+    point3D.x = transformedPoint(0, 0);
+    point3D.y = transformedPoint(1, 0);
+    point3D.z = transformedPoint(2, 0);
+
+    data.push_back(std::pair<cv::Point2d, cv::Point3d>(undistortedPoints[i], point3D));
+  }
+  CalculateHandEyeUsingPoint2Line(cameraMatrix, data, exitCondition, handEye);
+}
+
+
+/**
+ From Morgan et al. IPCAI 2017
+
+ MATLAB code provided in paper:
+
+% INPUTS: X : (3xn) 3D coordinates (tracker space).
+%         Q : (2xn) 2D pixel coordinates (image space).
+%         A : (3x3) camera Matrix.
+%       tol : exit condition.
+% OUTPUTS R : 3x3 rotation matrix
+%         t : 3x1 translation vector.
+%
+% n = size(Q,2); e = ones(1,n); j=eye(n)-((e'*e)./n);
+% Q = normc(inv(A)*[Q;e]);
+% Y = Q;
+% err = +Inf; E_old = 1000*ones(3,n);
+% while err > tol
+%   [U,~,V] = svd(Y*J*X');
+%   R = U*[1 0 0; 0 1 0; 0 0 det (U*V')]*V';
+%   t = mean(Y-R*X, 2);
+%   Y = repmat(dot(R*X + t*e, Q), [3,1]) .* Q;
+%   E = Y-R*X - t*e;
+%   err = norm(E-E_old, ' fro '); E_old = E;
+% end
+*/
+//-----------------------------------------------------------------------------
+void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                                           cameraMatrix,
+    const std::vector<std::pair<cv::Point2d, cv::Point3d> >& pairedPoints,
+    const double&                                            tol,
+    cv::Matx44d&                                             handEye
+    )
+{
+  int n = pairedPoints.size();
+  cv::Mat e = cv::Mat::ones( 1, n, CV_64FC1 );
+
+  cv::Mat ePrime;
+  cv::transpose(e, ePrime);
+
+  cv::Mat J = cv::Mat::eye(n, n, CV_64FC1 ) - ((ePrime * e)/n);
+
+  cv::Mat Q = cvCreateMat ( 2, n, CV_64FC1 );
+  cv::Mat Qe = cvCreateMat ( 3, n, CV_64FC1 );
+  cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
+
+  for (int i = 0; i < n; i++)
+  {
+    Q.at<double>(0, i)  = pairedPoints[i].first.x;
+    Q.at<double>(1, i)  = pairedPoints[i].first.y;
+    Qe.at<double>(0, i) = pairedPoints[i].first.x;
+    Qe.at<double>(1, i) = pairedPoints[i].first.y;
+    Qe.at<double>(2, i) = e.at<double>(0, i);
+    X.at<double>(0, i)  = pairedPoints[i].second.x;
+    X.at<double>(1, i)  = pairedPoints[i].second.y;
+    X.at<double>(2, i)  = pairedPoints[i].second.z;
+  }
+
+  cv::Mat AInv = cameraMatrix.inv();
+  cv::Mat lines = AInv * Qe;
+
+  assert(lines.rows == Qe.rows);
+  assert(lines.cols == Qe.cols);
+
+  // Normalise columns
+  for (int c = 0; c < lines.cols; c++)
+  {
+    double magnitude = 0;
+    for (int r = 0; r < lines.rows; r++)
+    {
+      magnitude += (lines.at<double>(r, c) * lines.at<double>(r, c));
+    }
+    magnitude = sqrt(magnitude);
+
+    for (int r = 0; r < lines.rows; r++)
+    {
+      lines.at<double>(r, c) = lines.at<double>(r, c) / magnitude;
+    }
+  }
+  lines.copyTo(Q); // Assigns 3xn matrix to Q, so Q is now 3xn not 2xn
+
+  // Set up X' for SVD part.
+  cv::Mat XPrime;
+  cv::transpose(X, XPrime);
+
+  // Setup loop.
+  cv::Mat Y;
+  Q.copyTo(Y);
+
+  double err = std::numeric_limits<double>::max();
+  cv::Mat E_old = 1000*cv::Mat::ones(3, n, CV_64FC1);
+  cv::Mat E;
+  cv::Mat R = cv::Mat::eye(3, 3, CV_64FC1);
+  cv::Mat t = cv::Mat::zeros(3, 1, CV_64FC1);
+
+  // Iterate to minimise error.
+  while (err > tol)
+  {
+    cv::SVD svd(Y*J*XPrime);
+    cv::Mat U = svd.u;
+    cv::Mat VPrime = svd.vt;
+
+    double det = cv::determinant(U*VPrime);
+
+    cv::Mat detMatrix = cv::Mat::eye(3, 3, CV_64FC1);
+    detMatrix.at<double>(2, 2) = det;
+
+    R = U * detMatrix * VPrime;
+
+    cv::Mat yMinusRotatedX = Y - R*X;
+
+    // mean along row
+    for (int r = 0; r < yMinusRotatedX.rows; r++)
+    {
+      double mean = 0;
+      for (int c = 0; c < yMinusRotatedX.cols; c++)
+      {
+        mean += yMinusRotatedX.at<double>(r,c);
+      }
+      mean /= static_cast<double>(yMinusRotatedX.cols);
+      t.at<double>(r, 0) = mean;
+    }
+
+    // Next section should be:
+    // Y = repmat(dot(R*X+t*e,Q), [3,1]).* Q;
+    cv::Mat rotatedXPlusTrans = R*X + t*e;
+    cv::Mat dot = cv::Mat::zeros(1, n, CV_64FC1);
+
+    assert(rotatedXPlusTrans.rows == Q.rows);
+    assert(rotatedXPlusTrans.cols == Q.cols);
+
+    // Dot product bit.
+    for (int r = 0; r < Q.rows; r++)
+    {
+      for (int c = 0; c < Q.cols; c++)
+      {
+        dot.at<double>(0, c) += rotatedXPlusTrans.at<double>(r, c) * Q.at<double>(r,c);
+      }
+    }
+    // Repmat and element-wise multiplication by Q.
+    for (int r = 0; r < Y.rows; r++)
+    {
+      for (int c = 0; c < Y.cols; c++)
+      {
+        Y.at<double>(r, c) = dot.at<double>(0, c) * Q.at<double>(r,c);
+      }
+    }
+
+    yMinusRotatedX = Y - R*X; // as y has been updated.
+    E = yMinusRotatedX - t * e;
+
+    cv::Mat residual = E-E_old;
+    cv::Mat residualTransposed;
+    cv::transpose(residual, residualTransposed);
+    cv::Mat squaredResiduals = residualTransposed * residual;
+    cv::Mat trace = squaredResiduals.diag(0);
+    err = std::sqrt(cv::sum(trace)[0]); // Frobenius norm of E - E_old
+    E.copyTo(E_old);
+  }
+
+  cv::Matx44d eyeHand = cv::Matx44d::eye();
+  for (int r = 0; r < 3; r++)
+  {
+    for (int c = 0; c < 3; c++)
+    {
+      eyeHand(r, c) = R.at<double>(r, c);
+    }
+    eyeHand(r, 3) = t.at<double>(r, 0);
+  }
+
+  handEye = eyeHand.inv();
+}
+
+
+//-----------------------------------------------------------------------------
 cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     const std::list<cv::Matx44d >& handMatrices,
     const std::list<cv::Matx44d >& eyeMatrices,

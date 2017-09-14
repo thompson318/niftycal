@@ -27,6 +27,7 @@ NonLinearStereoCameraCalibration2DCostFunction::NonLinearStereoCameraCalibration
 , m_Optimise2DOFStereo(false)
 {
   m_AxisOfRotation = 0;
+  m_AngleOfRotation = 0;
   m_TranslationVector = 0;
 }
 
@@ -107,20 +108,24 @@ NonLinearStereoCameraCalibration2DCostFunction::InternalGetValue(const Parameter
   if (m_Optimise2DOFStereo)
   {
     cv::Matx14d axisAngle;
+
+    // pick up static values provided in setter.
     axisAngle(0, 0) = m_AxisOfRotation[0];
     axisAngle(0, 1) = m_AxisOfRotation[1];
     axisAngle(0, 2) = m_AxisOfRotation[2];
-    axisAngle(0, 3) = parameters[externalParameterCounter++];
+    axisAngle(0, 3) = m_AngleOfRotation;
 
     cv::Mat rodrigues = niftk::AxisAngleToRodrigues(axisAngle);
     internalParameters[internalParameterCounter++] = rodrigues.at<double>(0, 0);
     internalParameters[internalParameterCounter++] = rodrigues.at<double>(0, 1);
     internalParameters[internalParameterCounter++] = rodrigues.at<double>(0, 2);
 
-    double translationInMillimetres = parameters[externalParameterCounter++];
-    internalParameters[internalParameterCounter++] = m_TranslationVector[0] * translationInMillimetres;
-    internalParameters[internalParameterCounter++] = m_TranslationVector[1] * translationInMillimetres;
-    internalParameters[internalParameterCounter++] = m_TranslationVector[2] * translationInMillimetres;
+    double xTranslationInMillimetres = parameters[externalParameterCounter++];
+    double yTranslationInMillimetres = parameters[externalParameterCounter++];
+
+    internalParameters[internalParameterCounter++] = xTranslationInMillimetres;
+    internalParameters[internalParameterCounter++] = yTranslationInMillimetres;
+    internalParameters[internalParameterCounter++] = m_TranslationVector[2]; // pick up static value provided in setter.
   }
   else
   {

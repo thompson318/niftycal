@@ -28,6 +28,12 @@ namespace niftk
 {
 
 /**
+\brief In debug mode at least, cv::Rodrigues can flip the 1x3 rotation vector to 3x1, so this function doesn't
+*/
+NIFTYCAL_WINEXPORT void SafeRodrigues(const cv::Mat& rotationMatrix3x3,
+                                      cv::Mat& rotationVector1x3);
+
+/**
 * \brief Converts 3x3 rotation and 3x1 translation (i.e. stereo extrinsics) to a 4x4 matrix.
 */
 NIFTYCAL_WINEXPORT cv::Matx44d RotationAndTranslationToMatrix(const cv::Mat& rotationMatrix3x3,

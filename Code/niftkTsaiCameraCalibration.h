@@ -73,7 +73,9 @@ NIFTYCAL_WINEXPORT cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D&
                                                            cv::Mat& essentialMatrix,
                                                            cv::Mat& fundamentalMatrix,
                                                            const int& cvFlags = 0,
-                                                           const bool& optimise3D = false
+                                                           const bool& optimise3D = false,
+                                                           const bool& optimise2DOFStereo = false,
+                                                           const bool& force2DOFStereoAxis = false
                                                           );
 
 } // end namespace

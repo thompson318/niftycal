@@ -22,7 +22,16 @@ set(NIFTYCAL_APPS
   niftkStereoChessboardCalibration
   niftkTimingCalibrationFromPoints
   niftkPoseFromPoints
+  niftkHandEyeCalibrationUsingPointToLine
 )
+
+if (VTK_FOUND AND QT_FOUND)
+  list(APPEND NIFTYCAL_APPS niftkRenderCalibratedModel)
+  if(ITK_FOUND)
+#    list(APPEND NIFTYCAL_APPS niftkAprilTagsCalibrationWithRendering)
+  endif()
+endif()
+
 foreach(app ${NIFTYCAL_APPS})
   add_executable(${app} ${app}.cxx)
   target_link_libraries(${app} niftycal ${ALL_THIRD_PARTY_LIBRARIES})

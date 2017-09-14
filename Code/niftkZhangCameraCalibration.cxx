@@ -83,8 +83,8 @@ double ZhangMonoCameraCalibration(const Model3D& model,
     {
       objectPoints.push_back(vectors3D);
       imagePoints.push_back(vectors2D);
-      rvecs.push_back(cv::Mat());
-      tvecs.push_back(cv::Mat());
+      rvecs.push_back(cvCreateMat(1, 3, CV_64FC1));
+      tvecs.push_back(cvCreateMat(1, 3, CV_64FC1));
     }
     else
     {

@@ -26,6 +26,7 @@ set(TEST_CASES
   niftkExtractChessboardPointsTest
   niftkExtractCirclesPointsTest
   niftkExtractRingsPointsTest
+  niftkExtractBallTest
   niftkMonoChessboardCameraCalibrationTest
   niftkIterativeMonoChessboardCameraCalibrationTest
   niftkStereoChessboardCameraCalibrationTest
@@ -40,6 +41,7 @@ set(TEST_CASES
   niftkTsaiReferenceNonCoplanerCalibrationTest
   niftkTimingCalibrationUtilitiesTest
   niftkTimingCalibrationTest
+  niftkMorganHandEyeTest
 )
 
 if(AprilTags_FOUND AND Eigen_FOUND)
@@ -74,6 +76,9 @@ add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPoint
 add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
 add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
 add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0 1)
+add_test(UNIT-ExtRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red.png  1 1 1920 1080 0 788.5 581.5)
+add_test(UNIT-ExtSmallRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red-smaller.png  1 1 1920 1080 0 862.5 670.5)
+add_test(UNIT-ExtWhiteBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-white.png  1 1 1920 1080 1 914.5 575.5)
 add_test(UNIT-TimingUtils ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationUtilitiesTest )
 add_test(UNIT-Timing1 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-1.txt  0)
 add_test(UNIT-Timing2 ${EXECUTABLE_OUTPUT_PATH}/niftkTimingCalibrationTest ${DATA_DIR}/Timing/tracker3D.txt ${DATA_DIR}/Timing/image2D-2.txt  3)
@@ -198,6 +203,34 @@ add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
   ${DATA_DIR}/Laparoscope/Right/right-3685.png
   ${DATA_DIR}/Laparoscope/Right/right-4848.png
   ${DATA_DIR}/Laparoscope/Right/right-798.png
+)
+
+add_test(REQ-2002-CSD-0001-015-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
+  ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
+  14 10                                          # internal corners
+  -0.0198931 0.0402461 0.000409826               # rvec
+  -4.64005 0.26403 0.297868                      # tvec
+  0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
+  0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
+  0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-1.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-2.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-3.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-4.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-5.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-6.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-7.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-8.png
+  ${DATA_DIR}/LaparoscopeRendered/Left/rendered-9.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-1.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-2.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-3.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-4.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-5.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-6.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-7.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-8.png
+  ${DATA_DIR}/LaparoscopeRendered/Right/rendered-9.png
 )
 
 # Now try iterative. Using simulation 2. No distortion.
@@ -422,7 +455,7 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
-  1 2                                                       # Simulation has proper scale factors
+  1 2                                                       # Real data needs scaling
   0.00870366 -0.0224016 -0.00259507 # rvec
   -2.77744 0.0814374 -0.523483 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
@@ -630,4 +663,28 @@ add_test(REG-TsaiAsymmNCPMonoLF ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrati
 add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
          ${DATA_DIR}/Tsai/NonCoplanar/data.txt
          576 576 0.02300000 0.02300000 3041.15 3040 262.302 212.689 3.07898 0.0898487
+        )
+
+add_test(Morgan-HandEye ${EXECUTABLE_OUTPUT_PATH}/niftkMorganHandEyeTest
+         ${DATA_DIR}/Morgan/calib.left.intrinsic.txt
+         ${DATA_DIR}/Morgan/Morgan3DPoints.txt      # Just contains 3D location of 1 fixed point.
+         ${DATA_DIR}/Morgan/Morgan2DPoints.txt      # Camera moves relative to point, so 12x2D image points.
+         -0.2236744227315183                        # Rodrigues R1
+         -0.6797945064485761                        # Rodrigues R2
+         2.396782218345076                          # Rodrigues R3
+         -0.59618984788028                          # Tx
+         -6.386247216929902                         # Ty
+         19.03417758944623                          # Tz
+         ${DATA_DIR}/Morgan/MorganLaparoscope01.4x4 # Corresponding Laparoscope tracking matrices for each 2D point.
+         ${DATA_DIR}/Morgan/MorganLaparoscope02.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope03.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope04.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope05.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope06.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope07.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope08.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope09.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope10.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope11.4x4
+         ${DATA_DIR}/Morgan/MorganLaparoscope12.4x4
         )

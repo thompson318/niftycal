@@ -18,7 +18,6 @@
 #include <niftkChessboardPointDetector.h>
 #include <niftkZhangCameraCalibration.h>
 #include <niftkIOUtilities.h>
-
 #include <cv.h>
 #include <highgui.h>
 #include <iostream>

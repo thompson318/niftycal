@@ -72,6 +72,7 @@ NIFTYCAL_WINEXPORT cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 * \param residual returns 2D rms reprojection error.
 *
 * Optimises intrinsic (4DOF), distortion (5DOF), model-to-world (6DOF) and hand-eye (6DOF).
+*
 * If ITK is not compiled in, this just sets residual to zero.
 */
 NIFTYCAL_WINEXPORT void CalculateHandEyeUsingMaltisMethod(
@@ -127,6 +128,55 @@ NIFTYCAL_WINEXPORT void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     cv::Matx44d&                  modelToWorld,
     cv::Matx44d&                  stereoExtrinsics,
     double&                       residual
+    );
+
+/**
+* \brief Calculates Hand-Eye by Morgan et al. IPCAI 2017 paper.
+*
+* \param cameraMatrix The intrinsic 3x3 matrix of the camera.
+* \param stylusOrigin The offset of the stylus tip in coordinate system of the stylus.
+* \param stylusTrackingMatrices Tracking matrices to convert stylus tip position into tracker coordinates.
+* \param trackingMatrices Tracking matrices of the thing being calibrated eg. laparoscope.
+* \param undistortedPoints The corresponding undistorted image points of the view of the stylus tip.
+* \param exitCondition Tolerance that stops the iterations.
+* \param handEye The output hand-eye matrix.
+*
+*/
+NIFTYCAL_WINEXPORT void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const cv::Point3d&              stylusOrigin,
+    const std::vector<cv::Matx44d>& stylusTrackingMatrices,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    );
+
+/**
+* \brief Overriden version of the above.
+* \param cameraMatrix The intrinsic 3x3 matrix of the camera.
+* \param trackingMatrices Tracking matrices of the thing being calibrated eg. laparoscope.
+* \param pointsInTrackerSpace 3D points, of the stylus tip, already in tracker coordinates.
+*/
+NIFTYCAL_WINEXPORT void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                  cameraMatrix,
+    const std::vector<cv::Matx44d>& trackingMatrices,
+    const std::vector<cv::Point3d>& pointsInTrackerSpace,
+    const std::vector<cv::Point2d>& undistortedPoints,
+    const double&                   exitCondition,
+    cv::Matx44d&                    handEye
+    );
+
+/**
+* \brief Overriden method, containing the main algorithm implemented in Morgan et al. IPCAI 2017 paper.
+*
+* Called by above two methods.
+*/
+NIFTYCAL_WINEXPORT void CalculateHandEyeUsingPoint2Line(
+    const cv::Mat&                                           cameraMatrix,
+    const std::vector<std::pair<cv::Point2d, cv::Point3d> >& pairedPoints,
+    const double&                                            exitCondition,
+    cv::Matx44d&                                             handEye
     );
 
 } // end namespace

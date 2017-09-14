@@ -24,6 +24,9 @@ set(NIFTYCAL_SRCS
   Detectors/niftkTemplateRingsPointDetector.cxx
   Detectors/niftkTemplateCirclesPointDetector.cxx
   Detectors/niftkSideBySideDetector.cxx
+  Detectors/niftkBallDetector.cxx
+  Detectors/niftkRedBallDetector.cxx
+  Detectors/niftkWhiteBallDetector.cxx
   niftkNiftyCalException.cxx
   niftkNiftyCalTypes.cxx
   niftkPointUtilities.cxx
@@ -96,6 +99,26 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DOptimiser.cxx)
 
+endif()
+
+###############################################################################
+# Experimental: Try to calibrate based on rendering the model.
+# Conclusion  : Slow, and not much benefit at the moment.
+###############################################################################
+if(VTK_FOUND AND ITK_FOUND AND QT_FOUND)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedCamera.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkCalibratedRenderingPipeline.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/niftkIntensityBasedCameraCalibration.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkIntensityBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoIntrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoExtrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedMonoBlurringCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkRenderingBasedStereoExtrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedMonoIntrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedMonoExtrinsicCostFunction.cxx)
+  list(APPEND NIFTYCAL_SRCS IntensityBased/Internal/niftkProjectionBasedStereoExtrinsicCostFunction.cxx)
 endif()
 
 add_library(niftycal ${NIFTYCAL_SRCS})
