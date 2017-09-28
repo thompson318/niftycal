@@ -15,6 +15,7 @@
 #include "niftkZhangCameraCalibration.h"
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkPointUtilities.h"
+#include "niftkTsaiCameraCalibration.h"
 #include <Internal/niftkCalibrationUtilities_p.h>
 
 #ifdef NIFTYCAL_WITH_ITK
@@ -104,6 +105,29 @@ double ZhangMonoCameraCalibration(const Model3D& model,
   }
 
   // Do calibration
+
+  if (!niftk::ModelIsPlanar(model))
+  {
+    // We run Tsais method on the first set of points
+    // to initialise the intrinsics and distortion params.
+
+    cv::Mat rvec;
+    cv::Mat tvec;
+    cv::Point2d sensorDims;
+    sensorDims.x = 1;
+    sensorDims.y = 1;
+
+    niftk::TsaiMonoCameraCalibration(model,
+                                     *(listOfPointSets.begin()),
+                                     imageSize,
+                                     sensorDims,
+                                     intrinsic,
+                                     distortion,
+                                     rvec,
+                                     tvec,
+                                     true);
+
+  }
 
   if (cvFlags == 0)
   {
