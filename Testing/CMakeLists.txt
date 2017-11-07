@@ -32,8 +32,6 @@ set(TEST_CASES
   niftkStereoChessboardCameraCalibrationTest
   niftkIterativeStereoChessboardCameraCalibrationTest
   niftkIterativeStereoCirclesCameraCalibrationTest
-  niftkIterativeStereoAprilTagsCameraCalibrationTest
-  niftkIterativeMonoAprilTagsCameraCalibrationTest
   niftkMonoChessboardHandEyeCalibrationTest
   niftkIterativeTemplateMatchingCameraCalibrationTest
   niftkTsaiMonoCalibrationTest
@@ -46,6 +44,8 @@ set(TEST_CASES
 
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
+  list(APPEND TEST_CASES niftkIterativeStereoAprilTagsCameraCalibrationTest)
+  list(APPEND TEST_CASES niftkIterativeMonoAprilTagsCameraCalibrationTest)
 endif()
 
 foreach(_test_case ${TEST_CASES})
@@ -72,9 +72,6 @@ add_test(UNIT-AveMatrix2 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA
 add_test(UNIT-AveMatrix3 ${EXECUTABLE_OUTPUT_PATH}/niftkMatrixAverageTest ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${DATA_DIR}/MatrixAverage1/mat2.4x4 ${DATA_DIR}/MatrixAverage1/mat3.4x4)
 add_test(UNIT-StereoMatrixIO-1 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoMatrixIOTest ${DATA_DIR}/MatrixAverage1/mat1.4x4 ${TMP_DIR}/calib.r2l.txt)
 add_test(UNIT-ExtChessSim ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboardPointsTest ${DATA_DIR}/Simulation2/reference_750_550_14_10.png 1 1 750 550 14 10 140 0)
-add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
-add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
-add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
 add_test(UNIT-ExtASymCircles1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/Asymmetric/1488546956550506240_right.png 1 2 1920 540 23 7 161 0 1)
 add_test(UNIT-ExtRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red.png  1 1 1920 1080 0 788.5 581.5)
 add_test(UNIT-ExtSmallRedBall ${EXECUTABLE_OUTPUT_PATH}/niftkExtractBallTest ${DATA_DIR}/Balls/Ball-red-smaller.png  1 1 1920 1080 0 862.5 670.5)
@@ -96,15 +93,19 @@ add_test(REQ-2002-CSD-0001-002-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractChessboa
 add_test(REQ-2002-CSD-0001-003-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 1 1 792 612   11 4  0 0 1)
 add_test(REQ-2002-CSD-0001-004-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractCirclesPointsTest ${DATA_DIR}/SimulationDots1/Left1.png               1 1 1280 1024 11 4 44 0 1)
 
-# April
-add_test(REQ-2002-CSD-0001-005-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 36h11 1 1 1280 1024 0 0)
-add_test(REQ-2002-CSD-0001-006-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8-500border-smaller.png 25h7 1 1 1079 973 360 0)
-
 # Rings
 add_test(REQ-2002-CSD-0001-007-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp                          1 1 1280 1024 10 7 0 0 10000  0 2.0)
 add_test(REQ-2002-CSD-0001-008-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp                          1 1 1280 1024 10 7 0 0 260000 1 0.1)
 add_test(REQ-2002-CSD-0001-009-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.png ${DATA_DIR}/CMU/rings_10_7.png ${DATA_DIR}/CMU/centres_10_7_on_12_9.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/packagedCode/gringFilter.bmp 1 1 1400 1050 10 7 70 260000 1 0 0.1 ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings.txt)
 add_test(REQ-2002-CSD-0001-014-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractRingsPointsTest ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.png ${DATA_DIR}/Tsai/reference_780_540_21_7.txt ${DATA_DIR}/CMU/PreciseCameraCalibration/GridPattern-rings-template.png  1 1  780  540 21 7 147 260000 0 1 0.1 ${DATA_DIR}/Tsai/reference_780_540_21_7.txt)
+
+if(AprilTags_FOUND AND Eigen_FOUND)
+  add_test(UNIT-ExtAprilTags1 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.png 36h11 1 1 1280 1024 175 0)
+  add_test(UNIT-ExtAprilTags2 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png 36h11 1 1 792 612 175 0)
+  add_test(UNIT-ExtAprilTags3 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8.png 25h7 1 1 7632 6784 360 0)
+  add_test(REQ-2002-CSD-0001-005-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/SimulationDots1/Left1.png 36h11 1 1 1280 1024 0 0)
+  add_test(REQ-2002-CSD-0001-006-01 ${EXECUTABLE_OUTPUT_PATH}/niftkExtractAprilTagsPointsTest ${DATA_DIR}/AprilTags/apriltags-25h7-9x8-500border-smaller.png 25h7 1 1 1079 973 360 0)
+endif()
 
 # Test the performance of the underlying OpenCV mono calibration.
 add_test(REQ-2002-CSD-0001-010-01 ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardCameraCalibrationTest
@@ -389,6 +390,8 @@ add_test(REG-CalibIterMonoCMU2 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoChess
   ${DATA_DIR}/CMU/TestRealImage/checker/1/img5.bmp
 )
 
+if(AprilTags_FOUND AND Eigen_FOUND)
+
 add_test(REG-CalibIterMonoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeMonoAprilTagsCameraCalibrationTest
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.png       # Model image
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in-3D.txt    # Model description (grid points 3D)
@@ -499,6 +502,8 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230296794573800_right.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/right/1458230320793946400_right.bmp
 )
+
+endif()
 
 add_test(REG-CalibIterMonoCirclesSim1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeTemplateMatchingCameraCalibrationTest
   1                                                     # Method (0==rings, 1==circles)
