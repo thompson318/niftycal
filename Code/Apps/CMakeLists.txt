@@ -16,7 +16,6 @@ set(NIFTYCAL_APPS
   niftkStereoSimulationByParameter
   niftkMonoCalibrationFromPoints
   niftkStereoCalibrationFromPoints
-  niftkStereoIterativeAprilTagsCalibration
   niftkStereoIterativeCirclesCalibration
   niftkStereoIterativeRingsCalibration
   niftkStereoChessboardCalibration
@@ -30,6 +29,10 @@ if (VTK_FOUND AND QT_FOUND)
   if(ITK_FOUND)
 #    list(APPEND NIFTYCAL_APPS niftkAprilTagsCalibrationWithRendering)
   endif()
+endif()
+
+if (AprilTags_FOUND AND Eigen_FOUND)
+  list(APPEND NIFTYCAL_APPS niftkStereoIterativeAprilTagsCalibration)
 endif()
 
 foreach(app ${NIFTYCAL_APPS})
