@@ -1,0 +1,15 @@
+If you use this software, please cite:
+
+@proceeding{doi: 10.1117/12.2253717,
+author = { Stephen  Thompson,Yannic  Meuer,Eddie  Edwards,João  Ramalhinho,Maria Ruxandra  Robu,Danail  Stoyanov,Sébastian  Ourselin,Brian  Davidson,David  Hawkes,Matthew J. Clarkson},
+title = {On pattern selection for laparoscope calibration},
+journal = {Proc.SPIE},
+volume = {10135},
+number = {},
+pages = {10135 - 10135 - 13},
+year = {2017},
+doi = {10.1117/12.2253717},
+URL = {https://doi.org/10.1117/12.2253717},
+eprint = {}
+}
+
