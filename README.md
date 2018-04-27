@@ -1,9 +1,12 @@
 NiftyCal
 ---------
 
-NiftyCal is a software library to perform video camera calibration.
+NiftyCal is an open source software library to perform video camera calibration.
 
-A full feature list is available by running doxygen.
+In short, this software uses OpenCV for [Zhang's method][Zhang2000], and additionally provides implementations
+of [Tsai's intrinsic method][Tsai87], [Tsai's hand-eye method][Tsai89], [Datta's iterative method][Datta],
+[Shahidi's hand-eye method][Shahidi] and a non-linear method similar to [Malti's hand-eye method][Malti].
+A full feature list is available once compiled, by running doxygen.
 
 NiftyCal was developed by the [Centre for Medical Image Computing][cmic] at [University College London (UCL)][ucl].
 
@@ -13,16 +16,13 @@ Useful Links
  - [Mailing list][mailinglist].
  - NiftyCal is part of [NifTK][niftk].
  - [NiftyCal home page][NiftyCalHome].
- - [Dashboard][dashboard].
 
 License
 -----------
 
 Copyright (c) 2016, [University College London][ucl].
 
-This project is NOT open-source, and should NOT be distributed
-without the prior permission of [Dr. Matt Clarkson][matt].
-
+BSD License, see LICENSE.txt.
 
 Supported Platforms
 -----------------------------
@@ -72,14 +72,13 @@ Branching Workflow
 [cmic]: http://cmic.cs.ucl.ac.uk
 [ucl]: http://www.ucl.ac.uk
 [mailinglist]: https://www.mailinglists.ucl.ac.uk/mailman/listinfo/niftk-users
-[dashboard]: http://cdash.cmiclab.cs.ucl.ac.uk/index.php?project=NiftyCal
-[citation]: http://link.springer.com/article/10.1007%2Fs11548-014-1124-7
+[citation]: https://doi.org/10.1117/12.2253717
 [niftk]: http://www.niftk.org
 [NiftyCalHome]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyCal
-[matt]: http://www.mattclarkson.co.uk
 [April]: http://github.com/NifTK/apriltags
 [Datta]: http://dx.doi.org/10.1109/ICCVW.2009.5457474
 [Shahidi]: http://dx.doi.org/10.1109/TMI.2002.806597
 [Tsai89]: http://dx.doi.org/10.1109/70.34770
 [Malti]: http://dx.doi.org/10.1002/rcs.1478
 [Tsai87]: http://ieeexplore.ieee.org/document/1087109
+[Zhang2000]: http://dx.doi.org/10.1109/34.888718
