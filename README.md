@@ -8,6 +8,8 @@ of [Tsai's intrinsic method][Tsai87], [Tsai's hand-eye method][Tsai89], [Datta's
 [Shahidi's hand-eye method][Shahidi] and a non-linear method similar to [Malti's hand-eye method][Malti].
 A full feature list is available once compiled, by running doxygen.
 
+This software was used in [Thompson's evaluation][citation]. If you use this software please cite [this][citation] paper.
+
 NiftyCal was developed by the [Centre for Medical Image Computing][cmic] at [University College London (UCL)][ucl].
 
 Useful Links
