@@ -200,6 +200,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   while (fabs(currentRMS - previousRMS) >= rmsTolerance)
   {
+    previousRMS = currentRMS;
+
     // First optimise extrinsics (camera positions)
     niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer optimiser2D
         = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
@@ -224,7 +226,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     optimiser2D->SetOptimiseExtrinsics(true);
     optimiser2D->SetOptimiseR2L(false);
 
-    previousRMS = currentRMS;
     currentRMS = optimiser2D->Optimise(intrinsicLeft,
                                        intrinsicRight,
                                        rvecsLeft,
@@ -235,12 +236,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
     // Then optimise just R2L
     optimiser2D->SetOptimiseIntrinsics(false);
-    optimiser2D->SetOptimiseExtrinsics(false);
     optimiser2D->SetOptimise2DOFStereo(false);
     optimiser2D->SetForceUnitVectorAxes(false);
+    optimiser2D->SetOptimiseExtrinsics(false);
     optimiser2D->SetOptimiseR2L(true);
 
-    previousRMS = currentRMS;
     currentRMS = optimiser2D->Optimise(intrinsicLeft,
                                        intrinsicRight,
                                        rvecsLeft,
@@ -277,8 +277,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
+  std::cout << "niftkStereoCameraCalibration:2D optimisation finished, rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS << std::endl;
+
 #ifdef NIFTYCAL_WITH_ITK
-  if (optimise3D)
+  if (true)
   {
     // Now optimise RMS reconstruction error via intrinsics.
     niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
@@ -296,10 +299,10 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
     intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
-    intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                  intrinsicRight
-                                 );
-
+    reconstructedRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                                     intrinsicRight
+                                                    );
+    /*
     // Now optimise RMS reconstruction error via extrinsics.
     niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
         niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::New();
@@ -319,6 +322,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                      leftToRightRotationMatrix,
                                                      leftToRightTranslationVector
                                                     );
+    */
 
     // Recompute re-projection error, as it will now be different.
     projectedRMS = niftk::ComputeRMSReprojectionError(model,
