@@ -54,6 +54,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   double projectedRMS = 0;
   double reconstructedRMS = 0;
+  cv::Point3d rmsInEachAxis;
 
   if (model.empty())
   {
@@ -173,7 +174,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     niftkNiftyCalThrow() << "No right image points extracted.";
   }
 
-  // Do calibration
+  // Do standard OpenCV calibration
   projectedRMS = cv::stereoCalibrate(objectPoints,
                                      leftImagePoints,
                                      rightImagePoints,
@@ -189,6 +190,34 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-10),
                                      cvFlags
                                     );
+
+
+  // Ensure rhs extrinsics are set from lhs and left-to-right
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+
+  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                          listOfLeftHandPointSets,
+                                                          listOfRightHandPointSets,
+                                                          intrinsicLeft,
+                                                          distortionLeft,
+                                                          rvecsLeft,
+                                                          tvecsLeft,
+                                                          intrinsicRight,
+                                                          distortionRight,
+                                                          leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector,
+                                                          rmsInEachAxis
+                                                         );
+
+  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS << std::endl;
 
 #ifdef NIFTYCAL_WITH_ITK
 
@@ -262,7 +291,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  tvecsRight
                                 );
 
-  cv::Point3d rmsInEachAxis;
   reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
                                                           listOfLeftHandPointSets,
                                                           listOfRightHandPointSets,
