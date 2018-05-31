@@ -246,11 +246,7 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
   }
   if ((parameters.size() - 30) % 6 != 0)
   {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
-  }
-  if ((parameters.size() - 24) / 6 != leftPoints->size())
-  {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then [6DOF stereo extrinsic], then [Nx6DOF].";
   }
   if (leftPoints->size() != rightPoints->size())
   {

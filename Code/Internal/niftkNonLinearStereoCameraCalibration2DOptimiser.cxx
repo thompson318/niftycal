@@ -25,6 +25,8 @@ namespace niftk
 NonLinearStereoCameraCalibration2DOptimiser::NonLinearStereoCameraCalibration2DOptimiser()
 : m_CostFunction(nullptr)
 , m_OptimiseIntrinsics(false)
+, m_OptimiseExtrinsics(true)
+, m_OptimiseR2L(true)
 , m_Optimise2DOFStereo(false)
 , m_ForceUnitVectorAxes(false)
 {
@@ -44,6 +46,24 @@ void NonLinearStereoCameraCalibration2DOptimiser::SetOptimiseIntrinsics(const bo
 {
   m_OptimiseIntrinsics = optimise;
   m_CostFunction->SetOptimiseIntrinsics(optimise);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetOptimiseExtrinsics(const bool& optimise)
+{
+  m_OptimiseExtrinsics = optimise;
+  m_CostFunction->SetOptimiseExtrinsics(optimise);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetOptimiseR2L(const bool& optimise)
+{
+  m_OptimiseR2L = optimise;
+  m_CostFunction->SetOptimiseR2L(optimise);
   this->Modified();
 }
 
@@ -103,6 +123,16 @@ void NonLinearStereoCameraCalibration2DOptimiser::SetRightDistortion(const cv::M
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoCameraCalibration2DOptimiser::SetExtrinsics(
+  const std::vector<cv::Mat>& rvecsLeft,
+  const std::vector<cv::Mat>& tvecsLeft)
+{
+  m_CostFunction->SetExtrinsics(rvecsLeft, tvecsLeft);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrinsic,
                                                              cv::Mat& rightIntrinsic,
                                                              std::vector<cv::Mat>& rvecsLeft,
@@ -141,10 +171,21 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
                          << ", versus " << tvecsLeft.size();
   }
 
+  if (m_Optimise2DOFStereo && m_OptimiseR2L)
+  {
+    niftkNiftyCalThrow() << "Optimise2DOFStereo and OptimiseR2L are mutually exclusive";
+  }
+
+  if (m_ForceUnitVectorAxes && m_OptimiseR2L)
+  {
+    niftkNiftyCalThrow() << "ForceUnitVectorAxes and OptimiseR2L are mutually exclusive";
+  }
+
   cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::SafeRodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
-  int numberOfParameters = 6 * rvecsLeft.size(); // extrinsics of each left hand camera
+  int numberOfParameters = 0;
+
   if (m_OptimiseIntrinsics)
   {
     numberOfParameters += 8;
@@ -153,9 +194,18 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   {
     numberOfParameters += 2;
   }
-  else
+  if (m_OptimiseR2L)
   {
     numberOfParameters += 6;
+  }
+  if (m_OptimiseExtrinsics)
+  {
+    numberOfParameters += 6 * rvecsLeft.size(); // extrinsics of each left hand camera
+  }
+
+  if (numberOfParameters == 0)
+  {
+    niftkNiftyCalThrow() << "Nothing to optimise";
   }
 
   niftk::NonLinearStereoCameraCalibration2DCostFunction::ParametersType initialParameters;
@@ -207,7 +257,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     m_CostFunction->SetAxisOfRotation(rotationUnitVector);
     m_CostFunction->SetAngleOfRotation(angle);
   }
-  else
+  if (m_OptimiseR2L)
   {
     initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 0);
     initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 1);
@@ -216,14 +266,31 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     initialParameters[counter++] = leftToRightTranslationVector.at<double>(1, 0);
     initialParameters[counter++] = leftToRightTranslationVector.at<double>(2, 0);
   }
-  for (int i = 0; i < rvecsLeft.size(); i++)
+  else
   {
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 0);
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 1);
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 2);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 0);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 1);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
+    axisAngle = niftk::RodriguesToAxisAngle(leftToRightRotationVector);
+    rotationUnitVector[0] = axisAngle(0, 0);
+    rotationUnitVector[1] = axisAngle(0, 1);
+    rotationUnitVector[2] = axisAngle(0, 2);
+    m_CostFunction->SetTranslationVector(leftToRightTranslationVector);
+    m_CostFunction->SetAngleOfRotation(axisAngle(0, 3));
+    m_CostFunction->SetAxisOfRotation(rotationUnitVector);
+  }
+  if (m_OptimiseExtrinsics)
+  {
+    for (int i = 0; i < rvecsLeft.size(); i++)
+    {
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 0);
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 1);
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 2);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 0);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 1);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
+    }
+  }
+  else
+  {
+    m_CostFunction->SetExtrinsics(rvecsLeft, tvecsLeft);
   }
 
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
@@ -234,15 +301,25 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
   optimiser->SetNumberOfIterations(1000);
-  optimiser->SetGradientTolerance(0.0001);
-  optimiser->SetEpsilonFunction(0.0001);
-  optimiser->SetValueTolerance(0.0001);
+  optimiser->SetGradientTolerance(0.0000001);
+  optimiser->SetEpsilonFunction(0.0000001);
+  optimiser->SetValueTolerance(0.0000001);
+
+  /*
+  niftk::NonLinearStereoCameraCalibration2DCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
+  double initialRMS = m_CostFunction->GetRMS(initialValues);
+  std::cout << this->GetNameOfClass() << ": initial:" << initialParameters << "=" << initialRMS << std::endl;
+  */
 
   optimiser->StartOptimization();
 
   niftk::NonLinearStereoCameraCalibration2DCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
   niftk::NonLinearStereoCameraCalibration2DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
+
+  /*
+  std::cout << this->GetNameOfClass() << ": final:" << finalParameters << "=" << finalRMS << std::endl;
+  */
 
   counter = 0;
   if (m_OptimiseIntrinsics)
@@ -256,7 +333,6 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     rightIntrinsic.at<double>(0, 2) = finalParameters[counter++];
     rightIntrinsic.at<double>(1, 2) = finalParameters[counter++];
   }
-
   if (m_Optimise2DOFStereo)
   {
     if (m_ForceUnitVectorAxes)
@@ -273,7 +349,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
     leftToRightTranslationVector.at<double>(1, 0) = finalParameters[counter++];
   }
-  else
+  if (m_OptimiseR2L)
   {
     leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
     leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
@@ -282,15 +358,17 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     leftToRightTranslationVector.at<double>(1, 0) = finalParameters[counter++];
     leftToRightTranslationVector.at<double>(2, 0) = finalParameters[counter++];
   }
-
-  for (int i = 0; i < rvecsLeft.size(); i++)
+  if (m_OptimiseExtrinsics)
   {
-    rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
-    rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
-    rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+    for (int i = 0; i < rvecsLeft.size(); i++)
+    {
+      rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+      rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+      rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+    }
   }
 
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);

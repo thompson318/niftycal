@@ -38,6 +38,7 @@ public:
   typedef itk::SmartPointer<Self>                        Pointer;
   typedef itk::SmartPointer<const Self>                  ConstPointer;
   itkNewMacro(Self);
+  itkTypeMacro(niftk::NonLinearStereoCameraCalibration2DCostFunction, niftk::NonLinearStereo2DCostFunction);
 
   typedef Superclass::ParametersType                     ParametersType;
   typedef Superclass::DerivativeType                     DerivativeType;
@@ -45,6 +46,12 @@ public:
 
   itkSetMacro(OptimiseIntrinsics, bool);
   itkGetConstMacro(OptimiseIntrinsics, bool);
+
+  itkSetMacro(OptimiseExtrinsics, bool);
+  itkGetConstMacro(OptimiseExtrinsics, bool);
+
+  itkSetMacro(OptimiseR2L, bool);
+  itkGetConstMacro(OptimiseR2L, bool);
 
   itkSetMacro(Optimise2DOFStereo, bool);
   itkGetConstMacro(Optimise2DOFStereo, bool);
@@ -58,6 +65,9 @@ public:
   itkSetMacro(TranslationVector, cv::Vec3d);
   itkGetConstMacro(TranslationVector, cv::Vec3d);
 
+  void SetExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
+                     const std::vector<cv::Mat>& tvecsLeft);
+
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
 protected:
@@ -70,11 +80,15 @@ protected:
 
 private:
 
-  bool      m_OptimiseIntrinsics;
-  bool      m_Optimise2DOFStereo;
-  cv::Vec3d m_AxisOfRotation;
-  double    m_AngleOfRotation;
-  cv::Vec3d m_TranslationVector;
+  bool                 m_OptimiseIntrinsics;
+  bool                 m_OptimiseExtrinsics;
+  bool                 m_OptimiseR2L;
+  bool                 m_Optimise2DOFStereo;
+  cv::Vec3d            m_AxisOfRotation;
+  double               m_AngleOfRotation;
+  cv::Vec3d            m_TranslationVector;
+  std::vector<cv::Mat> m_RVecsLeft;
+  std::vector<cv::Mat> m_TVecsLeft;
 };
 
 } // end namespace

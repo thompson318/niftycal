@@ -45,9 +45,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                     cv::Mat& essentialMatrix,
                                     cv::Mat& fundamentalMatrix,
                                     const int& cvFlags,
-                                    const bool& optimise3D,
-                                    const bool& optimise2DOFStereo,
-                                    const bool& force2DOFStereoAxis
+                                    const bool& optimise3D
                                    )
 {
   cv::Matx21d result;
@@ -196,36 +194,63 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
 
-  niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer optimiser2D
-      = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
-  optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
-  optimiser2D->SetDistortion(&distortionLeft);
-  optimiser2D->SetRightDistortion(&distortionRight);
-  optimiser2D->SetIntrinsic(&intrinsicLeft);
-  optimiser2D->SetRightIntrinsic(&intrinsicRight);
+  double rmsTolerance = 0.0000001;
+  double previousRMS = projectedRMS + 2 * rmsTolerance;
+  double currentRMS = projectedRMS;
 
-  if (cvFlags & CV_CALIB_FIX_INTRINSIC)
+  while (fabs(currentRMS - previousRMS) >= rmsTolerance)
   {
+    // First optimise extrinsics (camera positions)
+    niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer optimiser2D
+        = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
+    optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
+    optimiser2D->SetDistortion(&distortionLeft);
+    optimiser2D->SetRightDistortion(&distortionRight);
+    optimiser2D->SetIntrinsic(&intrinsicLeft);
+    optimiser2D->SetRightIntrinsic(&intrinsicRight);
+    optimiser2D->SetExtrinsics(rvecsLeft, tvecsLeft);
+
+    if (cvFlags & CV_CALIB_FIX_INTRINSIC)
+    {
+      optimiser2D->SetOptimiseIntrinsics(false);
+    }
+    else
+    {
+      optimiser2D->SetOptimiseIntrinsics(true);
+    }
+
+    optimiser2D->SetOptimise2DOFStereo(false);  // not fully tested, so not in public API.
+    optimiser2D->SetForceUnitVectorAxes(false); // not fully tested, so not in public API.
+    optimiser2D->SetOptimiseExtrinsics(true);
+    optimiser2D->SetOptimiseR2L(false);
+
+    previousRMS = currentRMS;
+    currentRMS = optimiser2D->Optimise(intrinsicLeft,
+                                       intrinsicRight,
+                                       rvecsLeft,
+                                       tvecsLeft,
+                                       leftToRightRotationMatrix,
+                                       leftToRightTranslationVector
+                                      );
+
+    // Then optimise just R2L
     optimiser2D->SetOptimiseIntrinsics(false);
+    optimiser2D->SetOptimiseExtrinsics(false);
+    optimiser2D->SetOptimise2DOFStereo(false);
+    optimiser2D->SetForceUnitVectorAxes(false);
+    optimiser2D->SetOptimiseR2L(true);
+
+    previousRMS = currentRMS;
+    currentRMS = optimiser2D->Optimise(intrinsicLeft,
+                                       intrinsicRight,
+                                       rvecsLeft,
+                                       tvecsLeft,
+                                       leftToRightRotationMatrix,
+                                       leftToRightTranslationVector
+                                      );
   }
-  else
-  {
-    optimiser2D->SetOptimiseIntrinsics(true);
-  }
 
-  // bit unstable.
-  // optimiser2D->SetOptimiseIntrinsics(true);
-
-  optimiser2D->SetOptimise2DOFStereo(optimise2DOFStereo);
-  optimiser2D->SetForceUnitVectorAxes(force2DOFStereoAxis);
-
-  optimiser2D->Optimise(intrinsicLeft,
-                        intrinsicRight,
-                        rvecsLeft,
-                        tvecsLeft,
-                        leftToRightRotationMatrix,
-                        leftToRightTranslationVector
-                       );
+  projectedRMS = currentRMS;
 
 #endif
 
@@ -338,9 +363,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                         cv::Mat& leftToRightTranslationVector,
                                         cv::Mat& essentialMatrix,
                                         cv::Mat& fundamentalMatrix,
-                                        const bool& optimise3D,
-                                        const bool& optimise2DOFStereo,
-                                        const bool& force2DOFStereoAxis
+                                        const bool& optimise3D
                                        )
 {
   cv::Matx21d result;
@@ -397,9 +420,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
                                                 CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                                optimise3D,
-                                                optimise2DOFStereo,
-                                                force2DOFStereoAxis
+                                                optimise3D
                                                );
 
     rvecsLeft.clear();
@@ -449,9 +470,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                             essentialMatrix,
                                             fundamentalMatrix,
                                             CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
-                                            optimise3D,
-                                            optimise2DOFStereo,
-                                            force2DOFStereoAxis
+                                            optimise3D
                                            );
   }
   return result;
