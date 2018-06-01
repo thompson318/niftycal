@@ -615,7 +615,7 @@ void CalculateHandEyeUsingMaltisMethod(
                                  intrinsic,
                                  distortion
                                 );
-#endif // NIFTYCAL_WITH_ITK
+#endif
 }
 
 
@@ -644,7 +644,7 @@ void CalculateHandEyeByOptimisingAllExtrinsic(
 
   residual = optimiser->Optimise(modelToWorld, handEye);
 
-#endif // NIFTYCAL_WITH_ITK
+#endif
 }
 
 
@@ -696,7 +696,7 @@ void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     residual = optimiser3D->Optimise(modelToWorld, handEye, stereoExtrinsics);
   }
 
-#endif // NIFTYCAL_WITH_ITK
+#endif
 }
 
 } // end namespace
