@@ -33,8 +33,8 @@ class NonLinearNDOFHandEyeOptimiser : public itk::Object
 public:
 
   typedef  NonLinearNDOFHandEyeOptimiser Self;
-  typedef  itk::Object                        Superclass;
-  typedef  itk::SmartPointer<Self>            Pointer;
+  typedef  itk::Object                   Superclass;
+  typedef  itk::SmartPointer<Self>       Pointer;
   itkNewMacro(Self);
 
   void SetModel(const Model3D* const model);
