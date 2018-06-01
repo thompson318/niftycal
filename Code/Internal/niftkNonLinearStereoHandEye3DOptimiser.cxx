@@ -184,20 +184,7 @@ double NonLinearStereoHandEye3DOptimiser::Optimise(cv::Matx44d& modelToWorld,
       m_CostFunction->GetValue(initialParameters);
 
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-
-  /*
-  for (int i = 18; i < initialParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearStereoHandEye3DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
-    if ((i - 18) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  std::cout << ", rms=" << initialRMS << std::endl;
-  */
-
-  std::cout << "NonLinearStereoHandEye3DOptimiser: initial rms=" << initialRMS << std::endl;
+  std::cout << "NonLinearStereoHandEye3DOptimiser: initial 3D rms=" << initialRMS << std::endl;
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -230,20 +217,6 @@ double NonLinearStereoHandEye3DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearStereoHandEye3DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  /*
-  for (int i = 18; i < finalParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearStereoHandEye3DOptimiser: final(" << i << ")=" << finalParameters[i]
-                 << ", initial=" << initialParameters[i]
-                 << ", diff=" << finalParameters[i] - initialParameters[i]
-                 << std::endl;
-    if ((i - 18) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  */
-
   std::cout << "NonLinearStereoHandEye3DOptimiser: stereo="
             << stereoExtrinsicsRotationVector.at<double>(0, 0) << ", "
             << stereoExtrinsicsRotationVector.at<double>(0, 1) << ", "
@@ -266,7 +239,7 @@ double NonLinearStereoHandEye3DOptimiser::Optimise(cv::Matx44d& modelToWorld,
             << modelToWorldTranslationVector.at<double>(0, 1) << ", "
             << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
 
-  std::cout << "NonLinearStereoHandEye3DOptimiser: final rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearStereoHandEye3DOptimiser: final 3D rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }
