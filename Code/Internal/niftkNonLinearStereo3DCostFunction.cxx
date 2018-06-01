@@ -90,7 +90,7 @@ void NonLinearStereo3DCostFunction::SetExtrinsics(std::vector<cv::Mat>* const rv
 //-----------------------------------------------------------------------------
 unsigned int NonLinearStereo3DCostFunction::GetNumberOfValues(void) const
 {
-  return this->GetNumberOfTriangulatablePoints() * 3; // for dx, dy, dz in 3D.
+  return this->GetNumberOfTriangulatablePoints(); // DONT DO THIS:  * 3; // for dx, dy, dz in 3D.
 }
 
 } // end namespace

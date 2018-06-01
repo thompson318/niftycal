@@ -116,7 +116,7 @@ double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIn
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(1000);
+  optimiser->SetNumberOfIterations(100);
   optimiser->SetGradientTolerance(0.0000001);
   optimiser->SetEpsilonFunction(0.0000001);
   optimiser->SetValueTolerance(0.0000001);
