@@ -66,6 +66,7 @@ public:
   void SetExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
                      const std::vector<cv::Mat>& tvecsLeft);
 
+
   /**
   * \brief Optimises just extrinsic parameters, and returns the 2D RMS projection error.
   *

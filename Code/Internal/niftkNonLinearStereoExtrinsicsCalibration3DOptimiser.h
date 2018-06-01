@@ -52,6 +52,9 @@ public:
                      cv::Mat* const rightIntrinsic
                     );
 
+  void SetOptimiseCameraExtrinsics(const bool& optimise);
+  void SetOptimiseL2R(const bool& optimise);
+
   /**
   * \brief Optimises extrinsic parameters, and returns the 3D RMS reconstruction error.
   *

@@ -201,7 +201,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  tvecsRight
                                 );
 
-
+  // Compute 3D reconstruction error
   reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
                                                           listOfLeftHandPointSets,
                                                           listOfRightHandPointSets,
@@ -283,6 +283,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
 #endif
 
+  // Ensure rhs extrinsics are set from lhs and left-to-right
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
                                  leftToRightRotationMatrix,
@@ -291,6 +292,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  tvecsRight
                                 );
 
+  // Re-compute 3D reconstruction error
   reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
                                                           listOfLeftHandPointSets,
                                                           listOfRightHandPointSets,
@@ -309,65 +311,125 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
             << ", rms3D=" << reconstructedRMS << std::endl;
 
 #ifdef NIFTYCAL_WITH_ITK
-  if (true)
+  if (optimise3D)
   {
-    // Now optimise RMS reconstruction error via intrinsics.
-    niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
-        niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();
+    rmsTolerance = 0.0001;
+    previousRMS = reconstructedRMS + 2 * rmsTolerance;
+    currentRMS = reconstructedRMS;
+    unsigned int numberOfIterations = 0;
+    unsigned int maxNumberOfIterations = 10;
+    while (fabs(currentRMS - previousRMS) >= rmsTolerance
+           && numberOfIterations < maxNumberOfIterations
+          )
+    {
+      previousRMS = currentRMS;
 
-    intrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &listOfLeftHandPointSets,
-                                           &listOfRightHandPointSets
-                                          );
+      // Now optimise RMS reconstruction error via intrinsics.
+      niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
+          niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();
 
-    intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
-                                       &tvecsLeft,
-                                       &leftToRightRotationMatrix,
-                                       &leftToRightTranslationVector);
+      intrinsicsOptimiser->SetModelAndPoints(tmpModel,
+                                             &listOfLeftHandPointSets,
+                                             &listOfRightHandPointSets
+                                            );
 
-    intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+      intrinsicsOptimiser->SetExtrinsics(&rvecsLeft,
+                                         &tvecsLeft,
+                                         &leftToRightRotationMatrix,
+                                         &leftToRightTranslationVector);
 
-    reconstructedRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                                     intrinsicRight
-                                                    );
-    /*
-    // Now optimise RMS reconstruction error via extrinsics.
-    niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
-        niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::New();
+      intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
-    extrinsicsOptimiser->SetModelAndPoints(tmpModel,
-                                           &listOfLeftHandPointSets,
-                                           &listOfRightHandPointSets);
+      currentRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                                 intrinsicRight
+                                                );
 
-    extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
-                                       &intrinsicRight
-                                      );
+      // Recompute re-projection error, as it will now be different.
+      projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                        listOfLeftHandPointSets,
+                                                        listOfRightHandPointSets,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslationVector
+                                                       );
 
-    extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+      std::cout << "niftkStereoCameraCalibration:3D intrinsic optimisation finished, rms2D=" << projectedRMS
+                << ", rms3D=" << currentRMS << std::endl;
 
-    reconstructedRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
-                                                     tvecsLeft,
-                                                     leftToRightRotationMatrix,
-                                                     leftToRightTranslationVector
-                                                    );
-    */
+      // Now optimise RMS reconstruction error via extrinsics.
+      niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
+          niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::New();
 
-    // Recompute re-projection error, as it will now be different.
-    projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                      listOfLeftHandPointSets,
-                                                      listOfRightHandPointSets,
-                                                      intrinsicLeft,
-                                                      distortionLeft,
-                                                      rvecsLeft,
-                                                      tvecsLeft,
-                                                      intrinsicRight,
-                                                      distortionRight,
-                                                      leftToRightRotationMatrix,
-                                                      leftToRightTranslationVector
-                                                     );
+      extrinsicsOptimiser->SetModelAndPoints(tmpModel,
+                                             &listOfLeftHandPointSets,
+                                             &listOfRightHandPointSets);
 
-    std::cout << "niftkStereoCameraCalibration:3D optimisation finished, rms2D=" << projectedRMS
-              << ", rms3D=" << reconstructedRMS << std::endl;
+      extrinsicsOptimiser->SetIntrinsics(&intrinsicLeft,
+                                         &intrinsicRight
+                                        );
+
+      extrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
+      extrinsicsOptimiser->SetOptimiseCameraExtrinsics(true);
+      extrinsicsOptimiser->SetOptimiseL2R(false);
+
+      currentRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
+                                                 tvecsLeft,
+                                                 leftToRightRotationMatrix,
+                                                 leftToRightTranslationVector
+                                                );
+
+      // Recompute re-projection error, as it will now be different.
+      projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                        listOfLeftHandPointSets,
+                                                        listOfRightHandPointSets,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslationVector
+                                                       );
+
+      std::cout << "niftkStereoCameraCalibration:3D extrinsic optimisation finished, rms2D=" << projectedRMS
+                << ", rms3D=" << currentRMS << std::endl;
+
+      extrinsicsOptimiser->SetOptimiseCameraExtrinsics(false);
+      extrinsicsOptimiser->SetOptimiseL2R(true);
+
+      currentRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
+                                                 tvecsLeft,
+                                                 leftToRightRotationMatrix,
+                                                 leftToRightTranslationVector
+                                                );
+
+      // Recompute re-projection error, as it will now be different.
+      projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                        listOfLeftHandPointSets,
+                                                        listOfRightHandPointSets,
+                                                        intrinsicLeft,
+                                                        distortionLeft,
+                                                        rvecsLeft,
+                                                        tvecsLeft,
+                                                        intrinsicRight,
+                                                        distortionRight,
+                                                        leftToRightRotationMatrix,
+                                                        leftToRightTranslationVector
+                                                       );
+
+      std::cout << "niftkStereoCameraCalibration:3D l2r optimisation finished, rms2D=" << projectedRMS
+                << ", rms3D=" << currentRMS << std::endl;
+
+      numberOfIterations++;
+    }
+
+    reconstructedRMS = currentRMS;
   }
 #endif
 
