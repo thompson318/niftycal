@@ -255,13 +255,13 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     optimiser2D->SetOptimiseExtrinsics(true);
     optimiser2D->SetOptimiseR2L(false);
 
-    currentRMS = optimiser2D->Optimise(intrinsicLeft,
-                                       intrinsicRight,
-                                       rvecsLeft,
-                                       tvecsLeft,
-                                       leftToRightRotationMatrix,
-                                       leftToRightTranslationVector
-                                      );
+    optimiser2D->Optimise(intrinsicLeft,
+                          intrinsicRight,
+                          rvecsLeft,
+                          tvecsLeft,
+                          leftToRightRotationMatrix,
+                          leftToRightTranslationVector
+                         );
 
     // Then optimise just R2L
     optimiser2D->SetOptimiseIntrinsics(false);
@@ -340,9 +340,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
       intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
-      currentRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                                 intrinsicRight
-                                                );
+      intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                    intrinsicRight
+                                   );
 
       // Now optimise RMS reconstruction error via extrinsics.
       niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
@@ -360,11 +360,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
       extrinsicsOptimiser->SetOptimiseCameraExtrinsics(true);
       extrinsicsOptimiser->SetOptimiseL2R(false);
 
-      currentRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
-                                                 tvecsLeft,
-                                                 leftToRightRotationMatrix,
-                                                 leftToRightTranslationVector
-                                                );
+      extrinsicsOptimiser->Optimise(rvecsLeft,
+                                    tvecsLeft,
+                                    leftToRightRotationMatrix,
+                                    leftToRightTranslationVector
+                                   );
 
       extrinsicsOptimiser->SetOptimiseCameraExtrinsics(false);
       extrinsicsOptimiser->SetOptimiseL2R(true);
