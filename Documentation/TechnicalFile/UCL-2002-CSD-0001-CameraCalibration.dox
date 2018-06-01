@@ -8,7 +8,7 @@
 <tr><td>Document ID:</td><td>UCL-2002-CSD-0001-CameraCalibration.dox</td></tr>
 <tr><td>Prepared By:</td><td>Matt Clarkson</td></tr>
 <tr><td>Authorised By:</td><td></td></tr>
-<tr><td>Last Modified:</td><td>18 Jun 2016</td></tr>
+<tr><td>Last Modified:</td><td>1 Jun 2018</td></tr>
 </table>
 
 \subsection NiftyCalCSDPreamble Preamble
@@ -26,6 +26,7 @@ This section only describes the changes between authorised published versions.
 <table>
 <tr><th>Version</th><th>Date</th><th>Author(s)</th><th>Change(s)</th><th>Sections Affected</th></tr>
 <tr><td>0.1</td><td>18 June 2015</td><td>Matt Clarkson</td><td>Initial Version</td><td>All</td></tr>
+<tr><td>0.2</td><td>1 June 2016</td><td>Matt Clarkson</td><td>Minor Edits</td><td>See diff</td></tr>
 </table>
 
 \section NiftyCalCSDIntro Introduction
