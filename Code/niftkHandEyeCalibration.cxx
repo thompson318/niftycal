@@ -661,7 +661,7 @@ void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     const bool&                   optimise3D,
     cv::Matx44d&                  handEye,
     cv::Matx44d&                  modelToWorld,
-    cv::Matx44d&                  stereoExtrinsics,
+    const cv::Matx44d&            stereoExtrinsics,
     double&                       residual
     )
 {
