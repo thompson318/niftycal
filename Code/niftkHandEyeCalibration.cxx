@@ -678,8 +678,9 @@ void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
   optimiser2D->SetLeftDistortion(&leftDistortion);
   optimiser2D->SetRightIntrinsic(&rightIntrinsic);
   optimiser2D->SetRightDistortion(&rightDistortion);
+  optimiser2D->SetLeftToRight(stereoExtrinsics);
 
-  residual = optimiser2D->Optimise(modelToWorld, handEye, stereoExtrinsics);
+  residual = optimiser2D->Optimise(modelToWorld, handEye);
 
   if (optimise3D)
   {
@@ -692,8 +693,9 @@ void CalculateHandEyeInStereoByOptimisingAllExtrinsic(
     optimiser3D->SetLeftDistortion(&leftDistortion);
     optimiser3D->SetRightIntrinsic(&rightIntrinsic);
     optimiser3D->SetRightDistortion(&rightDistortion);
+    optimiser2D->SetLeftToRight(stereoExtrinsics);
 
-    residual = optimiser3D->Optimise(modelToWorld, handEye, stereoExtrinsics);
+    residual = optimiser3D->Optimise(modelToWorld, handEye);
   }
 
 #endif

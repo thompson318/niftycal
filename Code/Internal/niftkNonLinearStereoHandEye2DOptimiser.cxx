@@ -99,10 +99,16 @@ void NonLinearStereoHandEye2DOptimiser::SetRightDistortion(const cv::Mat* const 
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoHandEye2DOptimiser::SetLeftToRight(const cv::Matx44d& mat)
+{
+  m_CostFunction->SetLeftToRight(mat);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
-                                                 cv::Matx44d& handEye,
-                                                 cv::Matx44d& stereoExtrinsics
-                                                )
+                                                   cv::Matx44d& handEye)
 {
   std::list<cv::Matx44d>* matrices = m_CostFunction->GetHandMatrices();
   if (matrices == nullptr)
@@ -118,14 +124,9 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   cv::Mat handEyeTranslationVector = cvCreateMat(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
-  cv::Mat stereoExtrinsicsRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat stereoExtrinsicsTranslationVector = cvCreateMat(1, 3, CV_64FC1);
-  niftk::MatrixToRodrigues(stereoExtrinsics, stereoExtrinsicsRotationVector, stereoExtrinsicsTranslationVector);
-
   niftk::NonLinearStereoHandEye2DCostFunction::ParametersType initialParameters;
   initialParameters.SetSize(  6                    // model to world
                             + 6                    // hand eye
-                            + 6                    // stereo extrinsics
                             + 6 * matrices->size() // extrinsics for each left hand view.
                            );
 
@@ -142,14 +143,8 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   initialParameters[9] = modelToWorldTranslationVector.at<double>(0, 0);
   initialParameters[10] = modelToWorldTranslationVector.at<double>(0, 1);
   initialParameters[11] = modelToWorldTranslationVector.at<double>(0, 2);
-  initialParameters[12] = stereoExtrinsicsRotationVector.at<double>(0, 0);
-  initialParameters[13] = stereoExtrinsicsRotationVector.at<double>(0, 1);
-  initialParameters[14] = stereoExtrinsicsRotationVector.at<double>(0, 2);
-  initialParameters[15] = stereoExtrinsicsTranslationVector.at<double>(0, 0);
-  initialParameters[16] = stereoExtrinsicsTranslationVector.at<double>(0, 1);
-  initialParameters[17] = stereoExtrinsicsTranslationVector.at<double>(0, 2);
 
-  unsigned int counter = 18;
+  unsigned int counter = 12;
   std::list<cv::Matx44d>::const_iterator iter;
   for (iter = (*matrices).begin();
        iter != (*matrices).end();
@@ -203,27 +198,13 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   modelToWorldTranslationVector.at<double>(0, 0) = finalParameters[9];
   modelToWorldTranslationVector.at<double>(0, 1) = finalParameters[10];
   modelToWorldTranslationVector.at<double>(0, 2) = finalParameters[11];
-  stereoExtrinsicsRotationVector.at<double>(0, 0) = finalParameters[12];
-  stereoExtrinsicsRotationVector.at<double>(0, 1) = finalParameters[13];
-  stereoExtrinsicsRotationVector.at<double>(0, 2) = finalParameters[14];
-  stereoExtrinsicsTranslationVector.at<double>(0, 0) = finalParameters[15];
-  stereoExtrinsicsTranslationVector.at<double>(0, 1) = finalParameters[16];
-  stereoExtrinsicsTranslationVector.at<double>(0, 2) = finalParameters[17];
 
   modelToWorld = niftk::RodriguesToMatrix(modelToWorldRotationVector, modelToWorldTranslationVector);
   handEye = niftk::RodriguesToMatrix(handEyeRotationVector, handEyeTranslationVector);
-  stereoExtrinsics = niftk::RodriguesToMatrix(stereoExtrinsicsRotationVector, stereoExtrinsicsTranslationVector);
 
   niftk::NonLinearStereoHandEye2DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  std::cout << "NonLinearStereoHandEye2DOptimiser: stereo="
-            << stereoExtrinsicsRotationVector.at<double>(0, 0) << ", "
-            << stereoExtrinsicsRotationVector.at<double>(0, 1) << ", "
-            << stereoExtrinsicsRotationVector.at<double>(0, 2) << ", "
-            << stereoExtrinsicsTranslationVector.at<double>(0, 0) << ", "
-            << stereoExtrinsicsTranslationVector.at<double>(0, 1) << ", "
-            << stereoExtrinsicsTranslationVector.at<double>(0, 2) << std::endl;
   std::cout << "NonLinearStereoHandEye2DOptimiser: hand-eye="
             << handEyeRotationVector.at<double>(0, 0) << ", "
             << handEyeRotationVector.at<double>(0, 1) << ", "

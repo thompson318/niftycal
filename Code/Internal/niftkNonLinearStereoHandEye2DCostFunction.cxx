@@ -34,6 +34,14 @@ NonLinearStereoHandEye2DCostFunction::~NonLinearStereoHandEye2DCostFunction()
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoHandEye2DCostFunction::SetLeftToRight(const cv::Matx44d& mat)
+{
+  m_LeftToRight = mat;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 NonLinearStereoHandEye2DCostFunction::MeasureType
 NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
@@ -62,6 +70,10 @@ NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& par
                             );
   internalParameters.Fill(0);
 
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(m_LeftToRight, leftToRightRotationVector, leftToRightTranslationVector);
+
   // Intrinsic params are not in the input array, as they are constant.
   internalParameters[0] = (*m_Intrinsic).at<double>(0, 0);
   internalParameters[1] = (*m_Intrinsic).at<double>(1, 1);
@@ -81,12 +93,12 @@ NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& par
   internalParameters[15] = (*m_RightDistortion).at<double>(0, 2);
   internalParameters[16] = (*m_RightDistortion).at<double>(0, 3);
   internalParameters[17] = (*m_RightDistortion).at<double>(0, 4);
-  internalParameters[18] = parameters[12];
-  internalParameters[19] = parameters[13];
-  internalParameters[20] = parameters[14];
-  internalParameters[21] = parameters[15];
-  internalParameters[22] = parameters[16];
-  internalParameters[23] = parameters[17];
+  internalParameters[18] = leftToRightRotationVector.at<double>(0, 0);
+  internalParameters[19] = leftToRightRotationVector.at<double>(0, 1);
+  internalParameters[20] = leftToRightRotationVector.at<double>(0, 2);
+  internalParameters[21] = leftToRightTranslationVector.at<double>(0, 0);
+  internalParameters[22] = leftToRightTranslationVector.at<double>(0, 1);
+  internalParameters[23] = leftToRightTranslationVector.at<double>(0, 2);
 
   cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
   handEyeRotationVector.at<double>(0, 0) = parameters[0];

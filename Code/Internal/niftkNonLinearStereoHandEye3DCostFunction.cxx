@@ -34,6 +34,14 @@ NonLinearStereoHandEye3DCostFunction::~NonLinearStereoHandEye3DCostFunction()
 
 
 //-----------------------------------------------------------------------------
+void NonLinearStereoHandEye3DCostFunction::SetLeftToRight(const cv::Matx44d& mat)
+{
+  m_LeftToRight = mat;
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
 NonLinearStereoHandEye3DCostFunction::MeasureType
 NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
@@ -57,10 +65,13 @@ NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& par
                              + 5 // left distortion
                              + 4 // right intrinsic
                              + 5 // right distortion
-                             + 6 // left to right
                              + (m_Points->size()*6)
                             );
   internalParameters.Fill(0);
+
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(m_LeftToRight, leftToRightRotationVector, leftToRightTranslationVector);
 
   // Intrinsic params are not in the input array, as they are constant.
   internalParameters[0] = (*m_Intrinsic).at<double>(0, 0);

@@ -126,7 +126,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
                                                  tvecs
                                                  );
 
-  std::cout << "Mono intrinsic calibration RMS=" << rms << std::endl;
+  std::cout << "Zhang's, mono intrinsic calibration RMS=" << rms << std::endl;
 
   std::chrono::time_point<std::chrono::system_clock> endCalib = std::chrono::system_clock::now();
   elapsed_seconds = endCalib - endStartup;
@@ -162,7 +162,7 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
         residuals
         );
 
-  std::cout << "Done hand-eye, rotation residual=" << residuals(0, 0) << ", translation residual=" << residuals(1, 0) << std::endl;
+  std::cout << "Done Tsai hand-eye, rotation residual=" << residuals(0, 0) << ", translation residual=" << residuals(1, 0) << std::endl;
 
   std::chrono::time_point<std::chrono::system_clock> endTsai= std::chrono::system_clock::now();
   elapsed_seconds = endTsai - endCalib;
@@ -184,19 +184,10 @@ TEST_CASE( "Mono HandEye", "[MonoCalibration]" ) {
   cv::Matx44d modelToWorld = (*(trackingMatrices.begin())) * eyeHand * (*(cameraMatrices.begin()));
 
   double reprojectionRMS = 0;
-
-  // Here, Im just testing that the stereo code runs to completion, as we only have mono data.
-  cv::Matx44d stereoExtrinsics = cv::Matx44d::eye();
-  niftk::CalculateHandEyeInStereoByOptimisingAllExtrinsic(model, listOfPoints, intrinsic, distortion, listOfPoints, intrinsic, distortion, trackingMatrices, false, handEye, modelToWorld, stereoExtrinsics, reprojectionRMS);
-
-  std::chrono::time_point<std::chrono::system_clock> endStereo= std::chrono::system_clock::now();
-  elapsed_seconds = endStereo - endTsai;
-  std::cout << "TIME:STEREO=" << elapsed_seconds.count() << std::endl;
-
   niftk::CalculateHandEyeByOptimisingAllExtrinsic(model, listOfPoints, trackingMatrices, intrinsic, distortion, handEye, modelToWorld, reprojectionRMS);
 
   std::chrono::time_point<std::chrono::system_clock> endNDOF= std::chrono::system_clock::now();
-  elapsed_seconds = endNDOF - endStereo;
+  elapsed_seconds = endNDOF - endTsai;
   std::cout << "TIME:NDOF=" << elapsed_seconds.count() << std::endl;
 
   niftk::CalculateHandEyeUsingMaltisMethod(model, listOfPoints, trackingMatrices, intrinsic, distortion, handEye, modelToWorld, reprojectionRMS);
