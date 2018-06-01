@@ -175,28 +175,15 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(1000);
-  optimiser->SetGradientTolerance(0.0001);
-  optimiser->SetEpsilonFunction(0.0001);
-  optimiser->SetValueTolerance(0.0001);
+  optimiser->SetNumberOfIterations(100);
+  optimiser->SetGradientTolerance(0.0000001);
+  optimiser->SetEpsilonFunction(0.0000001);
+  optimiser->SetValueTolerance(0.0000001);
 
   niftk::NonLinearStereoHandEye2DCostFunction::MeasureType initialValues =
       m_CostFunction->GetValue(initialParameters);
 
   double initialRMS = m_CostFunction->GetRMS(initialValues);
-
-  /*
-  for (int i = 18; i < initialParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearStereoHandEye2DOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
-    if ((i - 18) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  std::cout << ", rms=" << initialRMS << std::endl;
-  */
-
   std::cout << "NonLinearStereoHandEye2DOptimiser: initial rms=" << initialRMS << std::endl;
 
   // Do optimisation.
@@ -230,20 +217,6 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearStereoHandEye2DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  /*
-  for (int i = 18; i < finalParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearStereoHandEye2DOptimiser: final(" << i << ")=" << finalParameters[i]
-                 << ", initial=" << initialParameters[i]
-                 << ", diff=" << finalParameters[i] - initialParameters[i]
-                 << std::endl;
-    if ((i - 18) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  */
-
   std::cout << "NonLinearStereoHandEye2DOptimiser: stereo="
             << stereoExtrinsicsRotationVector.at<double>(0, 0) << ", "
             << stereoExtrinsicsRotationVector.at<double>(0, 1) << ", "
@@ -266,7 +239,7 @@ double NonLinearStereoHandEye2DOptimiser::Optimise(cv::Matx44d& modelToWorld,
             << modelToWorldTranslationVector.at<double>(0, 1) << ", "
             << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
 
-  std::cout << "NonLinearStereoHandEye2DOptimiser: final rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearStereoHandEye2DOptimiser: final projection rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

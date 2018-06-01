@@ -305,21 +305,11 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
   optimiser->SetEpsilonFunction(0.0000001);
   optimiser->SetValueTolerance(0.0000001);
 
-  /*
-  niftk::NonLinearStereoCameraCalibration2DCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
-  double initialRMS = m_CostFunction->GetRMS(initialValues);
-  std::cout << this->GetNameOfClass() << ": initial:" << initialParameters << "=" << initialRMS << std::endl;
-  */
-
   optimiser->StartOptimization();
 
   niftk::NonLinearStereoCameraCalibration2DCostFunction::ParametersType finalParameters = optimiser->GetCurrentPosition();
   niftk::NonLinearStereoCameraCalibration2DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-
-  /*
-  std::cout << this->GetNameOfClass() << ": final:" << finalParameters << "=" << finalRMS << std::endl;
-  */
 
   counter = 0;
   if (m_OptimiseIntrinsics)
