@@ -139,25 +139,14 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(1000);
-  optimiser->SetGradientTolerance(0.0001);
-  optimiser->SetEpsilonFunction(0.0001);
-  optimiser->SetValueTolerance(0.0001);
+  optimiser->SetNumberOfIterations(100);
+  optimiser->SetGradientTolerance(0.0000001);
+  optimiser->SetEpsilonFunction(0.0000001);
+  optimiser->SetValueTolerance(0.0000001);
 
   niftk::NonLinearNDOFHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);
 
-  /*
-  for (int i = 12; i < initialParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearNDOFHandEyeOptimiser: initial(" << i << ")=" << initialParameters[i] << std::endl;
-    if ((i - 12) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  std::cout << ", rms=" << initialRMS << std::endl;
-  */
   std::cout << "NonLinearNDOFHandEyeOptimiser: initial rms=" << initialRMS << std::endl;
 
   // Do optimisation.
@@ -184,19 +173,6 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   niftk::NonLinearNDOFHandEyeCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  /*
-  for (int i = 12; i < finalParameters.GetSize(); i++)
-  {
-    std::cout << "NonLinearNDOFHandEyeOptimiser: final(" << i << ")=" << finalParameters[i]
-                 << ", initial=" << initialParameters[i]
-                 << ", diff=" << finalParameters[i] - initialParameters[i]
-                 << std::endl;
-    if ((i - 12) % 6 == 5)
-    {
-      std::cout << std::endl;
-    }
-  }
-  */
   std::cout << "NonLinearNDOFHandEyeOptimiser: hand-eye="
             << handEyeRotationVector.at<double>(0, 0) << ", "
             << handEyeRotationVector.at<double>(0, 1) << ", "
@@ -212,7 +188,7 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
             << modelToWorldTranslationVector.at<double>(0, 1) << ", "
             << modelToWorldTranslationVector.at<double>(0, 2) << std::endl;
 
-  std::cout << "NonLinearNDOFHandEyeOptimiser: final rms=" << finalRMS << std::endl;
+  std::cout << "NonLinearNDOFHandEyeOptimiser: final projection rms=" << finalRMS << std::endl;
 
   return finalRMS;
 }

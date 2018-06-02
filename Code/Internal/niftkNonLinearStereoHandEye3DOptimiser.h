@@ -44,11 +44,10 @@ public:
   void SetLeftDistortion(const cv::Mat* const distortion);
   void SetRightIntrinsic(const cv::Mat* const intrinsic);
   void SetRightDistortion(const cv::Mat* const distortion);
+  void SetLeftToRight(const cv::Matx44d& mat);
 
   double Optimise(cv::Matx44d& modelToWorld,
-                  cv::Matx44d& handEye,
-                  cv::Matx44d& stereoExtrinsics
-                 );
+                  cv::Matx44d& handEye);
 
 protected:
 

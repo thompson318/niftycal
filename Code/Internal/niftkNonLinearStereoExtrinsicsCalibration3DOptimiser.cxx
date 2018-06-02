@@ -70,12 +70,28 @@ void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetIntrinsics(cv::Mat* con
 }
 
 
+//----------------------------------------------------------------------------
+void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetOptimiseCameraExtrinsics(const bool& optimise)
+{
+  m_CostFunction->SetOptimiseCameraExtrinsics(optimise);
+  this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+void NonLinearStereoExtrinsicsCalibration3DOptimiser::SetOptimiseL2R(const bool& optimise)
+{
+  m_CostFunction->SetOptimiseL2R(optimise);
+  this->Modified();
+}
+
+
 //-----------------------------------------------------------------------------
 double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv::Mat>& rvecsLeft,
-                                                               std::vector<cv::Mat>& tvecsLeft,
-                                                               cv::Mat& leftToRightRotationMatrix,
-                                                               cv::Mat& leftToRightTranslationVector
-                                                              )
+                                                                 std::vector<cv::Mat>& tvecsLeft,
+                                                                 cv::Mat& leftToRightRotationMatrix,
+                                                                 cv::Mat& leftToRightTranslationVector
+                                                                )
 {
   if (leftToRightRotationMatrix.rows != 3 || leftToRightRotationMatrix.cols != 3)
   {
@@ -98,31 +114,45 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
   cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
+  unsigned int numberOfParameters = 0;
+  if (this->m_CostFunction->GetOptimiseL2R())
+  {
+    numberOfParameters += 6;
+  }
+  if (this->m_CostFunction->GetOptimiseCameraExtrinsics())
+  {
+    numberOfParameters += (rvecsLeft.size() * 6);
+  }
+
   niftk::NonLinearStereoExtrinsicsCalibration3DCostFunction::ParametersType initialParameters;
-  initialParameters.SetSize(  3                    // leftToRightRotationVector
-                            + 3                    // leftToRightTranslationVector
-                            + 6 * rvecsLeft.size() // extrinsics of each left hand camera
-                           );
+  initialParameters.SetSize(numberOfParameters);
 
   // Set initial parameters.
   int counter = 0;
-  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 0);
-  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 1);
-  initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 2);
-  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0);
-  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 1);
-  initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 2);
-  for (int i = 0; i < rvecsLeft.size(); i++)
+  if (m_CostFunction->GetOptimiseL2R())
   {
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 0);
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 1);
-    initialParameters[counter++] = rvecsLeft[i].at<double>(0, 2);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 0);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 1);
-    initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
+    initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 0);
+    initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 1);
+    initialParameters[counter++] = leftToRightRotationVector.at<double>(0, 2);
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(0, 0);
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(1, 0);
+    initialParameters[counter++] = leftToRightTranslationVector.at<double>(2, 0);
+  }
+  if (m_CostFunction->GetOptimiseCameraExtrinsics())
+  {
+    for (int i = 0; i < rvecsLeft.size(); i++)
+    {
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 0);
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 1);
+      initialParameters[counter++] = rvecsLeft[i].at<double>(0, 2);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 0);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 1);
+      initialParameters[counter++] = tvecsLeft[i].at<double>(0, 2);
+    }
   }
 
   m_CostFunction->SetNumberOfParameters(initialParameters.GetSize());
+  m_CostFunction->SetExtrinsics(&rvecsLeft, &tvecsLeft, &leftToRightRotationMatrix, &leftToRightTranslationVector);
 
   // Setup optimiser.
   itk::LevenbergMarquardtOptimizer::Pointer optimiser = itk::LevenbergMarquardtOptimizer::New();
@@ -130,18 +160,9 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
   optimiser->SetNumberOfIterations(100);
-  optimiser->SetGradientTolerance(0.001);
-  optimiser->SetEpsilonFunction(0.001);
-  optimiser->SetValueTolerance(0.001);
-
-  /*
-  niftk::NonLinearStereoExtrinsicsCalibration3DCostFunction::MeasureType initialValues =
-    m_CostFunction->GetValue(initialParameters);
-  double initialRMS = m_CostFunction->GetRMS(initialValues);
-
-  int startingPointOfExtrinsics = 6;
-  std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: initial rms=" << initialRMS << std::endl;
-  */
+  optimiser->SetGradientTolerance(0.0000001);
+  optimiser->SetEpsilonFunction(0.0000001);
+  optimiser->SetValueTolerance(0.0000001);
 
   // Do optimisation.
   optimiser->StartOptimization();
@@ -153,58 +174,30 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
       = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
 
-  /*
-  for (int i = startingPointOfExtrinsics; i < finalParameters.GetSize(); i++)
+  counter = 0;
+  if (m_CostFunction->GetOptimiseL2R())
   {
-    std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
-                 << ", initial=" << initialParameters[i]
-                 << ", diff=" << finalParameters[i] - initialParameters[i]
-                 << std::endl;
-    if ((i - startingPointOfExtrinsics) % 6 == 5)
+    leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
+    leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
+    leftToRightRotationVector.at<double>(0, 2) = finalParameters[counter++];
+    cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+
+    leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(1, 0) = finalParameters[counter++];
+    leftToRightTranslationVector.at<double>(2, 0) = finalParameters[counter++];
+  }
+  if (m_CostFunction->GetOptimiseCameraExtrinsics())
+  {
+    for (int i = 0; i < rvecsLeft.size(); i++)
     {
-      std::cout << std::endl;
+      rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+      rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+      rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
+      tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
     }
   }
-  */
-
-  counter = 0;
-  leftToRightRotationVector.at<double>(0, 0) = finalParameters[counter++];
-  leftToRightRotationVector.at<double>(0, 1) = finalParameters[counter++];
-  leftToRightRotationVector.at<double>(0, 2) = finalParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 0) = finalParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 1) = finalParameters[counter++];
-  leftToRightTranslationVector.at<double>(0, 2) = finalParameters[counter++];
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    rvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
-    rvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
-    rvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 0) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 1) = finalParameters[counter++];
-    tvecsLeft[i].at<double>(0, 2) = finalParameters[counter++];
-  }
-
-  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
-
-  /*
-  for (int i = 0; i < startingPointOfExtrinsics; i++)
-  {
-    std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: final(" << i << ")=" << finalParameters[i]
-                 << ", initial=" << initialParameters[i]
-                 << ", diff=" << finalParameters[i] - initialParameters[i]
-                 << std::endl;
-  }
-
-  std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: stereo="
-            << leftToRightRotationVector.at<double>(0, 0) << ", "
-            << leftToRightRotationVector.at<double>(0, 1) << ", "
-            << leftToRightRotationVector.at<double>(0, 2) << ", "
-            << leftToRightTranslationVector.at<double>(0, 0) << ", "
-            << leftToRightTranslationVector.at<double>(0, 1) << ", "
-            << leftToRightTranslationVector.at<double>(0, 2) << std::endl;
-  std::cout << "NonLinearStereoExtrinsicsCalibration3DOptimiser: rms=" << finalRMS << std::endl;
-  */
-
   return finalRMS;
 }
 

@@ -122,10 +122,10 @@ double NonLinearMaltiHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(1000);
-  optimiser->SetGradientTolerance(0.0001);
-  optimiser->SetEpsilonFunction(0.0001);
-  optimiser->SetValueTolerance(0.0001);
+  optimiser->SetNumberOfIterations(100);
+  optimiser->SetGradientTolerance(0.0000001);
+  optimiser->SetEpsilonFunction(0.0000001);
+  optimiser->SetValueTolerance(0.0000001);
 
   niftk::NonLinearMaltiHandEyeCostFunction::MeasureType initialValues = m_CostFunction->GetValue(initialParameters);
   double initialRMS = m_CostFunction->GetRMS(initialValues);

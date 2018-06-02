@@ -40,6 +40,12 @@ public:
 
   virtual unsigned int GetNumberOfValues(void) const ITK_OVERRIDE;
 
+  void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
+                     std::vector<cv::Mat>* const tvecsLeft,
+                     cv::Mat* const leftToRightRotationMatrix,
+                     cv::Mat* const leftToRightTranslationVector
+                     );
+
 protected:
 
   NonLinearStereo3DCostFunction();
@@ -47,6 +53,11 @@ protected:
 
   NonLinearStereo3DCostFunction(const NonLinearStereo3DCostFunction&); // Purposefully not implemented.
   NonLinearStereo3DCostFunction& operator=(const NonLinearStereo3DCostFunction&); // Purposefully not implemented.
+
+  std::vector<cv::Mat> *m_RvecsLeft;
+  std::vector<cv::Mat> *m_TvecsLeft;
+  cv::Mat              *m_LeftToRightRotationMatrix;
+  cv::Mat              *m_LeftToRightTranslationVector;
 
 };
 

@@ -246,11 +246,7 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
   }
   if ((parameters.size() - 30) % 6 != 0)
   {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
-  }
-  if ((parameters.size() - 24) / 6 != leftPoints->size())
-  {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+    niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then [6DOF stereo extrinsic], then [Nx6DOF].";
   }
   if (leftPoints->size() != rightPoints->size())
   {
@@ -377,7 +373,7 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
   rp.push_back(rightPoints);
 
   unsigned long int totalPointCounter = 0;
-  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)) * 3;
+  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)); // * 3;
 
   errorValues.clear();
   errorValues.SetSize(numberOfValues);
@@ -394,11 +390,13 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
     {
       niftkNiftyCalThrow() << "Failed to find point " << id << " in gold standard model.";
     }
-    niftk::Point3D triangulatedPoint = (*modelIter).second;
-    niftk::Point3D goldStandardPoint = (*goldIter).second;
-    errorValues[totalPointCounter++] = triangulatedPoint.point.x - goldStandardPoint.point.x;
-    errorValues[totalPointCounter++] = triangulatedPoint.point.y - goldStandardPoint.point.y;
-    errorValues[totalPointCounter++] = triangulatedPoint.point.z - goldStandardPoint.point.z;
+    niftk::Point3D tp = (*modelIter).second;
+    niftk::Point3D gsp = (*goldIter).second;
+    errorValues[totalPointCounter++] = std::sqrt(
+        (tp.point.x - gsp.point.x) * (tp.point.x - gsp.point.x)
+      + (tp.point.y - gsp.point.y) * (tp.point.y - gsp.point.y)
+      + (tp.point.z - gsp.point.z) * (tp.point.z - gsp.point.z)
+      );
   }
 }
 

@@ -494,9 +494,7 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                                    essentialMatrix,
                                                    fundamentalMatrix,
                                                    cvFlags,
-                                                   optimise3D,
-                                                   optimise2DOFStereo,
-                                                   force2DOFStereoAxis
+                                                   optimise3D
                                                   );
 
   rvecsLeft[0].copyTo(rvec1x3Left);

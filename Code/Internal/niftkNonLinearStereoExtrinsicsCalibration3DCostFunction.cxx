@@ -23,6 +23,8 @@ namespace niftk
 
 //-----------------------------------------------------------------------------
 NonLinearStereoExtrinsicsCalibration3DCostFunction::NonLinearStereoExtrinsicsCalibration3DCostFunction()
+: m_OptimiseCameraExtrinsics(true)
+, m_OptimiseL2R(true)
 {
 }
 
@@ -54,43 +56,73 @@ NonLinearStereoExtrinsicsCalibration3DCostFunction::InternalGetValue(const Param
                              + 6 * m_Points->size() // 6DOF per view
                             );
 
-  internalParameters[0] = m_Intrinsic->at<double>(0, 0);
-  internalParameters[1] = m_Intrinsic->at<double>(1, 1);
-  internalParameters[2] = m_Intrinsic->at<double>(0, 2);
-  internalParameters[3] = m_Intrinsic->at<double>(1, 2);
-  internalParameters[4] = m_Distortion->at<double>(0, 0);
-  internalParameters[5] = m_Distortion->at<double>(0, 1);
-  internalParameters[6] = m_Distortion->at<double>(0, 2);
-  internalParameters[7] = m_Distortion->at<double>(0, 3);
-  internalParameters[8] = m_Distortion->at<double>(0, 4);
-  internalParameters[9]  = m_RightIntrinsic->at<double>(0, 0);
-  internalParameters[10] = m_RightIntrinsic->at<double>(1, 1);
-  internalParameters[11] = m_RightIntrinsic->at<double>(0, 2);
-  internalParameters[12] = m_RightIntrinsic->at<double>(1, 2);
-  internalParameters[13] = m_RightDistortion->at<double>(0, 0);
-  internalParameters[14] = m_RightDistortion->at<double>(0, 1);
-  internalParameters[15] = m_RightDistortion->at<double>(0, 2);
-  internalParameters[16] = m_RightDistortion->at<double>(0, 3);
-  internalParameters[17] = m_RightDistortion->at<double>(0, 4);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Rodrigues(*m_LeftToRightRotationMatrix, leftToRightRotationVector);
 
-  internalParameters[18] = parameters[0];
-  internalParameters[19] = parameters[1];
-  internalParameters[20] = parameters[2];
+  unsigned int internalParameterCounter = 0;
+  unsigned int externalParameterCounter = 0;
 
-  internalParameters[21] = parameters[3];
-  internalParameters[22] = parameters[4];
-  internalParameters[23] = parameters[5];
+  internalParameters[internalParameterCounter++] = m_Intrinsic->at<double>(0, 0);
+  internalParameters[internalParameterCounter++] = m_Intrinsic->at<double>(1, 1);
+  internalParameters[internalParameterCounter++] = m_Intrinsic->at<double>(0, 2);
+  internalParameters[internalParameterCounter++] = m_Intrinsic->at<double>(1, 2);
+  internalParameters[internalParameterCounter++] = m_Distortion->at<double>(0, 0);
+  internalParameters[internalParameterCounter++] = m_Distortion->at<double>(0, 1);
+  internalParameters[internalParameterCounter++] = m_Distortion->at<double>(0, 2);
+  internalParameters[internalParameterCounter++] = m_Distortion->at<double>(0, 3);
+  internalParameters[internalParameterCounter++] = m_Distortion->at<double>(0, 4);
+  internalParameters[internalParameterCounter++]  = m_RightIntrinsic->at<double>(0, 0);
+  internalParameters[internalParameterCounter++] = m_RightIntrinsic->at<double>(1, 1);
+  internalParameters[internalParameterCounter++] = m_RightIntrinsic->at<double>(0, 2);
+  internalParameters[internalParameterCounter++] = m_RightIntrinsic->at<double>(1, 2);
+  internalParameters[internalParameterCounter++] = m_RightDistortion->at<double>(0, 0);
+  internalParameters[internalParameterCounter++] = m_RightDistortion->at<double>(0, 1);
+  internalParameters[internalParameterCounter++] = m_RightDistortion->at<double>(0, 2);
+  internalParameters[internalParameterCounter++] = m_RightDistortion->at<double>(0, 3);
+  internalParameters[internalParameterCounter++] = m_RightDistortion->at<double>(0, 4);
 
-  unsigned int internalParameterCounter = 24;
-  unsigned int parametersCounter = 6;
-  for (unsigned int i = 0; i < m_Points->size(); i++)
+  if (m_OptimiseL2R)
   {
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
-    internalParameters[internalParameterCounter++] = parameters[parametersCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+  }
+  else
+  {
+    internalParameters[internalParameterCounter++] = leftToRightRotationVector.at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = leftToRightRotationVector.at<double>(0, 1);
+    internalParameters[internalParameterCounter++] = leftToRightRotationVector.at<double>(0, 2);
+    internalParameters[internalParameterCounter++] = m_LeftToRightTranslationVector->at<double>(0, 0);
+    internalParameters[internalParameterCounter++] = m_LeftToRightTranslationVector->at<double>(1, 0);
+    internalParameters[internalParameterCounter++] = m_LeftToRightTranslationVector->at<double>(2, 0);
+  }
+
+  if (m_OptimiseCameraExtrinsics)
+  {
+    for (unsigned int i = 0; i < m_Points->size(); i++)
+    {
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+      internalParameters[internalParameterCounter++] = parameters[externalParameterCounter++];
+    }
+  }
+  else
+  {
+    for (unsigned int i = 0; i < m_Points->size(); i++)
+    {
+      internalParameters[internalParameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 0);
+      internalParameters[internalParameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 1);
+      internalParameters[internalParameterCounter++] = (*m_RvecsLeft)[i].at<double>(0, 2);
+      internalParameters[internalParameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 0);
+      internalParameters[internalParameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 1);
+      internalParameters[internalParameterCounter++] = (*m_TvecsLeft)[i].at<double>(0, 2);
+    }
   }
 
   niftk::ComputeStereoReconstructionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);

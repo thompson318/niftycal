@@ -46,6 +46,8 @@ public:
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
+  void SetLeftToRight(const cv::Matx44d& mat);
+
 protected:
 
   NonLinearStereoHandEye2DCostFunction();
@@ -53,6 +55,8 @@ protected:
 
   NonLinearStereoHandEye2DCostFunction(const NonLinearStereoHandEye2DCostFunction&);
   NonLinearStereoHandEye2DCostFunction& operator=(const NonLinearStereoHandEye2DCostFunction&);
+
+  cv::Matx44d m_LeftToRight;
 
 };
 

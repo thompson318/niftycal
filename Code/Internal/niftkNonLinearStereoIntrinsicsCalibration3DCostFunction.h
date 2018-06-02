@@ -44,12 +44,6 @@ public:
   typedef Superclass::DerivativeType                         DerivativeType;
   typedef Superclass::MeasureType                            MeasureType;
 
-  void SetExtrinsics(std::vector<cv::Mat>* const rvecsLeft,
-                     std::vector<cv::Mat>* const tvecsLeft,
-                     cv::Mat* const leftToRightRotationMatrix,
-                     cv::Mat* const leftToRightTranslationVector
-                     );
-
   void SetDistortionParameters(cv::Mat* const leftDistortion,
                                cv::Mat* const rightDistortion
                                );
@@ -65,12 +59,8 @@ protected:
   NonLinearStereoIntrinsicsCalibration3DCostFunction& operator=(const NonLinearStereoIntrinsicsCalibration3DCostFunction&);
 
 private:
-  std::vector<cv::Mat> *m_RvecsLeft;
-  std::vector<cv::Mat> *m_TvecsLeft;
-  cv::Mat              *m_LeftToRightRotationMatrix;
-  cv::Mat              *m_LeftToRightTranslationVector;
-  cv::Mat              *m_LeftDistortion;
-  cv::Mat              *m_RightDistortion;
+  cv::Mat *m_LeftDistortion;
+  cv::Mat *m_RightDistortion;
 };
 
 } // end namespace

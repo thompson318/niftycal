@@ -48,6 +48,12 @@ public:
 
   virtual MeasureType InternalGetValue( const ParametersType & parameters ) const ITK_OVERRIDE;
 
+  itkSetMacro(OptimiseCameraExtrinsics, bool);
+  itkGetConstMacro(OptimiseCameraExtrinsics, bool);
+
+  itkSetMacro(OptimiseL2R, bool);
+  itkGetConstMacro(OptimiseL2R, bool);
+
 protected:
 
   NonLinearStereoExtrinsicsCalibration3DCostFunction();
@@ -56,6 +62,8 @@ protected:
   NonLinearStereoExtrinsicsCalibration3DCostFunction(const NonLinearStereoExtrinsicsCalibration3DCostFunction&);
   NonLinearStereoExtrinsicsCalibration3DCostFunction& operator=(const NonLinearStereoExtrinsicsCalibration3DCostFunction&);
 
+  bool m_OptimiseCameraExtrinsics;
+  bool m_OptimiseL2R;
 };
 
 } // end namespace

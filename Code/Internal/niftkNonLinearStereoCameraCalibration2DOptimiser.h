@@ -35,9 +35,16 @@ public:
   typedef  itk::Object                                 Superclass;
   typedef  itk::SmartPointer<Self>                     Pointer;
   itkNewMacro(Self);
+  itkTypeMacro(niftk::NonLinearStereoCameraCalibration2DOptimiser, itk::Object);
 
   void SetOptimiseIntrinsics(const bool& optimise);
   itkGetConstMacro(OptimiseIntrinsics, bool);
+
+  void SetOptimiseExtrinsics(const bool& optimise);
+  itkGetConstMacro(OptimiseExtrinsics, bool);
+
+  void SetOptimiseR2L(const bool& optimise);
+  itkGetConstMacro(OptimiseR2L, bool);
 
   itkSetMacro(ForceUnitVectorAxes, bool);
   itkGetConstMacro(ForceUnitVectorAxes, bool);
@@ -55,6 +62,10 @@ public:
 
   void SetRightIntrinsic(const cv::Mat* const intrinsic);
   void SetRightDistortion(const cv::Mat* const distortion);
+
+  void SetExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
+                     const std::vector<cv::Mat>& tvecsLeft);
+
 
   /**
   * \brief Optimises just extrinsic parameters, and returns the 2D RMS projection error.
@@ -90,6 +101,8 @@ protected:
 private:
   niftk::NonLinearStereoCameraCalibration2DCostFunction::Pointer m_CostFunction;
   bool                                                           m_OptimiseIntrinsics;
+  bool                                                           m_OptimiseExtrinsics;
+  bool                                                           m_OptimiseR2L;
   bool                                                           m_Optimise2DOFStereo;
   bool                                                           m_ForceUnitVectorAxes;
 };

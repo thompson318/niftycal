@@ -9,7 +9,7 @@ Copyright (C) 2016 University College London (UCL). All rights reserved.
 \section MainPageIntro Introduction
 
 NiftyCal is a software library to perform
-video camera calibration, and is largely based on OpenCV (2.4.11), with non-linear optimisers provided by ITK (4.7.1).
+video camera calibration, and is largely based on OpenCV (e.g. 2.4.11), with non-linear optimisers provided by ITK (e.g. 4.7.1).
 
 NiftyCal provides:
 \li 2D and 3D structures that store each point along with its identifier.
@@ -30,7 +30,6 @@ method, that works with a single view of a either a coplanar or non-coplanar mod
 <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 \li Timing calibration, that correlates two series of timestamped samples, both representing the same physical movment.
 \li Performance enhancements using OpenMP.
-\li Performance enhancements using CUDA for NVIDIA GPUs (coming soon).
 
 Further information can be obtained via
 
