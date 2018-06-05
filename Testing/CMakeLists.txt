@@ -459,8 +459,8 @@ add_test(REG-CalibIterStereoAprilReal1 ${EXECUTABLE_OUTPUT_PATH}/niftkIterativeS
   ${DATA_DIR}/AprilTags/8.5x11in-tag-mosaic-1.5in.txt       # 2D points for reference image
   0                                                         # zero distortion (1==true)
   1 2                                                       # Real data needs scaling
-  0.00870366 -0.0224016 -0.00259507 # rvec
-  -2.77744 0.0814374 -0.523483 # tvec
+  0.00670252 -0.0229573 -0.00307071 # rvec
+  -2.74784 -0.00322055 -0.4844 # tvec
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251914006800_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230251962009600_left.bmp
   ${DATA_DIR}/AprilTagsMono-2016.03.17/left/1458230252058015000_left.bmp
@@ -653,7 +653,7 @@ add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibration
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1685.666148 1710.715217 900.4041295 519.8804775 -0.2188825101 0.439184848 1)
+         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.4789230435 1)
 
 add_test(REG-TsaiAsymmCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
