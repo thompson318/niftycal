@@ -365,6 +365,15 @@ cv::Matx21d IterativeStereoCameraCalibration(
        );
     }
 
+    if (optimise3D)
+    {
+      currentRMS = currentResult(1, 0);
+    }
+    else
+    {
+      currentRMS = currentResult(0, 0);
+    }
+
     std::cout << "Iterative calibration iter=" << iterationCount++
               << ", prms=" << previousRMS
               << ", crms=" << currentRMS
@@ -372,14 +381,6 @@ cv::Matx21d IterativeStereoCameraCalibration(
 
     if (currentRMS < previousRMS)
     {
-      if (optimise3D)
-      {
-        currentRMS = result(1, 0);
-      }
-      else
-      {
-        currentRMS = result(0, 0);
-      }
       result = currentResult;
 
       tmpIntrinsicLeft.copyTo(intrinsicLeft);
