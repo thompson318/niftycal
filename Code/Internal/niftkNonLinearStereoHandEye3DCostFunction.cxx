@@ -65,6 +65,7 @@ NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& par
                              + 5 // left distortion
                              + 4 // right intrinsic
                              + 5 // right distortion
+                             + 6 // left to right
                              + (m_Points->size()*6)
                             );
   internalParameters.Fill(0);
@@ -92,12 +93,12 @@ NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& par
   internalParameters[15] = (*m_RightDistortion).at<double>(0, 2);
   internalParameters[16] = (*m_RightDistortion).at<double>(0, 3);
   internalParameters[17] = (*m_RightDistortion).at<double>(0, 4);
-  internalParameters[18] = parameters[12];
-  internalParameters[19] = parameters[13];
-  internalParameters[20] = parameters[14];
-  internalParameters[21] = parameters[15];
-  internalParameters[22] = parameters[16];
-  internalParameters[23] = parameters[17];
+  internalParameters[18] = leftToRightRotationVector.at<double>(0, 0);
+  internalParameters[19] = leftToRightRotationVector.at<double>(0, 1);
+  internalParameters[20] = leftToRightRotationVector.at<double>(0, 2);
+  internalParameters[21] = leftToRightTranslationVector.at<double>(0, 0);
+  internalParameters[22] = leftToRightTranslationVector.at<double>(0, 1);
+  internalParameters[23] = leftToRightTranslationVector.at<double>(0, 2);
 
   cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
   handEyeRotationVector.at<double>(0, 0) = parameters[0];
@@ -124,7 +125,7 @@ NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& par
 
   std::list<cv::Matx44d>::const_iterator matrixIter;
   unsigned int internalParameterCounter = 24;
-  unsigned int parameterCounter = 18;
+  unsigned int parameterCounter = 12;
 
   for (matrixIter = m_HandMatrices->begin();
        matrixIter != m_HandMatrices->end();

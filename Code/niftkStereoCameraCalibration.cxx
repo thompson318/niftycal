@@ -313,7 +313,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
-    rmsTolerance = 0.0000001;
+    rmsTolerance = 0.005;
     previousRMS = reconstructedRMS + 2 * rmsTolerance;
     currentRMS = reconstructedRMS;
     unsigned int numberOfIterations = 0;
@@ -323,7 +323,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
           )
     {
       previousRMS = currentRMS;
-
+/*
       // Now optimise RMS reconstruction error via intrinsics.
       niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::Pointer intrinsicsOptimiser =
           niftk::NonLinearStereoIntrinsicsCalibration3DOptimiser::New();
@@ -340,10 +340,12 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
       intrinsicsOptimiser->SetDistortionParameters(&distortionLeft, &distortionRight);
 
-      intrinsicsOptimiser->Optimise(intrinsicLeft,
-                                    intrinsicRight
-                                   );
+      currentRMS = intrinsicsOptimiser->Optimise(intrinsicLeft,
+                                                 intrinsicRight
+                                                );
 
+      std::cout << "niftkStereoCameraCalibration::Optimised intrinsics rms3D = " << currentRMS << std::endl;
+*/
       // Now optimise RMS reconstruction error via extrinsics.
       niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::Pointer extrinsicsOptimiser =
           niftk::NonLinearStereoExtrinsicsCalibration3DOptimiser::New();
@@ -360,11 +362,13 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
       extrinsicsOptimiser->SetOptimiseCameraExtrinsics(true);
       extrinsicsOptimiser->SetOptimiseL2R(false);
 
-      extrinsicsOptimiser->Optimise(rvecsLeft,
-                                    tvecsLeft,
-                                    leftToRightRotationMatrix,
-                                    leftToRightTranslationVector
-                                   );
+      currentRMS = extrinsicsOptimiser->Optimise(rvecsLeft,
+                                                 tvecsLeft,
+                                                 leftToRightRotationMatrix,
+                                                 leftToRightTranslationVector
+                                                );
+
+      std::cout << "niftkStereoCameraCalibration::Optimised extrinsics rms3D = " << currentRMS << std::endl;
 
       extrinsicsOptimiser->SetOptimiseCameraExtrinsics(false);
       extrinsicsOptimiser->SetOptimiseL2R(true);
@@ -374,6 +378,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                  leftToRightRotationMatrix,
                                                  leftToRightTranslationVector
                                                 );
+
+      std::cout << "niftkStereoCameraCalibration::Optimised r2l rms3D = " << currentRMS << std::endl;
+
       numberOfIterations++;
     }
 
