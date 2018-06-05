@@ -125,7 +125,7 @@ NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& par
 
   std::list<cv::Matx44d>::const_iterator matrixIter;
   unsigned int internalParameterCounter = 24;
-  unsigned int parameterCounter = 18;
+  unsigned int parameterCounter = 12;
 
   for (matrixIter = m_HandMatrices->begin();
        matrixIter != m_HandMatrices->end();

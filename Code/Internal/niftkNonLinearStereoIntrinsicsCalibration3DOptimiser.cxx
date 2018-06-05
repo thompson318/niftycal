@@ -117,9 +117,9 @@ double NonLinearStereoIntrinsicsCalibration3DOptimiser::Optimise(cv::Mat& leftIn
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
   optimiser->SetNumberOfIterations(100);
-  optimiser->SetGradientTolerance(0.0000001);
-  optimiser->SetEpsilonFunction(0.0000001);
-  optimiser->SetValueTolerance(0.0000001);
+  optimiser->SetGradientTolerance(0.0001);
+  optimiser->SetEpsilonFunction(0.0001);
+  optimiser->SetValueTolerance(0.001);
 
   // Do optimisation.
   optimiser->StartOptimization();

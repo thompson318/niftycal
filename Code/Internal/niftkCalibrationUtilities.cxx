@@ -151,7 +151,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   }
   if ((parameters.size() - 9) / 6 != points->size())
   {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+    niftkNiftyCalThrow() << "Incorrect number of parameters for mono, the number of sets of 6DOF extrinsic parameters, must match the number of views";
   }
 
   unsigned int parameterCounter = 0;
@@ -417,9 +417,10 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
   {
     niftkNiftyCalThrow() << "Incorrect number of parameters, must be at least intrinsic (4DOF), distortion (5DOF) for both left and right, then 6DOF stereo extrinsic, then Nx6DOF.";
   }
-  if ((parameters.size() - 24) / 6 != leftPoints->size())
+  if ((parameters.size() - 18) / 6 != (leftPoints->size() + 1)) // plus 1 for l2r
   {
-    niftkNiftyCalThrow() << "Incorrect number of parameters, the number of sets of 6DOF extrinsic parameters, must match the number of views";
+    niftkNiftyCalThrow() << "Incorrect number of parameters for stereo, the number of sets of 6DOF extrinsic parameters ("
+      << (parameters.size() - 18) << "), must match the number of views (" << leftPoints->size() << ")";
   }
   if (leftPoints->size() != rightPoints->size())
   {
