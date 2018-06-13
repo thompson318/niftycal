@@ -35,6 +35,31 @@ int Signum(const double& x)
 
 
 //-----------------------------------------------------------------------------
+cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrinsic,
+                                                      const cv::Mat& leftToRightRotationMatrix,
+                                                      const cv::Mat& leftToRightTranslationVector,
+                                                      const cv::Mat& rightIntrinsic
+                                                     )
+{
+  cv::Mat C = cvCreateMat(3, 3, CV_64FC1);
+  C.at<double>(0, 0) = 0;
+  C.at<double>(0, 1) = -leftToRightTranslationVector.at<double>(2, 0);
+  C.at<double>(0, 2) =  leftToRightTranslationVector.at<double>(1, 0);
+  C.at<double>(1, 0) =  leftToRightTranslationVector.at<double>(2, 0);
+  C.at<double>(1, 1) = 0;
+  C.at<double>(1, 2) = -leftToRightTranslationVector.at<double>(0, 0);
+  C.at<double>(2, 0) = -leftToRightTranslationVector.at<double>(1, 0);
+  C.at<double>(2, 1) =  leftToRightTranslationVector.at<double>(0, 0);
+  C.at<double>(2, 2) = 0;
+
+  cv::Mat E = C * leftToRightRotationMatrix;
+  cv::gemm(rightIntrinsic.inv(cv::DECOMP_SVD), E, 1, 0, 0, E, CV_GEMM_A_T);
+  cv::Mat F = E * (leftIntrinsic.inv(cv::DECOMP_SVD));
+  return F/F.at<double>(2,2);
+}
+
+
+//-----------------------------------------------------------------------------
 void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
                              const std::vector<cv::Mat>& tvecsLeft,
                              const cv::Mat& leftToRightRotationMatrix,
