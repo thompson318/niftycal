@@ -373,7 +373,7 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
   rp.push_back(rightPoints);
 
   unsigned long int totalPointCounter = 0;
-  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)); // * 3;
+  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)) * 3;
 
   errorValues.clear();
   errorValues.SetSize(numberOfValues);
@@ -392,11 +392,9 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
     }
     niftk::Point3D tp = (*modelIter).second;
     niftk::Point3D gsp = (*goldIter).second;
-    errorValues[totalPointCounter++] = std::sqrt(
-        (tp.point.x - gsp.point.x) * (tp.point.x - gsp.point.x)
-      + (tp.point.y - gsp.point.y) * (tp.point.y - gsp.point.y)
-      + (tp.point.z - gsp.point.z) * (tp.point.z - gsp.point.z)
-      );
+    errorValues[totalPointCounter++] = tp.point.x - gsp.point.x;
+    errorValues[totalPointCounter++] = tp.point.y - gsp.point.y;
+    errorValues[totalPointCounter++] = tp.point.z - gsp.point.z;
   }
 }
 
