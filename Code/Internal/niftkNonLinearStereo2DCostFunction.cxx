@@ -32,10 +32,15 @@ NonLinearStereo2DCostFunction::~NonLinearStereo2DCostFunction()
 //-----------------------------------------------------------------------------
 unsigned int NonLinearStereo2DCostFunction::GetNumberOfValues(void) const
 {
-
   return (NonLinearCostFunction::GetNumberOfValues()
           + NonLinearStereoCostFunction::GetNumberOfRightHandValues())
           * 2; // multiply by 2 for dx, dy.
+
+  /* Tried this for epi-polar lines.
+  return ((NonLinearCostFunction::GetNumberOfValues() + NonLinearStereoCostFunction::GetNumberOfRightHandValues()) * 2.0
+          + (this->GetNumberOfTriangulatablePoints() * 2.0)
+         );
+  */
 }
 
 } // end namespace

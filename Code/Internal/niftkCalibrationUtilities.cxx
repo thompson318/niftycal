@@ -35,6 +35,31 @@ int Signum(const double& x)
 
 
 //-----------------------------------------------------------------------------
+cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrinsic,
+                                                      const cv::Mat& leftToRightRotationMatrix,
+                                                      const cv::Mat& leftToRightTranslationVector,
+                                                      const cv::Mat& rightIntrinsic
+                                                     )
+{
+  cv::Mat C = cvCreateMat(3, 3, CV_64FC1);
+  C.at<double>(0, 0) = 0;
+  C.at<double>(0, 1) = -leftToRightTranslationVector.at<double>(2, 0);
+  C.at<double>(0, 2) =  leftToRightTranslationVector.at<double>(1, 0);
+  C.at<double>(1, 0) =  leftToRightTranslationVector.at<double>(2, 0);
+  C.at<double>(1, 1) = 0;
+  C.at<double>(1, 2) = -leftToRightTranslationVector.at<double>(0, 0);
+  C.at<double>(2, 0) = -leftToRightTranslationVector.at<double>(1, 0);
+  C.at<double>(2, 1) =  leftToRightTranslationVector.at<double>(0, 0);
+  C.at<double>(2, 2) = 0;
+
+  cv::Mat E = C * leftToRightRotationMatrix;
+  cv::gemm(rightIntrinsic.inv(cv::DECOMP_SVD), E, 1, 0, 0, E, CV_GEMM_A_T);
+  cv::Mat F = E * (leftIntrinsic.inv(cv::DECOMP_SVD));
+  return F/F.at<double>(2,2);
+}
+
+
+//-----------------------------------------------------------------------------
 void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
                              const std::vector<cv::Mat>& tvecsLeft,
                              const cv::Mat& leftToRightRotationMatrix,
@@ -216,8 +241,26 @@ void ComputeStereoProjectionErrors(const Model3D& model,
   itk::MultipleValuedCostFunction::MeasureType rightErrors;
   ComputeMonoProjectionErrors(model, rightPoints, rightExtrinsic, rightIntrinsic, rightDistortion, rightErrors);
 
+  /* Tried this, not much better.
+  cv::Matx44d leftToRight = niftk::GetLeftToRightMatrix(leftExtrinsic, rightExtrinsic);
+  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 1, CV_64FC1);
+  niftk::MatrixToRodrigues(leftToRight, leftToRightRotationVector, leftToRightTranslationVector);
+  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
+  cv::Mat F = ComputeFundamentalMatrixFromCameraCalibration(leftIntrinsic, leftToRightRotationMatrix, leftToRightTranslationVector, rightIntrinsic);
+
+  itk::MultipleValuedCostFunction::MeasureType leftEpipolarErrors;
+  ComputeEpipolarErrors(leftPoints, leftIntrinsic, leftDistortion, rightPoints, rightIntrinsic, rightDistortion, 1, F, leftEpipolarErrors);
+
+  itk::MultipleValuedCostFunction::MeasureType rightEpipolarErrors;
+  ComputeEpipolarErrors(rightPoints, rightIntrinsic, rightDistortion, leftPoints, leftIntrinsic, leftDistortion, 2, F, rightEpipolarErrors);
+  */
+
   errors.clear();
-  errors.SetSize(leftErrors.size() + rightErrors.size());
+  errors.SetSize(leftErrors.size() + rightErrors.size()
+                 // + leftEpipolarErrors.size() + rightEpipolarErrors.size() // Tried this, not much better
+                 );
 
   unsigned long int errorCounter = 0;
   for (unsigned long int i = 0; i < leftErrors.size(); i++)
@@ -229,6 +272,18 @@ void ComputeStereoProjectionErrors(const Model3D& model,
   {
     errors[errorCounter++] = rightErrors[i];
   }
+
+  /*
+  for (unsigned long int i = 0; i < leftEpipolarErrors.size(); i++)
+  {
+    errors[errorCounter++] = leftEpipolarErrors[i];
+  }
+
+  for (unsigned long int i = 0; i < rightEpipolarErrors.size(); i++)
+  {
+    errors[errorCounter++] = rightEpipolarErrors[i];
+  }
+  */
 }
 
 
@@ -373,7 +428,7 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
   rp.push_back(rightPoints);
 
   unsigned long int totalPointCounter = 0;
-  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)); // * 3;
+  unsigned long int numberOfValues = (niftk::GetNumberOfTriangulatablePoints(model, lp, rp)) * 3;
 
   errorValues.clear();
   errorValues.SetSize(numberOfValues);
@@ -392,11 +447,9 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
     }
     niftk::Point3D tp = (*modelIter).second;
     niftk::Point3D gsp = (*goldIter).second;
-    errorValues[totalPointCounter++] = std::sqrt(
-        (tp.point.x - gsp.point.x) * (tp.point.x - gsp.point.x)
-      + (tp.point.y - gsp.point.y) * (tp.point.y - gsp.point.y)
-      + (tp.point.z - gsp.point.z) * (tp.point.z - gsp.point.z)
-      );
+    errorValues[totalPointCounter++] = tp.point.x - gsp.point.x;
+    errorValues[totalPointCounter++] = tp.point.y - gsp.point.y;
+    errorValues[totalPointCounter++] = tp.point.z - gsp.point.z;
   }
 }
 
@@ -508,6 +561,52 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
     {
       errors[errorCounter++] = errorsPerView[i];
     }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void ComputeEpipolarErrors(const PointSet& leftPoints,
+                           const cv::Mat& leftIntrinsic,
+                           const cv::Mat& leftDistortion,
+                           const PointSet& rightPoints,
+                           const cv::Mat& rightIntrinsic,
+                           const cv::Mat& rightDistortion,
+                           const int& whichImage,
+                           const cv::Mat& fundamentalMatrix,
+                           itk::MultipleValuedCostFunction::MeasureType& errors
+                          )
+{
+  PointSet undistortedLeftPoints;
+  niftk::UndistortPoints(leftPoints, leftIntrinsic, leftDistortion, undistortedLeftPoints);
+
+  PointSet undistortedRightPoints;
+  niftk::UndistortPoints(rightPoints, rightIntrinsic, rightDistortion, undistortedRightPoints);
+
+  std::vector<cv::Point2f> lp;
+  std::vector<cv::Point2f> rp;
+  std::vector<niftk::NiftyCalIdType> commonIds;
+  niftk::ExtractCommonPoints(undistortedLeftPoints, undistortedRightPoints, lp, rp, commonIds);
+
+  unsigned long int errorCounter = 0;
+  unsigned long int numberOfValues = commonIds.size();
+  errors.clear();
+  errors.SetSize(numberOfValues);
+
+  std::vector<cv::Point3f> epiLines;
+  cv::computeCorrespondEpilines(lp, whichImage, fundamentalMatrix, epiLines);
+
+  for (std::vector<niftk::NiftyCalIdType>::size_type i = 0;
+       i < commonIds.size(); i++)
+  {
+    double A = epiLines[i].x;
+    double B = epiLines[i].y;
+    double C = epiLines[i].z;
+
+    double distance = std::fabs(A * rp[i].x + B * rp[i].y + C)
+                    / (std::sqrt(A*A + B*B));
+
+    errors[errorCounter++] = distance;
   }
 }
 

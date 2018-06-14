@@ -653,7 +653,7 @@ add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibration
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
          ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
          ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.4789230435 1)
+         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.2738925548 1)
 
 add_test(REG-TsaiAsymmCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
          ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
