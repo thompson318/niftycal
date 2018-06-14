@@ -35,7 +35,7 @@ int Signum(const double& x);
 
 
 /**
- * \brief Computes F from Camera Calibration
+ * \brief Computes F from Camera Calibration.
  */
 cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrinsic,
                                                       const cv::Mat& leftToRightRotationMatrix,
@@ -199,6 +199,24 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
                                        const itk::MultipleValuedCostFunction::ParametersType& parameters,
                                        itk::MultipleValuedCostFunction::MeasureType& errors
                                       );
+
+/**
+ * \brief Computes distances from epi-polar lines to use as a registration metric.
+ *
+ * The parameters below say 'left' and 'right' as for each left point, you compute
+ * the epi-polar line on the right hand image, and compare against the right hand point.
+ * You can swap left/right to get symmetric error.
+ */
+void ComputeEpipolarErrors(const PointSet& leftPoints,
+                           const cv::Mat& leftIntrinsic,
+                           const cv::Mat& leftDistortion,
+                           const PointSet& rightPoints,
+                           const cv::Mat& rightIntrinsic,
+                           const cv::Mat& rightDistortion,
+                           const int& whichImage,
+                           const cv::Mat& fundamentalMatrix,
+                           itk::MultipleValuedCostFunction::MeasureType& errors
+                          );
 
 } // end namespace
 
