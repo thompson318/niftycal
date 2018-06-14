@@ -998,7 +998,8 @@ double ComputeRMSReprojectionError(
 
     for (unsigned int i = 0; i < numberOfPointsInLeft; i++)
     {
-      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
+      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x))
+             +  ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
     }
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
     unsigned int numberOfPointsInRight = niftk::ProjectMatchingPoints(model,
@@ -1012,8 +1013,8 @@ double ComputeRMSReprojectionError(
                                                                       );
     for (unsigned int i = 0; i < numberOfPointsInRight; i++)
     {
-      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
-      rms += ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x))
+             + ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
     }
     pointCounter += (numberOfPointsInLeft + numberOfPointsInRight);
     viewCounter++;
