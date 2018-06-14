@@ -190,9 +190,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cv::TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-10),
                                      cvFlags
                                     );
+  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, rms2D=" << projectedRMS << std::endl;
 
-
-  // Ensure rhs extrinsics are set from lhs and left-to-right
+  // Ensure rhs extrinsics are set from lhs and left-to-right transform.
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
                                  leftToRightRotationMatrix,
@@ -201,7 +201,21 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  tvecsRight
                                 );
 
-  // Compute 3D reconstruction error
+  // Recompute re-projection error, now we have updated the right extrinsics.
+  projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                    listOfLeftHandPointSets,
+                                                    listOfRightHandPointSets,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    rvecsLeft,
+                                                    tvecsLeft,
+                                                    intrinsicRight,
+                                                    distortionRight,
+                                                    leftToRightRotationMatrix,
+                                                    leftToRightTranslationVector
+                                                   );
+
+  // Compute 3D reconstruction error, now we have updated the right extrinsics.
   reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
                                                           listOfLeftHandPointSets,
                                                           listOfRightHandPointSets,
@@ -216,7 +230,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, rms2D=" << projectedRMS
+  std::cout << "niftkStereoCameraCalibration:OpenCV with recomputed metrics, rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
 
 #ifdef NIFTYCAL_WITH_ITK
@@ -231,7 +245,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   {
     previousRMS = currentRMS;
 
-    // First optimise extrinsics (camera positions)
+    // First optimise left camera extrinsics (camera positions).
     niftk::NonLinearStereoCameraCalibration2DOptimiser::Pointer optimiser2D
         = niftk::NonLinearStereoCameraCalibration2DOptimiser::New();
     optimiser2D->SetModelAndPoints(tmpModel, &listOfLeftHandPointSets, &listOfRightHandPointSets);
@@ -255,13 +269,15 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     optimiser2D->SetOptimiseExtrinsics(true);
     optimiser2D->SetOptimiseR2L(false);
 
-    optimiser2D->Optimise(intrinsicLeft,
-                          intrinsicRight,
-                          rvecsLeft,
-                          tvecsLeft,
-                          leftToRightRotationMatrix,
-                          leftToRightTranslationVector
-                         );
+    double interimRMS = optimiser2D->Optimise(intrinsicLeft,
+                                              intrinsicRight,
+                                              rvecsLeft,
+                                              tvecsLeft,
+                                              leftToRightRotationMatrix,
+                                              leftToRightTranslationVector
+                                             );
+
+    std::cout << "niftkStereoCameraCalibration::Optimised extrinsics rms2D = " << interimRMS << std::endl;
 
     // Then optimise just R2L
     optimiser2D->SetOptimiseIntrinsics(false);
@@ -277,6 +293,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                        leftToRightRotationMatrix,
                                        leftToRightTranslationVector
                                       );
+
+    std::cout << "niftkStereoCameraCalibration::Optimised r2l rms2D = " << currentRMS << std::endl;
   }
 
   projectedRMS = currentRMS;
@@ -306,6 +324,23 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           leftToRightTranslationVector,
                                                           rmsInEachAxis
                                                          );
+
+  std::cout << "niftkStereoCameraCalibration:2D optimisation finished,     rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS << std::endl;
+
+  // Recompute re-projection error, now we have updated the left/right extrinsics.
+  projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                    listOfLeftHandPointSets,
+                                                    listOfRightHandPointSets,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    rvecsLeft,
+                                                    tvecsLeft,
+                                                    intrinsicRight,
+                                                    distortionRight,
+                                                    leftToRightRotationMatrix,
+                                                    leftToRightTranslationVector
+                                                   );
 
   std::cout << "niftkStereoCameraCalibration:2D optimisation finished,     rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
