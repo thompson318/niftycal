@@ -383,6 +383,38 @@ NIFTYCAL_WINEXPORT unsigned long int GetNumberOfTriangulatablePoints(const Model
                                                                     );
 
 
+/**
+* \brief Computes FRE between corresponding points.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double CalculateFiducialRegistrationError(const std::vector<cv::Point3d>& fixedPoints,
+                                                             const std::vector<cv::Point3d>& movingPoints,
+                                                             const cv::Matx44d& matrix
+                                                            );
+
+/**
+* \brief Computes rigid body registration between corresponding points.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double RegisterPoints(const std::vector<cv::Point3d>& fixedPoints,
+                                         const std::vector<cv::Point3d>& movingPoints,
+                                         cv::Matx44d& rigidBodyMatrix
+                                        );
+
+
+/**
+* \brief Computes leftToRight using point based registration.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double ComputeLeftToRight(const Model3D& model,
+                                             const std::vector<cv::Mat>& rvecsLeft,
+                                             const std::vector<cv::Mat>& tvecsLeft,
+                                             const std::vector<cv::Mat>& rvecsRight,
+                                             const std::vector<cv::Mat>& tvecsRight,
+                                             cv::Mat& leftToRightRotationMatrix,
+                                             cv::Mat& leftToRightTranslationVector
+                                            );
+
 } // end namespace
 
 #endif

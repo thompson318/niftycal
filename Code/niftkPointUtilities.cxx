@@ -1279,4 +1279,290 @@ double ComputeRMSReprojectionError(const Model3D& model,
   return rms;
 }
 
+
+//-----------------------------------------------------------------------------
+cv::Point3d GetCentroid(const std::vector<cv::Point3d>& points)
+{
+  double numberOfPoints = static_cast<double>(points.size());
+  if (numberOfPoints < 1)
+  {
+    niftkNiftyCalThrow() << "The number of points should be >= 1";
+  }
+
+  cv::Point3d centroid(0, 0, 0);
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < numberOfPoints; ++i)
+  {
+    centroid += points[i];
+  }
+  centroid.x /= numberOfPoints;
+  centroid.y /= numberOfPoints;
+  centroid.z /= numberOfPoints;
+
+  return centroid;
+}
+
+
+//-----------------------------------------------------------------------------
+std::vector<cv::Point3d> SubtractCentroid(const std::vector<cv::Point3d>& points,
+                                          const cv::Point3d& centroid)
+{
+  std::vector<cv::Point3d> result;
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < points.size(); ++i)
+  {
+    cv::Point3d tmp = points[i] - centroid;
+    result.push_back(tmp);
+  }
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
+double CalculateFiducialRegistrationError(const std::vector<cv::Point3d>& fixedPoints,
+                                          const std::vector<cv::Point3d>& movingPoints,
+                                          const cv::Matx44d& matrix
+                                         )
+{
+  if (fixedPoints.size() != movingPoints.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is " << fixedPoints.size()
+                         << " whereas the number of 'moving' points is " << movingPoints.size()
+                         << " and they should correspond.";
+  }
+
+  double fre = 0;
+  std::vector<cv::Point3d>::size_type numberOfPoints = fixedPoints.size();
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < numberOfPoints; ++i)
+  {
+    cv::Matx41d f, m, mPrime;
+    f(0,0) = fixedPoints[i].x;
+    f(1,0) = fixedPoints[i].y;
+    f(2,0) = fixedPoints[i].z;
+    f(3,0) = 1;
+    m(0,0) = movingPoints[i].x;
+    m(1,0) = movingPoints[i].y;
+    m(2,0) = movingPoints[i].z;
+    m(3,0) = 1;
+    mPrime = matrix * m;
+    double squaredError =   (f(0,0) - mPrime(0,0)) * (f(0,0) - mPrime(0,0))
+                          + (f(1,0) - mPrime(1,0)) * (f(1,0) - mPrime(1,0))
+                          + (f(2,0) - mPrime(2,0)) * (f(2,0) - mPrime(2,0))
+                          ;
+    fre += squaredError;
+  }
+  if (numberOfPoints > 0)
+  {
+    fre /= (double)numberOfPoints;
+  }
+  fre = std::sqrt(fre);
+  return fre;
+}
+
+
+//-----------------------------------------------------------------------------
+double RegisterPoints(const std::vector<cv::Point3d>& fixedPoints,
+                      const std::vector<cv::Point3d>& movingPoints,
+                      cv::Matx44d& rigidBodyMatrix
+                     )
+{
+  if (fixedPoints.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is < 3";
+  }
+
+  if (movingPoints.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The number of 'moving' points is < 3";
+  }
+
+  if (fixedPoints.size() != movingPoints.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is " << fixedPoints.size()
+                         << " whereas the number of 'moving' points is " << movingPoints.size()
+                         << " and they should match.";
+  }
+
+  // Based on Arun's method:
+  // Least-Squares Fitting of two, 3-D Point Sets, Arun, 1987,
+  // 10.1109/TPAMI.1987.4767965
+  //
+  // Also See:
+  // http://eecs.vanderbilt.edu/people/mikefitzpatrick/papers/ (new line)
+  // 2009_Medim_Fitzpatrick_TRE_FRE_uncorrelated_as_published.pdf
+  // Then:
+  // http://tango.andrew.cmu.edu/~gustavor/42431-intro-bioimaging/readings/ch8.pdf
+
+  // Arun Equation 4.
+  cv::Point3d pPrime = GetCentroid(fixedPoints);
+
+  // Arun Equation 6.
+  cv::Point3d p = GetCentroid(movingPoints);
+
+  // Arun Equation 7.
+  std::vector<cv::Point3d> q = SubtractCentroid(movingPoints, p);
+
+  // Arun Equation 8.
+  std::vector<cv::Point3d> qPrime = SubtractCentroid(fixedPoints, pPrime);
+
+  // Arun Equation 11.
+  cv::Matx33d H = cv::Matx33d::zeros();
+  for (std::vector<cv::Point3d>::size_type i = 0; i < q.size(); ++i)
+  {
+    cv::Matx33d tmp(
+          q[i].x*qPrime[i].x, q[i].x*qPrime[i].y, q[i].x*qPrime[i].z,
+          q[i].y*qPrime[i].x, q[i].y*qPrime[i].y, q[i].y*qPrime[i].z,
+          q[i].z*qPrime[i].x, q[i].z*qPrime[i].y, q[i].z*qPrime[i].z
+        );
+    H += tmp;
+  }
+
+  // Arun Equation 12.
+  cv::SVD svd(H);
+
+  // Arun Equation 13.
+  // cv::Mat X = svd.vt.t() * svd.u.t();
+
+  // Replace Arun Equation 13 with Fitzpatrick, chapter 8, page 470.
+  cv::Mat VU = svd.vt.t() * svd.u;
+  double detVU = cv::determinant(VU);
+  cv::Matx33d diag = cv::Matx33d::zeros();
+  diag(0,0) = 1;
+  diag(1,1) = 1;
+  diag(2,2) = detVU;
+  cv::Mat diagonal(diag);
+  cv::Mat X = (svd.vt.t() * (diagonal * svd.u.t()));
+
+  // Arun Step 5.
+  double detX = cv::determinant(X);
+
+  if ( detX < 0
+       && (   std::fabs(svd.w.at<double>(0,0)) < 0.000001
+           || std::fabs(svd.w.at<double>(1,1)) < 0.000001
+           || std::fabs(svd.w.at<double>(2,2)) < 0.000001
+          )
+     )
+  {
+    // Implement 2a in section VI in Arun paper.
+    cv::Mat VPrime = svd.vt.t();
+    VPrime.at<double>(0,2) = -1.0 * VPrime.at<double>(0,2);
+    VPrime.at<double>(1,2) = -1.0 * VPrime.at<double>(1,2);
+    VPrime.at<double>(2,2) = -1.0 * VPrime.at<double>(2,2);
+    X = VPrime * svd.u.t();
+    detX = cv::determinant(X);
+  }
+
+  if (detX < 0)
+  {
+    niftkNiftyCalThrow() << "Determinant < 0";
+  }
+
+  // Arun Equation 10.
+  cv::Matx31d T, tmpP, tmpPPrime;
+  cv::Matx33d R(X);
+  tmpP(0,0) = p.x;
+  tmpP(1,0) = p.y;
+  tmpP(2,0) = p.z;
+  tmpPPrime(0,0) = pPrime.x;
+  tmpPPrime(1,0) = pPrime.y;
+  tmpPPrime(2,0) = pPrime.z;
+  T = tmpPPrime - R*tmpP;
+
+  rigidBodyMatrix = cv::Matx44d::eye();
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      rigidBodyMatrix(i, j) = R(i, j);
+    }
+    rigidBodyMatrix(i, 3) = T(i, 0);
+  }
+
+  double fre = CalculateFiducialRegistrationError(fixedPoints, movingPoints, rigidBodyMatrix);
+  return fre;
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeLeftToRight(const Model3D& model,
+                          const std::vector<cv::Mat>& rvecsLeft,
+                          const std::vector<cv::Mat>& tvecsLeft,
+                          const std::vector<cv::Mat>& rvecsRight,
+                          const std::vector<cv::Mat>& tvecsRight,
+                          cv::Mat& leftToRightRotationMatrix,
+                          cv::Mat& leftToRightTranslationVector
+                         )
+{
+  if (rvecsLeft.size() < 1)
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' is < 1.";
+  }
+  if (rvecsLeft.size() != tvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'tvecsLeft'." << std::endl;
+  }
+  if (rvecsLeft.size() != rvecsRight.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'rvecsRight'." << std::endl;
+  }
+  if (rvecsLeft.size() != tvecsRight.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'rvecsRight'." << std::endl;
+  }
+  if (model.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The model must have at least 3 points.";
+  }
+
+  std::vector<cv::Point3d> fixedPoints;
+  std::vector<cv::Point3d> movingPoints;
+
+  for (std::vector<cv::Mat>::size_type i = 0; i < rvecsLeft.size(); i++)
+  {
+    cv::Matx44d leftExtrinsics = RodriguesToMatrix(rvecsLeft[i], tvecsLeft[i]);
+    cv::Matx44d rightExtrinsics = RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
+
+    cv::Point3d tmpModelPoint;
+    cv::Point3d tmpLeftPoint;
+    cv::Point3d tmpRightPoint;
+
+    cv::Matx41d modelPoint;
+    cv::Matx41d transformedModelPointLeft;
+    cv::Matx41d transformedModelPointRight;
+
+    for (Model3D::const_iterator iter = model.begin(); iter != model.end(); ++iter)
+    {
+      tmpModelPoint = (*iter).second.point;
+      modelPoint(0, 0) = tmpModelPoint.x;
+      modelPoint(1, 0) = tmpModelPoint.y;
+      modelPoint(2, 0) = tmpModelPoint.z;
+      modelPoint(3, 0) = 1;
+
+      transformedModelPointLeft = leftExtrinsics * modelPoint;
+      transformedModelPointRight = rightExtrinsics * modelPoint;
+
+      tmpLeftPoint.x = transformedModelPointLeft(0, 0);
+      tmpLeftPoint.y = transformedModelPointLeft(1, 0);
+      tmpLeftPoint.z = transformedModelPointLeft(2, 0);
+
+      tmpRightPoint.x = transformedModelPointLeft(0, 0);
+      tmpRightPoint.y = transformedModelPointLeft(1, 0);
+      tmpRightPoint.z = transformedModelPointLeft(2, 0);
+
+      movingPoints.push_back(tmpLeftPoint);
+      fixedPoints.push_back(tmpRightPoint);
+    }
+  }
+  cv::Matx44d registrationMatrix;
+
+  double fre = RegisterPoints(fixedPoints, movingPoints, registrationMatrix);
+
+  cv::Mat rotationVector = cvCreateMat(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(registrationMatrix, rotationVector, leftToRightTranslationVector);
+  cv::Rodrigues(rotationVector, leftToRightRotationMatrix);
+
+  return fre;
+}
+
 } // end namespace
