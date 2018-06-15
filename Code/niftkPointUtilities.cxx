@@ -1546,9 +1546,9 @@ double ComputeLeftToRight(const Model3D& model,
       tmpLeftPoint.y = transformedModelPointLeft(1, 0);
       tmpLeftPoint.z = transformedModelPointLeft(2, 0);
 
-      tmpRightPoint.x = transformedModelPointLeft(0, 0);
-      tmpRightPoint.y = transformedModelPointLeft(1, 0);
-      tmpRightPoint.z = transformedModelPointLeft(2, 0);
+      tmpRightPoint.x = transformedModelPointRight(0, 0);
+      tmpRightPoint.y = transformedModelPointRight(1, 0);
+      tmpRightPoint.z = transformedModelPointRight(2, 0);
 
       movingPoints.push_back(tmpLeftPoint);
       fixedPoints.push_back(tmpRightPoint);
