@@ -242,7 +242,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
 
-  double rmsTolerance = 0.0000001;
+  double rmsTolerance = 0.0001;
   double previousRMS = projectedRMS + 2 * rmsTolerance;
   double currentRMS = projectedRMS;
 
