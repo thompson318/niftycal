@@ -328,9 +328,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-  std::cout << "niftkStereoCameraCalibration:2D optimisation finished,     rms2D=" << projectedRMS
-            << ", rms3D=" << reconstructedRMS << std::endl;
-
   // Recompute re-projection error, now we have updated the left/right extrinsics.
   projectedRMS = niftk::ComputeRMSReprojectionError(model,
                                                     listOfLeftHandPointSets,
