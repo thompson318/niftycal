@@ -260,7 +260,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   double rightRMS = monoRightOptimiser->Optimise(rvecsRight, tvecsRight);
 */
   // Recompute left-to-right using rigid body registration.
-  double fre = ComputeLeftToRight(model, rvecsLeft, tvecsLeft, rvecsRight, tvecsRight, leftToRightRotationMatrix, leftToRightTranslationVector);
+  double fre = ComputeLeftToRight(model,
+                                  rvecsLeft, tvecsLeft,
+                                  rvecsRight, tvecsRight,
+                                  leftToRightRotationMatrix, leftToRightTranslationVector
+                                 );
   std::cout << "niftkStereoCameraCalibration::Registered l2r, FRE=" << fre
             //<< ", leftRMS=" << leftRMS
             //<< ", rightRMS=" << rightRMS
@@ -395,8 +399,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     std::cout << "niftkStereoCameraCalibration::Optimised r2l rms2D = " << currentRMS << std::endl;
 
   }
-
-  projectedRMS = currentRMS;
 
 #endif
 
