@@ -99,6 +99,10 @@ if(ITK_FOUND)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DCostFunction.cxx)
   list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearStereoHandEye3DOptimiser.cxx)
 
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMonoCostFunction3D.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMonoCameraCalibration3DOptimiser.cxx)
+  list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearMonoCameraCalibration3DCostFunction.cxx)
+
 endif()
 
 ###############################################################################

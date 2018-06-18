@@ -42,8 +42,8 @@ public:
   typedef Superclass::DerivativeType      DerivativeType;
   typedef Superclass::MeasureType         MeasureType;
 
-  void SetModel(const Model3D* const model);
-  void SetPoints(const std::list<PointSet>* const points);
+  virtual void SetModel(const Model3D* const model);
+  virtual void SetPoints(const std::list<PointSet>* const points);
   void SetHandMatrices(const std::list<cv::Matx44d>* const matrices);
   std::list<cv::Matx44d>* GetHandMatrices() const;
 

@@ -153,8 +153,8 @@ void ComputeMonoProjectionErrors(const niftk::Model3D& model,
 
   for (unsigned int i = 0; i < observed.size(); i++)
   {
-    errorValues[totalPointCounter++] = (observed[i].x - projected[i].x);
-    errorValues[totalPointCounter++] = (observed[i].y - projected[i].y);
+    errorValues[totalPointCounter++] = (projected[i].x - observed[i].x);
+    errorValues[totalPointCounter++] = (projected[i].y - observed[i].y);
   }
 }
 
@@ -273,7 +273,7 @@ void ComputeStereoProjectionErrors(const Model3D& model,
     errors[errorCounter++] = rightErrors[i];
   }
 
-  /*
+  /* Tried this, not much better.
   for (unsigned long int i = 0; i < leftEpipolarErrors.size(); i++)
   {
     errors[errorCounter++] = leftEpipolarErrors[i];
