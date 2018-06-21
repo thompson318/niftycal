@@ -105,6 +105,15 @@ if(ITK_FOUND)
 
 endif()
 
+list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/cmake/Ceres/)
+list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/gflags/install)
+list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/glog/install)
+
+find_package(Ceres REQUIRED)
+include_directories(${CERES_INCLUDE_DIRS})
+
+list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresStereoOptimiser.cxx)
+
 ###############################################################################
 # Experimental: Try to calibrate based on rendering the model.
 # Conclusion  : Slow, and not much benefit at the moment.
@@ -133,6 +142,6 @@ if(BUILD_SHARED_LIBS)
   endif(WIN32)
 endif(BUILD_SHARED_LIBS)
 
-target_link_libraries(niftycal PRIVATE ${ALL_THIRD_PARTY_LIBRARIES})
+target_link_libraries(niftycal PRIVATE ${CERES_LIBRARIES} ${ALL_THIRD_PARTY_LIBRARIES})
 
 add_subdirectory(Apps)

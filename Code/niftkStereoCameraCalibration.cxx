@@ -27,6 +27,8 @@
 #include <Internal/niftkNonLinearMonoCameraCalibration3DOptimiser.h>
 #endif
 
+#include <Internal/niftkNonLinearCeresStereoOptimiser.h>
+
 namespace niftk
 {
 
@@ -194,7 +196,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cvFlags
                                     );
 
-  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, rms2D=" << projectedRMS << std::endl;
+  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, cvFlags=" << cvFlags << ", rms2D=" << projectedRMS << std::endl;
 
   // Ensure rhs extrinsics are set from lhs and left-to-right transform.
   niftk::ComputeStereoExtrinsics(rvecsLeft,
@@ -240,7 +242,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 #ifdef NIFTYCAL_WITH_ITK
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
-/*
+
+  /*
   niftk::NonLinearMonoCameraCalibration3DOptimiser::Pointer monoLeftOptimiser
       = niftk::NonLinearMonoCameraCalibration3DOptimiser::New();
   monoLeftOptimiser->SetModel(tmpModel);
@@ -258,17 +261,74 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   monoRightOptimiser->SetDistortion(distortionRight);
 
   double rightRMS = monoRightOptimiser->Optimise(rvecsRight, tvecsRight);
-*/
+
   // Recompute left-to-right using rigid body registration.
   double fre = ComputeLeftToRight(model,
                                   rvecsLeft, tvecsLeft,
                                   rvecsRight, tvecsRight,
                                   leftToRightRotationMatrix, leftToRightTranslationVector
                                  );
+
   std::cout << "niftkStereoCameraCalibration::Registered l2r, FRE=" << fre
-            //<< ", leftRMS=" << leftRMS
-            //<< ", rightRMS=" << rightRMS
+            << ", leftRMS=" << leftRMS
+            << ", rightRMS=" << rightRMS
             << std::endl;
+  */
+
+  // Now do stereo optimisation based on Ceres.
+  niftk::CeresStereoCameraCalibration(objectPoints,
+                                      leftImagePoints,
+                                      rightImagePoints,
+                                      intrinsicLeft,
+                                      distortionLeft,
+                                      rvecsLeft,
+                                      tvecsLeft,
+                                      intrinsicRight,
+                                      distortionRight,
+                                      leftToRightRotationMatrix,
+                                      leftToRightTranslationVector
+                                     );
+
+  // Ensure rhs extrinsics are set from lhs and left-to-right transform.
+  niftk::ComputeStereoExtrinsics(rvecsLeft,
+                                 tvecsLeft,
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 rvecsRight,
+                                 tvecsRight
+                                );
+
+  // Recompute re-projection error, now we have updated the right extrinsics.
+  projectedRMS = niftk::ComputeRMSReprojectionError(model,
+                                                    listOfLeftHandPointSets,
+                                                    listOfRightHandPointSets,
+                                                    intrinsicLeft,
+                                                    distortionLeft,
+                                                    rvecsLeft,
+                                                    tvecsLeft,
+                                                    intrinsicRight,
+                                                    distortionRight,
+                                                    leftToRightRotationMatrix,
+                                                    leftToRightTranslationVector
+                                                   );
+
+  // Compute 3D reconstruction error, now we have updated the right extrinsics.
+  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
+                                                          listOfLeftHandPointSets,
+                                                          listOfRightHandPointSets,
+                                                          intrinsicLeft,
+                                                          distortionLeft,
+                                                          rvecsLeft,
+                                                          tvecsLeft,
+                                                          intrinsicRight,
+                                                          distortionRight,
+                                                          leftToRightRotationMatrix,
+                                                          leftToRightTranslationVector,
+                                                          rmsInEachAxis
+                                                         );
+
+  std::cout << "niftkStereoCameraCalibration:Ceres with recomputed metrics, rms2D=" << projectedRMS
+            << ", rms3D=" << reconstructedRMS << std::endl;
 
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
@@ -297,7 +357,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     f << inverted(2, 0) << " " << inverted(2, 1) << " " << inverted(2, 2) << " " << inverted(2, 3) << std::endl;
     f << inverted(3, 0) << " " << inverted(3, 1) << " " << inverted(3, 2) << " " << inverted(3, 3) << std::endl;
   }
-
 
   std::cerr << "Matt, l2r=" << leftToRightTranslationVector << std::endl;
 
@@ -656,7 +715,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                             leftToRightTranslationVector,
                                             essentialMatrix,
                                             fundamentalMatrix,
-                                            CV_CALIB_USE_INTRINSIC_GUESS,
+                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                             optimise3D
                                            );
   }
