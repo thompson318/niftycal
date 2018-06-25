@@ -113,6 +113,7 @@ find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
 list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresStereoOptimiser.cxx)
+list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresMonoOptimiser.cxx)
 
 ###############################################################################
 # Experimental: Try to calibrate based on rendering the model.

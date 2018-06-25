@@ -702,6 +702,37 @@ PointSet AddGaussianNoise(std::default_random_engine& engine,
 
 
 //-----------------------------------------------------------------------------
+cv::Mat ProjectPointsToImage(const Model3D& model,
+                             const PointSet& points,
+                             const cv::Matx44d& extrinsic,
+                             const cv::Mat& intrinsic,
+                             const cv::Mat& distortion,
+                             const cv::Size& imageSize
+                            )
+{
+  std::vector<cv::Point2f> observed;
+  std::vector<cv::Point2f> projected;
+  std::vector<niftk::NiftyCalIdType> ids;
+
+  ProjectMatchingPoints(model, points, extrinsic, intrinsic, distortion, observed, projected, ids);
+  cv::Mat image = cv::Mat::zeros(imageSize.height, imageSize.width, CV_8UC1);
+
+  for (std::vector<cv::Point2f>::size_type i = 0; i < projected.size(); i++)
+  {
+    if (projected[i].x >= 0 && projected[i].y >= 0
+        && projected[i].x <= imageSize.width - 1
+        && projected[i].y <= imageSize.height - 1
+        )
+    {
+      image.at<unsigned char>(projected[i].y, projected[i].x) = 255;
+    }
+
+  }
+  return image;
+}
+
+
+//-----------------------------------------------------------------------------
 unsigned int ProjectMatchingPoints(const Model3D& model,
                                    const PointSet& points,
                                    const cv::Matx44d& extrinsic,
@@ -1009,8 +1040,9 @@ double ComputeRMSReprojectionError(
       rms += dy;
       rmsLeft += dx;
       rmsLeft += dy;
-      //std::cerr << "Matt, left v=" << viewCounter << ", i=" << i << ", dx=" << dx << ", dy=" << dy << std::endl;
     }
+    std::cerr << "Matt, left v=" << viewCounter << ", rmsLeft=" << std::sqrt(rmsLeft / (2*numberOfPointsInLeft)) << std::endl;
+
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
     unsigned int numberOfPointsInRight = niftk::ProjectMatchingPoints(model,
                                                                       *rightIter,
@@ -1029,8 +1061,9 @@ double ComputeRMSReprojectionError(
       rms += dy;
       rmsRight += dx;
       rmsRight += dy;
-      //std::cerr << "Matt, right v=" << viewCounter << ", i=" << i << ", dx=" << dx << ", dy=" << dy << std::endl;
     }
+    std::cerr << "Matt, right v=" << viewCounter << ", rmsRight=" << std::sqrt(rmsRight  / (2 * numberOfPointsInRight)) << std::endl;
+
     pointCounter += (2 * (numberOfPointsInLeft + numberOfPointsInRight));
     pointCounterLeft += 2*numberOfPointsInLeft;
     pointCounterRight += 2*numberOfPointsInRight;

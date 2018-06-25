@@ -268,6 +268,18 @@ NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
 
 
 /**
+* \brief Projects points to an image.
+*/
+NIFTYCAL_WINEXPORT cv::Mat ProjectPointsToImage(const Model3D& model,
+                                                const PointSet& points,
+                                                const cv::Matx44d& extrinsic,
+                                                const cv::Mat& intrinsic,
+                                                const cv::Mat& distortion,
+                                                const cv::Size& imageSize
+                                               );
+
+
+/**
 * \brief Triangulates common (same identifier) points in left and right views.
 */
 NIFTYCAL_WINEXPORT void TriangulatePointPairs(const PointSet& leftDistortedPoints,

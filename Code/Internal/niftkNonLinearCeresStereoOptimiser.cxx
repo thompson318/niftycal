@@ -53,112 +53,107 @@ void ProjectToPoint(const T* const intrinsic,
   y = intrinsic[1]*ypd + intrinsic[3];
 }
 
-
-/**
- * \brief Internal function to compute the reconstructed point from triangulating between 2 cameras.
- */
-template <typename T>
-void ReconstructPoint(const T* const intrinsicLeft,
-                      const T* const distortionLeft,
-                      const T* const cameraPointLeft,
-                      const T* const intrinsicRight,
-                      const T* const distortionRight,
-                      const T* const cameraPointRight,
-                      T& x,
-                      T& y,
-                      T& z
-                   )
-{
-
-}
-
-
-struct StereoProjectionConstraint {
+struct LeftProjectionConstraint {
 public:
-  StereoProjectionConstraint(const unsigned int& cameraCounter,
-                             const cv::Point3f& p,
-                             const cv::Vec2f& l,
-                             const cv::Vec2f& r
-                            )
-  : m_CameraCounter(cameraCounter)
-  , m_ModelPoint(p)
-  , m_ObservedL(l)
-  , m_ObservedR(r)
+  LeftProjectionConstraint(const std::vector<cv::Vec3f>& m,
+                           const std::vector<cv::Vec2f>& l
+                          )
+  : m_ModelPoints(m)
+  , m_ImagePoints(l)
   {
   }
 
-  /**
-   * Lets define
-   * Left intrinsic (4) (0-3)
-   * Left distortion (5) (4-8)
-   * Right intrinsic (4) (9-12)
-   * Right distortion (5) (13-17)
-   * Left-to-right rotation and translation vector (6) (18-23)
-   * Left camera rotation and translation vector (6) (24 onwards)
-   */
   template <typename T>
   bool operator()(T const* const* parameters,
                   T* residuals) const {
 
-    T m[3];
-    m[0] = T(static_cast<double>(m_ModelPoint.x));
-    m[1] = T(static_cast<double>(m_ModelPoint.y));
-    m[2] = T(static_cast<double>(m_ModelPoint.z));
+    unsigned long long int residualCounter = 0;
+    for (std::vector<cv::Point3f>::size_type p = 0; p < m_ModelPoints.size(); p++)
+    {
+      T m[3];
+      m[0] = T(static_cast<double>(m_ModelPoints[p](0)));
+      m[1] = T(static_cast<double>(m_ModelPoints[p](1)));
+      m[2] = T(static_cast<double>(m_ModelPoints[p](2)));
 
-    T l[3];
-    ceres::AngleAxisRotatePoint(parameters[6 + m_CameraCounter*2 + 0], m, l);
-    l[0] += *(parameters[6 + m_CameraCounter*2 + 1] + 0);
-    l[1] += *(parameters[6 + m_CameraCounter*2 + 1] + 1);
-    l[2] += *(parameters[6 + m_CameraCounter*2 + 1] + 2);
+      T l[3];
+      ceres::AngleAxisRotatePoint(parameters[2], m, l);
+      l[0] += (parameters[2])[3];
+      l[1] += (parameters[2])[4];
+      l[2] += (parameters[2])[5];
 
-    T lx;
-    T ly;
-    ProjectToPoint<T>(parameters[0],
-                      parameters[1],
-                      l,
-                      lx,
-                      ly
-                     );
+      T lx;
+      T ly;
+      ProjectToPoint<T>(parameters[0],
+                        parameters[1],
+                        l,
+                        lx,
+                        ly
+                       );
 
-    T r[3];
-    ceres::AngleAxisRotatePoint(parameters[4], l, r);
-    r[0] += *(parameters[5] + 0);
-    r[1] += *(parameters[5] + 1);
-    r[2] += *(parameters[5] + 2);
-
-    T rx;
-    T ry;
-    ProjectToPoint<T>(parameters[2],
-                      parameters[3],
-                      r,
-                      rx,
-                      ry
-                     );
-
-    residuals[0] = lx - T(static_cast<double>(m_ObservedL(0)));
-    residuals[1] = ly - T(static_cast<double>(m_ObservedL(1)));
-    residuals[2] = rx - T(static_cast<double>(m_ObservedR(0)));
-    residuals[3] = ry - T(static_cast<double>(m_ObservedR(1)));
-
+      residuals[residualCounter++] = lx - T(static_cast<double>(m_ImagePoints[p](0)));
+      residuals[residualCounter++] = ly - T(static_cast<double>(m_ImagePoints[p](1)));
+    }
     return true;
   }
 
-  static ceres::CostFunction* Create(unsigned int& cameraCounter,
-                                     const cv::Vec3f& modelPoint,
-                                     const cv::Vec2f& leftObservedPoint,
-                                     const cv::Vec2f& rightObservedPoint) {
-    return (new ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint>(
-              new StereoProjectionConstraint(cameraCounter,
-                                             modelPoint,
-                                             leftObservedPoint,
-                                             rightObservedPoint)));
+  std::vector<cv::Vec3f> m_ModelPoints;
+  std::vector<cv::Vec2f> m_ImagePoints;
+};
+
+
+struct RightProjectionConstraint {
+public:
+  RightProjectionConstraint(const std::vector<cv::Vec3f>& m,
+                            const std::vector<cv::Vec2f>& r
+                           )
+  : m_ModelPoints(m)
+  , m_ImagePoints(r)
+  {
   }
 
-  unsigned int m_CameraCounter;
-  cv::Point3f m_ModelPoint;
-  cv::Vec2f   m_ObservedL;
-  cv::Vec2f   m_ObservedR;
+  template <typename T>
+  bool operator()(T const* const* parameters,
+                  T* residuals) const {
+
+    unsigned long long int residualCounter = 0;
+    for (std::vector<cv::Point3f>::size_type p = 0; p < m_ModelPoints.size(); p++)
+    {
+      T m[3];
+      m[0] = T(static_cast<double>(m_ModelPoints[p](0)));
+      m[1] = T(static_cast<double>(m_ModelPoints[p](1)));
+      m[2] = T(static_cast<double>(m_ModelPoints[p](2)));
+
+      T l[3];
+      ceres::AngleAxisRotatePoint(&((parameters[3])[0]), m, l);
+      l[0] += (parameters[3])[3];
+      l[1] += (parameters[3])[4];
+      l[2] += (parameters[3])[5];
+
+      T r[3];
+      ceres::AngleAxisRotatePoint(parameters[2], l, r);
+      r[0] += (parameters[2])[3];
+      r[1] += (parameters[2])[4];
+      r[2] += (parameters[2])[5];
+
+      T rx;
+      T ry;
+      ProjectToPoint<T>(parameters[0],
+                        parameters[1],
+                        r,
+                        rx,
+                        ry
+                       );
+
+      residuals[residualCounter++] = rx - T(static_cast<double>(m_ImagePoints[p](0)));
+      residuals[residualCounter++] = ry - T(static_cast<double>(m_ImagePoints[p](1)));
+    }
+    return true;
+  }
+
+  std::vector<cv::Vec3f> m_ModelPoints;
+  std::vector<cv::Vec2f> m_ImagePoints;
 };
+
 
 //-----------------------------------------------------------------------------
 double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& objectVectors3D,
@@ -174,8 +169,19 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                   cv::Mat& leftToRightTranslationVector
                                  )
 {
+  unsigned long long int numberOfPoints = 0;
+  for (std::vector<std::vector<cv::Vec3f> >::size_type i = 0; i < objectVectors3D.size(); i++)
+  {
+    numberOfPoints += objectVectors3D[i].size();
+  }
 
-  const unsigned int numberOfParameters = 4 + 5 + 4 + 5 + 6 + 6*rvecsLeft.size();
+  const unsigned int numberOfParameters = 4 // intrinsic left
+                                        + 5 // distortion left
+                                        + 4 // intrinsic right
+                                        + 5 // distortion right
+                                        + 6 // left to right transform
+                                        + 6*rvecsLeft.size(); // extrinsics for each left-hand camera
+
   double *parameters = new double[numberOfParameters];
 
   unsigned int parameterCounter = 0;
@@ -218,62 +224,71 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     parameters[parameterCounter++] = tvecsLeft[i].at<double>(0, 2);
   }
 
-  ceres::Problem problem;
-  for (unsigned int cameraCounter = 0; cameraCounter < objectVectors3D.size(); cameraCounter++)
+  double *initialParameters = new double[numberOfParameters];
+  for (unsigned int i = 0; i < numberOfParameters; i++)
   {
-    for (unsigned int pointCounter = 0; pointCounter < objectVectors3D[cameraCounter].size(); pointCounter++)
-    {
-      ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint> *costFunction =
-        new ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint>(
-          new StereoProjectionConstraint(cameraCounter,
-                                         objectVectors3D[cameraCounter][pointCounter],
-                                         leftVectors2D[cameraCounter][pointCounter],
-                                         rightVectors2D[cameraCounter][pointCounter]));
-      std::vector<double*> parameterBlocks;
-      parameterBlocks.push_back(&parameters[0]);
-      costFunction->AddParameterBlock(4);
-      parameterBlocks.push_back(&parameters[4]);
-      costFunction->AddParameterBlock(5);
-      parameterBlocks.push_back(&parameters[9]);
-      costFunction->AddParameterBlock(4);
-      parameterBlocks.push_back(&parameters[13]);
-      costFunction->AddParameterBlock(5);
-      parameterBlocks.push_back(&parameters[18]);
-      costFunction->AddParameterBlock(3);
-      parameterBlocks.push_back(&parameters[21]);
-      costFunction->AddParameterBlock(3);
-
-      for (int i = 0; i < objectVectors3D.size(); i++)
-      {
-        parameterBlocks.push_back(&parameters[24 + i*6 + 0]);
-        costFunction->AddParameterBlock(3);
-        parameterBlocks.push_back(&parameters[24 + i*6 + 3]);
-        costFunction->AddParameterBlock(3);
-      }
-      costFunction->SetNumResiduals(4);
-      problem.AddResidualBlock(costFunction,
-                               NULL,
-                               parameterBlocks
-                              );
-    }
+    initialParameters[i] = parameters[i];
   }
-/*
-  problem.SetParameterBlockConstant(&parameters[0]);
-  problem.SetParameterBlockConstant(&parameters[4]);
-  problem.SetParameterBlockConstant(&parameters[9]);
-  problem.SetParameterBlockConstant(&parameters[13]);
-  problem.SetParameterBlockConstant(&parameters[18]);
-  problem.SetParameterBlockConstant(&parameters[21]);
-*/
 
-  // Run the solver!
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_SCHUR;
   options.minimizer_progress_to_stdout = true;
 
+  ceres::Problem problem;
+
+  // Cost functions for each left hand camera.
+  for (unsigned int i = 0; i < rvecsLeft.size(); i++)
+  {
+    ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint> *leftCostFunction =
+      new ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint>(
+        new LeftProjectionConstraint(objectVectors3D[i], leftVectors2D[i])
+        );
+    std::vector<double*> leftBlocks;
+    leftBlocks.push_back(&parameters[0]);
+    leftCostFunction->AddParameterBlock(4);
+    leftBlocks.push_back(&parameters[4]);
+    leftCostFunction->AddParameterBlock(5);
+    leftBlocks.push_back(&parameters[24 + i*6]);
+    leftCostFunction->AddParameterBlock(6);
+    leftCostFunction->SetNumResiduals(2 * objectVectors3D[i].size());
+
+    problem.AddResidualBlock(leftCostFunction,
+                             NULL,
+                             leftBlocks
+                            );
+
+    problem.SetParameterBlockConstant(&parameters[0]);
+    problem.SetParameterBlockConstant(&parameters[4]);
+
+    ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint> *rightCostFunction =
+      new ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint>(
+        new RightProjectionConstraint(objectVectors3D[i], rightVectors2D[i])
+        );
+
+    std::vector<double*> rightBlocks;
+    rightBlocks.push_back(&parameters[9]);
+    rightCostFunction->AddParameterBlock(4);
+    rightBlocks.push_back(&parameters[13]);
+    rightCostFunction->AddParameterBlock(5);
+    rightBlocks.push_back(&parameters[18]);
+    rightCostFunction->AddParameterBlock(6);
+    rightBlocks.push_back(&parameters[24 + i*6]);
+    rightCostFunction->AddParameterBlock(6);
+    rightCostFunction->SetNumResiduals(2 * objectVectors3D[i].size());
+
+    problem.AddResidualBlock(rightCostFunction,
+                             NULL,
+                             rightBlocks
+                            );
+
+    problem.SetParameterBlockConstant(&parameters[9]);
+    problem.SetParameterBlockConstant(&parameters[13]);
+  }
+
+  // Run the solver!
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
-  std::cout << summary.FullReport() << "\n";
+  std::cout << summary.BriefReport() << "\n";
 
   parameterCounter = 0;
   intrinsicLeft.at<double>(0, 0) = parameters[parameterCounter++];
@@ -315,9 +330,13 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     tvecsLeft[i].at<double>(0, 2) = parameters[parameterCounter++];
   }
 
+  for (unsigned int i = 0; i < numberOfParameters; i++)
+  {
+    std::cerr << "Matt, i=" << i << ", " << initialParameters[i] << ", " << parameters[i] << ", " << parameters[i] - initialParameters[i] << std::endl;
+  }
   delete [] parameters;
 
-  return 0;
+  return summary.final_cost;
 }
 
 } // end namespace
