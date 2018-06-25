@@ -259,6 +259,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
     problem.SetParameterBlockConstant(&parameters[0]);
     problem.SetParameterBlockConstant(&parameters[4]);
+    problem.SetParameterBlockConstant(&parameters[24 + i*6]);
 
     ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint> *rightCostFunction =
       new ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint>(
@@ -335,6 +336,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     std::cerr << "Matt, i=" << i << ", " << initialParameters[i] << ", " << parameters[i] << ", " << parameters[i] - initialParameters[i] << std::endl;
   }
   delete [] parameters;
+  delete [] initialParameters;
 
   return summary.final_cost;
 }
