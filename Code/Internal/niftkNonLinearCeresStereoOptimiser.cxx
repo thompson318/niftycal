@@ -124,16 +124,16 @@ public:
       m[2] = T(static_cast<double>(m_ModelPoints[p](2)));
 
       T l[3];
-      ceres::AngleAxisRotatePoint(&((parameters[3])[0]), m, l);
-      l[0] += (parameters[3])[3];
-      l[1] += (parameters[3])[4];
-      l[2] += (parameters[3])[5];
+      ceres::AngleAxisRotatePoint(&((parameters[4])[0]), m, l);
+      l[0] += (parameters[4])[3];
+      l[1] += (parameters[4])[4];
+      l[2] += (parameters[4])[5];
 
       T r[3];
       ceres::AngleAxisRotatePoint(parameters[2], l, r);
-      r[0] += (parameters[2])[3];
-      r[1] += (parameters[2])[4];
-      r[2] += (parameters[2])[5];
+      r[0] += (parameters[3])[0];
+      r[1] += (parameters[3])[1];
+      r[2] += (parameters[3])[2];
 
       T rx;
       T ry;
@@ -154,6 +154,72 @@ public:
   std::vector<cv::Vec2f> m_ImagePoints;
 };
 
+struct StereoProjectionConstraint {
+public:
+  StereoProjectionConstraint(const std::vector<cv::Vec3f>& m,
+                             const std::vector<cv::Vec2f>& l,
+                             const std::vector<cv::Vec2f>& r
+                           )
+  : m_ModelPoints(m)
+  , m_LeftImagePoints(l)
+  , m_RightImagePoints(r)
+  {
+  }
+
+  template <typename T>
+  bool operator()(T const* const* parameters,
+                  T* residuals) const {
+
+    unsigned long long int residualCounter = 0;
+    for (std::vector<cv::Point3f>::size_type p = 0; p < m_ModelPoints.size(); p++)
+    {
+      T m[3];
+      m[0] = T(static_cast<double>(m_ModelPoints[p](0)));
+      m[1] = T(static_cast<double>(m_ModelPoints[p](1)));
+      m[2] = T(static_cast<double>(m_ModelPoints[p](2)));
+
+      T l[3];
+      ceres::QuaternionRotatePoint(&((parameters[6])[0]), m, l);
+      l[0] += (parameters[7])[0];
+      l[1] += (parameters[7])[1];
+      l[2] += (parameters[7])[2];
+
+      T lx;
+      T ly;
+      ProjectToPoint<T>(parameters[0],
+                        parameters[1],
+                        l,
+                        lx,
+                        ly
+                       );
+
+      T r[3];
+      ceres::QuaternionRotatePoint(parameters[4], l, r);
+      r[0] += (parameters[5])[0];
+      r[1] += (parameters[5])[1];
+      r[2] += (parameters[5])[2];
+
+      T rx;
+      T ry;
+      ProjectToPoint<T>(parameters[2],
+                        parameters[3],
+                        r,
+                        rx,
+                        ry
+                       );
+
+      residuals[residualCounter++] = lx - T(static_cast<double>(m_LeftImagePoints[p](0)));
+      residuals[residualCounter++] = ly - T(static_cast<double>(m_LeftImagePoints[p](1)));
+      residuals[residualCounter++] = rx - T(static_cast<double>(m_RightImagePoints[p](0)));
+      residuals[residualCounter++] = ry - T(static_cast<double>(m_RightImagePoints[p](1)));
+    }
+    return true;
+  }
+
+  std::vector<cv::Vec3f> m_ModelPoints;
+  std::vector<cv::Vec2f> m_LeftImagePoints;
+  std::vector<cv::Vec2f> m_RightImagePoints;
+};
 
 //-----------------------------------------------------------------------------
 double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& objectVectors3D,
@@ -179,8 +245,8 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                         + 5 // distortion left
                                         + 4 // intrinsic right
                                         + 5 // distortion right
-                                        + 6 // left to right transform
-                                        + 6*rvecsLeft.size(); // extrinsics for each left-hand camera
+                                        + 7 // left to right transform
+                                        + 7*rvecsLeft.size(); // extrinsics for each left-hand camera
 
   double *parameters = new double[numberOfParameters];
 
@@ -207,18 +273,34 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
-  parameters[parameterCounter++] = leftToRightRotationVector.at<double>(0, 0);
-  parameters[parameterCounter++] = leftToRightRotationVector.at<double>(0, 1);
-  parameters[parameterCounter++] = leftToRightRotationVector.at<double>(0, 2);
+  double axisAngle[3];
+  axisAngle[0] = leftToRightRotationVector.at<double>(0, 0);
+  axisAngle[1] = leftToRightRotationVector.at<double>(0, 1);
+  axisAngle[2] = leftToRightRotationVector.at<double>(0, 2);
+
+  double quaternion[4];
+  ceres::AngleAxisToQuaternion(axisAngle, quaternion);
+
+  parameters[parameterCounter++] = quaternion[0];
+  parameters[parameterCounter++] = quaternion[1];
+  parameters[parameterCounter++] = quaternion[2];
+  parameters[parameterCounter++] = quaternion[3];
   parameters[parameterCounter++] = leftToRightTranslationVector.at<double>(0, 0);
   parameters[parameterCounter++] = leftToRightTranslationVector.at<double>(0, 1);
   parameters[parameterCounter++] = leftToRightTranslationVector.at<double>(0, 2);
 
   for (unsigned int i = 0; i < rvecsLeft.size(); i++)
   {
-    parameters[parameterCounter++] = rvecsLeft[i].at<double>(0, 0);
-    parameters[parameterCounter++] = rvecsLeft[i].at<double>(0, 1);
-    parameters[parameterCounter++] = rvecsLeft[i].at<double>(0, 2);
+    axisAngle[0] = rvecsLeft[i].at<double>(0, 0);
+    axisAngle[1] = rvecsLeft[i].at<double>(0, 1);
+    axisAngle[2] = rvecsLeft[i].at<double>(0, 2);
+
+    ceres::AngleAxisToQuaternion(axisAngle, quaternion);
+
+    parameters[parameterCounter++] = quaternion[0];
+    parameters[parameterCounter++] = quaternion[1];
+    parameters[parameterCounter++] = quaternion[2];
+    parameters[parameterCounter++] = quaternion[3];
     parameters[parameterCounter++] = tvecsLeft[i].at<double>(0, 0);
     parameters[parameterCounter++] = tvecsLeft[i].at<double>(0, 1);
     parameters[parameterCounter++] = tvecsLeft[i].at<double>(0, 2);
@@ -239,6 +321,40 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   // Cost functions for each left hand camera.
   for (unsigned int i = 0; i < rvecsLeft.size(); i++)
   {
+    ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint> *stereoCostFunction =
+      new ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint>(
+        new StereoProjectionConstraint(objectVectors3D[i], leftVectors2D[i], rightVectors2D[i])
+        );
+    std::vector<double*> stereoBlocks;
+    stereoBlocks.push_back(&parameters[0]);
+    stereoCostFunction->AddParameterBlock(4);
+    stereoBlocks.push_back(&parameters[4]);
+    stereoCostFunction->AddParameterBlock(5);
+    stereoBlocks.push_back(&parameters[9]);
+    stereoCostFunction->AddParameterBlock(4);
+    stereoBlocks.push_back(&parameters[13]);
+    stereoCostFunction->AddParameterBlock(5);
+    stereoBlocks.push_back(&parameters[18]);
+    stereoCostFunction->AddParameterBlock(4);
+    stereoBlocks.push_back(&parameters[22]);
+    stereoCostFunction->AddParameterBlock(3);
+    stereoBlocks.push_back(&parameters[25 + i*7]);
+    stereoCostFunction->AddParameterBlock(4);
+    stereoBlocks.push_back(&parameters[25 + i*7 + 4]);
+    stereoCostFunction->AddParameterBlock(3);
+    stereoCostFunction->SetNumResiduals(4 * objectVectors3D[i].size());
+
+    problem.AddResidualBlock(stereoCostFunction,
+                             NULL,
+                             stereoBlocks
+                            );
+
+    problem.SetParameterBlockConstant(&parameters[0]);
+    problem.SetParameterBlockConstant(&parameters[4]);
+    problem.SetParameterBlockConstant(&parameters[9]);
+    problem.SetParameterBlockConstant(&parameters[13]);
+
+    /*
     ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint> *leftCostFunction =
       new ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint>(
         new LeftProjectionConstraint(objectVectors3D[i], leftVectors2D[i])
@@ -259,8 +375,9 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
     problem.SetParameterBlockConstant(&parameters[0]);
     problem.SetParameterBlockConstant(&parameters[4]);
-    problem.SetParameterBlockConstant(&parameters[24 + i*6]);
+    */
 
+    /*
     ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint> *rightCostFunction =
       new ceres::DynamicAutoDiffCostFunction<RightProjectionConstraint>(
         new RightProjectionConstraint(objectVectors3D[i], rightVectors2D[i])
@@ -272,7 +389,9 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     rightBlocks.push_back(&parameters[13]);
     rightCostFunction->AddParameterBlock(5);
     rightBlocks.push_back(&parameters[18]);
-    rightCostFunction->AddParameterBlock(6);
+    rightCostFunction->AddParameterBlock(3);
+    rightBlocks.push_back(&parameters[21]);
+    rightCostFunction->AddParameterBlock(3);
     rightBlocks.push_back(&parameters[24 + i*6]);
     rightCostFunction->AddParameterBlock(6);
     rightCostFunction->SetNumResiduals(2 * objectVectors3D[i].size());
@@ -284,6 +403,8 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
     problem.SetParameterBlockConstant(&parameters[9]);
     problem.SetParameterBlockConstant(&parameters[13]);
+    //problem.SetParameterBlockConstant(&parameters[18]);
+    */
   }
 
   // Run the solver!
@@ -311,9 +432,15 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   distortionRight.at<double>(0, 3) = parameters[parameterCounter++];
   distortionRight.at<double>(0, 4) = parameters[parameterCounter++];
 
-  leftToRightRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
-  leftToRightRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
-  leftToRightRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
+  quaternion[0] = parameters[parameterCounter++];
+  quaternion[1] = parameters[parameterCounter++];
+  quaternion[2] = parameters[parameterCounter++];
+  quaternion[3] = parameters[parameterCounter++];
+  ceres::QuaternionToAngleAxis(quaternion, axisAngle);
+
+  leftToRightRotationVector.at<double>(0, 0) = axisAngle[0];
+  leftToRightRotationVector.at<double>(0, 1) = axisAngle[1];
+  leftToRightRotationVector.at<double>(0, 2) = axisAngle[2];
 
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
 
@@ -323,18 +450,20 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
   for (unsigned int i = 0; i < rvecsLeft.size(); i++)
   {
-    rvecsLeft[i].at<double>(0, 0) = parameters[parameterCounter++];
-    rvecsLeft[i].at<double>(0, 1) = parameters[parameterCounter++];
-    rvecsLeft[i].at<double>(0, 2) = parameters[parameterCounter++];
+    quaternion[0] = parameters[parameterCounter++];
+    quaternion[1] = parameters[parameterCounter++];
+    quaternion[2] = parameters[parameterCounter++];
+    quaternion[3] = parameters[parameterCounter++];
+    ceres::QuaternionToAngleAxis(quaternion, axisAngle);
+
+    rvecsLeft[i].at<double>(0, 0) = axisAngle[0];
+    rvecsLeft[i].at<double>(0, 1) = axisAngle[1];
+    rvecsLeft[i].at<double>(0, 2) = axisAngle[2];
     tvecsLeft[i].at<double>(0, 0) = parameters[parameterCounter++];
     tvecsLeft[i].at<double>(0, 1) = parameters[parameterCounter++];
     tvecsLeft[i].at<double>(0, 2) = parameters[parameterCounter++];
   }
 
-  for (unsigned int i = 0; i < numberOfParameters; i++)
-  {
-    std::cerr << "Matt, i=" << i << ", " << initialParameters[i] << ", " << parameters[i] << ", " << parameters[i] - initialParameters[i] << std::endl;
-  }
   delete [] parameters;
   delete [] initialParameters;
 

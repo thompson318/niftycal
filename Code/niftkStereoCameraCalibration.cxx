@@ -812,7 +812,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                       rvecsLeft,
                                       tvecsLeft,
                                       CV_CALIB_FIX_PRINCIPAL_POINT
-                                      | CV_CALIB_ZERO_TANGENT_DIST
+                                      | CV_CALIB_FIX_K2
                                       | CV_CALIB_FIX_K3
                                       | CV_CALIB_FIX_K4
                                       | CV_CALIB_FIX_K5
@@ -827,7 +827,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                       rvecsRight,
                                       tvecsRight,
                                       CV_CALIB_FIX_PRINCIPAL_POINT
-                                      | CV_CALIB_ZERO_TANGENT_DIST
+                                      | CV_CALIB_FIX_K2
                                       | CV_CALIB_FIX_K3
                                       | CV_CALIB_FIX_K4
                                       | CV_CALIB_FIX_K5
