@@ -18,6 +18,28 @@
 #include <ceres/rotation.h>
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_siman.h>
+#include <gsl/gsl_ieee_utils.h>
+
+#define SA_N_TRIES 12000           /* how many points do we try before stepping */
+#define SA_ITERS_FIXED_T 1000      /* how many iterations for each T? */
+#define SA_STEP_SIZE 1.0           /* max step size in random walk */
+#define SA_K 1.0                   /* Boltzmann constant */
+#define SA_T_INITIAL 5000.0        /* initial temperature */
+#define SA_MU_T 1.002              /* damping factor for temperature */
+#define SA_T_MIN 5.0e-1
+
+gsl_siman_params_t params = {SA_N_TRIES, SA_ITERS_FIXED_T, SA_STEP_SIZE,
+                             SA_K, SA_T_INITIAL, SA_MU_T, SA_T_MIN};
+
+unsigned int totalNumberOfPoints;
+unsigned int totalNumberOfParameters;
+std::vector<std::vector<cv::Vec3f> > modelPoints;
+std::vector<std::vector<cv::Vec2f> > leftImagePoints;
+std::vector<std::vector<cv::Vec2f> > rightImagePoints;
 
 namespace niftk
 {
@@ -221,6 +243,137 @@ public:
   std::vector<cv::Vec2f> m_RightImagePoints;
 };
 
+
+void P1(void *xp)
+{
+  std::cerr << " ";
+  for (unsigned int i = 0; i < totalNumberOfParameters; i++)
+  {
+    std::cerr << (reinterpret_cast<double*>(xp))[i] << " ";
+  }
+  std::cerr << std::endl;
+}
+
+double E1(void *xp)
+{
+  double rms = 0;
+
+  double *parameters = reinterpret_cast<double*>(xp);
+  unsigned long long int counter = 0;
+  for (unsigned long int i = 0; i < modelPoints.size(); i++)
+  {
+    for (unsigned long int p = 0; p < modelPoints[i].size(); p++)
+    {
+      double m[3];
+      m[0] = modelPoints[i][p](0);
+      m[1] = modelPoints[i][p](1);
+      m[2] = modelPoints[i][p](2);
+
+      double l[3];
+      ceres::QuaternionRotatePoint(&(parameters[25 + i*7]), m, l);
+      l[0] += parameters[25 + i*7 + 4];
+      l[1] += parameters[25 + i*7 + 5];
+      l[2] += parameters[25 + i*7 + 6];
+
+      double lx;
+      double ly;
+      ProjectToPoint<double>(&parameters[0],
+                             &parameters[4],
+                             l,
+                             lx,
+                             ly
+                            );
+
+      double r[3];
+      ceres::QuaternionRotatePoint(&parameters[18], l, r);
+      r[0] += parameters[18 + 4];
+      r[1] += parameters[18 + 5];
+      r[2] += parameters[18 + 6];
+
+      double rx;
+      double ry;
+      ProjectToPoint<double>(&parameters[9],
+                             &parameters[13],
+                             r,
+                             rx,
+                             ry
+                            );
+
+      rms += (lx - leftImagePoints[i][p](0))*(lx - leftImagePoints[i][p](0));
+      rms += (ly - leftImagePoints[i][p](1))*(ly - leftImagePoints[i][p](1));
+      counter++;
+      rms += (rx - rightImagePoints[i][p](0))*(rx - rightImagePoints[i][p](0));
+      rms += (ry - rightImagePoints[i][p](1))*(ry - rightImagePoints[i][p](1));
+      counter++;
+    }
+  }
+  return rms / static_cast<double>(counter);
+}
+
+double M1(void *xp, void *yp)
+{
+  double m1 = 0;
+  for (unsigned int i = 0; i < totalNumberOfParameters; i++)
+  {
+    m1 += std::fabs((reinterpret_cast<double*>(xp))[i]- (reinterpret_cast<double*>(yp))[i]);
+  }
+  return m1;
+}
+
+void S1(const gsl_rng * r, void *xp, double step_size)
+{
+  double *old_x = new double[totalNumberOfParameters];
+  double *new_x = new double[totalNumberOfParameters];
+  double *scales = new double[totalNumberOfParameters];
+
+  scales[0] = 50;
+  scales[1] = 50;
+  scales[2] = 5;
+  scales[3] = 5;
+  scales[4] = 0.01;
+  scales[5] = 0.01;
+  scales[6] = 0.01;
+  scales[7] = 0.01;
+  scales[8] = 0.01;
+  scales[9] = 50;
+  scales[10] = 50;
+  scales[11] = 5;
+  scales[12] = 5;
+  scales[13] = 0.01;
+  scales[14] = 0.01;
+  scales[15] = 0.01;
+  scales[16] = 0.01;
+  scales[17] = 0.01;
+  scales[18] = 0.1;
+  scales[19] = 0.1;
+  scales[20] = 0.1;
+  scales[21] = 0.1;
+  scales[22] = 5;
+  scales[23] = 5;
+  scales[24] = 5;
+  for (unsigned int i = 0; i < modelPoints.size(); i++)
+  {
+    scales[25 + i*7 + 0] = 0.1;
+    scales[25 + i*7 + 1] = 0.1;
+    scales[25 + i*7 + 2] = 0.1;
+    scales[25 + i*7 + 3] = 0.1;
+    scales[25 + i*7 + 4] = 5;
+    scales[25 + i*7 + 5] = 5;
+    scales[25 + i*7 + 6] = 5;
+  }
+  for (unsigned int i = 0; i < totalNumberOfParameters; i++)
+  {
+    double u = gsl_rng_uniform(r);
+    old_x[i] = (reinterpret_cast<double*>(xp))[i];
+    new_x[i] = u * 2 * step_size * scales[i] - step_size * scales[i]  + old_x[i];
+  }
+  memcpy(xp, new_x, totalNumberOfParameters * sizeof(double));
+
+  delete [] old_x;
+  delete [] new_x;
+  delete [] scales;
+}
+
 //-----------------------------------------------------------------------------
 double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& objectVectors3D,
                                   const std::vector<std::vector<cv::Vec2f> >& leftVectors2D,
@@ -240,6 +393,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   {
     numberOfPoints += objectVectors3D[i].size();
   }
+  totalNumberOfPoints = numberOfPoints;
 
   const unsigned int numberOfParameters = 4 // intrinsic left
                                         + 5 // distortion left
@@ -247,6 +401,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                         + 5 // distortion right
                                         + 7 // left to right transform
                                         + 7*rvecsLeft.size(); // extrinsics for each left-hand camera
+  totalNumberOfParameters = numberOfParameters;
 
   double *parameters = new double[numberOfParameters];
 
@@ -312,13 +467,27 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     initialParameters[i] = parameters[i];
   }
 
+  modelPoints = objectVectors3D;
+  leftImagePoints = leftVectors2D;
+  rightImagePoints = rightVectors2D;
+
+  const gsl_rng_type * T;
+  gsl_rng * r;
+  gsl_rng_env_setup();
+  T = gsl_rng_default;
+  r = gsl_rng_alloc(T);
+  gsl_siman_solve(r, parameters, E1, S1, M1, NULL,
+                    NULL, NULL, NULL,
+                    numberOfParameters * sizeof(double), params);
+/*
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_SCHUR;
   options.minimizer_progress_to_stdout = true;
 
   ceres::Problem problem;
-
+*/
   // Cost functions for each left hand camera.
+/*
   for (unsigned int i = 0; i < rvecsLeft.size(); i++)
   {
     ceres::DynamicAutoDiffCostFunction<StereoProjectionConstraint> *stereoCostFunction =
@@ -353,7 +522,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     problem.SetParameterBlockConstant(&parameters[4]);
     problem.SetParameterBlockConstant(&parameters[9]);
     problem.SetParameterBlockConstant(&parameters[13]);
-
+*/
     /*
     ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint> *leftCostFunction =
       new ceres::DynamicAutoDiffCostFunction<LeftProjectionConstraint>(
@@ -405,12 +574,19 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     problem.SetParameterBlockConstant(&parameters[13]);
     //problem.SetParameterBlockConstant(&parameters[18]);
     */
+/*
   }
 
   // Run the solver!
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
   std::cout << summary.BriefReport() << "\n";
+*/
+
+  for (unsigned int i = 0; i < numberOfParameters; i++)
+  {
+    std::cerr << "Matt, post optimisation, i=" << i << ", i=" << initialParameters[i] << ", f=" << parameters[i] << ", d=" << parameters[i] - initialParameters[i] << std::endl;
+  }
 
   parameterCounter = 0;
   intrinsicLeft.at<double>(0, 0) = parameters[parameterCounter++];
@@ -467,7 +643,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   delete [] parameters;
   delete [] initialParameters;
 
-  return summary.final_cost;
+  return 0;
 }
 
 } // end namespace
