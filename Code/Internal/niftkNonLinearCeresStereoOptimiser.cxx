@@ -19,6 +19,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
@@ -243,7 +244,7 @@ public:
   std::vector<cv::Vec2f> m_RightImagePoints;
 };
 
-
+/*
 void P1(void *xp)
 {
   std::cerr << " ";
@@ -373,7 +374,7 @@ void S1(const gsl_rng * r, void *xp, double step_size)
   delete [] new_x;
   delete [] scales;
 }
-
+*/
 //-----------------------------------------------------------------------------
 double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& objectVectors3D,
                                   const std::vector<std::vector<cv::Vec2f> >& leftVectors2D,
@@ -471,6 +472,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   leftImagePoints = leftVectors2D;
   rightImagePoints = rightVectors2D;
 
+  /*
   const gsl_rng_type * T;
   gsl_rng * r;
   gsl_rng_env_setup();
@@ -479,6 +481,8 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   gsl_siman_solve(r, parameters, E1, S1, M1, NULL,
                     NULL, NULL, NULL,
                     numberOfParameters * sizeof(double), params);
+  */
+
 /*
   ceres::Solver::Options options;
   options.linear_solver_type = ceres::DENSE_SCHUR;
