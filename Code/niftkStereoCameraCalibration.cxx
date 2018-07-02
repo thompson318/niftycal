@@ -850,7 +850,9 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                             leftToRightTranslationVector,
                                             essentialMatrix,
                                             fundamentalMatrix,
-                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
+                                            CV_CALIB_USE_INTRINSIC_GUESS
+                                            | CV_CALIB_FIX_INTRINSIC
+                                            ,
                                             optimise3D
                                            );
   }
