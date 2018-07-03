@@ -198,11 +198,12 @@ public:
                   const T* const leftDistortion,
                   const T* const rightIntrinsic,
                   const T* const rightDistortion,
-                  const T* const leftRotation,
-                  const T* const rightPosition,
-                  const T* const rightRotation,
                   const T* const baselineRotation,
-                  const T* const baselinePosition,
+                  const T* const baselineTranslation,
+                  const T* const leftRotation,
+                  const T* const leftTranslation,
+                  const T* const rightRotation,
+                  const T* const rightTranslation,
                   T* residuals) const {
 
     unsigned long long int residualCounter = 0;
@@ -211,74 +212,44 @@ public:
     m[1] = T(static_cast<double>(m_ModelPoint(1)));
     m[2] = T(static_cast<double>(m_ModelPoint(2)));
 
+    T b[3];
+    ceres::QuaternionRotatePoint(baselineRotation, m, b);
+
+    T bt[3];
+    bt[0] = b[0] + baselineTranslation[0];
+    bt[1] = b[1] + baselineTranslation[1];
+    bt[2] = b[2] + baselineTranslation[2];
+
     T l[3];
-    ceres::QuaternionRotatePoint(baselineRotation, m, l);
+    ceres::QuaternionRotatePoint(leftRotation, bt, l);
 
-    T c[3];
-    c[0] = baselinePosition[0];
-    c[1] = baselinePosition[1];
-    c[2] = baselinePosition[2];
-
-    T rc[3];
-    ceres::QuaternionRotatePoint(baselineRotation, c, rc);
-    rc[0] = T(-1) * rc[0];
-    rc[1] = T(-1) * rc[1];
-    rc[2] = T(-1) * rc[2];
-
-    l[0] = l[0] + rc[0];
-    l[1] = l[1] + rc[1];
-    l[2] = l[2] + rc[2];
-
-    T rl[3];
-    ceres::QuaternionRotatePoint(leftRotation, l, rl);
+    T lt[3];
+    lt[0] = l[0] + leftTranslation[0];
+    lt[1] = l[1] + leftTranslation[1];
+    lt[2] = l[2] + leftTranslation[2];
 
     T lx;
     T ly;
     ProjectToPoint<T>(leftIntrinsic,
                       leftDistortion,
-                      rl,
+                      lt,
                       lx,
                       ly
                      );
 
-    T rr[3];
-    ceres::QuaternionRotatePoint(rightRotation, l, rr);
-
-    T cr[3];
-    cr[0] = rightPosition[0];
-    cr[1] = rightPosition[1];
-    cr[2] = T(0);
-
-    T rcr[3];
-    ceres::QuaternionRotatePoint(rightRotation, cr, rcr);
-    rcr[0] = T(-1) * rcr[0];
-    rcr[1] = T(-1) * rcr[1];
-    rcr[2] = T(-1) * rcr[2];
-
     T r[3];
-    r[0] = rr[0] + rcr[0];
-    r[1] = rr[1] + rcr[1];
-    r[2] = rr[2] + rcr[2];
+    ceres::QuaternionRotatePoint(rightRotation, bt, r);
 
-    /*
-    T cr[3];
-    cr[0] = rightPosition[0];
-    cr[1] = rightPosition[1];
-    cr[2] = T(0);
+    T rt[3];
+    rt[0] = r[0] + rightTranslation[0];
+    rt[1] = r[1] + rightTranslation[1];
+    rt[2] = r[2] + rightTranslation[2];
 
-    T rcr[3];
-    rcr[0] = l[0] + cr[0];
-    rcr[1] = l[1] + cr[1];
-    rcr[2] = l[2] + cr[2];
-
-    T r[3];
-    ceres::QuaternionRotatePoint(rightRotation, rcr, r);
-*/
     T rx;
     T ry;
     ProjectToPoint<T>(rightIntrinsic,
                       rightDistortion,
-                      r,
+                      rt,
                       rx,
                       ry
                      );
@@ -473,6 +444,8 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                   std::vector<cv::Mat>& tvecsLeft,
                                   cv::Mat& intrinsicRight,
                                   cv::Mat& distortionRight,
+                                  std::vector<cv::Mat>& rvecsRight,
+                                  std::vector<cv::Mat>& tvecsRight,
                                   cv::Mat& leftToRightRotationMatrix,
                                   cv::Mat& leftToRightTranslationVector
                                  )
@@ -488,14 +461,19 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                         + 5 // distortion left
                                         + 4 // intrinsic right
                                         + 5 // distortion right
-                                        + 4 // left camera rotation
-                                        + 2 // right camera position (x,y) in left camera coordinates
-                                        + 4 // right camera rotation
                                         + 4 * objectVectors3D.size() // base frame rotation
                                         + 3 * objectVectors3D.size() // base frame translation
+                                        + 4 // left camera rotation
+                                        + 3 // left camera translation
+                                        + 4 // right camera rotation
+                                        + 3 // right camera translation
                                         ;
 
+  std::cerr << "Matt, numberOfParameters = " << numberOfParameters << std::endl;
+
   totalNumberOfParameters = numberOfParameters;
+//  leftToRightRotationMatrix = cv::Mat::eye(3, 3, CV_64FC1);
+//  leftToRightTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
 
   double *parameters = new double[numberOfParameters];
 
@@ -522,6 +500,82 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   parameters[parameterCounter++] = distortionRight.at<double>(0, 3);
   parameters[parameterCounter++] = distortionRight.at<double>(0, 4);
 
+  std::list<cv::Matx44d> toLeftCameraExtrinsics;
+  std::list<cv::Matx44d> toRightCameraExtrinsics;
+  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+
+  // Base frame rotation (4) and translation (3), in that order.
+  for (unsigned int i = 0; i < rvecsLeft.size(); i++)
+  {
+    cv::Matx44d leftExtrinsic = niftk::RodriguesToMatrix(rvecsLeft[i], tvecsLeft[i]);
+    cv::Matx44d rightExtrinsic = niftk::RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
+
+    std::list<cv::Matx44d> toAverage;
+    toAverage.push_back(leftExtrinsic);
+    toAverage.push_back(rightExtrinsic);
+
+    cv::Matx44d averageExtrinsic = niftk::AverageMatricesUsingEigenValues(toAverage);
+
+    toLeftCameraExtrinsics.push_back(leftExtrinsic * averageExtrinsic.inv());
+    toRightCameraExtrinsics.push_back(rightExtrinsic * averageExtrinsic.inv());
+
+    niftk::MatrixToRodrigues(averageExtrinsic, rvec, tvec);
+
+    axisAngle[0] = rvec.at<double>(0, 0);
+    axisAngle[1] = rvec.at<double>(0, 1);
+    axisAngle[2] = rvec.at<double>(0, 2);
+
+    ceres::AngleAxisToQuaternion(axisAngle, quaternion);
+
+    parameters[parameterCounter++] = quaternion[0];
+    parameters[parameterCounter++] = quaternion[1];
+    parameters[parameterCounter++] = quaternion[2];
+    parameters[parameterCounter++] = quaternion[3];
+
+    parameters[parameterCounter++] = tvec.at<double>(0, 0);
+    parameters[parameterCounter++] = tvec.at<double>(0, 1);
+    parameters[parameterCounter++] = tvec.at<double>(0, 2);
+  }
+
+  cv::Matx44d toLeftCamera = niftk::AverageMatricesUsingEigenValues(toLeftCameraExtrinsics);
+  cv::Matx44d toRightCamera = niftk::AverageMatricesUsingEigenValues(toRightCameraExtrinsics);
+
+  // From baseline to left camera
+  niftk::MatrixToRodrigues(toLeftCamera, rvec, tvec);
+  axisAngle[0] = rvec.at<double>(0, 0);
+  axisAngle[1] = rvec.at<double>(0, 1);
+  axisAngle[2] = rvec.at<double>(0, 2);
+
+  ceres::AngleAxisToQuaternion(axisAngle, quaternion);
+
+  parameters[parameterCounter++] = quaternion[0];
+  parameters[parameterCounter++] = quaternion[1];
+  parameters[parameterCounter++] = quaternion[2];
+  parameters[parameterCounter++] = quaternion[3];
+
+  parameters[parameterCounter++] = tvec.at<double>(0, 0);
+  parameters[parameterCounter++] = tvec.at<double>(0, 1);
+  parameters[parameterCounter++] = tvec.at<double>(0, 2);
+
+  // From baseline to right camera
+  niftk::MatrixToRodrigues(toRightCamera, rvec, tvec);
+  axisAngle[0] = rvec.at<double>(0, 0);
+  axisAngle[1] = rvec.at<double>(0, 1);
+  axisAngle[2] = rvec.at<double>(0, 2);
+
+  ceres::AngleAxisToQuaternion(axisAngle, quaternion);
+
+  parameters[parameterCounter++] = quaternion[0];
+  parameters[parameterCounter++] = quaternion[1];
+  parameters[parameterCounter++] = quaternion[2];
+  parameters[parameterCounter++] = quaternion[3];
+
+  parameters[parameterCounter++] = tvec.at<double>(0, 0);
+  parameters[parameterCounter++] = tvec.at<double>(0, 1);
+  parameters[parameterCounter++] = tvec.at<double>(0, 2);
+
+/*
   // Left camera rotation, initialise to identity.
   axisAngle[0] = 0;
   axisAngle[1] = 0;
@@ -587,6 +641,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     parameters[parameterCounter++] = cameraPosition(1, 0);
     parameters[parameterCounter++] = cameraPosition(2, 0);
   }
+*/
 
   double *initialParameters = new double[numberOfParameters];
   for (unsigned int i = 0; i < numberOfParameters; i++)
@@ -628,13 +683,14 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
           5, // left distortion
           4, // right intrinsic
           5, // right distortion
-          4, // left rotation
-          2, // right position
-          4, // right rotation
           4, // baseline rotation
-          3  // baseline translation
+          3, // baseline translation
+          4, // left rotation
+          3, // left translation
+          4, // right rotation
+          3  // right translation
           > *stereoCostFunction =
-        new ceres::AutoDiffCostFunction<StereoProjectionConstraint, 4, 4, 5, 4, 5, 4, 2, 4, 4, 3>(
+        new ceres::AutoDiffCostFunction<StereoProjectionConstraint, 4, 4, 5, 4, 5, 4, 3, 4, 3, 4, 3>(
           new StereoProjectionConstraint(objectVectors3D[i][p], leftVectors2D[i][p], rightVectors2D[i][p])
           );
 /*
@@ -665,16 +721,20 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
                                &parameters[4],  // left distortion
                                &parameters[9],  // right intrinsic
                                &parameters[13], // right distortion
-                               &parameters[18], // left rotation
-                               &parameters[22], // right position with respect to left camera
-                               &parameters[24], // right rotation
-                               &parameters[28 + i*4], // baseline rotation
-                               &parameters[28 + rvecsLeft.size()*4 + i*3] // baseline translation
+                               &parameters[18 + i*7 + 0], // baseline rotation
+                               &parameters[18 + i*7 + 4], // baseline translation
+                               &parameters[18 + rvecsLeft.size()*7 + 0], // left rotation
+                               &parameters[18 + rvecsLeft.size()*7 + 4], // left translation
+                               &parameters[18 + rvecsLeft.size()*7 + 7], // right rotation
+                               &parameters[18 + rvecsLeft.size()*7 + 11] // right translation
                               );
-      problem.SetParameterBlockConstant(&parameters[28 + i*4]);
+      problem.SetParameterBlockConstant(&parameters[18 + i*7 + 0]);
     }
   }
 
+  std::cerr << "Matt, after loop, num parameters=" << 18 + rvecsLeft.size()*7 + 11 + 3 << std::endl;
+
+/*
   problem.SetParameterLowerBound(&(parameters[0]), 0, parameters[0] - 50);
   problem.SetParameterUpperBound(&(parameters[0]), 0, parameters[0] + 50);
   problem.SetParameterLowerBound(&(parameters[0]), 1, parameters[1] - 50);
@@ -759,6 +819,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
     problem.SetParameterLowerBound(&(parameters[28 + + rvecsLeft.size()*4 + i*3]), 2, parameters[28 + rvecsLeft.size()*4 + i*3 + 2] - 2);
     problem.SetParameterUpperBound(&(parameters[28 + + rvecsLeft.size()*4 + i*3]), 2, parameters[28 + rvecsLeft.size()*4 + i*3 + 2] + 2);
   }
+  */
 
   //problem.SetParameterBlockConstant(&parameters[0]);
   //problem.SetParameterBlockConstant(&parameters[4]);
@@ -833,7 +894,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   {
     std::cerr << "Matt, post optimisation, i=" << i << ", b=" << initialParameters[i] << ", a=" << parameters[i] << ", d=" << parameters[i] - initialParameters[i] << std::endl;
   }
-
+  std::cerr << "Matt, indicative error=" << std::sqrt(summary.final_cost / static_cast<double>(numberOfPoints)) << std::endl;
   parameterCounter = 0;
   intrinsicLeft.at<double>(0, 0) = parameters[parameterCounter++];
   intrinsicLeft.at<double>(1, 1) = parameters[parameterCounter++];
@@ -854,6 +915,65 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   distortionRight.at<double>(0, 3) = parameters[parameterCounter++];
   distortionRight.at<double>(0, 4) = parameters[parameterCounter++];
 
+  // Extract common baseline to left
+  quaternion[0] = parameters[18 + rvecsLeft.size()*7 + 0];
+  quaternion[1] = parameters[18 + rvecsLeft.size()*7 + 1];
+  quaternion[2] = parameters[18 + rvecsLeft.size()*7 + 2];
+  quaternion[3] = parameters[18 + rvecsLeft.size()*7 + 3];
+  ceres::QuaternionToAngleAxis(quaternion, axisAngle);
+  rvec.at<double>(0, 0) = axisAngle[0];
+  rvec.at<double>(0, 1) = axisAngle[1];
+  rvec.at<double>(0, 2) = axisAngle[2];
+  tvec.at<double>(0, 0) = parameters[18 + rvecsLeft.size()*7 + 4];
+  tvec.at<double>(0, 1) = parameters[18 + rvecsLeft.size()*7 + 5];
+  tvec.at<double>(0, 2) = parameters[18 + rvecsLeft.size()*7 + 6];
+  cv::Matx44d baselineToLeft = niftk::RodriguesToMatrix(rvec, tvec);
+  std::cerr << "Matt, baselineToLeft=" << baselineToLeft << std::endl;
+
+  // Extract common baseline to right
+  quaternion[0] = parameters[18 + rvecsLeft.size()*7 + 7];
+  quaternion[1] = parameters[18 + rvecsLeft.size()*7 + 8];
+  quaternion[2] = parameters[18 + rvecsLeft.size()*7 + 9];
+  quaternion[3] = parameters[18 + rvecsLeft.size()*7 + 10];
+  ceres::QuaternionToAngleAxis(quaternion, axisAngle);
+  rvec.at<double>(0, 0) = axisAngle[0];
+  rvec.at<double>(0, 1) = axisAngle[1];
+  rvec.at<double>(0, 2) = axisAngle[2];
+  tvec.at<double>(0, 0) = parameters[18 + rvecsLeft.size()*7 + 11];
+  tvec.at<double>(0, 1) = parameters[18 + rvecsLeft.size()*7 + 12];
+  tvec.at<double>(0, 2) = parameters[18 + rvecsLeft.size()*7 + 13];
+  cv::Matx44d baselineToRight = niftk::RodriguesToMatrix(rvec, tvec);
+  std::cerr << "Matt, baselineToRight=" << baselineToRight << std::endl;
+
+  // Calculate final left to right transformation.
+  cv::Matx44d leftToRight = baselineToRight * baselineToLeft.inv();
+  niftk::MatrixToRodrigues(leftToRight, rvec, leftToRightTranslationVector);
+  cv::Rodrigues(rvec, leftToRightRotationMatrix);
+  std::cerr << "Matt, leftToRightTranslationVector=" << leftToRightTranslationVector << std::endl;
+  std::cerr << "Matt, leftToRightRotationMatrix=" << leftToRightRotationMatrix << std::endl;
+
+  // Now set rvecs and tvecs consistently
+  // (consistent with respect to the left to right transformation)
+  for (unsigned int i = 0; i < rvecsLeft.size(); i++)
+  {
+    quaternion[0] = parameters[18 + i*7 + 0];
+    quaternion[1] = parameters[18 + i*7 + 1];
+    quaternion[2] = parameters[18 + i*7 + 2];
+    quaternion[3] = parameters[18 + i*7 + 3];
+    ceres::QuaternionToAngleAxis(quaternion, axisAngle);
+    rvec.at<double>(0, 0) = axisAngle[0];
+    rvec.at<double>(0, 1) = axisAngle[1];
+    rvec.at<double>(0, 2) = axisAngle[2];
+    tvec.at<double>(0, 0) = parameters[18 + i*7 + 4];
+    tvec.at<double>(0, 1) = parameters[18 + i*7 + 5];
+    tvec.at<double>(0, 2) = parameters[18 + i*7 + 6];
+    cv::Matx44d baseline = niftk::RodriguesToMatrix(rvec, tvec);
+    cv::Matx44d leftExtrinsic = baselineToLeft * baseline;
+    niftk::MatrixToRodrigues(leftExtrinsic, rvecsLeft[i], tvecsLeft[i]);
+    cv::Matx44d rightExtrinsic = baselineToRight * baseline;
+    niftk::MatrixToRodrigues(rightExtrinsic, rvecsRight[i], tvecsRight[i]);
+  }
+/*
   // Extract R_L, left camera rotation
   quaternion[0] = parameters[parameterCounter++];
   quaternion[1] = parameters[parameterCounter++];
@@ -944,30 +1064,14 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
     combinedTransform = leftTransform * baselineTransform;
 
-    std::cerr << "Matt, baselineTransform=" << baselineTransform << std::endl;
-    std::cerr << "Matt, leftTransform=" << leftTransform << std::endl;
-    std::cerr << "Matt, combinedTransform=" << combinedTransform << std::endl;
-    std::cerr << "Matt, beforeExtrinsic=" << niftk::RodriguesToMatrix(rvecsLeftBefore[i], tvecsLeftBefore[i]) << std::endl;
     combinedTransform(cv::Rect(0,0,3,3)).copyTo(tmpRotationMatrix);
     cv::Rodrigues(tmpRotationMatrix, rvecsLeft[i]);
 
     tvecsLeft[i].at<double>(0, 0) = combinedTransform.at<double>(0, 3);
     tvecsLeft[i].at<double>(0, 1) = combinedTransform.at<double>(1, 3);
     tvecsLeft[i].at<double>(0, 2) = combinedTransform.at<double>(2, 3);
-
-    std::cerr << "Matt, i=" << i << ", rvecsBefore=" << rvecsLeftBefore[i] << std::endl;
-    std::cerr << "Matt, i=" << i << ", rvecsAfter=" << rvecsLeft[i] << std::endl;
-    std::cerr << "Matt, i=" << i << ", tvecsBefore=" << tvecsLeftBefore[i] << std::endl;
-    std::cerr << "Matt, i=" << i << ", tvecsAfter=" << tvecsLeft[i] << std::endl;
-
   }
-
-  std::cerr << "Matt, l2rrbefore=" << l2rBeforeMatrix << std::endl;
-  std::cerr << "Matt, l2rrafter=" << leftToRightRotationMatrix << std::endl;
-
-  std::cerr << "Matt, l2rtbefore=" << l2rBeforeTrans << std::endl;
-  std::cerr << "Matt, l2rtafter=" << leftToRightTranslationVector << std::endl;
-
+*/
   delete [] parameters;
   delete [] initialParameters;
 

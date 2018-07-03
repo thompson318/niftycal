@@ -223,6 +223,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   }
 
   std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, cvFlags=" << cvFlags << ", rms2D=" << projectedRMS << std::endl;
+  std::cerr << "Matt, OpenCV l2r=" << leftToRightTranslationVector << std::endl;
 
   /*
   // Recompute left-to-right using rigid body registration.
@@ -234,6 +235,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
   */
 
   // Ensure rhs extrinsics are set from lhs and left-to-right transform.
+  /*
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
                                  leftToRightRotationMatrix,
@@ -241,8 +243,10 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  rvecsRight,
                                  tvecsRight
                                 );
+  */
 
   // Recompute re-projection error, now we have updated the right extrinsics.
+  /*
   projectedRMS = niftk::ComputeRMSReprojectionError(model,
                                                     listOfLeftHandPointSets,
                                                     listOfRightHandPointSets,
@@ -271,7 +275,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-
   v = 0;
   for (leftIter = listOfLeftHandPointSets.begin(), rightIter = listOfRightHandPointSets.begin();
        leftIter != listOfLeftHandPointSets.end() && rightIter != listOfRightHandPointSets.end();
@@ -293,7 +296,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   std::cout << "niftkStereoCameraCalibration:OpenCV then reset, with recomputed metrics, rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
-
+  */
 #ifdef NIFTYCAL_WITH_ITK
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
@@ -389,6 +392,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                       tvecsLeft,
                                       intrinsicRight,
                                       distortionRight,
+                                      rvecsRight,
+                                      tvecsRight,
                                       leftToRightRotationMatrix,
                                       leftToRightTranslationVector
                                      );
