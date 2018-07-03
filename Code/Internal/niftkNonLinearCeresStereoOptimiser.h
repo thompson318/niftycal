@@ -30,6 +30,8 @@ NIFTYCAL_WINEXPORT double CeresStereoCameraCalibration(const std::vector<std::ve
                                                        std::vector<cv::Mat>& tvecsLeft,
                                                        cv::Mat& intrinsicRight,
                                                        cv::Mat& distortionRight,
+                                                       std::vector<cv::Mat>& rvecsRight,
+                                                       std::vector<cv::Mat>& tvecsRight,
                                                        cv::Mat& leftToRightRotationMatrix,
                                                        cv::Mat& leftToRightTranslationVector
                                                       );
