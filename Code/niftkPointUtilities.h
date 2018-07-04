@@ -427,6 +427,39 @@ NIFTYCAL_WINEXPORT double ComputeLeftToRight(const Model3D& model,
                                              cv::Mat& leftToRightTranslationVector
                                             );
 
+/**
+* \brief Checks if stereo cameras are cross eyed.
+*/
+NIFTYCAL_WINEXPORT bool IsCrossEyed(const cv::Mat& intrinsicLeft,
+                                    const cv::Mat& distortionLeft,
+                                    const cv::Mat& rvecLeft,
+                                    const cv::Mat& tvecLeft,
+                                    const cv::Mat& intrinsicRight,
+                                    const cv::Mat& distortionRight,
+                                    const cv::Mat& rvecRight,
+                                    const cv::Mat& tvecRight,
+                                    cv::Point3d* convergencePoint,
+                                    const double& maximumUsableDistance = std::numeric_limits<float>::max()
+                                   );
+
+/**
+* \brief Can be used to check if points are both
+* nearer and further than the convergence point of a stereo pair of cameras.
+*/
+NIFTYCAL_WINEXPORT void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints,
+                                                     const std::list<PointSet>& rightDistortedPoints,
+                                                     const cv::Mat& intrinsicLeft,
+                                                     const cv::Mat& distortionLeft,
+                                                     const std::vector<cv::Mat>& rvecsLeft,
+                                                     const std::vector<cv::Mat>& tvecsLeft,
+                                                     const cv::Mat& intrinsicRight,
+                                                     const cv::Mat& distortionRight,
+                                                     const std::vector<cv::Mat>& rvecsRight,
+                                                     const std::vector<cv::Mat>& tvecsRight,
+                                                     const cv::Point3d& convergencePoint,
+                                                     bool& somePointsAreNearer,
+                                                     bool& somePointsAreFurther
+                                                    );
 } // end namespace
 
 #endif

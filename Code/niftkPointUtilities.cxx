@@ -1619,4 +1619,153 @@ double ComputeLeftToRight(const Model3D& model,
   return fre;
 }
 
+
+//-----------------------------------------------------------------------------
+bool IsCrossEyed(const cv::Mat& intrinsicLeft,
+                 const cv::Mat& distortionLeft,
+                 const cv::Mat& rvecLeft,
+                 const cv::Mat& tvecLeft,
+                 const cv::Mat& intrinsicRight,
+                 const cv::Mat& distortionRight,
+                 const cv::Mat& rvecRight,
+                 const cv::Mat& tvecRight,
+                 cv::Point3d* convergencePoint,
+                 const double& maximumUsableDistance
+                )
+{
+  bool isCrossEyed = false;
+
+  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+  niftk::GetLeftToRightMatrix(rvecLeft,
+                              tvecLeft,
+                              rvecRight,
+                              tvecRight,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector);
+
+  niftk::Point2D p;
+  p.id = 0;
+
+  p.point.x = intrinsicLeft.at<double>(0, 2);
+  p.point.y = intrinsicLeft.at<double>(1, 2);
+
+  niftk::PointSet leftPrincipalPoint;
+  leftPrincipalPoint.insert(std::pair<NiftyCalIdType, Point2D>(0, p));
+
+  p.point.x = intrinsicRight.at<double>(0, 2);
+  p.point.y = intrinsicRight.at<double>(1, 2);
+
+  niftk::PointSet rightPrincipalPoint;
+  rightPrincipalPoint.insert(std::pair<NiftyCalIdType, Point2D>(0, p));
+
+  niftk::Model3D triangulatedPoints;
+  niftk::TriangulatePointPairs(leftPrincipalPoint,
+                               rightPrincipalPoint,
+                               intrinsicLeft,
+                               distortionLeft,
+                               rvecLeft,
+                               tvecLeft,
+                               leftToRightRotationMatrix,
+                               leftToRightTranslationVector,
+                               intrinsicRight,
+                               distortionRight,
+                               triangulatedPoints
+                              );
+
+  if (triangulatedPoints.size() != 1)
+  {
+    niftkNiftyCalThrow() << "There should be exactly 1 triangulated vergence point.";
+  }
+
+  cv::Point3d tp = (*(triangulatedPoints.begin())).second.point;
+
+  if (convergencePoint != nullptr)
+  {
+    *convergencePoint = tp;
+  }
+
+  if (tp.z > 0 && tp.z < maximumUsableDistance)
+  {
+    isCrossEyed = true;
+  }
+
+  return isCrossEyed;
+}
+
+
+//-----------------------------------------------------------------------------
+void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints,
+                                  const std::list<PointSet>& rightDistortedPoints,
+                                  const cv::Mat& intrinsicLeft,
+                                  const cv::Mat& distortionLeft,
+                                  const std::vector<cv::Mat>& rvecsLeft,
+                                  const std::vector<cv::Mat>& tvecsLeft,
+                                  const cv::Mat& intrinsicRight,
+                                  const cv::Mat& distortionRight,
+                                  const std::vector<cv::Mat>& rvecsRight,
+                                  const std::vector<cv::Mat>& tvecsRight,
+                                  const cv::Point3d& convergencePoint,
+                                  bool& somePointsAreNearer,
+                                  bool& somePointsAreFurther
+                                 )
+{
+  somePointsAreNearer = false;
+  somePointsAreFurther = false;
+
+  double depth = convergencePoint.z;
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+  unsigned int viewCounter = 0;
+  for (leftIter = leftDistortedPoints.begin(),
+       rightIter = rightDistortedPoints.begin();
+       leftIter != leftDistortedPoints.end() &&
+       rightIter != rightDistortedPoints.end();
+       leftIter++,
+       rightIter++
+       )
+  {
+    cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+    cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+    niftk::GetLeftToRightMatrix(rvecsLeft[viewCounter],
+                                tvecsLeft[viewCounter],
+                                rvecsRight[viewCounter],
+                                tvecsRight[viewCounter],
+                                leftToRightRotationMatrix,
+                                leftToRightTranslationVector);
+
+    niftk::Model3D triangulatedPoints;
+    niftk::TriangulatePointPairs(*leftIter,
+                                 *rightIter,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft[viewCounter],
+                                 tvecsLeft[viewCounter],
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 triangulatedPoints
+                                );
+
+    niftk::Model3D::const_iterator modelIter;
+    for (modelIter = triangulatedPoints.begin();
+         modelIter != triangulatedPoints.end();
+         modelIter++
+        )
+    {
+      if (modelIter->second.point.z > depth)
+      {
+        somePointsAreFurther = true;
+      }
+      if (modelIter->second.point.z <= depth)
+      {
+        somePointsAreNearer = true;
+      }
+    }
+    viewCounter++;
+  }
+}
+
 } // end namespace

@@ -184,6 +184,50 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     niftkNiftyCalThrow() << "No right image points extracted.";
   }
 
+  // Check for cross-eyed cameras AND points both before and after convergence point.
+  cv::Point3d convergencePoint;
+  bool isCrossEyed = niftk::IsCrossEyed(intrinsicLeft,
+                                        distortionLeft,
+                                        rvecsLeft[0],
+                                        tvecsLeft[0],
+                                        intrinsicRight,
+                                        distortionRight,
+                                        rvecsRight[0],
+                                        tvecsRight[0],
+                                        &convergencePoint
+                                       );
+
+  bool somePointsAreNearer = false;
+  bool somePointsAreFurther = false;
+  niftk::CheckAgainstConvergencePoint(listOfLeftHandPointSets,
+                                      listOfRightHandPointSets,
+                                      intrinsicLeft,
+                                      distortionLeft,
+                                      rvecsLeft,
+                                      tvecsLeft,
+                                      intrinsicRight,
+                                      distortionRight,
+                                      rvecsRight,
+                                      tvecsRight,
+                                      convergencePoint,
+                                      somePointsAreNearer,
+                                      somePointsAreFurther
+                                     );
+
+  // Warnings for now?
+  if (isCrossEyed)
+  {
+    std::cerr << "WARNING: Cameras are cross eyed. Convergence depth is approx "
+              << static_cast<int>(convergencePoint.z)
+              << " mm."
+              << std::endl;
+
+    if (somePointsAreFurther)
+    {
+      std::cerr << "WARNING: Cameras are cross eyed and data is beyond convergence point." << std::endl;
+    }
+  }
+
   // Do standard OpenCV calibration
   projectedRMS = cv::stereoCalibrate(objectPoints,
                                      leftImagePoints,
