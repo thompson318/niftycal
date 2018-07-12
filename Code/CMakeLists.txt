@@ -105,17 +105,24 @@ if(ITK_FOUND)
 
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/cmake/Ceres/)
-list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/gflags/install)
-list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/glog/install)
 
-find_package(Ceres REQUIRED)
-include_directories(${CERES_INCLUDE_DIRS})
-
-list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresStereoOptimiser.cxx)
-list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresMonoOptimiser.cxx)
-
-include_directories(/Users/mattclarkson/install/gsl-2.5/include)
+###############################################################################
+# Start of Highly Experimental Section: Do not use.
+###############################################################################
+#list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/cmake/Ceres/)
+#list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/gflags/install)
+#list(APPEND CMAKE_PREFIX_PATH /Users/mattclarkson/build/CMakeCatchTemplate-SuperBuild-Qt5/glog/install)
+#
+#find_package(Ceres REQUIRED)
+#include_directories(${CERES_INCLUDE_DIRS})
+#
+#list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresStereoOptimiser.cxx)
+#list(APPEND NIFTYCAL_SRCS Internal/niftkNonLinearCeresMonoOptimiser.cxx)
+#
+#include_directories(/Users/mattclarkson/install/gsl-2.5/include)
+###############################################################################
+# End of Highly Experimental Section: Do not use.
+###############################################################################
 
 ###############################################################################
 # Experimental: Try to calibrate based on rendering the model.

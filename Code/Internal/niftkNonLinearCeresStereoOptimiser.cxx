@@ -254,10 +254,10 @@ public:
                       ry
                      );
 
-    residuals[residualCounter++] = lx - T(static_cast<double>(m_LeftImagePoint(0)));
-    residuals[residualCounter++] = ly - T(static_cast<double>(m_LeftImagePoint(1)));
-    residuals[residualCounter++] = rx - T(static_cast<double>(m_RightImagePoint(0)));
-    residuals[residualCounter++] = ry - T(static_cast<double>(m_RightImagePoint(1)));
+    residuals[residualCounter++] = (lx - T(static_cast<double>(m_LeftImagePoint(0))));
+    residuals[residualCounter++] = (ly - T(static_cast<double>(m_LeftImagePoint(1))));
+    residuals[residualCounter++] = (rx - T(static_cast<double>(m_RightImagePoint(0))));
+    residuals[residualCounter++] = (ry - T(static_cast<double>(m_RightImagePoint(1))));
 
 /*
     residuals[residualCounter++] =

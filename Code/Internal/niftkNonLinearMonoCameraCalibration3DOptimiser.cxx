@@ -91,7 +91,7 @@ double NonLinearMonoCameraCalibration3DOptimiser::Optimise(std::vector<cv::Mat>&
   optimiser->UseCostFunctionGradientOff(); // use default VNL derivative, not our one.
   optimiser->SetCostFunction(m_CostFunction);
   optimiser->SetInitialPosition(initialParameters);
-  optimiser->SetNumberOfIterations(10000);
+  optimiser->SetNumberOfIterations(100);
   optimiser->SetGradientTolerance(0.0000001);
   optimiser->SetEpsilonFunction(0.0000001);
   optimiser->SetValueTolerance(0.0000001);
@@ -119,7 +119,7 @@ double NonLinearMonoCameraCalibration3DOptimiser::Optimise(std::vector<cv::Mat>&
 
   niftk::NonLinearMonoCameraCalibration3DCostFunction::MeasureType finalValues = m_CostFunction->GetValue(finalParameters);
   double finalRMS = m_CostFunction->GetRMS(finalValues);
-
+/*
   for (unsigned int i = 0; i < finalParameters.size(); i++)
   {
     std::cout << "NonLinearMonoCameraCalibration3DOptimiser: " << initialParameters[i]
@@ -127,6 +127,7 @@ double NonLinearMonoCameraCalibration3DOptimiser::Optimise(std::vector<cv::Mat>&
                  << "\t" << finalParameters[i] - initialParameters[i]
                  << std::endl;
   }
+*/
   std::cout << "NonLinearMonoCameraCalibration3DOptimiser: finalRMS=" << finalRMS << ", stopped by " << optimiser->GetStopConditionDescription() << std::endl;
 
   return finalRMS;

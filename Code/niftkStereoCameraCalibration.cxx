@@ -184,7 +184,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     niftkNiftyCalThrow() << "No right image points extracted.";
   }
 
-  // Check for cross-eyed cameras AND points both before and after convergence point.
+  // Check for cross-eyed cameras.
   cv::Point3d convergencePoint;
   bool isCrossEyed = niftk::IsCrossEyed(intrinsicLeft,
                                         distortionLeft,
@@ -197,6 +197,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                         &convergencePoint
                                        );
 
+  // Check for whether we have points both before and after convergence point.
   bool somePointsAreNearer = false;
   bool somePointsAreFurther = false;
   niftk::CheckAgainstConvergencePoint(listOfLeftHandPointSets,
@@ -214,7 +215,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                       somePointsAreFurther
                                      );
 
-  // Warnings for now?
+  // Warn about such cross-eyed issues.
+  // I'm not totally sure if this warrants an error or an exception.
   if (isCrossEyed)
   {
     std::cerr << "WARNING: Cameras are cross eyed. Convergence depth is approx "
@@ -224,7 +226,11 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
     if (somePointsAreFurther)
     {
-      std::cerr << "WARNING: Cameras are cross eyed and data is beyond convergence point." << std::endl;
+      std::cerr << "WARNING: Cameras are cross eyed and some data is beyond convergence point." << std::endl;
+    }
+    if (somePointsAreNearer)
+    {
+      std::cerr << "WARNING: Cameras are cross eyed and some data is nearer than convergence point." << std::endl;
     }
   }
 
@@ -245,41 +251,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cvFlags
                                     );
 
-  std::list<PointSet>::const_iterator leftIter;
-  std::list<PointSet>::const_iterator rightIter;
-  unsigned int v = 0;
-  for (leftIter = listOfLeftHandPointSets.begin(), rightIter = listOfRightHandPointSets.begin();
-       leftIter != listOfLeftHandPointSets.end() && rightIter != listOfRightHandPointSets.end();
-       leftIter++, rightIter++)
-  {
-    std::ostringstream fileName;
-    fileName << "/Users/mattclarkson/calib.opencv.left." << v << ".png";
-    cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvecsLeft[v], tvecsLeft[v]);
-    cv::Mat image = niftk::ProjectPointsToImage(model, *leftIter, extrinsic, intrinsicLeft, distortionLeft, cv::Size(1920, 540));
-    cv::imwrite(fileName.str(), image);
-
-    std::ostringstream fileName2;
-    fileName2 << "/Users/mattclarkson/calib.opencv.right." << v << ".png";
-    extrinsic = niftk::RodriguesToMatrix(rvecsRight[v], tvecsRight[v]);
-    image = niftk::ProjectPointsToImage(model, *rightIter, extrinsic, intrinsicRight, distortionRight, cv::Size(1920, 540));
-    cv::imwrite(fileName2.str(), image);
-    v++;
-  }
-
   std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, cvFlags=" << cvFlags << ", rms2D=" << projectedRMS << std::endl;
-  std::cerr << "Matt, OpenCV l2r=" << leftToRightTranslationVector << std::endl;
-
-  /*
-  // Recompute left-to-right using rigid body registration.
-  double fre = ComputeLeftToRight(model,
-                                  rvecsLeft, tvecsLeft,
-                                  rvecsRight, tvecsRight,
-                                  leftToRightRotationMatrix, leftToRightTranslationVector
-                                 );
-  */
 
   // Ensure rhs extrinsics are set from lhs and left-to-right transform.
-  /*
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
                                  leftToRightRotationMatrix,
@@ -287,10 +261,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                  rvecsRight,
                                  tvecsRight
                                 );
-  */
 
   // Recompute re-projection error, now we have updated the right extrinsics.
-  /*
   projectedRMS = niftk::ComputeRMSReprojectionError(model,
                                                     listOfLeftHandPointSets,
                                                     listOfRightHandPointSets,
@@ -319,32 +291,13 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-  v = 0;
-  for (leftIter = listOfLeftHandPointSets.begin(), rightIter = listOfRightHandPointSets.begin();
-       leftIter != listOfLeftHandPointSets.end() && rightIter != listOfRightHandPointSets.end();
-       leftIter++, rightIter++)
-  {
-    std::ostringstream fileName;
-    fileName << "/Users/mattclarkson/calib.reset.left." << v << ".png";
-    cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvecsLeft[v], tvecsLeft[v]);
-    cv::Mat image = niftk::ProjectPointsToImage(model, *leftIter, extrinsic, intrinsicLeft, distortionLeft, cv::Size(1920, 540));
-    cv::imwrite(fileName.str(), image);
-
-    std::ostringstream fileName2;
-    fileName2 << "/Users/mattclarkson/calib.reset.right." << v << ".png";
-    extrinsic = niftk::RodriguesToMatrix(rvecsRight[v], tvecsRight[v]);
-    image = niftk::ProjectPointsToImage(model, *rightIter, extrinsic, intrinsicRight, distortionRight, cv::Size(1920, 540));
-    cv::imwrite(fileName2.str(), image);
-    v++;
-  }
-
-  std::cout << "niftkStereoCameraCalibration:OpenCV then reset, with recomputed metrics, rms2D=" << projectedRMS
+  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation reset, rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
-  */
+
 #ifdef NIFTYCAL_WITH_ITK
 
   Model3D* tmpModel = const_cast<Model3D*>(&model);
-/*
+
   niftk::NonLinearMonoCameraCalibration3DOptimiser::Pointer monoLeftOptimiser
       = niftk::NonLinearMonoCameraCalibration3DOptimiser::New();
   monoLeftOptimiser->SetModel(tmpModel);
@@ -363,36 +316,21 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   double rightRMS = monoRightOptimiser->Optimise(rvecsRight, tvecsRight);
 
-  double fre2 = ComputeLeftToRight(model,
+  std::cout << "niftkStereoCameraCalibration::ITK optimisation finished"
+            << ", leftRMS=" << leftRMS
+            << ", rightRMS=" << rightRMS
+            << std::endl;
+
+  // Tried Ceres in mono, not much difference really.
+  // double leftRMS = niftk::CeresMonoCameraCalibration(objectPoints, leftImagePoints, intrinsicLeft, distortionLeft, rvecsLeft, tvecsLeft);
+  // double rightRMS = niftk::CeresMonoCameraCalibration(objectPoints, rightImagePoints, intrinsicRight, distortionRight, rvecsRight, tvecsRight);
+
+  double fre = ComputeLeftToRight(model,
                                   rvecsLeft, tvecsLeft,
                                   rvecsRight, tvecsRight,
                                   leftToRightRotationMatrix, leftToRightTranslationVector
                                  );
 
-
-  std::cout << "niftkStereoCameraCalibration::Registered l2r using ITK, FRE=" << fre
-            << ", fre2=" << fre2
-            << ", leftRMS=" << leftRMS
-            << ", rightRMS=" << rightRMS
-            << std::endl;
-  */
-
-  //double leftRMS = niftk::CeresMonoCameraCalibration(objectPoints, leftImagePoints, intrinsicLeft, distortionLeft, rvecsLeft, tvecsLeft);
-  //double rightRMS = niftk::CeresMonoCameraCalibration(objectPoints, rightImagePoints, intrinsicRight, distortionRight, rvecsRight, tvecsRight);
-
-  /*
-  double fre2 = ComputeLeftToRight(model,
-                                   rvecsLeft, tvecsLeft,
-                                   rvecsRight, tvecsRight,
-                                   leftToRightRotationMatrix, leftToRightTranslationVector
-                                  );
-  */
-/*
-  std::cout << "niftkStereoCameraCalibration::Ceres mono, leftRMS=" << leftRMS
-            << ", rightRMS=" << rightRMS
-            << std::endl;
-            */
-/*
   // Recompute re-projection error, now we have updated the right extrinsics.
   projectedRMS = niftk::ComputeRMSReprojectionError(model,
                                                     listOfLeftHandPointSets,
@@ -422,11 +360,14 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-  std::cout << "niftkStereoCameraCalibration:Ceres immediately after optimising with recomputed metrics, rms2D=" << projectedRMS
+  std::cout << "niftkStereoCameraCalibration:ITK optimisation after registration, fre=" << fre << ", rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
-*/
 
-  // Now do stereo optimisation based on Ceres.
+  /*
+   * Tried Ceres in stereo, not much difference really.
+   * If the data is bad (e.g. laparoscope is too cross-eyed) then LM fails
+   * in either ITK or Ceres.
+   *
   niftk::CeresStereoCameraCalibration(objectPoints,
                                       leftImagePoints,
                                       rightImagePoints,
@@ -441,142 +382,12 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                       leftToRightRotationMatrix,
                                       leftToRightTranslationVector
                                      );
-
-  // Ensure rhs extrinsics are set from lhs and left-to-right transform.
-  niftk::ComputeStereoExtrinsics(rvecsLeft,
-                                 tvecsLeft,
-                                 leftToRightRotationMatrix,
-                                 leftToRightTranslationVector,
-                                 rvecsRight,
-                                 tvecsRight
-                                );
-
-  // Recompute re-projection error, now we have updated the right extrinsics.
-  projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                    listOfLeftHandPointSets,
-                                                    listOfRightHandPointSets,
-                                                    intrinsicLeft,
-                                                    distortionLeft,
-                                                    rvecsLeft,
-                                                    tvecsLeft,
-                                                    intrinsicRight,
-                                                    distortionRight,
-                                                    leftToRightRotationMatrix,
-                                                    leftToRightTranslationVector
-                                                   );
-
-  // Compute 3D reconstruction error, now we have updated the right extrinsics.
-  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
-                                                          listOfLeftHandPointSets,
-                                                          listOfRightHandPointSets,
-                                                          intrinsicLeft,
-                                                          distortionLeft,
-                                                          rvecsLeft,
-                                                          tvecsLeft,
-                                                          intrinsicRight,
-                                                          distortionRight,
-                                                          leftToRightRotationMatrix,
-                                                          leftToRightTranslationVector,
-                                                          rmsInEachAxis
-                                                         );
-
-  v = 0;
-  for (leftIter = listOfLeftHandPointSets.begin(), rightIter = listOfRightHandPointSets.begin();
-       leftIter != listOfLeftHandPointSets.end() && rightIter != listOfRightHandPointSets.end();
-       leftIter++, rightIter++)
-  {
-    std::ostringstream fileName;
-    fileName << "/Users/mattclarkson/calib.ceres.left." << v << ".png";
-    cv::Matx44d extrinsic = niftk::RodriguesToMatrix(rvecsLeft[v], tvecsLeft[v]);
-    cv::Mat image = niftk::ProjectPointsToImage(model, *leftIter, extrinsic, intrinsicLeft, distortionLeft, cv::Size(1920, 540));
-    cv::imwrite(fileName.str(), image);
-
-    std::ostringstream fileName2;
-    fileName2 << "/Users/mattclarkson/calib.ceres.right." << v << ".png";
-    extrinsic = niftk::RodriguesToMatrix(rvecsRight[v], tvecsRight[v]);
-    image = niftk::ProjectPointsToImage(model, *rightIter, extrinsic, intrinsicRight, distortionRight, cv::Size(1920, 540));
-    cv::imwrite(fileName2.str(), image);
-    v++;
-  }
-
-  std::cout << "niftkStereoCameraCalibration:Ceres 3D with recomputed metrics, rms2D=" << projectedRMS
-            << ", rms3D=" << reconstructedRMS << std::endl;
-
-  for (int i = 0; i < rvecsLeft.size(); i++)
-  {
-    std::ostringstream fileName;
-    fileName << "/Users/mattclarkson/calib.before.left." << i << ".4x4";
-    cv::Matx44d extrinsics = niftk::RodriguesToMatrix(rvecsLeft[i], tvecsLeft[i]);
-    cv::Matx44d inverted = extrinsics.inv();
-    std::ofstream f;
-    f.open(fileName.str());
-    f << inverted(0, 0) << " " << inverted(0, 1) << " " << inverted(0, 2) << " " << inverted(0, 3) << std::endl;
-    f << inverted(1, 0) << " " << inverted(1, 1) << " " << inverted(1, 2) << " " << inverted(1, 3) << std::endl;
-    f << inverted(2, 0) << " " << inverted(2, 1) << " " << inverted(2, 2) << " " << inverted(2, 3) << std::endl;
-    f << inverted(3, 0) << " " << inverted(3, 1) << " " << inverted(3, 2) << " " << inverted(3, 3) << std::endl;
-  }
-
-  for (int i = 0; i < rvecsRight.size(); i++)
-  {
-    std::ostringstream fileName;
-    fileName << "/Users/mattclarkson/calib.before.right." << i << ".4x4";
-    cv::Matx44d extrinsics = niftk::RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
-    cv::Matx44d inverted = extrinsics.inv();
-    std::ofstream f;
-    f.open(fileName.str());
-    f << inverted(0, 0) << " " << inverted(0, 1) << " " << inverted(0, 2) << " " << inverted(0, 3) << std::endl;
-    f << inverted(1, 0) << " " << inverted(1, 1) << " " << inverted(1, 2) << " " << inverted(1, 3) << std::endl;
-    f << inverted(2, 0) << " " << inverted(2, 1) << " " << inverted(2, 2) << " " << inverted(2, 3) << std::endl;
-    f << inverted(3, 0) << " " << inverted(3, 1) << " " << inverted(3, 2) << " " << inverted(3, 3) << std::endl;
-  }
-
-  std::cerr << "Matt, l2r=" << leftToRightTranslationVector << std::endl;
-
-  // Ensure rhs extrinsics are set from lhs and left-to-right transform.
-  niftk::ComputeStereoExtrinsics(rvecsLeft,
-                                 tvecsLeft,
-                                 leftToRightRotationMatrix,
-                                 leftToRightTranslationVector,
-                                 rvecsRight,
-                                 tvecsRight
-                                );
-
-  // Recompute re-projection error, now we have updated the right extrinsics.
-  projectedRMS = niftk::ComputeRMSReprojectionError(model,
-                                                    listOfLeftHandPointSets,
-                                                    listOfRightHandPointSets,
-                                                    intrinsicLeft,
-                                                    distortionLeft,
-                                                    rvecsLeft,
-                                                    tvecsLeft,
-                                                    intrinsicRight,
-                                                    distortionRight,
-                                                    leftToRightRotationMatrix,
-                                                    leftToRightTranslationVector
-                                                   );
-
-  // Compute 3D reconstruction error, now we have updated the right extrinsics.
-  reconstructedRMS = niftk::ComputeRMSReconstructionError(model,
-                                                          listOfLeftHandPointSets,
-                                                          listOfRightHandPointSets,
-                                                          intrinsicLeft,
-                                                          distortionLeft,
-                                                          rvecsLeft,
-                                                          tvecsLeft,
-                                                          intrinsicRight,
-                                                          distortionRight,
-                                                          leftToRightRotationMatrix,
-                                                          leftToRightTranslationVector,
-                                                          rmsInEachAxis
-                                                         );
-
-  std::cout << "niftkStereoCameraCalibration:Our optimisation with recomputed metrics, rms2D=" << projectedRMS
-            << ", rms3D=" << reconstructedRMS << std::endl;
+  */
 
   double rmsTolerance = 0.0001;
   double previousRMS = projectedRMS + 2 * rmsTolerance;
   double currentRMS = projectedRMS;
-/*
+
   while (fabs(currentRMS - previousRMS) >= rmsTolerance)
   {
     previousRMS = currentRMS;
@@ -630,9 +441,7 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
     std::cout << "niftkStereoCameraCalibration::Optimised r2l rms2D = " << currentRMS << std::endl;
 
   }
-*/
-#endif
-/*
+
   // Ensure rhs extrinsics are set from lhs and left-to-right
   niftk::ComputeStereoExtrinsics(rvecsLeft,
                                  tvecsLeft,
@@ -673,7 +482,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
 
   std::cout << "niftkStereoCameraCalibration:2D optimisation finished,     rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
-*/
+
+#endif
+
 #ifdef NIFTYCAL_WITH_ITK
   if (optimise3D)
   {
@@ -859,13 +670,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                       intrinsicLeft,
                                       distortionLeft,
                                       rvecsLeft,
-                                      tvecsLeft,
-                                      CV_CALIB_FIX_PRINCIPAL_POINT
-                                      | CV_CALIB_FIX_K2
-                                      | CV_CALIB_FIX_K3
-                                      | CV_CALIB_FIX_K4
-                                      | CV_CALIB_FIX_K5
-                                      | CV_CALIB_FIX_K6
+                                      tvecsLeft
                                      );
 
     niftk::ZhangMonoCameraCalibration(model,
@@ -874,13 +679,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                       intrinsicRight,
                                       distortionRight,
                                       rvecsRight,
-                                      tvecsRight,
-                                      CV_CALIB_FIX_PRINCIPAL_POINT
-                                      | CV_CALIB_FIX_K2
-                                      | CV_CALIB_FIX_K3
-                                      | CV_CALIB_FIX_K4
-                                      | CV_CALIB_FIX_K5
-                                      | CV_CALIB_FIX_K6
+                                      tvecsRight
                                      );
 
     result = niftk::StereoCameraCalibration(model,
@@ -899,9 +698,7 @@ cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                             leftToRightTranslationVector,
                                             essentialMatrix,
                                             fundamentalMatrix,
-                                            CV_CALIB_USE_INTRINSIC_GUESS
-                                            | CV_CALIB_FIX_INTRINSIC
-                                            ,
+                                            CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC,
                                             optimise3D
                                            );
   }

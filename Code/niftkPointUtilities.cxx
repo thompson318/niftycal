@@ -980,8 +980,6 @@ double ComputeRMSReprojectionError(
     )
 {
   double rms = 0;
-  double rmsLeft = 0;
-  double rmsRight = 0;
   unsigned int pointCounter = 0;
   unsigned int pointCounterLeft = 0;
   unsigned int pointCounterRight = 0;
@@ -1038,10 +1036,7 @@ double ComputeRMSReprojectionError(
 
       rms += dx;
       rms += dy;
-      rmsLeft += dx;
-      rmsLeft += dy;
     }
-    std::cerr << "Matt, left v=" << viewCounter << ", rmsLeft=" << std::sqrt(rmsLeft / (2*numberOfPointsInLeft)) << std::endl;
 
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
     unsigned int numberOfPointsInRight = niftk::ProjectMatchingPoints(model,
@@ -1059,10 +1054,7 @@ double ComputeRMSReprojectionError(
       double dy = ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
       rms += dx;
       rms += dy;
-      rmsRight += dx;
-      rmsRight += dy;
     }
-    std::cerr << "Matt, right v=" << viewCounter << ", rmsRight=" << std::sqrt(rmsRight  / (2 * numberOfPointsInRight)) << std::endl;
 
     pointCounter += (2 * (numberOfPointsInLeft + numberOfPointsInRight));
     pointCounterLeft += 2*numberOfPointsInLeft;
@@ -1073,14 +1065,9 @@ double ComputeRMSReprojectionError(
   if (pointCounter != 0)
   {
     rms /= static_cast<double>(pointCounter);
-    rmsLeft /= static_cast<double>(pointCounterLeft);
-    rmsRight /= static_cast<double>(pointCounterRight);
   }
 
   rms = sqrt(rms);
-  rmsLeft = sqrt(rmsLeft);
-  rmsRight = sqrt(rmsRight);
-  std::cerr << "Matt, rmsLeft=" << rmsLeft << ", rmsRight=" << rmsRight << std::endl;
   return rms;
 }
 
