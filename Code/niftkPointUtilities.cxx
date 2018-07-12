@@ -981,8 +981,6 @@ double ComputeRMSReprojectionError(
 {
   double rms = 0;
   unsigned int pointCounter = 0;
-  unsigned int pointCounterLeft = 0;
-  unsigned int pointCounterRight = 0;
   unsigned int viewCounter = 0;
 
   if (listOfLeftHandPointSets.size() != listOfRightHandPointSets.size())
@@ -1057,8 +1055,6 @@ double ComputeRMSReprojectionError(
     }
 
     pointCounter += (2 * (numberOfPointsInLeft + numberOfPointsInRight));
-    pointCounterLeft += 2*numberOfPointsInLeft;
-    pointCounterRight += 2*numberOfPointsInRight;
     viewCounter++;
   }
 
@@ -1709,8 +1705,8 @@ void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints
        rightIter = rightDistortedPoints.begin();
        leftIter != leftDistortedPoints.end() &&
        rightIter != rightDistortedPoints.end();
-       leftIter++,
-       rightIter++
+       ++leftIter,
+       ++rightIter
        )
   {
     cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
@@ -1739,7 +1735,7 @@ void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints
     niftk::Model3D::const_iterator modelIter;
     for (modelIter = triangulatedPoints.begin();
          modelIter != triangulatedPoints.end();
-         modelIter++
+         ++modelIter
         )
     {
       if (modelIter->second.point.z > depth)

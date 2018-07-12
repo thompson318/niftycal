@@ -251,7 +251,8 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                      cvFlags
                                     );
 
-  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, cvFlags=" << cvFlags << ", rms2D=" << projectedRMS << std::endl;
+  std::cout << "niftkStereoCameraCalibration:OpenCV optimisation finished, cvFlags="
+            << cvFlags << ", rms2D=" << projectedRMS << std::endl;
 
   // Ensure rhs extrinsics are set from lhs and left-to-right transform.
   niftk::ComputeStereoExtrinsics(rvecsLeft,
@@ -321,10 +322,6 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
             << ", rightRMS=" << rightRMS
             << std::endl;
 
-  // Tried Ceres in mono, not much difference really.
-  // double leftRMS = niftk::CeresMonoCameraCalibration(objectPoints, leftImagePoints, intrinsicLeft, distortionLeft, rvecsLeft, tvecsLeft);
-  // double rightRMS = niftk::CeresMonoCameraCalibration(objectPoints, rightImagePoints, intrinsicRight, distortionRight, rvecsRight, tvecsRight);
-
   double fre = ComputeLeftToRight(model,
                                   rvecsLeft, tvecsLeft,
                                   rvecsRight, tvecsRight,
@@ -360,29 +357,9 @@ cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                           rmsInEachAxis
                                                          );
 
-  std::cout << "niftkStereoCameraCalibration:ITK optimisation after registration, fre=" << fre << ", rms2D=" << projectedRMS
+  std::cout << "niftkStereoCameraCalibration:ITK optimisation after registration, fre=" << fre
+            << ", rms2D=" << projectedRMS
             << ", rms3D=" << reconstructedRMS << std::endl;
-
-  /*
-   * Tried Ceres in stereo, not much difference really.
-   * If the data is bad (e.g. laparoscope is too cross-eyed) then LM fails
-   * in either ITK or Ceres.
-   *
-  niftk::CeresStereoCameraCalibration(objectPoints,
-                                      leftImagePoints,
-                                      rightImagePoints,
-                                      intrinsicLeft,
-                                      distortionLeft,
-                                      rvecsLeft,
-                                      tvecsLeft,
-                                      intrinsicRight,
-                                      distortionRight,
-                                      rvecsRight,
-                                      tvecsRight,
-                                      leftToRightRotationMatrix,
-                                      leftToRightTranslationVector
-                                     );
-  */
 
   double rmsTolerance = 0.0001;
   double previousRMS = projectedRMS + 2 * rmsTolerance;
