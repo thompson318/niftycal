@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearTsaiCostFunction_h
 #define niftkNonLinearTsaiCostFunction_h
 
-#include "niftkNonLinearMonoCostFunction.h"
+#include <Internal/niftkNonLinearMonoCostFunction.h>
 
 namespace niftk
 {

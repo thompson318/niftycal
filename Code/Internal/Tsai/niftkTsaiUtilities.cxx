@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include "niftkTsaiUtilities_p.h"
-#include "niftkCalibrationUtilities_p.h"
+#include "Internal/niftkCalibrationUtilities_p.h"
 #include <niftkNiftyCalExceptionMacro.h>
 
 namespace niftk

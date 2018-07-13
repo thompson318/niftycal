@@ -183,6 +183,7 @@ int main(int argc, char ** argv)
                                                 leftToRightTranslationVector,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
+                                                flags,
                                                 optimise3D
                                                );
 

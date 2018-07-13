@@ -19,6 +19,7 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkHomographyUtilities.h"
 #include "niftkPointUtilities.h"
+#include "niftkMatrixUtilities.h"
 #include <Internal/niftkTriangulationUtilities_p.h>
 #include <Internal/niftkIterativeCalibrationUtilities_p.h>
 #include <Internal/niftkCalibrationUtilities_p.h>

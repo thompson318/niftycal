@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearStereoCameraCalibration2DOptimiser.h"
-#include "niftkCalibrationUtilities_p.h"
+#include <Internal/niftkCalibrationUtilities_p.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <itkLevenbergMarquardtOptimizer.h>

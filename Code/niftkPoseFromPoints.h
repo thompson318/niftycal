@@ -16,9 +16,9 @@
 #define niftkPoseFromPoints_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkIPoint2DDetector.h"
-#include <list>
+#include "niftkNiftyCalTypes.h"
 #include <cv.h>
+#include <list>
 
 namespace niftk
 {

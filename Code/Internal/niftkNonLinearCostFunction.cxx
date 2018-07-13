@@ -58,7 +58,6 @@ void NonLinearCostFunction::SetPoints(const std::list<PointSet>* const points)
     niftkNiftyCalThrow() << "Points are NULL.";
   }
 
-
   unsigned int num = 0;
   std::list<PointSet>::const_iterator iter;
   for (iter = points->begin();

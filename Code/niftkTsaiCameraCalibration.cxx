@@ -17,13 +17,15 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
-#include <Internal/niftkTsaiUtilities_p.h>
-#include <Internal/niftkNonLinearTsai3ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai2ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai5ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai8ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai10ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai11ParamOptimiser.h>
+#include <Internal/Tsai/niftkTsaiUtilities_p.h>
+#ifdef NIFTYCAL_WITH_ITK
+#include <Internal/Tsai/niftkNonLinearTsai3ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai2ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai5ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai8ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai10ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai11ParamOptimiser.h>
+#endif
 #include <vector>
 
 namespace niftk
@@ -448,9 +450,7 @@ cv::Matx21d TsaiStereoCameraCalibration(const niftk::Model3D& model3D,
                                         cv::Mat& essentialMatrix,
                                         cv::Mat& fundamentalMatrix,
                                         const int& cvFlags,
-                                        const bool& optimise3D,
-                                        const bool& optimise2DOFStereo,
-                                        const bool& force2DOFStereoAxis
+                                        const bool& optimise3D
                                        )
 {
   std::list<niftk::PointSet> leftPoints;

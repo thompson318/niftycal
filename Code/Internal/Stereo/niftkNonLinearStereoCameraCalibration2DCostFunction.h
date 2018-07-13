@@ -15,8 +15,8 @@
 #ifndef niftkNonLinearStereoCameraCalibration2DCostFunction_h
 #define niftkNonLinearStereoCameraCalibration2DCostFunction_h
 
-#include "niftkNonLinearStereo2DCostFunction.h"
-#include "niftkNonLinearNoIntrinsicsCostFunction.h"
+#include <Internal/niftkNonLinearStereo2DCostFunction.h>
+#include <Internal/niftkNonLinearNoIntrinsicsCostFunction.h>
 
 namespace niftk
 {

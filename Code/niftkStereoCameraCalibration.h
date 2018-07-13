@@ -16,9 +16,9 @@
 #define niftkStereoCameraCalibration_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkIPoint2DDetector.h"
-#include <list>
+#include "niftkNiftyCalTypes.h"
 #include <cv.h>
+#include <list>
 
 namespace niftk
 {
@@ -40,7 +40,7 @@ namespace niftk
 *
 * This method, ONLY does the stereo calibration. Also, OpenCV notes that this
 * can be unstable, so you are advised to calibrate both left and right cameras
-* separately first, and then call this method with CV_CALIB_USE_INTRINSIC_GUESS
+* separately first, and then call this method with cvFlags = CV_CALIB_USE_INTRINSIC_GUESS
 * or CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_INTRINSIC (better).
 */
 NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
@@ -59,8 +59,8 @@ NIFTYCAL_WINEXPORT cv::Matx21d StereoCameraCalibration(const Model3D& model,
                                                        cv::Mat& leftToRightTranslationVector,
                                                        cv::Mat& essentialMatrix,
                                                        cv::Mat& fundamentalMatrix,
-                                                       const int& cvFlags = 0,
-                                                       const bool& optimise3D = false
+                                                       const int& cvFlags,
+                                                       const bool& optimise3D
                                                       );
 
 /**
@@ -82,7 +82,8 @@ NIFTYCAL_WINEXPORT cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                                            cv::Mat& leftToRightTranslationVector,
                                                            cv::Mat& essentialMatrix,
                                                            cv::Mat& fundamentalMatrix,
-                                                           const bool& optimise3D = false
+                                                           const int& cvFlags,
+                                                           const bool& optimise3D
                                                           );
 
 } // end namespace

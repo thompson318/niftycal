@@ -268,6 +268,18 @@ NIFTYCAL_WINEXPORT unsigned int ProjectMatchingPoints(const Model3D& model,
 
 
 /**
+* \brief Projects points to an image.
+*/
+NIFTYCAL_WINEXPORT cv::Mat ProjectPointsToImage(const Model3D& model,
+                                                const PointSet& points,
+                                                const cv::Matx44d& extrinsic,
+                                                const cv::Mat& intrinsic,
+                                                const cv::Mat& distortion,
+                                                const cv::Size& imageSize
+                                               );
+
+
+/**
 * \brief Triangulates common (same identifier) points in left and right views.
 */
 NIFTYCAL_WINEXPORT void TriangulatePointPairs(const PointSet& leftDistortedPoints,
@@ -383,6 +395,71 @@ NIFTYCAL_WINEXPORT unsigned long int GetNumberOfTriangulatablePoints(const Model
                                                                     );
 
 
+/**
+* \brief Computes FRE between corresponding points.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double CalculateFiducialRegistrationError(const std::vector<cv::Point3d>& fixedPoints,
+                                                             const std::vector<cv::Point3d>& movingPoints,
+                                                             const cv::Matx44d& matrix
+                                                            );
+
+/**
+* \brief Computes rigid body registration between corresponding points.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double RegisterPoints(const std::vector<cv::Point3d>& fixedPoints,
+                                         const std::vector<cv::Point3d>& movingPoints,
+                                         cv::Matx44d& rigidBodyMatrix
+                                        );
+
+
+/**
+* \brief Computes leftToRight using point based registration.
+* \return RMS fiducial registration error
+*/
+NIFTYCAL_WINEXPORT double ComputeLeftToRight(const Model3D& model,
+                                             const std::vector<cv::Mat>& rvecsLeft,
+                                             const std::vector<cv::Mat>& tvecsLeft,
+                                             const std::vector<cv::Mat>& rvecsRight,
+                                             const std::vector<cv::Mat>& tvecsRight,
+                                             cv::Mat& leftToRightRotationMatrix,
+                                             cv::Mat& leftToRightTranslationVector
+                                            );
+
+/**
+* \brief Checks if stereo cameras are cross eyed.
+*/
+NIFTYCAL_WINEXPORT bool IsCrossEyed(const cv::Mat& intrinsicLeft,
+                                    const cv::Mat& distortionLeft,
+                                    const cv::Mat& rvecLeft,
+                                    const cv::Mat& tvecLeft,
+                                    const cv::Mat& intrinsicRight,
+                                    const cv::Mat& distortionRight,
+                                    const cv::Mat& rvecRight,
+                                    const cv::Mat& tvecRight,
+                                    cv::Point3d* convergencePoint,
+                                    const double& maximumUsableDistance = std::numeric_limits<float>::max()
+                                   );
+
+/**
+* \brief Can be used to check if points are both
+* nearer and further than the convergence point of a stereo pair of cameras.
+*/
+NIFTYCAL_WINEXPORT void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints,
+                                                     const std::list<PointSet>& rightDistortedPoints,
+                                                     const cv::Mat& intrinsicLeft,
+                                                     const cv::Mat& distortionLeft,
+                                                     const std::vector<cv::Mat>& rvecsLeft,
+                                                     const std::vector<cv::Mat>& tvecsLeft,
+                                                     const cv::Mat& intrinsicRight,
+                                                     const cv::Mat& distortionRight,
+                                                     const std::vector<cv::Mat>& rvecsRight,
+                                                     const std::vector<cv::Mat>& tvecsRight,
+                                                     const cv::Point3d& convergencePoint,
+                                                     bool& somePointsAreNearer,
+                                                     bool& somePointsAreFurther
+                                                    );
 } // end namespace
 
 #endif

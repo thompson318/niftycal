@@ -13,7 +13,7 @@
 =============================================================================*/
 
 #include "niftkNonLinearTsai10ParamCostFunction.h"
-#include "niftkCalibrationUtilities_p.h"
+#include <Internal/niftkCalibrationUtilities_p.h>
 
 namespace niftk
 {

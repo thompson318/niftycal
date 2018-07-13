@@ -16,8 +16,8 @@
 #define niftkNonLinearStereoExtrinsicsCalibration3DCostFunction_h
 
 #include <niftkNiftyCalTypes.h>
-#include "niftkNonLinearStereo3DCostFunction.h"
-#include "niftkNonLinearNoIntrinsicsCostFunction.h"
+#include <Internal/niftkNonLinearStereo3DCostFunction.h>
+#include <Internal/niftkNonLinearNoIntrinsicsCostFunction.h>
 
 namespace niftk
 {

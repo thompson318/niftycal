@@ -702,6 +702,37 @@ PointSet AddGaussianNoise(std::default_random_engine& engine,
 
 
 //-----------------------------------------------------------------------------
+cv::Mat ProjectPointsToImage(const Model3D& model,
+                             const PointSet& points,
+                             const cv::Matx44d& extrinsic,
+                             const cv::Mat& intrinsic,
+                             const cv::Mat& distortion,
+                             const cv::Size& imageSize
+                            )
+{
+  std::vector<cv::Point2f> observed;
+  std::vector<cv::Point2f> projected;
+  std::vector<niftk::NiftyCalIdType> ids;
+
+  ProjectMatchingPoints(model, points, extrinsic, intrinsic, distortion, observed, projected, ids);
+  cv::Mat image = cv::Mat::zeros(imageSize.height, imageSize.width, CV_8UC1);
+
+  for (std::vector<cv::Point2f>::size_type i = 0; i < projected.size(); i++)
+  {
+    if (projected[i].x >= 0 && projected[i].y >= 0
+        && projected[i].x <= imageSize.width - 1
+        && projected[i].y <= imageSize.height - 1
+        )
+    {
+      image.at<unsigned char>(projected[i].y, projected[i].x) = 255;
+    }
+
+  }
+  return image;
+}
+
+
+//-----------------------------------------------------------------------------
 unsigned int ProjectMatchingPoints(const Model3D& model,
                                    const PointSet& points,
                                    const cv::Matx44d& extrinsic,
@@ -998,9 +1029,13 @@ double ComputeRMSReprojectionError(
 
     for (unsigned int i = 0; i < numberOfPointsInLeft; i++)
     {
-      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x))
-             +  ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+      double dx = ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
+      double dy = ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+
+      rms += dx;
+      rms += dy;
     }
+
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
     unsigned int numberOfPointsInRight = niftk::ProjectMatchingPoints(model,
                                                                       *rightIter,
@@ -1013,10 +1048,13 @@ double ComputeRMSReprojectionError(
                                                                       );
     for (unsigned int i = 0; i < numberOfPointsInRight; i++)
     {
-      rms += ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x))
-             + ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+      double dx = ((observed[i].x - projected[i].x) * (observed[i].x - projected[i].x));
+      double dy = ((observed[i].y - projected[i].y) * (observed[i].y - projected[i].y));
+      rms += dx;
+      rms += dy;
     }
-    pointCounter += (numberOfPointsInLeft + numberOfPointsInRight);
+
+    pointCounter += (2 * (numberOfPointsInLeft + numberOfPointsInRight));
     viewCounter++;
   }
 
@@ -1026,7 +1064,6 @@ double ComputeRMSReprojectionError(
   }
 
   rms = sqrt(rms);
-
   return rms;
 }
 
@@ -1277,6 +1314,441 @@ double ComputeRMSReprojectionError(const Model3D& model,
   rms = sqrt(rms);
 
   return rms;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Point3d GetCentroid(const std::vector<cv::Point3d>& points)
+{
+  double numberOfPoints = static_cast<double>(points.size());
+  if (numberOfPoints < 1)
+  {
+    niftkNiftyCalThrow() << "The number of points should be >= 1";
+  }
+
+  cv::Point3d centroid(0, 0, 0);
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < numberOfPoints; ++i)
+  {
+    centroid += points[i];
+  }
+  centroid.x /= numberOfPoints;
+  centroid.y /= numberOfPoints;
+  centroid.z /= numberOfPoints;
+
+  return centroid;
+}
+
+
+//-----------------------------------------------------------------------------
+std::vector<cv::Point3d> SubtractCentroid(const std::vector<cv::Point3d>& points,
+                                          const cv::Point3d& centroid)
+{
+  std::vector<cv::Point3d> result;
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < points.size(); ++i)
+  {
+    cv::Point3d tmp = points[i] - centroid;
+    result.push_back(tmp);
+  }
+  return result;
+}
+
+
+//-----------------------------------------------------------------------------
+double CalculateFiducialRegistrationError(const std::vector<cv::Point3d>& fixedPoints,
+                                          const std::vector<cv::Point3d>& movingPoints,
+                                          const cv::Matx44d& matrix
+                                         )
+{
+  if (fixedPoints.size() != movingPoints.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is " << fixedPoints.size()
+                         << " whereas the number of 'moving' points is " << movingPoints.size()
+                         << " and they should correspond.";
+  }
+
+  double fre = 0;
+  std::vector<cv::Point3d>::size_type numberOfPoints = fixedPoints.size();
+
+  for (std::vector<cv::Point3d>::size_type i = 0; i < numberOfPoints; ++i)
+  {
+    cv::Matx41d f, m, mPrime;
+    f(0,0) = fixedPoints[i].x;
+    f(1,0) = fixedPoints[i].y;
+    f(2,0) = fixedPoints[i].z;
+    f(3,0) = 1;
+    m(0,0) = movingPoints[i].x;
+    m(1,0) = movingPoints[i].y;
+    m(2,0) = movingPoints[i].z;
+    m(3,0) = 1;
+    mPrime = matrix * m;
+    double squaredError =   (f(0,0) - mPrime(0,0)) * (f(0,0) - mPrime(0,0))
+                          + (f(1,0) - mPrime(1,0)) * (f(1,0) - mPrime(1,0))
+                          + (f(2,0) - mPrime(2,0)) * (f(2,0) - mPrime(2,0))
+                          ;
+    fre += squaredError;
+  }
+  if (numberOfPoints > 0)
+  {
+    fre /= (double)numberOfPoints;
+  }
+  fre = std::sqrt(fre);
+  return fre;
+}
+
+
+//-----------------------------------------------------------------------------
+double RegisterPoints(const std::vector<cv::Point3d>& fixedPoints,
+                      const std::vector<cv::Point3d>& movingPoints,
+                      cv::Matx44d& rigidBodyMatrix
+                     )
+{
+  if (fixedPoints.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is < 3";
+  }
+
+  if (movingPoints.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The number of 'moving' points is < 3";
+  }
+
+  if (fixedPoints.size() != movingPoints.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'fixed' points is " << fixedPoints.size()
+                         << " whereas the number of 'moving' points is " << movingPoints.size()
+                         << " and they should match.";
+  }
+
+  // Based on Arun's method:
+  // Least-Squares Fitting of two, 3-D Point Sets, Arun, 1987,
+  // 10.1109/TPAMI.1987.4767965
+  //
+  // Also See:
+  // http://eecs.vanderbilt.edu/people/mikefitzpatrick/papers/ (new line)
+  // 2009_Medim_Fitzpatrick_TRE_FRE_uncorrelated_as_published.pdf
+  // Then:
+  // http://tango.andrew.cmu.edu/~gustavor/42431-intro-bioimaging/readings/ch8.pdf
+
+  // Arun Equation 4.
+  cv::Point3d pPrime = GetCentroid(fixedPoints);
+
+  // Arun Equation 6.
+  cv::Point3d p = GetCentroid(movingPoints);
+
+  // Arun Equation 7.
+  std::vector<cv::Point3d> q = SubtractCentroid(movingPoints, p);
+
+  // Arun Equation 8.
+  std::vector<cv::Point3d> qPrime = SubtractCentroid(fixedPoints, pPrime);
+
+  // Arun Equation 11.
+  cv::Matx33d H = cv::Matx33d::zeros();
+  for (std::vector<cv::Point3d>::size_type i = 0; i < q.size(); ++i)
+  {
+    cv::Matx33d tmp(
+          q[i].x*qPrime[i].x, q[i].x*qPrime[i].y, q[i].x*qPrime[i].z,
+          q[i].y*qPrime[i].x, q[i].y*qPrime[i].y, q[i].y*qPrime[i].z,
+          q[i].z*qPrime[i].x, q[i].z*qPrime[i].y, q[i].z*qPrime[i].z
+        );
+    H += tmp;
+  }
+
+  // Arun Equation 12.
+  cv::SVD svd(H);
+
+  // Arun Equation 13.
+  // cv::Mat X = svd.vt.t() * svd.u.t();
+
+  // Replace Arun Equation 13 with Fitzpatrick, chapter 8, page 470.
+  cv::Mat VU = svd.vt.t() * svd.u;
+  double detVU = cv::determinant(VU);
+  cv::Matx33d diag = cv::Matx33d::zeros();
+  diag(0,0) = 1;
+  diag(1,1) = 1;
+  diag(2,2) = detVU;
+  cv::Mat diagonal(diag);
+  cv::Mat X = (svd.vt.t() * (diagonal * svd.u.t()));
+
+  // Arun Step 5.
+  double detX = cv::determinant(X);
+
+  if ( detX < 0
+       && (   std::fabs(svd.w.at<double>(0,0)) < 0.000001
+           || std::fabs(svd.w.at<double>(1,1)) < 0.000001
+           || std::fabs(svd.w.at<double>(2,2)) < 0.000001
+          )
+     )
+  {
+    // Implement 2a in section VI in Arun paper.
+    cv::Mat VPrime = svd.vt.t();
+    VPrime.at<double>(0,2) = -1.0 * VPrime.at<double>(0,2);
+    VPrime.at<double>(1,2) = -1.0 * VPrime.at<double>(1,2);
+    VPrime.at<double>(2,2) = -1.0 * VPrime.at<double>(2,2);
+    X = VPrime * svd.u.t();
+    detX = cv::determinant(X);
+  }
+
+  if (detX < 0)
+  {
+    niftkNiftyCalThrow() << "Determinant < 0";
+  }
+
+  // Arun Equation 10.
+  cv::Matx31d T, tmpP, tmpPPrime;
+  cv::Matx33d R(X);
+  tmpP(0,0) = p.x;
+  tmpP(1,0) = p.y;
+  tmpP(2,0) = p.z;
+  tmpPPrime(0,0) = pPrime.x;
+  tmpPPrime(1,0) = pPrime.y;
+  tmpPPrime(2,0) = pPrime.z;
+  T = tmpPPrime - R*tmpP;
+
+  rigidBodyMatrix = cv::Matx44d::eye();
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      rigidBodyMatrix(i, j) = R(i, j);
+    }
+    rigidBodyMatrix(i, 3) = T(i, 0);
+  }
+
+  double fre = CalculateFiducialRegistrationError(fixedPoints, movingPoints, rigidBodyMatrix);
+  return fre;
+}
+
+
+//-----------------------------------------------------------------------------
+double ComputeLeftToRight(const Model3D& model,
+                          const std::vector<cv::Mat>& rvecsLeft,
+                          const std::vector<cv::Mat>& tvecsLeft,
+                          const std::vector<cv::Mat>& rvecsRight,
+                          const std::vector<cv::Mat>& tvecsRight,
+                          cv::Mat& leftToRightRotationMatrix,
+                          cv::Mat& leftToRightTranslationVector
+                         )
+{
+  if (rvecsLeft.size() < 1)
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' is < 1.";
+  }
+  if (rvecsLeft.size() != tvecsLeft.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'tvecsLeft'." << std::endl;
+  }
+  if (rvecsLeft.size() != rvecsRight.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'rvecsRight'." << std::endl;
+  }
+  if (rvecsLeft.size() != tvecsRight.size())
+  {
+    niftkNiftyCalThrow() << "The number of 'rvecsLeft' doesn't match the number of 'rvecsRight'." << std::endl;
+  }
+  if (model.size() < 3)
+  {
+    niftkNiftyCalThrow() << "The model must have at least 3 points.";
+  }
+
+  std::vector<cv::Point3d> fixedPoints;
+  std::vector<cv::Point3d> movingPoints;
+
+  for (std::vector<cv::Mat>::size_type i = 0; i < rvecsLeft.size(); i++)
+  {
+    cv::Matx44d leftExtrinsics = RodriguesToMatrix(rvecsLeft[i], tvecsLeft[i]);
+    cv::Matx44d rightExtrinsics = RodriguesToMatrix(rvecsRight[i], tvecsRight[i]);
+
+    cv::Point3d tmpModelPoint;
+    cv::Point3d tmpLeftPoint;
+    cv::Point3d tmpRightPoint;
+
+    cv::Matx41d modelPoint;
+    cv::Matx41d transformedModelPointLeft;
+    cv::Matx41d transformedModelPointRight;
+
+    for (Model3D::const_iterator iter = model.begin(); iter != model.end(); ++iter)
+    {
+      tmpModelPoint = (*iter).second.point;
+      modelPoint(0, 0) = tmpModelPoint.x;
+      modelPoint(1, 0) = tmpModelPoint.y;
+      modelPoint(2, 0) = tmpModelPoint.z;
+      modelPoint(3, 0) = 1;
+
+      transformedModelPointLeft = leftExtrinsics * modelPoint;
+      transformedModelPointRight = rightExtrinsics * modelPoint;
+
+      tmpLeftPoint.x = transformedModelPointLeft(0, 0);
+      tmpLeftPoint.y = transformedModelPointLeft(1, 0);
+      tmpLeftPoint.z = transformedModelPointLeft(2, 0);
+
+      tmpRightPoint.x = transformedModelPointRight(0, 0);
+      tmpRightPoint.y = transformedModelPointRight(1, 0);
+      tmpRightPoint.z = transformedModelPointRight(2, 0);
+
+      movingPoints.push_back(tmpLeftPoint);
+      fixedPoints.push_back(tmpRightPoint);
+    }
+  }
+  cv::Matx44d registrationMatrix;
+
+  double fre = RegisterPoints(fixedPoints, movingPoints, registrationMatrix);
+
+  cv::Mat rotationVector = cvCreateMat(1, 3, CV_64FC1);
+  niftk::MatrixToRodrigues(registrationMatrix, rotationVector, leftToRightTranslationVector);
+  cv::Rodrigues(rotationVector, leftToRightRotationMatrix);
+
+  return fre;
+}
+
+
+//-----------------------------------------------------------------------------
+bool IsCrossEyed(const cv::Mat& intrinsicLeft,
+                 const cv::Mat& distortionLeft,
+                 const cv::Mat& rvecLeft,
+                 const cv::Mat& tvecLeft,
+                 const cv::Mat& intrinsicRight,
+                 const cv::Mat& distortionRight,
+                 const cv::Mat& rvecRight,
+                 const cv::Mat& tvecRight,
+                 cv::Point3d* convergencePoint,
+                 const double& maximumUsableDistance
+                )
+{
+  bool isCrossEyed = false;
+
+  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+  niftk::GetLeftToRightMatrix(rvecLeft,
+                              tvecLeft,
+                              rvecRight,
+                              tvecRight,
+                              leftToRightRotationMatrix,
+                              leftToRightTranslationVector);
+
+  niftk::Point2D p;
+  p.id = 0;
+
+  p.point.x = intrinsicLeft.at<double>(0, 2);
+  p.point.y = intrinsicLeft.at<double>(1, 2);
+
+  niftk::PointSet leftPrincipalPoint;
+  leftPrincipalPoint.insert(std::pair<NiftyCalIdType, Point2D>(0, p));
+
+  p.point.x = intrinsicRight.at<double>(0, 2);
+  p.point.y = intrinsicRight.at<double>(1, 2);
+
+  niftk::PointSet rightPrincipalPoint;
+  rightPrincipalPoint.insert(std::pair<NiftyCalIdType, Point2D>(0, p));
+
+  niftk::Model3D triangulatedPoints;
+  niftk::TriangulatePointPairs(leftPrincipalPoint,
+                               rightPrincipalPoint,
+                               intrinsicLeft,
+                               distortionLeft,
+                               rvecLeft,
+                               tvecLeft,
+                               leftToRightRotationMatrix,
+                               leftToRightTranslationVector,
+                               intrinsicRight,
+                               distortionRight,
+                               triangulatedPoints
+                              );
+
+  if (triangulatedPoints.size() != 1)
+  {
+    niftkNiftyCalThrow() << "There should be exactly 1 triangulated vergence point.";
+  }
+
+  cv::Point3d tp = (*(triangulatedPoints.begin())).second.point;
+
+  if (convergencePoint != nullptr)
+  {
+    *convergencePoint = tp;
+  }
+
+  if (tp.z > 0 && tp.z < maximumUsableDistance)
+  {
+    isCrossEyed = true;
+  }
+
+  return isCrossEyed;
+}
+
+
+//-----------------------------------------------------------------------------
+void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints,
+                                  const std::list<PointSet>& rightDistortedPoints,
+                                  const cv::Mat& intrinsicLeft,
+                                  const cv::Mat& distortionLeft,
+                                  const std::vector<cv::Mat>& rvecsLeft,
+                                  const std::vector<cv::Mat>& tvecsLeft,
+                                  const cv::Mat& intrinsicRight,
+                                  const cv::Mat& distortionRight,
+                                  const std::vector<cv::Mat>& rvecsRight,
+                                  const std::vector<cv::Mat>& tvecsRight,
+                                  const cv::Point3d& convergencePoint,
+                                  bool& somePointsAreNearer,
+                                  bool& somePointsAreFurther
+                                 )
+{
+  somePointsAreNearer = false;
+  somePointsAreFurther = false;
+
+  double depth = convergencePoint.z;
+
+  std::list<PointSet>::const_iterator leftIter;
+  std::list<PointSet>::const_iterator rightIter;
+  unsigned int viewCounter = 0;
+  for (leftIter = leftDistortedPoints.begin(),
+       rightIter = rightDistortedPoints.begin();
+       leftIter != leftDistortedPoints.end() &&
+       rightIter != rightDistortedPoints.end();
+       ++leftIter,
+       ++rightIter
+       )
+  {
+    cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+    cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+    niftk::GetLeftToRightMatrix(rvecsLeft[viewCounter],
+                                tvecsLeft[viewCounter],
+                                rvecsRight[viewCounter],
+                                tvecsRight[viewCounter],
+                                leftToRightRotationMatrix,
+                                leftToRightTranslationVector);
+
+    niftk::Model3D triangulatedPoints;
+    niftk::TriangulatePointPairs(*leftIter,
+                                 *rightIter,
+                                 intrinsicLeft,
+                                 distortionLeft,
+                                 rvecsLeft[viewCounter],
+                                 tvecsLeft[viewCounter],
+                                 leftToRightRotationMatrix,
+                                 leftToRightTranslationVector,
+                                 intrinsicRight,
+                                 distortionRight,
+                                 triangulatedPoints
+                                );
+
+    niftk::Model3D::const_iterator modelIter;
+    for (modelIter = triangulatedPoints.begin();
+         modelIter != triangulatedPoints.end();
+         ++modelIter
+        )
+    {
+      if (modelIter->second.point.z > depth)
+      {
+        somePointsAreFurther = true;
+      }
+      if (modelIter->second.point.z <= depth)
+      {
+        somePointsAreNearer = true;
+      }
+    }
+    viewCounter++;
+  }
 }
 
 } // end namespace

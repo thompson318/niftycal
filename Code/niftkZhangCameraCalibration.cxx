@@ -18,12 +18,6 @@
 #include "niftkTsaiCameraCalibration.h"
 #include <Internal/niftkCalibrationUtilities_p.h>
 
-#ifdef NIFTYCAL_WITH_ITK
-#include <Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.h>
-#include <Internal/niftkNonLinearStereoIntrinsicsCalibration3DOptimiser.h>
-#include <Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.h>
-#endif
-
 namespace niftk
 {
 

@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslation;
 
     cv::Matx21d result;
-
+    int flags = 0;
     result = niftk::FullStereoCameraCalibration(model,
                                                 leftPoints,
                                                 rightPoints,
@@ -120,6 +120,7 @@ int main(int argc, char ** argv)
                                                 leftToRightTranslation,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
+                                                flags,
                                                 false // could be command line arg.
                                                );
 
@@ -231,6 +232,7 @@ int main(int argc, char ** argv)
                                             leftToRightTranslation,
                                             essentialMatrix,
                                             fundamentalMatrix,
+                                            flags,
                                             false // could be command line arg.
                                            );
 
