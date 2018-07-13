@@ -140,6 +140,6 @@ if(BUILD_SHARED_LIBS)
   endif(WIN32)
 endif(BUILD_SHARED_LIBS)
 
-target_link_libraries(niftycal PRIVATE ${CERES_LIBRARIES} ${ALL_THIRD_PARTY_LIBRARIES} /Users/mattclarkson/install/gsl-2.5/lib/libgsl.a)
+target_link_libraries(niftycal PRIVATE ${CERES_LIBRARIES} ${ALL_THIRD_PARTY_LIBRARIES})
 
 add_subdirectory(Apps)
