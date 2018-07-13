@@ -21,7 +21,7 @@
 namespace niftk
 {
 /**
-* \class BallDetector
+* \class RedBallDetector
 * \brief Thresholds red things, so base class can fit circles.
 *
 * This detector is not thread safe.
