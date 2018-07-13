@@ -24,8 +24,8 @@
 #include <highgui.h>
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <Internal/niftkNonLinearStereoCameraCalibration2DOptimiser.h>
-#include <Internal/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.h>
+#include <Internal/Stereo/niftkNonLinearStereoCameraCalibration2DOptimiser.h>
+#include <Internal/Stereo/niftkNonLinearStereoExtrinsicsCalibration3DOptimiser.h>
 #endif
 
 namespace niftk
