@@ -131,6 +131,7 @@ int main(int argc, char ** argv)
     cv::Mat leftToRightTranslation;
 
     cv::Matx21d result;
+    int flags = 0;
 
     result = niftk::FullStereoCameraCalibration(firstModel,
                                                 leftPoints,
@@ -148,6 +149,7 @@ int main(int argc, char ** argv)
                                                 leftToRightTranslation,
                                                 essentialMatrix,
                                                 fundamentalMatrix,
+                                                flags,
                                                 false // optimise 3D, not needed here.
                                                );
 
@@ -285,6 +287,7 @@ int main(int argc, char ** argv)
                                                   leftToRightTranslation,
                                                   essentialMatrix,
                                                   fundamentalMatrix,
+                                                  flags,
                                                   optimise3D
                                                  );
 
@@ -362,6 +365,7 @@ int main(int argc, char ** argv)
                                                   leftToRightTranslation,
                                                   essentialMatrix,
                                                   fundamentalMatrix,
+                                                  flags,
                                                   optimise3D
                                                  );
 
