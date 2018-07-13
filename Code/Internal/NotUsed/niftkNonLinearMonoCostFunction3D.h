@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearMonoCostFunction3D_h
 #define niftkNonLinearMonoCostFunction3D_h
 
-#include "niftkNonLinearCostFunction.h"
+#include <Internal/niftkNonLinearCostFunction.h>
 
 namespace niftk
 {
