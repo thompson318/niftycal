@@ -16,10 +16,10 @@
 #include "niftkNiftyCalExceptionMacro.h"
 
 #ifdef NIFTYCAL_WITH_ITK
-#include <Internal/niftkNonLinearMaltiHandEyeOptimiser.h>
-#include <Internal/niftkNonLinearNDOFHandEyeOptimiser.h>
-#include <Internal/niftkNonLinearStereoHandEye2DOptimiser.h>
-#include <Internal/niftkNonLinearStereoHandEye3DOptimiser.h>
+#include <Internal/HandEye/niftkNonLinearMaltiHandEyeOptimiser.h>
+#include <Internal/HandEye/niftkNonLinearNDOFHandEyeOptimiser.h>
+#include <Internal/HandEye/niftkNonLinearStereoHandEye2DOptimiser.h>
+#include <Internal/HandEye/niftkNonLinearStereoHandEye3DOptimiser.h>
 #endif
 
 namespace niftk {

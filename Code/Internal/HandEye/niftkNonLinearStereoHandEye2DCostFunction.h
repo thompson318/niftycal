@@ -12,29 +12,30 @@
 
 =============================================================================*/
 
-#ifndef niftkNonLinearStereoHandEye3DCostFunction_h
-#define niftkNonLinearStereoHandEye3DCostFunction_h
+#ifndef niftkNonLinearStereoHandEye2DCostFunction_h
+#define niftkNonLinearStereoHandEye2DCostFunction_h
 
-#include "niftkNonLinearStereo3DCostFunction.h"
-#include "niftkNonLinearNoIntrinsicsCostFunction.h"
+#include <Internal/niftkNonLinearStereo2DCostFunction.h>
+#include <Internal/niftkNonLinearNoIntrinsicsCostFunction.h>
 
 namespace niftk
 {
 
 /**
-* \class NonLinearStereoHandEye3DCostFunction
+* \class NonLinearStereoHandEye2DCostFunction
 * \brief Computes cost as RMS re-projection error for stereo, extrinsic,
-* hand-eye and model-to-world optimisation.
+* hand-eye and model-to-world optimisation, as an extension of
+* <a href="http://dx.doi.org/10.1002/rcs.1478">Malti 2013</a>.
 */
-class NonLinearStereoHandEye3DCostFunction
-    : public NonLinearStereo3DCostFunction,
+class NonLinearStereoHandEye2DCostFunction
+    : public NonLinearStereo2DCostFunction,
       public NonLinearNoIntrinsicsCostFunction
 {
 
 public:
 
-  typedef NonLinearStereoHandEye3DCostFunction Self;
-  typedef NonLinearStereo3DCostFunction        Superclass;
+  typedef NonLinearStereoHandEye2DCostFunction Self;
+  typedef NonLinearStereo2DCostFunction        Superclass;
   typedef itk::SmartPointer<Self>              Pointer;
   typedef itk::SmartPointer<const Self>        ConstPointer;
   itkNewMacro(Self);
@@ -49,13 +50,14 @@ public:
 
 protected:
 
-  NonLinearStereoHandEye3DCostFunction();
-  virtual ~NonLinearStereoHandEye3DCostFunction();
+  NonLinearStereoHandEye2DCostFunction();
+  virtual ~NonLinearStereoHandEye2DCostFunction();
 
-  NonLinearStereoHandEye3DCostFunction(const NonLinearStereoHandEye3DCostFunction&);
-  NonLinearStereoHandEye3DCostFunction& operator=(const NonLinearStereoHandEye3DCostFunction&);
+  NonLinearStereoHandEye2DCostFunction(const NonLinearStereoHandEye2DCostFunction&);
+  NonLinearStereoHandEye2DCostFunction& operator=(const NonLinearStereoHandEye2DCostFunction&);
 
   cv::Matx44d m_LeftToRight;
+
 };
 
 } // end namespace

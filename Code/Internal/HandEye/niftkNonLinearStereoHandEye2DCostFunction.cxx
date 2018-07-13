@@ -12,8 +12,8 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearStereoHandEye3DCostFunction.h"
-#include "niftkCalibrationUtilities_p.h"
+#include "niftkNonLinearStereoHandEye2DCostFunction.h"
+#include <Internal/niftkCalibrationUtilities_p.h>
 #include <niftkNiftyCalExceptionMacro.h>
 #include <niftkMatrixUtilities.h>
 #include <niftkPointUtilities.h>
@@ -22,19 +22,19 @@ namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEye3DCostFunction::NonLinearStereoHandEye3DCostFunction()
+NonLinearStereoHandEye2DCostFunction::NonLinearStereoHandEye2DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEye3DCostFunction::~NonLinearStereoHandEye3DCostFunction()
+NonLinearStereoHandEye2DCostFunction::~NonLinearStereoHandEye2DCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void NonLinearStereoHandEye3DCostFunction::SetLeftToRight(const cv::Matx44d& mat)
+void NonLinearStereoHandEye2DCostFunction::SetLeftToRight(const cv::Matx44d& mat)
 {
   m_LeftToRight = mat;
   this->Modified();
@@ -42,12 +42,12 @@ void NonLinearStereoHandEye3DCostFunction::SetLeftToRight(const cv::Matx44d& mat
 
 
 //-----------------------------------------------------------------------------
-NonLinearStereoHandEye3DCostFunction::MeasureType
-NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& parameters ) const
+NonLinearStereoHandEye2DCostFunction::MeasureType
+NonLinearStereoHandEye2DCostFunction::InternalGetValue(const ParametersType& parameters ) const
 {
   if (!this->GetUseHandMatrices() && m_HandMatrices->size() != m_Points->size())
   {
-    niftkNiftyCalThrow() << "NonLinearStereoHandEye3DCostFunction requires hand (tracking) matrices.";
+    niftkNiftyCalThrow() << "NonLinearStereoHandEye2DCostFunction requires hand (tracking) matrices.";
   }
 
   if (m_Points->size() != m_RightHandPoints->size())
@@ -159,7 +159,7 @@ NonLinearStereoHandEye3DCostFunction::InternalGetValue(const ParametersType& par
     internalParameters[internalParameterCounter++] = tvec.at<double>(0, 2);
   }
 
-  niftk::ComputeStereoReconstructionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
+  niftk::ComputeStereoProjectionErrors(m_Model, m_Points, m_RightHandPoints, internalParameters, result);
   return result;
 }
 

@@ -15,8 +15,8 @@
 #ifndef niftkNonLinearNDOFHandEyeCostFunction_h
 #define niftkNonLinearNDOFHandEyeCostFunction_h
 
-#include "niftkNonLinearNoIntrinsicsCostFunction.h"
-#include "niftkNonLinearMonoCostFunction.h"
+#include <Internal/niftkNonLinearNoIntrinsicsCostFunction.h>
+#include <Internal/niftkNonLinearMonoCostFunction.h>
 
 namespace niftk
 {

@@ -15,7 +15,7 @@
 #ifndef niftkNonLinearMaltiHandEyeCostFunction_h
 #define niftkNonLinearMaltiHandEyeCostFunction_h
 
-#include "niftkNonLinearMonoCostFunction.h"
+#include <Internal/niftkNonLinearMonoCostFunction.h>
 
 namespace niftk
 {
