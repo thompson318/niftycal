@@ -14,6 +14,7 @@ video camera calibration, and is largely based on OpenCV (e.g. 2.4.11), with non
 NiftyCal provides:
 \li 2D and 3D structures that store each point along with its identifier.
 \li A simple IPoint2DDetector interface that all point detectors implement.
+\li The above 2 points mean that all optimisation routines can work with different numbers of points per view.
 \li A range of IPoint2DDetector implementations including chessboards, asymmetrical circle grids,
 <a href="http://github.com/NifTK/apriltags">AprilTags</a>, and template matching of dots and rings.
 \li Mono and stereo camera calibration using <a href="http://ieeexplore.ieee.org/document/888718/">Zhang's 2000</a> method
