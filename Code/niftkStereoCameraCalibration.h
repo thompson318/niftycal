@@ -82,6 +82,7 @@ NIFTYCAL_WINEXPORT cv::Matx21d FullStereoCameraCalibration(const Model3D& model,
                                                            cv::Mat& leftToRightTranslationVector,
                                                            cv::Mat& essentialMatrix,
                                                            cv::Mat& fundamentalMatrix,
+                                                           const int& cvFlags = 0,
                                                            const bool& optimise3D = false
                                                           );
 

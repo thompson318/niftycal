@@ -181,8 +181,8 @@ add_test(REQ-2002-CSD-0001-012-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
 add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
-  -0.0198931 0.0402461 0.000409826               # rvec
-  -4.64005 0.26403 0.297868                      # tvec
+  -0.0196205 0.038038 0.00102907                 # rvec
+  -4.65625 -0.000162148 -0.0196316               # tvec
   0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
   0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
   0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
@@ -209,8 +209,8 @@ add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
 add_test(REQ-2002-CSD-0001-015-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
-  -0.0198931 0.0402461 0.000409826               # rvec
-  -4.64005 0.26403 0.297868                      # tvec
+  -0.0188372 0.0410038 7.43605e-06               # rvec
+  -4.63598 0.275984 0.371224                     # tvec
   0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
   0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
   0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
