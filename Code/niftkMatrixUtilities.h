@@ -135,6 +135,30 @@ NIFTYCAL_WINEXPORT void GetLeftToRightMatrix(const cv::Mat& leftRVec1x3,
                                              cv::Mat& leftToRightMatrix3x3,
                                              cv::Mat& leftToRightTVec3x1
                                              );
+
+
+/**
+ * \brief Computes F from Camera Calibration.
+ */
+NIFTYCAL_WINEXPORT cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrinsic,
+                                                                         const cv::Mat& leftToRightRotationMatrix,
+                                                                         const cv::Mat& leftToRightTranslationVector,
+                                                                         const cv::Mat& rightIntrinsic
+                                                                        );
+
+/**
+* \brief Computes a consistent set of left and right extrinsics,
+* by taking the left extrinsics, and the left-to-right transformation
+* and computing the corresponding right extrinsics.
+*/
+NIFTYCAL_WINEXPORT void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
+                                                const std::vector<cv::Mat>& tvecsLeft,
+                                                const cv::Mat& leftToRightRotationMatrix,
+                                                const cv::Mat& leftToRightTranslationVector,
+                                                std::vector<cv::Mat>& rvecsRight,
+                                                std::vector<cv::Mat>& tvecsRight
+                                               );
+
 } // end namespace
 
 #endif

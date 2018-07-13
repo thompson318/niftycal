@@ -33,30 +33,6 @@ int Signum(const double& x);
 * \brief Private (as in 'deliberately not exported') utility functions.
 */
 
-
-/**
- * \brief Computes F from Camera Calibration.
- */
-cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrinsic,
-                                                      const cv::Mat& leftToRightRotationMatrix,
-                                                      const cv::Mat& leftToRightTranslationVector,
-                                                      const cv::Mat& rightIntrinsic
-                                                     );
-
-/**
-* \brief Computes a consistent set of left and right extrinsics,
-* by taking the left extrinsics, and the left-to-right transformation
-* and computing the corresponding right extrinsics.
-*/
-void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
-                             const std::vector<cv::Mat>& tvecsLeft,
-                             const cv::Mat& leftToRightRotationMatrix,
-                             const cv::Mat& leftToRightTranslationVector,
-                             std::vector<cv::Mat>& rvecsRight,
-                             std::vector<cv::Mat>& tvecsRight
-                            );
-
-
 /**
 * \brief For a single view, calculates projection errors.
 */
