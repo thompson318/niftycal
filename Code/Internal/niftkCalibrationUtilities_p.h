@@ -16,9 +16,12 @@
 #define niftkCalibrationUtilities_p_h
 
 #include "niftkNiftyCalTypes.h"
-#include <itkMultipleValuedCostFunction.h>
 #include <list>
 #include <cv.h>
+
+#ifdef NIFTYCAL_WITH_ITK
+#include <itkMultipleValuedCostFunction.h>
+#endif
 
 namespace niftk
 {
@@ -32,6 +35,8 @@ int Signum(const double& x);
 * \file niftkCalibrationUtilities_p.h
 * \brief Private (as in 'deliberately not exported') utility functions.
 */
+
+#ifdef NIFTYCAL_WITH_ITK
 
 /**
 * \brief For a single view, calculates projection errors.
@@ -193,6 +198,8 @@ void ComputeEpipolarErrors(const PointSet& leftPoints,
                            const cv::Mat& fundamentalMatrix,
                            itk::MultipleValuedCostFunction::MeasureType& errors
                           );
+
+#endif
 
 } // end namespace
 

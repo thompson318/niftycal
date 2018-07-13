@@ -33,6 +33,7 @@ int Signum(const double& x)
   }
 }
 
+#ifdef NIFTYCAL_WITH_ITK
 
 //-----------------------------------------------------------------------------
 void ComputeMonoProjectionErrors(const niftk::Model3D& model,
@@ -521,5 +522,7 @@ void ComputeEpipolarErrors(const PointSet& leftPoints,
     errors[errorCounter++] = distance;
   }
 }
+
+#endif
 
 } // end namespace
