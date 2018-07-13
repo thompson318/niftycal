@@ -17,14 +17,14 @@
 #include "niftkNiftyCalExceptionMacro.h"
 #include "niftkMatrixUtilities.h"
 #include "niftkPointUtilities.h"
-#include <Internal/niftkTsaiUtilities_p.h>
+#include <Internal/Tsai/niftkTsaiUtilities_p.h>
 #ifdef NIFTYCAL_WITH_ITK
-#include <Internal/niftkNonLinearTsai3ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai2ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai5ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai8ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai10ParamOptimiser.h>
-#include <Internal/niftkNonLinearTsai11ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai3ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai2ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai5ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai8ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai10ParamOptimiser.h>
+#include <Internal/Tsai/niftkNonLinearTsai11ParamOptimiser.h>
 #endif
 #include <vector>
 

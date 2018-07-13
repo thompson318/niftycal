@@ -12,42 +12,42 @@
 
 =============================================================================*/
 
-#include "niftkNonLinearTsai11ParamCostFunction.h"
-#include "niftkCalibrationUtilities_p.h"
+#include "niftkNonLinearTsai8ParamCostFunction.h"
+#include <Internal/niftkCalibrationUtilities_p.h>
 
 namespace niftk
 {
 
 //-----------------------------------------------------------------------------
-NonLinearTsai11ParamCostFunction::NonLinearTsai11ParamCostFunction()
+NonLinearTsai8ParamCostFunction::NonLinearTsai8ParamCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearTsai11ParamCostFunction::~NonLinearTsai11ParamCostFunction()
+NonLinearTsai8ParamCostFunction::~NonLinearTsai8ParamCostFunction()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-NonLinearTsai11ParamCostFunction::MeasureType
-NonLinearTsai11ParamCostFunction::InternalGetValue(const ParametersType& parameters) const
+NonLinearTsai8ParamCostFunction::MeasureType
+NonLinearTsai8ParamCostFunction::InternalGetValue(const ParametersType& parameters) const
 {
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
   ParametersType internalParameters;
-  internalParameters.SetSize(  4  // intrinsic
+  internalParameters.SetSize(  4 // intrinsic
                              + 5 // distortion
                              + 6 // extrinsic
                             );
 
-  internalParameters[0] = parameters[6] * parameters[10];  // f * sx
+  internalParameters[0] = parameters[6] * m_Sx;            // f * sx
   internalParameters[1] = parameters[6];                   // f
-  internalParameters[2] = parameters[7];                   // Cx
-  internalParameters[3] = parameters[8];                   // Cy
-  internalParameters[4] = parameters[9];                   // k1
+  internalParameters[2] = (*m_Intrinsic).at<double>(0, 2);
+  internalParameters[3] = (*m_Intrinsic).at<double>(1, 2);
+  internalParameters[4] = parameters[7];                   // k1
   internalParameters[5] = 0;
   internalParameters[6] = 0;
   internalParameters[7] = 0;
