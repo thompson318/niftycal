@@ -34,13 +34,16 @@ set(TEST_CASES
   niftkIterativeStereoCirclesCameraCalibrationTest
   niftkMonoChessboardHandEyeCalibrationTest
   niftkIterativeTemplateMatchingCameraCalibrationTest
-  niftkTsaiMonoCalibrationTest
-  niftkTsaiStereoCalibrationTest
-  niftkTsaiReferenceNonCoplanerCalibrationTest
   niftkTimingCalibrationUtilitiesTest
   niftkTimingCalibrationTest
   niftkMorganHandEyeTest
 )
+
+if(ITK_FOUND)
+  list(APPEND TEST_CASES niftkTsaiMonoCalibrationTest)
+  list(APPEND TEST_CASES niftkTsaiStereoCalibrationTest)
+  list(APPEND TEST_CASES niftkTsaiReferenceNonCoplanerCalibrationTest)
+endif()
 
 if(AprilTags_FOUND AND Eigen_FOUND)
   list(APPEND TEST_CASES niftkExtractAprilTagsPointsTest)
@@ -181,8 +184,8 @@ add_test(REQ-2002-CSD-0001-012-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
 add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
-  -0.0196205 0.038038 0.00102907                 # rvec
-  -4.65625 -0.000162148 -0.0196316               # tvec
+  -0.0195978 0.0421765 0.000339385               # rvec
+  -4.63951 0.263227 0.293895                     # tvec
   0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
   0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
   0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
@@ -209,8 +212,8 @@ add_test(REQ-2002-CSD-0001-013-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboar
 add_test(REQ-2002-CSD-0001-015-01 ${EXECUTABLE_OUTPUT_PATH}/niftkStereoChessboardCameraCalibrationTest
   ${DATA_DIR}/Laparoscope/chessboard_14_10_3.txt # Model description (chessboard points)
   14 10                                          # internal corners
-  -0.0188372 0.0410038 7.43605e-06               # rvec
-  -4.63598 0.275984 0.371224                     # tvec
+  -0.019423 0.0403948 0.000351244                # rvec
+  -4.64144 0.270077 0.297896                     # tvec
   0                                              # zeroDistortion==0 meaning 'no, we expect some distortion'.
   0.01                                           # rotation tolerance, so we expect OpenCV to work out r2l rotation parameters accurate to 0.01
   0.01                                           # translation tolerance, so we expect OpenCV to work out r2l translation parameters accurate to 0.01
@@ -633,42 +636,45 @@ add_test(REG-CalibHandEyeMono ${EXECUTABLE_OUTPUT_PATH}/niftkMonoChessboardHandE
 #  ${DATA_DIR}/2015.06.04_14-34-29-279/polaris.1/TrackerMatrices1/32.txt
 )
 
-add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
-         ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1676.49 1676.49 902.469 521.366 -0.218883 0.996344)
+if (ITK_FOUND)
 
-add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
-         ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1660.21 1660.21 977.488 529.236 -0.260808 1.42298)
+  add_test(REG-TsaiCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+           ${DATA_DIR}/Tsai/Coplanar/model.txt
+           10 7 1920 540 1 2 0 1676.49 1676.49 902.469 521.366 -0.218883 0.996344)
 
-add_test(REG-TsaiCPStereo2D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
-         ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.6790916665 0)
+  add_test(REG-TsaiCPMonoR ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+           ${DATA_DIR}/Tsai/Coplanar/model.txt
+           10 7 1920 540 1 2 0 1660.21 1660.21 977.488 529.236 -0.260808 1.42298)
 
-add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
-         ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
-         ${DATA_DIR}/Tsai/Coplanar/model.txt
-         10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.2738925548 1)
+  add_test(REG-TsaiCPStereo2D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+           ${DATA_DIR}/Tsai/Coplanar/model.txt
+           10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.6790916665 0)
 
-add_test(REG-TsaiAsymmCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
-         ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x60-world.txt
-         23 7 1920 540 1 2 1 1721.15 1721.15 916.856 512.815 -0.237124 1.88853)
+  add_test(REG-TsaiCPStereo3D ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiStereoCalibrationTest
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_left.bmp
+           ${DATA_DIR}/Tsai/Coplanar/1479224185706804480_right.bmp
+           ${DATA_DIR}/Tsai/Coplanar/model.txt
+           10 7 1920 540 1 2 0 1676.487247 1676.487247 902.4690329 521.3658481 -0.2188825101 0.2738925548 1)
 
-add_test(REG-TsaiAsymmNCPMonoLF ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
-         ${DATA_DIR}/Asymmetric/1488546362257514496_left_flipped.png
-         ${DATA_DIR}/Asymmetric/dots-noncoplanar-2x15x7x60-world.txt
-         15 7 1920 540 1 2 1 1721.88 1729.22 889.967 633.695 -0.273597 1.34762)
+  add_test(REG-TsaiAsymmCPMonoL ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+           ${DATA_DIR}/Asymmetric/1488546956550506240_right.png
+           ${DATA_DIR}/Asymmetric/dots-coplanar-1x23x7x60-world.txt
+           23 7 1920 540 1 2 1 1721.15 1721.15 916.856 512.815 -0.237124 1.88853)
 
-add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
-         ${DATA_DIR}/Tsai/NonCoplanar/data.txt
-         576 576 0.02300000 0.02300000 3041.15 3040 262.302 212.689 3.07898 0.0898487
-        )
+  add_test(REG-TsaiAsymmNCPMonoLF ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiMonoCalibrationTest
+           ${DATA_DIR}/Asymmetric/1488546362257514496_left_flipped.png
+           ${DATA_DIR}/Asymmetric/dots-noncoplanar-2x15x7x60-world.txt
+           15 7 1920 540 1 2 1 1721.88 1729.22 889.967 633.695 -0.273597 1.34762)
+
+  add_test(REG-TsaiRefNCP ${EXECUTABLE_OUTPUT_PATH}/niftkTsaiReferenceNonCoplanerCalibrationTest
+           ${DATA_DIR}/Tsai/NonCoplanar/data.txt
+           576 576 0.02300000 0.02300000 3041.15 3040 262.302 212.689 3.07898 0.0898487
+          )
+endif()
 
 add_test(Morgan-HandEye ${EXECUTABLE_OUTPUT_PATH}/niftkMorganHandEyeTest
          ${DATA_DIR}/Morgan/calib.left.intrinsic.txt
