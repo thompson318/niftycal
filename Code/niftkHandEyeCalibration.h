@@ -16,8 +16,8 @@
 #define niftkHandEyeCalibration_h
 
 #include "niftkWin32ExportHeader.h"
-#include "niftkMatrixUtilities.h"
 #include "niftkNiftyCalTypes.h"
+#include "niftkMatrixUtilities.h"
 #include <cv.h>
 #include <list>
 
