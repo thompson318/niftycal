@@ -30,8 +30,9 @@ namespace niftk
 
 /**
 * \brief Performs a mono camera calibration using Tsai 1987 method.
-* If ITK is not compiled in, you just have the initial linear bit.
-* Will check for planarity and then switch to either the coplanar or the non-coplanar method.
+* If ITK is not compiled in, you just have the initial linear bit, which
+* can be a bit poor, so for Tsai, you are advised to use ITK to get LM optimisation.
+* This method will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * \return rms re-projection error.
 */
 NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3D,
@@ -47,8 +48,9 @@ NIFTYCAL_WINEXPORT double TsaiMonoCameraCalibration(const niftk::Model3D& model3
 
 /**
 * \brief Performs a stereo camera calibration using Tsai 1987 method.
-* If ITK is not compiled in, you just have the initial linear bit.
-* Will check for planarity and then switch to either the coplanar or the non-coplanar method.
+* If ITK is not compiled in, you just have the initial linear bit, which
+* can be a bit poor, so for Tsai, you are advised to use ITK to get LM optimisation.
+* This method will check for planarity and then switch to either the coplanar or the non-coplanar method.
 * This method assumes the left and right camera have already been optimised, and then optimises
 * the extrinsic (2 x 6 DOF) parameters using the combined left and right re-projection error.
 * \param cvFlags See OpenCV docs, e.g. CV_CALIB_USE_INTRINSIC_GUESS, CV_CALIB_FIX_INTRINSIC etc.
