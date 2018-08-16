@@ -20,6 +20,7 @@ set(TEST_CASES
   niftkPointUtilitiesTest
   niftkPointDistortionTest
   niftkLoadModelTest
+  niftkLoadPointsTest
   niftkMatrixAverageTest
   niftkStereoMatrixIOTest
   niftkWarpChessboardByHomographyTest
@@ -69,6 +70,8 @@ endforeach()
 add_test(UNIT-NiftyCalExcept ${EXECUTABLE_OUTPUT_PATH}/niftkNiftyCalExceptionTest)
 add_test(UNIT-LoadModelNewline ${EXECUTABLE_OUTPUT_PATH}/niftkLoadModelTest ${DATA_DIR}/Laparoscope/chessboard_13_10_3.txt 130)
 add_test(UNIT-LoadModelNoNewline ${EXECUTABLE_OUTPUT_PATH}/niftkLoadModelTest ${DATA_DIR}/Laparoscope/chessboard_13_10_3_no_newline_at_end.txt 130)
+add_test(UNIT-LoadPointsNewline ${EXECUTABLE_OUTPUT_PATH}/niftkLoadPointsTest ${DATA_DIR}/SimulationAprilTags/Left1.txt 35)
+add_test(UNIT-LoadPointsNoNewline ${EXECUTABLE_OUTPUT_PATH}/niftkLoadPointsTest ${DATA_DIR}/SimulationAprilTags/Left1_no_newline.txt 35)
 add_test(UNIT-PointUtils ${EXECUTABLE_OUTPUT_PATH}/niftkPointUtilitiesTest)
 add_test(UNIT-PointDist ${EXECUTABLE_OUTPUT_PATH}/niftkPointDistortionTest ${DATA_DIR}/Laparoscope/calib.left.intrinsic.txt ${DATA_DIR}/Laparoscope/calib.left.distortion.txt 1920 1080 1098.3 267.087)
 add_test(UNIT-InterpSurf1 ${EXECUTABLE_OUTPUT_PATH}/niftkInterpolateQuadraticSurfaceTest)

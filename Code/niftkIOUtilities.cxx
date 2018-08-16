@@ -64,16 +64,25 @@ PointSet LoadPointSet(const std::string& fileName)
 
   niftk::PointSet result;
 
-  while (!ifs.eof())
+  std::string line;
+  while (std::getline(ifs, line))
   {
+    std::stringstream ss;
+    ss << line;
+
     Point2D tmp;
-    ifs >> tmp.id;
-    ifs >> tmp.point.x;
-    ifs >> tmp.point.y;
+    ss >> tmp.id;
+    ss >> tmp.point.x;
+    ss >> tmp.point.y;
     if (!ifs.bad() && !ifs.fail())
     {
       result.insert(IdPoint2D(tmp.id, tmp));
     }
+  }
+
+  if (ifs.bad())
+  {
+    niftkNiftyCalThrow() << "Failed to read file:" << fileName << std::endl;
   }
 
   ifs.close();
