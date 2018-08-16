@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace niftk {
 
@@ -63,16 +64,25 @@ PointSet LoadPointSet(const std::string& fileName)
 
   niftk::PointSet result;
 
-  while (!ifs.eof())
+  std::string line;
+  while (std::getline(ifs, line))
   {
+    std::stringstream ss;
+    ss << line;
+
     Point2D tmp;
-    ifs >> tmp.id;
-    ifs >> tmp.point.x;
-    ifs >> tmp.point.y;
+    ss >> tmp.id;
+    ss >> tmp.point.x;
+    ss >> tmp.point.y;
     if (!ifs.bad() && !ifs.fail())
     {
       result.insert(IdPoint2D(tmp.id, tmp));
     }
+  }
+
+  if (ifs.bad())
+  {
+    niftkNiftyCalThrow() << "Failed to read file:" << fileName << std::endl;
   }
 
   ifs.close();
@@ -126,17 +136,26 @@ Model3D LoadModel3D(const std::string& fileName)
 
   Model3D result;
 
-  while (ifs.good())
+  std::string line;
+  while (std::getline(ifs, line))
   {
+    std::stringstream ss;
+    ss << line;
+
     Point3D tmp;
-    ifs >> tmp.id;
-    ifs >> tmp.point.x;
-    ifs >> tmp.point.y;
-    ifs >> tmp.point.z;
-    if (ifs.good())
+    ss >> tmp.id;
+    ss >> tmp.point.x;
+    ss >> tmp.point.y;
+    ss >> tmp.point.z;
+    if (!ifs.bad() && !ifs.fail())
     {
       result.insert(IdPoint3D(tmp.id, tmp));
     }
+  }
+
+  if (ifs.bad())
+  {
+    niftkNiftyCalThrow() << "Failed to read file:" << fileName << std::endl;
   }
 
   ifs.close();
