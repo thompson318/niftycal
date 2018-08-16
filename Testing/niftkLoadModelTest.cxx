@@ -14,8 +14,8 @@
 
 #include "catch.hpp"
 #include "niftkCatchMain.h"
-#include "niftkNiftyCalTypes.h"
-#include "niftkIOUtilities.h"
+#include <niftkNiftyCalTypes.h>
+#include <niftkIOUtilities.h>
 
 TEST_CASE( "Load 3D Model, check against expected number of points", "[IO]" ) {
 
