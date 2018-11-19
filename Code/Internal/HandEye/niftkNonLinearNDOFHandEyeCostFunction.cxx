@@ -65,22 +65,22 @@ NonLinearNDOFHandEyeCostFunction::InternalGetValue(const ParametersType& paramet
   internalParameters[7] = (*m_Distortion).at<double>(0, 3);
   internalParameters[8] = (*m_Distortion).at<double>(0, 4);
 
-  cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat handEyeRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   handEyeRotationVector.at<double>(0, 0) = parameters[0];
   handEyeRotationVector.at<double>(0, 1) = parameters[1];
   handEyeRotationVector.at<double>(0, 2) = parameters[2];
 
-  cv::Mat handEyeTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat handEyeTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   handEyeTranslationVector.at<double>(0, 0) = parameters[3];
   handEyeTranslationVector.at<double>(0, 1) = parameters[4];
   handEyeTranslationVector.at<double>(0, 2) = parameters[5];
 
-  cv::Mat modelToWorldRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat modelToWorldRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   modelToWorldRotationVector.at<double>(0, 0) = parameters[6];
   modelToWorldRotationVector.at<double>(0, 1) = parameters[7];
   modelToWorldRotationVector.at<double>(0, 2) = parameters[8];
 
-  cv::Mat modelToWorldTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat modelToWorldTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   modelToWorldTranslationVector.at<double>(0, 0) = parameters[9];
   modelToWorldTranslationVector.at<double>(0, 1) = parameters[10];
   modelToWorldTranslationVector.at<double>(0, 2) = parameters[11];
@@ -97,12 +97,12 @@ NonLinearNDOFHandEyeCostFunction::InternalGetValue(const ParametersType& paramet
        ++matrixIter
        )
   {
-    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
     rvec.at<double>(0, 0) = parameters[parameterCounter++];
     rvec.at<double>(0, 1) = parameters[parameterCounter++];
     rvec.at<double>(0, 2) = parameters[parameterCounter++];
 
-    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
     tvec.at<double>(0, 0) = parameters[parameterCounter++];
     tvec.at<double>(0, 1) = parameters[parameterCounter++];
     tvec.at<double>(0, 2) = parameters[parameterCounter++];

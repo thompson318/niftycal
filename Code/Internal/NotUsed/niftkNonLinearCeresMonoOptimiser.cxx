@@ -167,8 +167,8 @@ double CeresMonoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& mo
 
   // So the parameters for the first camera that are optimised, start at the identity transform.
   cv::Matx44d identity = cv::Matx44d::eye();
-  cv::Mat firstCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat firstCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat firstCameraRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat firstCameraTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(identity, firstCameraRotationVector, firstCameraTranslationVector);
   parameters[parameterCounter++] = firstCameraRotationVector.at<double>(0, 0);
   parameters[parameterCounter++] = firstCameraRotationVector.at<double>(0, 1);
@@ -184,8 +184,8 @@ double CeresMonoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& mo
     cv::Matx44d currentCamera = niftk::RodriguesToMatrix(rvecs[i], tvecs[i]);
     cv::Matx44d previousCameraToCurrentCamera = currentCamera * previousCamera.inv();
 
-    cv::Mat previousCameraToCurrentCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    cv::Mat previousCameraToCurrentCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat previousCameraToCurrentCameraRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+    cv::Mat previousCameraToCurrentCameraTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
     niftk::MatrixToRodrigues(previousCameraToCurrentCamera,
                              previousCameraToCurrentCameraRotationVector,
                              previousCameraToCurrentCameraTranslationVector);
@@ -256,8 +256,8 @@ double CeresMonoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& mo
   for (unsigned int i = 0; i < rvecs.size(); i++)
   {
     cv::Matx44d cumulativeTransform = firstCamera;
-    cv::Mat currentCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    cv::Mat currentCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat currentCameraRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+    cv::Mat currentCameraTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
 
     unsigned int parameterCounterInsideLoop = parameterCounter;
 

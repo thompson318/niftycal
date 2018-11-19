@@ -25,7 +25,7 @@ TimeSamples1D ProjectTo1DAndNormalise(const TimeSamples3D& a)
 
   size_t numberSamples = static_cast<size_t>(a.size());
 
-  cv::Mat data = cvCreateMat(numberSamples, 3, CV_64FC1);
+  cv::Mat data = cv::Mat::zeros(numberSamples, 3, CV_64FC1);
 
   size_t sampleCounter = 0;
   TimeSamples3D::const_iterator iter;

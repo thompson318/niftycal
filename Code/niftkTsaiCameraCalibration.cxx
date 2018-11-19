@@ -245,7 +245,7 @@ double TsaiMonoNonCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double k1 = 0;
   double f = 0;
   double Tz = 0;
-  cv::Mat R = cvCreateMat ( 3, 3, CV_64FC1 );
+  cv::Mat R = cv::Mat::zeros ( 3, 3, CV_64FC1 );
   niftk::CalculateRAndTxForNonCoplanar(X, sx, Ty, R, Tx);
   niftk::CalculateRWithFAndTz(points3D, points2D, sensorDimensions, Ty, R, Tz, f);
 
@@ -346,7 +346,7 @@ double TsaiMonoCoplanarCameraCalibration(const niftk::Model3D& model3D,
   double k1 = 0;
   double f = 0;
   double Tz = 0;
-  cv::Mat R = cvCreateMat ( 3, 3, CV_64FC1 );
+  cv::Mat R = cv::Mat::zeros ( 3, 3, CV_64FC1 );
 
   niftk::CalculateRForCoplanar(X, Ty, R);
   niftk::CalculateRWithFAndTz(points3D, points2D, sensorDimensions, Ty, R, Tz, f);

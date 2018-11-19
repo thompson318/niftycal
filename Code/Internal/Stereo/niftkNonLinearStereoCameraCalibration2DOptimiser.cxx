@@ -181,7 +181,7 @@ double NonLinearStereoCameraCalibration2DOptimiser::Optimise(cv::Mat& leftIntrin
     niftkNiftyCalThrow() << "ForceUnitVectorAxes and OptimiseR2L are mutually exclusive";
   }
 
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::SafeRodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
   int numberOfParameters = 0;

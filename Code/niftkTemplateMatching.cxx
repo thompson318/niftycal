@@ -34,17 +34,17 @@ PointSet DoTemplateMatchingForAllPoints(const cv::Mat& image,
   halfTemplateSize.y = (templateSize.height - 1)/2.0;
 
   // Copy template into float image - once.
-  cv::Mat templateAsFloat = cvCreateMat(templateImage.cols, templateImage.rows, CV_8U);
+  cv::Mat templateAsFloat = cv::Mat::zeros(templateImage.cols, templateImage.rows, CV_8U);
   templateImage.convertTo(templateAsFloat, CV_8U);
 
   // This is to store a copy of the image data, as we need float.
-  cv::Mat regionAsFloat = cvCreateMat(2 * offset.width + templateSize.width,
+  cv::Mat regionAsFloat = cv::Mat::zeros(2 * offset.width + templateSize.width,
                                       2 * offset.height + templateSize.height,
                                       CV_8U
                                      );
 
   // This is the results array, temporary storage, for output of template matching.
-  cv::Mat result = cvCreateMat(regionAsFloat.cols - templateAsFloat.cols + 1,
+  cv::Mat result = cv::Mat::zeros(regionAsFloat.cols - templateAsFloat.cols + 1,
                                regionAsFloat.rows - templateAsFloat.rows + 1,
                                CV_8U
                               );

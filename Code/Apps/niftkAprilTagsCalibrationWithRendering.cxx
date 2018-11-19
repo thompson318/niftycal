@@ -63,8 +63,8 @@ double CalculateRMSOnUndistortedPoints(const niftk::Model3D& model,
     cv::Mat greyLeft;
     cv::cvtColor(colourLeftImages[i], greyLeft, CV_BGR2GRAY);
 
-    cv::Mat mapX = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
-    cv::Mat mapY = cvCreateMat(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::Mat mapX = cv::Mat::zeros(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
+    cv::Mat mapY = cv::Mat::zeros(colourLeftImages[i].rows, colourLeftImages[i].cols, CV_32FC1);
     cv::initUndistortRectifyMap(intrinsicLeft, distortionLeft, cv::noArray(), intrinsicLeft, colourLeftImages[i].size(), CV_32FC1, mapX, mapY);
 
     cv::Mat undistortedLeft;
@@ -78,8 +78,8 @@ double CalculateRMSOnUndistortedPoints(const niftk::Model3D& model,
     cv::Mat greyRight;
     cv::cvtColor(colourRightImages[i], greyRight, CV_BGR2GRAY);
 
-    mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
-    mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    mapX = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+    mapY = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
     cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, colourRightImages[i].size(), CV_32FC1, mapX, mapY);
 
     cv::Mat undistortedRight;
@@ -340,8 +340,8 @@ int main(int argc, char ** argv)
         std::ostringstream videoFileName;
         videoFileName << "/tmp/matt.rhs.normal.video." << i << ".png";
 
-        cv::Mat mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
-        cv::Mat mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+        cv::Mat mapX = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+        cv::Mat mapY = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
         cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
 
         cv::Mat undistorted;
@@ -495,8 +495,8 @@ int main(int argc, char ** argv)
         std::ostringstream videoFileName;
         videoFileName << "/tmp/matt.rhs.optimised.video." << i << ".png";
 
-        cv::Mat mapX = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
-        cv::Mat mapY = cvCreateMat(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+        cv::Mat mapX = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
+        cv::Mat mapY = cv::Mat::zeros(colourRightImages[i].rows, colourRightImages[i].cols, CV_32FC1);
         cv::initUndistortRectifyMap(intrinsicRight, distortionRight, cv::noArray(), intrinsicRight, imageSize, CV_32FC1, mapX, mapY);
 
         cv::Mat undistorted;

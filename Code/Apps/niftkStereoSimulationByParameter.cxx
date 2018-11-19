@@ -313,7 +313,7 @@ int main(int argc, char ** argv)
 
       for (int s = 0; s < numberOfSteps; s++)
       {
-        cv::Mat tmpLeftToRightTrans = cvCreateMat(3, 1, CV_64FC1);
+        cv::Mat tmpLeftToRightTrans = cv::Mat::zeros(3, 1, CV_64FC1);
         tmpLeftToRightTrans.at<double>(0, 0) = parameters[0];
         tmpLeftToRightTrans.at<double>(1, 0) = parameters[1];
         tmpLeftToRightTrans.at<double>(2, 0) = parameters[2];
@@ -322,7 +322,7 @@ int main(int argc, char ** argv)
         tmpAxisAngle(0, 3) = parameters[3];
 
         cv::Mat tmpLeftToRightRotVec = niftk::AxisAngleToRodrigues(tmpAxisAngle);
-        cv::Mat tmpLeftToRightRotMat = cvCreateMat(3, 3, CV_64FC1);
+        cv::Mat tmpLeftToRightRotMat = cv::Mat::zeros(3, 3, CV_64FC1);
         cv::Rodrigues(tmpLeftToRightRotVec, tmpLeftToRightRotMat);
 
         cv::Point3d rmsPerAxis;

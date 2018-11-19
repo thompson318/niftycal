@@ -85,12 +85,12 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
     niftkNiftyCalThrow() << "Hand (tracking) matrices are null.";
   }
 
-  cv::Mat modelToWorldRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat modelToWorldTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat modelToWorldRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat modelToWorldTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(modelToWorld, modelToWorldRotationVector, modelToWorldTranslationVector);
 
-  cv::Mat handEyeRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat handEyeTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat handEyeRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat handEyeTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(handEye, handEyeRotationVector, handEyeTranslationVector);
 
   niftk::NonLinearNDOFHandEyeCostFunction::ParametersType initialParameters;
@@ -120,8 +120,8 @@ double NonLinearNDOFHandEyeOptimiser::Optimise(cv::Matx44d& modelToWorld,
        ++iter
        )
   {
-    cv::Mat trackingRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    cv::Mat trackingTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat trackingRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+    cv::Mat trackingTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
     niftk::MatrixToRodrigues(*iter, trackingRotationVector, trackingTranslationVector);
 
     initialParameters[counter++] = trackingRotationVector.at<double>(0, 0);

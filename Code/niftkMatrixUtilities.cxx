@@ -22,7 +22,7 @@ namespace niftk {
 void SafeRodrigues(const cv::Mat& rotationMatrix3x3,
                    cv::Mat& rotationVector1x3)
 {
-  cv::Mat tmp = cvCreateMat(3, 1, CV_64FC1);
+  cv::Mat tmp = cv::Mat::zeros(3, 1, CV_64FC1);
   cv::Rodrigues(rotationMatrix3x3, tmp);
   rotationVector1x3.at<double>(0, 0) = tmp.at<double>(0, 0);
   rotationVector1x3.at<double>(0, 1) = tmp.at<double>(1, 0);
@@ -60,7 +60,7 @@ cv::Matx44d RodriguesToMatrix(const cv::Mat& rotationVector1x3,
   cv::Mat rotationMatrix;
   cv::Rodrigues(rotationVector1x3, rotationMatrix);
 
-  cv::Mat t = cvCreateMat(3, 1, CV_64FC1);
+  cv::Mat t = cv::Mat::zeros(3, 1, CV_64FC1);
   t.at<double>(0, 0) = translationVector1x3.at<double>(0, 0);
   t.at<double>(1, 0) = translationVector1x3.at<double>(0, 1);
   t.at<double>(2, 0) = translationVector1x3.at<double>(0, 2);
@@ -74,7 +74,7 @@ void MatrixToRodrigues(const cv::Matx44d& mat,
                        cv::Mat& rotationVector1x3,
                        cv::Mat& translationVector1x3)
 {
-  cv::Mat rotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat rotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
   for (int r = 0; r < 3; r++)
   {
     for (int c = 0; c < 3; c++)
@@ -104,7 +104,7 @@ cv::Matx14d RodriguesToAxisAngle(const cv::Mat& rotationVector1x3)
 //-----------------------------------------------------------------------------
 cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
 {
-  cv::Mat rodrigues = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rodrigues = cv::Mat::zeros(1, 3, CV_64FC1);
   rodrigues.at<double>(0, 0) = axisAngle(0, 0) * axisAngle(0, 3);
   rodrigues.at<double>(0, 1) = axisAngle(0, 1) * axisAngle(0, 3);
   rodrigues.at<double>(0, 2) = axisAngle(0, 2) * axisAngle(0, 3);
@@ -115,7 +115,7 @@ cv::Mat AxisAngleToRodrigues(const cv::Matx14d& axisAngle)
 //-----------------------------------------------------------------------------
 cv::Mat RodriguesToEulerAngles(const cv::Mat& rotationVector1x3)
 {
-  cv::Mat eulerAngles = cvCreateMat(1, 3,CV_64FC1);
+  cv::Mat eulerAngles = cv::Mat::zeros(1, 3,CV_64FC1);
 
   // This is not a straight forward conversion,
   // let's go Rodrigues->AxisAngle->Quaternion->Euler Angles
@@ -311,8 +311,8 @@ void InterpolateMaximumOfQuadraticSurface(
     return;
   }
 
-  cv::Mat A = cvCreateMat ( 9, 6, CV_64FC1 );
-  cv::Mat B = cvCreateMat ( 9, 1, CV_64FC1 );
+  cv::Mat A = cv::Mat::zeros( 9, 6, CV_64FC1 );
+  cv::Mat B = cv::Mat::zeros( 9, 1, CV_64FC1 );
   int rowCounter = 0;
   for (int y = -1; y <= 1; y++)
   {
@@ -328,7 +328,7 @@ void InterpolateMaximumOfQuadraticSurface(
       rowCounter++;
     }
   }
-  cv::Mat invA = cvCreateMat ( 6, 9, CV_64FC1 );
+  cv::Mat invA = cv::Mat::zeros( 6, 9, CV_64FC1 );
   cv::invert(A, invA, cv::DECOMP_SVD);
 
   cv::Mat X = invA * B;
@@ -397,8 +397,8 @@ void GetLeftToRightMatrix(const cv::Mat& leftRVec,
   cv::Matx44d rightExtrinsics = niftk::RodriguesToMatrix(rightRVec, rightTVec);
   cv::Matx44d leftToRight = niftk::GetLeftToRightMatrix(leftExtrinsics, rightExtrinsics);
 
-  cv::Mat tmpRot = cvCreateMat (1, 3, CV_64FC1 );
-  cv::Mat tmpTrans = cvCreateMat (1, 3, CV_64FC1 );
+  cv::Mat tmpRot = cv::Mat::zeros(1, 3, CV_64FC1 );
+  cv::Mat tmpTrans = cv::Mat::zeros(1, 3, CV_64FC1 );
   niftk::MatrixToRodrigues(leftToRight, tmpRot, tmpTrans);
   cv::Rodrigues(tmpRot, leftToRightMatrix);
   leftToRightTVec.at<double>(0, 0) = tmpTrans.at<double>(0, 0);
@@ -414,7 +414,7 @@ cv::Mat ComputeFundamentalMatrixFromCameraCalibration(const cv::Mat& leftIntrins
                                                       const cv::Mat& rightIntrinsic
                                                      )
 {
-  cv::Mat C = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat C = cv::Mat::zeros(3, 3, CV_64FC1);
   C.at<double>(0, 0) = 0;
   C.at<double>(0, 1) = -leftToRightTranslationVector.at<double>(2, 0);
   C.at<double>(0, 2) =  leftToRightTranslationVector.at<double>(1, 0);
@@ -446,14 +446,14 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
   tvecsRight.clear();
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
-    rvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
-    tvecsRight.push_back(cvCreateMat(1, 3, CV_64FC1));
+    rvecsRight.push_back(cv::Mat::zeros(1, 3, CV_64FC1));
+    tvecsRight.push_back(cv::Mat::zeros(1, 3, CV_64FC1));
   }
 
   // Then make sure rvecs and tvecs are consistent left and right.
   for (int i = 0; i < rvecsLeft.size(); i++)
   {
-    cv::Mat leftRot = cvCreateMat(3, 3, CV_64FC1);
+    cv::Mat leftRot = cv::Mat::zeros(3, 3, CV_64FC1);
     cv::Rodrigues(rvecsLeft[i], leftRot);
 
     cv::Matx44d leftExtrinsic = cv::Matx44d::eye();
@@ -471,7 +471,7 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
     }
 
     cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
-    cv::Mat rightRotation = cvCreateMat(3, 3, CV_64FC1);
+    cv::Mat rightRotation = cv::Mat::zeros(3, 3, CV_64FC1);
 
     for (int r = 0; r < 3; r++)
     {
@@ -481,7 +481,7 @@ void ComputeStereoExtrinsics(const std::vector<cv::Mat>& rvecsLeft,
       }
     }
 
-    cv::Mat rightRotationVec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rightRotationVec = cv::Mat::zeros(1, 3, CV_64FC1);
     niftk::SafeRodrigues(rightRotation, rightRotationVec);
 
     rvecsRight[i].at<double>(0, 0) = rightRotationVec.at<double>(0,0);

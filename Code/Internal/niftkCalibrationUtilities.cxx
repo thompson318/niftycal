@@ -100,7 +100,7 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   intrinsic.at<double>(0, 2) = parameters[parameterCounter++];
   intrinsic.at<double>(1, 2) = parameters[parameterCounter++];
 
-  cv::Mat distortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat distortion = cv::Mat::zeros(1, 5, CV_64FC1);
   distortion.at<double>(0, 0) = parameters[parameterCounter++];
   distortion.at<double>(0, 1) = parameters[parameterCounter++];
   distortion.at<double>(0, 2) = parameters[parameterCounter++];
@@ -113,12 +113,12 @@ void ComputeMonoProjectionErrors(const Model3D* const model,
   std::list<PointSet>::const_iterator iter;
   for (iter = points->begin(); iter != points->end(); iter++)
   {
-    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
     rvec.at<double>(0, 0) = parameters[parameterCounter++];
     rvec.at<double>(0, 1) = parameters[parameterCounter++];
     rvec.at<double>(0, 2) = parameters[parameterCounter++];
 
-    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
     tvec.at<double>(0, 0) = parameters[parameterCounter++];
     tvec.at<double>(0, 1) = parameters[parameterCounter++];
     tvec.at<double>(0, 2) = parameters[parameterCounter++];
@@ -156,10 +156,10 @@ void ComputeStereoProjectionErrors(const Model3D& model,
 
   /* Tried this, not much better.
   cv::Matx44d leftToRight = niftk::GetLeftToRightMatrix(leftExtrinsic, rightExtrinsic);
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 1, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(1, 1, CV_64FC1);
   niftk::MatrixToRodrigues(leftToRight, leftToRightRotationVector, leftToRightTranslationVector);
-  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
   cv::Mat F = ComputeFundamentalMatrixFromCameraCalibration(leftIntrinsic, leftToRightRotationMatrix, leftToRightTranslationVector, rightIntrinsic);
 
@@ -230,7 +230,7 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
   leftIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
   leftIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
 
-  cv::Mat leftDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat leftDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   leftDistortion.at<double>(0, 0) = parameters[parameterCounter++];
   leftDistortion.at<double>(0, 1) = parameters[parameterCounter++];
   leftDistortion.at<double>(0, 2) = parameters[parameterCounter++];
@@ -243,19 +243,19 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
   rightIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
   rightIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
 
-  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat rightDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   rightDistortion.at<double>(0, 0) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 1) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 2) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 3) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 4) = parameters[parameterCounter++];
 
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   leftToRightRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
   leftToRightRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
   leftToRightRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
 
-  cv::Mat leftToRightTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   leftToRightTranslationVector.at<double>(0, 0) = parameters[parameterCounter++];
   leftToRightTranslationVector.at<double>(0, 1) = parameters[parameterCounter++];
   leftToRightTranslationVector.at<double>(0, 2) = parameters[parameterCounter++];
@@ -272,12 +272,12 @@ void ComputeStereoProjectionErrors(const Model3D* const model,
        leftIter++, rightIter++
       )
   {
-    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
     rvec.at<double>(0, 0) = parameters[parameterCounter++];
     rvec.at<double>(0, 1) = parameters[parameterCounter++];
     rvec.at<double>(0, 2) = parameters[parameterCounter++];
 
-    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
     tvec.at<double>(0, 0) = parameters[parameterCounter++];
     tvec.at<double>(0, 1) = parameters[parameterCounter++];
     tvec.at<double>(0, 2) = parameters[parameterCounter++];
@@ -310,8 +310,8 @@ void ComputeStereoReconstructionErrors(const Model3D& model,
 {
   niftk::Model3D triangulatedModelInLeftCameraSpace;
 
-  cv::Mat rvecLeft = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat tvecLeft = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat tvecLeft = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(leftExtrinsic, rvecLeft, tvecLeft);
 
   niftk::TriangulatePointPairs(
@@ -402,7 +402,7 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
   leftIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
   leftIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
 
-  cv::Mat leftDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat leftDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   leftDistortion.at<double>(0, 0) = parameters[parameterCounter++];
   leftDistortion.at<double>(0, 1) = parameters[parameterCounter++];
   leftDistortion.at<double>(0, 2) = parameters[parameterCounter++];
@@ -415,24 +415,24 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
   rightIntrinsic.at<double>(0, 2) = parameters[parameterCounter++];
   rightIntrinsic.at<double>(1, 2) = parameters[parameterCounter++];
 
-  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat rightDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   rightDistortion.at<double>(0, 0) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 1) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 2) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 3) = parameters[parameterCounter++];
   rightDistortion.at<double>(0, 4) = parameters[parameterCounter++];
 
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   leftToRightRotationVector.at<double>(0, 0) = parameters[parameterCounter++];
   leftToRightRotationVector.at<double>(0, 1) = parameters[parameterCounter++];
   leftToRightRotationVector.at<double>(0, 2) = parameters[parameterCounter++];
 
-  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
   leftToRightTranslationVector.at<double>(0, 0) = parameters[parameterCounter++];
   leftToRightTranslationVector.at<double>(1, 0) = parameters[parameterCounter++];
   leftToRightTranslationVector.at<double>(2, 0) = parameters[parameterCounter++];
 
-  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);
 
   itk::MultipleValuedCostFunction::MeasureType errorsPerView;
@@ -445,12 +445,12 @@ void ComputeStereoReconstructionErrors(const Model3D* const model,
        leftIter++, rightIter++
       )
   {
-    cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
     rvec.at<double>(0, 0) = parameters[parameterCounter++];
     rvec.at<double>(0, 1) = parameters[parameterCounter++];
     rvec.at<double>(0, 2) = parameters[parameterCounter++];
 
-    cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
     tvec.at<double>(0, 0) = parameters[parameterCounter++];
     tvec.at<double>(0, 1) = parameters[parameterCounter++];
     tvec.at<double>(0, 2) = parameters[parameterCounter++];
