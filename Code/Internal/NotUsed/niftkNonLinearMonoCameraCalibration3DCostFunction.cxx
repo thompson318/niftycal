@@ -60,7 +60,7 @@ NonLinearMonoCameraCalibration3DCostFunction::InternalGetValue(const ParametersT
   rightIntrinsic.at<double>(0, 2) = m_Intrinsic.at<double>(0, 2);
   rightIntrinsic.at<double>(1, 2) = m_Intrinsic.at<double>(1, 2);
 
-  cv::Mat rightDistortion = cvCreateMat(1, 5, CV_64FC1);
+  cv::Mat rightDistortion = cv::Mat::zeros(1, 5, CV_64FC1);
   rightDistortion.at<double>(0, 0) = m_Distortion.at<double>(0, 0);
   rightDistortion.at<double>(0, 1) = m_Distortion.at<double>(0, 1);
   rightDistortion.at<double>(0, 2) = m_Distortion.at<double>(0, 2);
@@ -84,24 +84,24 @@ NonLinearMonoCameraCalibration3DCostFunction::InternalGetValue(const ParametersT
        ++ rightPointsIter
       )
   {
-    cv::Mat leftExtrinsicRVec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat leftExtrinsicRVec = cv::Mat::zeros(1, 3, CV_64FC1);
     leftExtrinsicRVec.at<double>(0, 0) = parameters[leftCounter*6 + 0 + parameterOffset];
     leftExtrinsicRVec.at<double>(0, 1) = parameters[leftCounter*6 + 1 + parameterOffset];
     leftExtrinsicRVec.at<double>(0, 2) = parameters[leftCounter*6 + 2 + parameterOffset];
 
-    cv::Mat leftExtrinsicTVec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat leftExtrinsicTVec = cv::Mat::zeros(1, 3, CV_64FC1);
     leftExtrinsicTVec.at<double>(0, 0) = parameters[leftCounter*6 + 3 + parameterOffset];
     leftExtrinsicTVec.at<double>(0, 1) = parameters[leftCounter*6 + 4 + parameterOffset];
     leftExtrinsicTVec.at<double>(0, 2) = parameters[leftCounter*6 + 5 + parameterOffset];
 
     cv::Matx44d leftExtrinsic = niftk::RodriguesToMatrix(leftExtrinsicRVec, leftExtrinsicTVec);
 
-    cv::Mat rightExtrinsicRVec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rightExtrinsicRVec = cv::Mat::zeros(1, 3, CV_64FC1);
     rightExtrinsicRVec.at<double>(0, 0) = parameters[rightCounter*6 + 0 + parameterOffset];
     rightExtrinsicRVec.at<double>(0, 1) = parameters[rightCounter*6 + 1 + parameterOffset];
     rightExtrinsicRVec.at<double>(0, 2) = parameters[rightCounter*6 + 2 + parameterOffset];
 
-    cv::Mat rightExtrinsicTVec = cvCreateMat(1, 3, CV_64FC1);
+    cv::Mat rightExtrinsicTVec = cv::Mat::zeros(1, 3, CV_64FC1);
     rightExtrinsicTVec.at<double>(0, 0) = parameters[rightCounter*6 + 3 + parameterOffset];
     rightExtrinsicTVec.at<double>(0, 1) = parameters[rightCounter*6 + 4 + parameterOffset];
     rightExtrinsicTVec.at<double>(0, 2) = parameters[rightCounter*6 + 5 + parameterOffset];
@@ -110,9 +110,9 @@ NonLinearMonoCameraCalibration3DCostFunction::InternalGetValue(const ParametersT
 
     cv::Matx44d leftToRight = rightExtrinsic * leftExtrinsic.inv();
 
-    cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
-    cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
-    cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
+    cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+    cv::Mat leftToRightTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
+    cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
 
     niftk::MatrixToRodrigues(leftToRight, leftToRightRotationVector, leftToRightTranslationVector);
     cv::Rodrigues(leftToRightRotationVector, leftToRightRotationMatrix);

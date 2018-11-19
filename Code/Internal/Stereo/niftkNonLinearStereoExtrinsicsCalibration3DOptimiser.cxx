@@ -111,7 +111,7 @@ double NonLinearStereoExtrinsicsCalibration3DOptimiser::Optimise(std::vector<cv:
                          << ", versus " << tvecsLeft.size();
   }
 
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
 
   unsigned int numberOfParameters = 0;

@@ -247,7 +247,7 @@ cv::Mat LoadMatrix(const std::string& fileName)
   }
   cols = data[0].size();
 
-  result = cvCreateMat(data.size(), cols, CV_64FC1);
+  result = cv::Mat::zeros(data.size(), cols, CV_64FC1);
   for (int r = 0; r < data.size(); r++)
   {
     if (data[r].size() != cols)
@@ -504,8 +504,8 @@ void SaveRigidParams(const cv::Matx44d& matrix,
                      const std::string& fileName
                     )
 {
-  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
 
   niftk::MatrixToRodrigues(matrix, rvec, tvec);
   niftk::SaveRigidParams(rvec, tvec, fileName);

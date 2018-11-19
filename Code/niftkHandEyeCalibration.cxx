@@ -33,8 +33,8 @@ void MatrixToThetaAndPr(const cv::Matx44d& mat,
                         double& angle
                        )
 {
-  cv::Mat rotationVector = cvCreateMat ( 1, 3, CV_64FC1 );
-  cv::Mat translationVector = cvCreateMat ( 1, 3, CV_64FC1 );
+  cv::Mat rotationVector = cv::Mat::zeros ( 1, 3, CV_64FC1 );
+  cv::Mat translationVector = cv::Mat::zeros ( 1, 3, CV_64FC1 );
   niftk::MatrixToRodrigues(mat, rotationVector, translationVector);
   double norm = cv::norm(rotationVector);
   rotationVector /= norm;                // gives unit vector.
@@ -233,9 +233,9 @@ void CalculateHandEyeUsingPoint2Line(
 
   cv::Mat J = cv::Mat::eye(n, n, CV_64FC1 ) - ((ePrime * e)/n);
 
-  cv::Mat Q = cvCreateMat ( 2, n, CV_64FC1 );
-  cv::Mat Qe = cvCreateMat ( 3, n, CV_64FC1 );
-  cv::Mat X = cvCreateMat ( 3, n, CV_64FC1 );
+  cv::Mat Q = cv::Mat::zeros ( 2, n, CV_64FC1 );
+  cv::Mat Qe = cv::Mat::zeros ( 3, n, CV_64FC1 );
+  cv::Mat X = cv::Mat::zeros ( 3, n, CV_64FC1 );
 
   for (int i = 0; i < n; i++)
   {
@@ -404,8 +404,8 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   double ThetaCij;
   double ThetaGij;
 
-  cv::Mat A = cvCreateMat ( 3 * (numberOfViews - 1), 3, CV_64FC1 );
-  cv::Mat b = cvCreateMat ( 3 * (numberOfViews - 1), 1, CV_64FC1 );
+  cv::Mat A = cv::Mat::zeros ( 3 * (numberOfViews - 1), 3, CV_64FC1 );
+  cv::Mat b = cv::Mat::zeros ( 3 * (numberOfViews - 1), 1, CV_64FC1 );
 
   // Step 1: Filling A, b for least squares solution of pcgPrime.
   for (int i = 0; i < numberOfViews - 1; i++)
@@ -416,12 +416,12 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     niftk::MatrixToThetaAndPr(handMovement, Pgij, ThetaGij);
     niftk::MatrixToThetaAndPr(eyeMovement, Pcij, ThetaCij);
 
-    cv::Mat sum = cvCreateMat(3, 1, CV_64FC1);
+    cv::Mat sum = cv::Mat::zeros(3, 1, CV_64FC1);
     sum.at<double>(0, 0) = Pcij(0, 0) + Pgij(0, 0);
     sum.at<double>(1, 0) = Pcij(1, 0) + Pgij(1, 0);
     sum.at<double>(2, 0) = Pcij(2, 0) + Pgij(2, 0);
 
-    cv::Mat diff = cvCreateMat(3, 1, CV_64FC1);
+    cv::Mat diff = cv::Mat::zeros(3, 1, CV_64FC1);
     diff.at<double>(0, 0) = Pcij(0, 0) - Pgij(0, 0);
     diff.at<double>(1, 0) = Pcij(1, 0) - Pgij(1, 0);
     diff.at<double>(2, 0) = Pcij(2, 0) - Pgij(2, 0);
@@ -441,7 +441,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     b.at<double>(i*3+2,0)=diff.at<double>(2,0);
   }
 
-  cv::Mat pseudoInverse = cvCreateMat(3,3,CV_64FC1);
+  cv::Mat pseudoInverse = cv::Mat::zeros(3,3,CV_64FC1);
   cv::invert(A, pseudoInverse, CV_SVD);
 
   // Step 1. Here we have Pcg'
@@ -449,7 +449,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 
   // Here calculating RMS error for rotation.
   cv::Mat errorRotation = A * pcgPrime - b;
-  cv::Mat errorRotationTransMult = cvCreateMat(errorRotation.cols, errorRotation.cols, CV_64FC1);
+  cv::Mat errorRotationTransMult = cv::Mat::zeros(errorRotation.cols, errorRotation.cols, CV_64FC1);
   cv::mulTransposed (errorRotation, errorRotationTransMult, true);
   residual(0, 0) = sqrt(errorRotationTransMult.at<double>(0,0)/static_cast<double>((numberOfViews-1)));
 
@@ -458,7 +458,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
 
   // Start, computing Rcg, using Pcg and Eqn. 10.
   cv::Mat id3 = cv::Mat::eye(3, 3, CV_64FC1);
-  cv::Mat pcgCrossProduct = cvCreateMat(3,3,CV_64FC1);
+  cv::Mat pcgCrossProduct = cv::Mat::zeros(3,3,CV_64FC1);
   pcgCrossProduct.at<double>(0,0)=0.0;
   pcgCrossProduct.at<double>(0,1)=-(pcg.at<double>(2,0));
   pcgCrossProduct.at<double>(0,2)=(pcg.at<double>(1,0));
@@ -469,7 +469,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   pcgCrossProduct.at<double>(2,1)=(pcg.at<double>(0,0));
   pcgCrossProduct.at<double>(2,2)=0.0;
 
-  cv::Mat pcgMulTransposed = cvCreateMat(pcg.rows, pcg.rows, CV_64FC1);
+  cv::Mat pcgMulTransposed = cv::Mat::zeros(pcg.rows, pcg.rows, CV_64FC1);
   cv::mulTransposed (pcg, pcgMulTransposed, false);
 
   // Eqn. 10, giving us the rotation we are looking for.
@@ -497,8 +497,8 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
     A.at<double>(i*3+2,1)=handMovement(2,1) - 0.0;
     A.at<double>(i*3+2,2)=handMovement(2,2) - 1.0;
 
-    cv::Mat Tgij = cvCreateMat(3,1,CV_64FC1);
-    cv::Mat Tcij = cvCreateMat(3,1,CV_64FC1);
+    cv::Mat Tgij = cv::Mat::zeros(3,1,CV_64FC1);
+    cv::Mat Tcij = cv::Mat::zeros(3,1,CV_64FC1);
 
     for ( int j = 0; j < 3; j ++ )
     {
@@ -517,7 +517,7 @@ cv::Matx44d CalculateHandEyeUsingTsaisMethod(
   cv::Mat tcg = pseudoInverse * b;
 
   cv::Mat errorTranslation = A * tcg - b;
-  cv::Mat errorTranslationTransMult = cvCreateMat(errorTranslation.cols, errorTranslation.cols, CV_64FC1);
+  cv::Mat errorTranslationTransMult = cv::Mat::zeros(errorTranslation.cols, errorTranslation.cols, CV_64FC1);
   cv::mulTransposed (errorTranslation, errorTranslationTransMult, true);
   residual(1, 0) = sqrt(errorTranslationTransMult.at<double>(0,0)/(numberOfViews-1));
 

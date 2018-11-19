@@ -27,25 +27,25 @@ void AllocateTsaiMatrices(cv::Mat& intrinsic,
 {
   if (intrinsic.rows != 3 || intrinsic.cols != 3)
   {
-    intrinsic = cvCreateMat(3, 3, CV_64FC1);
+    intrinsic = cv::Mat::zeros(3, 3, CV_64FC1);
   }
   intrinsic = cv::Mat::eye(3, 3, CV_64FC1);
 
   if (distortion.rows != 1 || distortion.cols != 5)
   {
-    distortion = cvCreateMat(1, 5, CV_64FC1);
+    distortion = cv::Mat::zeros(1, 5, CV_64FC1);
   }
   distortion = cv::Mat::zeros(1, 5, CV_64FC1);
 
   if (rvec.rows != 1 || rvec.cols != 3)
   {
-    rvec = cvCreateMat(1, 3, CV_64FC1);
+    rvec = cv::Mat::zeros(1, 3, CV_64FC1);
   }
   rvec = cv::Mat::zeros(1, 3, CV_64FC1);
 
   if (tvec.rows != 1 || tvec.cols != 3)
   {
-    tvec = cvCreateMat(1, 3, CV_64FC1);
+    tvec = cv::Mat::zeros(1, 3, CV_64FC1);
   }
   tvec = cv::Mat::zeros(1, 3, CV_64FC1);
 }
@@ -80,8 +80,8 @@ cv::Mat CalculateEquation10(const std::vector<cv::Point3d>& points3D,
                            )
 {
   unsigned int numberOfPoints = points2D.size();
-  cv::Mat A = cvCreateMat ( numberOfPoints, 5, CV_64FC1 );
-  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+  cv::Mat A = cv::Mat::zeros ( numberOfPoints, 5, CV_64FC1 );
+  cv::Mat B = cv::Mat::zeros ( numberOfPoints, 1, CV_64FC1 );
 
   // Step (b). Compute 5 unknowns - implement and solve equation (10).
   for (int i = 0; i < numberOfPoints; i++)
@@ -94,7 +94,7 @@ cv::Mat CalculateEquation10(const std::vector<cv::Point3d>& points3D,
     B.at<double>(i, 0) =   points2D[i].x;
   }
 
-  cv::Mat pseudoInverse = cvCreateMat(5, numberOfPoints, CV_64FC1);
+  cv::Mat pseudoInverse = cv::Mat::zeros(5, numberOfPoints, CV_64FC1);
   cv::invert(A, pseudoInverse, CV_SVD);
   cv::Mat X = pseudoInverse * B;
   return X;
@@ -108,7 +108,7 @@ double CalculateTySquaredForCoplanar(const cv::Mat& X)
   // Step (c1). Compute abs(T_y).
 
   // Equation (11)
-  cv::Mat C = cvCreateMat ( 2, 2, CV_64FC1 );
+  cv::Mat C = cv::Mat::zeros ( 2, 2, CV_64FC1 );
   C.at<double>(0, 0) = X.at<double>(0, 0);
   C.at<double>(0, 1) = X.at<double>(1, 0);
   C.at<double>(1, 0) = X.at<double>(3, 0);
@@ -245,8 +245,8 @@ void CalculateApproximateFAndTz(const cv::Mat& R,
                                 double& Tz)
 {
   int numberOfPoints = points2D.size();
-  cv::Mat A = cvCreateMat ( numberOfPoints, 2, CV_64FC1 );
-  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+  cv::Mat A = cv::Mat::zeros ( numberOfPoints, 2, CV_64FC1 );
+  cv::Mat B = cv::Mat::zeros ( numberOfPoints, 1, CV_64FC1 );
 
   for (int i = 0; i < numberOfPoints; i++)
   {
@@ -255,7 +255,7 @@ void CalculateApproximateFAndTz(const cv::Mat& R,
     B.at<double>(i, 0) = (R.at<double>(2,0)*points3D[i].x + R.at<double>(2,1)*points3D[i].y + R.at<double>(2,2)*points3D[i].z)*sensorDy*points2D[i].y;
   }
 
-  cv::Mat pseudoInverse = cvCreateMat(2, numberOfPoints, CV_64FC1);
+  cv::Mat pseudoInverse = cv::Mat::zeros(2, numberOfPoints, CV_64FC1);
   cv::invert(A, pseudoInverse, CV_SVD);
   cv::Mat X = pseudoInverse * B;
 
@@ -364,8 +364,8 @@ cv::Mat CalculateEquation16(const std::vector<cv::Point3d>& points3D,
                             const std::vector<cv::Point2d>& points2D)
 {
   unsigned int numberOfPoints = points2D.size();
-  cv::Mat A = cvCreateMat ( numberOfPoints, 7, CV_64FC1 );
-  cv::Mat B = cvCreateMat ( numberOfPoints, 1, CV_64FC1 );
+  cv::Mat A = cv::Mat::zeros ( numberOfPoints, 7, CV_64FC1 );
+  cv::Mat B = cv::Mat::zeros ( numberOfPoints, 1, CV_64FC1 );
 
   // Section G, NonCoplanar, Stage 1, Part (b) - implement and solve equation (16).
   for (int i = 0; i < numberOfPoints; i++)
@@ -380,7 +380,7 @@ cv::Mat CalculateEquation16(const std::vector<cv::Point3d>& points3D,
     B.at<double>(i, 0) =   points2D[i].x;
   }
 
-  cv::Mat pseudoInverse = cvCreateMat(7, numberOfPoints, CV_64FC1);
+  cv::Mat pseudoInverse = cv::Mat::zeros(7, numberOfPoints, CV_64FC1);
   cv::invert(A, pseudoInverse, CV_SVD);
   cv::Mat X = pseudoInverse * B;
   return X;

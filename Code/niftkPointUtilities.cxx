@@ -751,8 +751,8 @@ unsigned int ProjectMatchingPoints(const Model3D& model,
   Model3D::const_iterator modelIter;
   unsigned int pointPerViewCounter = 0;
 
-  cv::Mat extrinsicRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat extrinsicTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat extrinsicRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat extrinsicTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(extrinsic, extrinsicRotationVector, extrinsicTranslationVector);
 
   observed.clear();
@@ -836,8 +836,8 @@ void TriangulatePointPairs(
 
   cv::Matx44d rightExtrinsic = leftToRight * leftExtrinsic;
 
-  cv::Mat rightCameraRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat rightCameraTranslationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rightCameraRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat rightCameraTranslationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(rightExtrinsic, rightCameraRotationVector, rightCameraTranslationVector);
 
   std::vector<cv::Point3f> triangulatedPoints;
@@ -1595,7 +1595,7 @@ double ComputeLeftToRight(const Model3D& model,
 
   double fre = RegisterPoints(fixedPoints, movingPoints, registrationMatrix);
 
-  cv::Mat rotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   niftk::MatrixToRodrigues(registrationMatrix, rotationVector, leftToRightTranslationVector);
   cv::Rodrigues(rotationVector, leftToRightRotationMatrix);
 
@@ -1618,8 +1618,8 @@ bool IsCrossEyed(const cv::Mat& intrinsicLeft,
 {
   bool isCrossEyed = false;
 
-  cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
-  cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+  cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
+  cv::Mat leftToRightTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
   niftk::GetLeftToRightMatrix(rvecLeft,
                               tvecLeft,
                               rvecRight,
@@ -1709,8 +1709,8 @@ void CheckAgainstConvergencePoint(const std::list<PointSet>& leftDistortedPoints
        ++rightIter
        )
   {
-    cv::Mat leftToRightRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
-    cv::Mat leftToRightTranslationVector = cvCreateMat(3, 1, CV_64FC1);
+    cv::Mat leftToRightRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
+    cv::Mat leftToRightTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
     niftk::GetLeftToRightMatrix(rvecsLeft[viewCounter],
                                 tvecsLeft[viewCounter],
                                 rvecsRight[viewCounter],

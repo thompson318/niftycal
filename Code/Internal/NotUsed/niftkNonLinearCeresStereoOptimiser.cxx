@@ -502,8 +502,8 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
 
   std::list<cv::Matx44d> toLeftCameraExtrinsics;
   std::list<cv::Matx44d> toRightCameraExtrinsics;
-  cv::Mat rvec = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat tvec = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat rvec = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat tvec = cv::Mat::zeros(1, 3, CV_64FC1);
 
   // Base frame rotation (4) and translation (3), in that order.
   for (unsigned int i = 0; i < rvecsLeft.size(); i++)
@@ -587,7 +587,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   parameters[parameterCounter++] = quaternion[3];
 
   // Right camera position
-  cv::Mat leftToRightRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftToRightRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   cv::Rodrigues(leftToRightRotationMatrix, leftToRightRotationVector);
   cv::Matx44d leftToRight = niftk::RodriguesToMatrix(leftToRightRotationVector, leftToRightTranslationVector);
   cv::Matx44d rightToLeft = leftToRight.inv();
@@ -980,7 +980,7 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   quaternion[2] = parameters[parameterCounter++];
   quaternion[3] = parameters[parameterCounter++];
   ceres::QuaternionToAngleAxis(quaternion, axisAngle);
-  cv::Mat leftRotationVector = cvCreateMat(1, 3, CV_64FC1);
+  cv::Mat leftRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
   leftRotationVector.at<double>(0, 0) = axisAngle[0];
   leftRotationVector.at<double>(0, 1) = axisAngle[1];
   leftRotationVector.at<double>(0, 2) = axisAngle[2];
@@ -1031,12 +1031,12 @@ double CeresStereoCameraCalibration(const std::vector<std::vector<cv::Vec3f> >& 
   }
 
   // Compute final left hand translation and rotation.
-  cv::Mat tmpRotationVector = cvCreateMat(1, 3, CV_64FC1);
-  cv::Mat tmpRotationMatrix = cvCreateMat(3, 3, CV_64FC1);
-  cv::Mat tmpTranslationVector = cvCreateMat(3, 1, CV_64FC1);
-  cv::Mat transformedTranslationVector = cvCreateMat(3, 1, CV_64FC1);
-  cv::Mat leftRotation = cvCreateMat(3, 3, CV_64FC1);
-  cv::Mat baselineRotation = cvCreateMat(3, 3, CV_64FC1);
+  cv::Mat tmpRotationVector = cv::Mat::zeros(1, 3, CV_64FC1);
+  cv::Mat tmpRotationMatrix = cv::Mat::zeros(3, 3, CV_64FC1);
+  cv::Mat tmpTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat transformedTranslationVector = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat leftRotation = cv::Mat::zeros(3, 3, CV_64FC1);
+  cv::Mat baselineRotation = cv::Mat::zeros(3, 3, CV_64FC1);
   cv::Mat baselineTransform = cv::Mat::eye(4, 4, CV_64FC1);
   cv::Mat leftTransform = cv::Mat::eye(4, 4, CV_64FC1);
   cv::Mat combinedTransform = cv::Mat::eye(4, 4, CV_64FC1);

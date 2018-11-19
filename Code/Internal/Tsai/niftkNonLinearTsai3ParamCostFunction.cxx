@@ -38,8 +38,8 @@ NonLinearTsai3ParamCostFunction::InternalGetValue(const ParametersType& paramete
   MeasureType result;
   result.SetSize(this->GetNumberOfValues());
 
-  cv::Mat rvec = cvCreateMat ( 1, 3, CV_64FC1 );
-  cv::Mat tvec = cvCreateMat ( 1, 3, CV_64FC1 );
+  cv::Mat rvec = cv::Mat::zeros ( 1, 3, CV_64FC1 );
+  cv::Mat tvec = cv::Mat::zeros ( 1, 3, CV_64FC1 );
   niftk::MatrixToRodrigues(*m_Extrinsic, rvec, tvec);
 
   ParametersType internalParameters;
